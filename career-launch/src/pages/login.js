@@ -1,4 +1,5 @@
 import { renderRegister } from './register.js';
+import { renderStudentProfiel } from './student-profiel.js';
 
 export function renderLogin(rootElement) {
   rootElement.innerHTML = `
@@ -60,7 +61,7 @@ export function renderLogin(rootElement) {
 
   // 1) Event listener voor het login-formulier
   const form = document.getElementById('loginForm');
-  form.addEventListener('submit', handleLogin);
+  form.addEventListener('submit', (e) => handleLogin(e, rootElement));
 
   // 2) Event listener voor de “Registreren”-link
   const registerLink = document.getElementById('register-link');
@@ -68,11 +69,9 @@ export function renderLogin(rootElement) {
     renderRegister(rootElement);
   });
 
-  // Back button (goes to home page or previous page)
+  // Back button (naar home of vorige pagina)
   const backButton = document.getElementById('back-button');
   backButton.addEventListener('click', () => {
-    // You can implement navigation to home page here
-    // For now, we'll show an alert
     alert('Navigatie naar home pagina nog niet geïmplementeerd');
   });
 
@@ -96,7 +95,7 @@ export function renderLogin(rootElement) {
   });
 }
 
-function handleLogin(event) {
+function handleLogin(event, rootElement) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
@@ -116,4 +115,17 @@ function handleLogin(event) {
   // TODO: stuur credentials naar je backend
   console.log('Inlogdata:', { email, password });
   alert(`Welkom terug, ${email}!`);
+
+  // Simuleer studentData na succesvolle login
+  const studentData = {
+    firstName: 'Jan',
+    lastName: 'Jansen',
+    email: email,
+    studyProgram: 'Webontwikkeling',
+    year: '2e Bachelor',
+    profilePictureUrl: '/src/Images/default.jpg'
+  };
+
+  // Ga naar student-profiel
+  renderStudentProfiel(rootElement, studentData);
 }
