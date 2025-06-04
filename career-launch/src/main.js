@@ -7,6 +7,8 @@ import { renderHome } from './pages/home.js';
 import { renderRegister } from './pages/register.js';
 import { renderLogin } from './pages/login.js';
 import { renderStudentProfiel } from './pages/student-profiel.js';
+import { renderSearchCriteriaStudent } from './pages/search-criteria-student.js';
+
 
 // functie om de 404 pagina te renderen (Nog aanpassen)
 function renderNotFound(rootElement) {
@@ -22,7 +24,8 @@ const routes = {
   '/404': renderNotFound,
   '/registreer': renderRegister,
   '/login' : renderLogin,
-  'Student-Profiel': renderStudentProfiel
+  '/Student/Student-Profiel': renderStudentProfiel,
+  '/Student/Zoek-Criteria': renderSearchCriteriaStudent
 
 
 };

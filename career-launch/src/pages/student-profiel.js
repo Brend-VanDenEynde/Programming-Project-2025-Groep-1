@@ -3,6 +3,7 @@
 import defaultAvatar from '../Images/default.jpg';             // import default profielfoto
 import logoIcon from '../Icons/favicon-32x32.png';             // import logo‐icoon
 import { renderLogin } from './login.js';
+import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 
 export function renderStudentProfiel(rootElement, studentData = {}) {
   // Destructure met fallback‐waarden
@@ -166,6 +167,14 @@ export function renderStudentProfiel(rootElement, studentData = {}) {
     </footer>
   `;
 
+  // Sidebar-navigatie: “Zoek-criteria” link
+  const searchBtn = document.querySelector('[data-route="search"]');
+  if (searchBtn) {
+    searchBtn.addEventListener('click', () => {
+      renderSearchCriteriaStudent(rootElement, studentData);
+    });
+  }
+
   // Sidebar toggler (burger-menu)
   const burger = document.getElementById('burger-menu');
   const dropdown = document.getElementById('burger-dropdown');
@@ -228,7 +237,7 @@ export function renderStudentProfiel(rootElement, studentData = {}) {
     }
   });
 
-  // OPSLAAN‐KNOP
+  // OPSLAAN‐KNOP (zonder e-mailvalidatie)
   document.getElementById('save-profile-btn').addEventListener('click', () => {
     const updatedData = {
       ...studentData,
@@ -243,13 +252,9 @@ export function renderStudentProfiel(rootElement, studentData = {}) {
       profilePictureUrl: studentData.profilePictureUrl
     };
 
-    // Eenvoudige validatie
+    // Eenvoudige validatie: alleen verplicht voornaam/achternaam
     if (!updatedData.firstName || !updatedData.lastName) {
       alert('Voor- en achternaam mogen niet leeg zijn.');
-      return;
-    }
-    if (!validateEmail(updatedData.email)) {
-      alert('Ongeldig e-mailadres.');
       return;
     }
 
@@ -269,8 +274,4 @@ export function renderStudentProfiel(rootElement, studentData = {}) {
     e.preventDefault();
     alert('Contacteer ons formulier wordt hier geladen.');
   });
-}
-
-function validateEmail(email) {
-  return /\S+@\S+\.\S+/.test(email);
 }
