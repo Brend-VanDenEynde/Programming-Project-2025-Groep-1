@@ -57,10 +57,9 @@ export function renderStudentProfiel(rootElement, studentData = {}) {
         <div class="student-profile-content">
           <div class="student-profile-form-container">
             <h1 class="student-profile-title">Profiel</h1>            <!-- Profiel-weergave -->
-            <div id="profile-view" class="student-profile-form-section">
-              <div class="student-profile-avatar-section">
+            <div id="profile-view" class="student-profile-form-section">              <div class="student-profile-avatar-section">
                 ${
-                  profilePictureUrl && profilePictureUrl !== defaultAvatar
+                  profilePictureUrl
                     ? `<img 
                     src="${profilePictureUrl}" 
                     alt="Profielfoto ${firstName} ${lastName}" 
@@ -117,10 +116,9 @@ export function renderStudentProfiel(rootElement, studentData = {}) {
                 <button id="logout-btn" class="student-profile-btn student-profile-btn-primary">UITLOGGEN</button>
               </div>
             </div>            <!-- Profiel bewerken -->
-            <div id="profile-edit" class="student-profile-form-section" style="display: none;">
-              <div class="student-profile-avatar-section">
+            <div id="profile-edit" class="student-profile-form-section" style="display: none;">              <div class="student-profile-avatar-section">
                 ${
-                  profilePictureUrl && profilePictureUrl !== defaultAvatar
+                  profilePictureUrl
                     ? `<img 
                     src="${profilePictureUrl}" 
                     alt="Profielfoto ${firstName} ${lastName}" 
