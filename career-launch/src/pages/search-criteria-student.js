@@ -10,7 +10,7 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
     studentData.criteria = {
       zoekType: '',        // enkelvoud, want radio-buttons
       skills: [],          // array van strings
-      skillAndere: '',     // ingevulde “Andere” skill
+      skillAndere: '',     // ingevulde “Andere” skil
       talen: [],           // array van strings
       taalAndere: ''       // ingevulde “Andere” taal
     };
