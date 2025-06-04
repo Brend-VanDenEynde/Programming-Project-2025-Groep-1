@@ -1,11 +1,12 @@
 import { renderLogin } from './login.js';
+import Router from '../router.js';
 
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `
     <div class="register-container">
       <div class="register-card">
         <div class="register-header">
-          <button class="back-button" id="back-button">← Terug</button>
+          <button class="back-button" id="back-button" data-route="/">← Terug</button>
           <h1>Registreren</h1>
           <p>Vermeld je school-email en een wachtwoord voor je account</p>
         </div>
@@ -86,9 +87,15 @@ export function renderRegister(rootElement) {
           Sign in with LinkedIn
         </button>
         
+        <div class="login-link">
+          <p>Heb je al een account? 
+            <a id="login-link" data-route="/login" style="cursor:pointer;">Inloggen</a>
+          </p>
+        </div>
+        
         <div class="footer-links">
-          <a href="#" id="privacy-link">Privacy Policy</a>
-          <a href="#" id="contact-link">Contacteer Ons</a>
+          <a href="/privacy" data-route="/privacy">Privacy Policy</a>
+          <a href="/contact" data-route="/contact">Contacteer Ons</a>
         </div>
       </div>
     </div>
@@ -100,8 +107,16 @@ export function renderRegister(rootElement) {
   // Back button
   const backButton = document.getElementById('back-button');
   backButton.addEventListener('click', () => {
-    renderLogin(rootElement);
+    Router.navigate('/');
   });
+
+  // Login link
+  const loginLink = document.getElementById('login-link');
+  if (loginLink) {
+    loginLink.addEventListener('click', () => {
+      Router.navigate('/login');
+    });
+  }
 
   // LinkedIn button
   const linkedinButton = document.getElementById('linkedin-btn');

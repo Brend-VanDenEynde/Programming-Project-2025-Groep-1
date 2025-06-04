@@ -1,5 +1,4 @@
-import { renderLogin } from './login.js';
-import { renderRegister } from './register.js';
+import Router from '../router.js';
 
 export function renderHome(rootElement) {
   rootElement.innerHTML = `
@@ -13,26 +12,27 @@ export function renderHome(rootElement) {
       <h2>CAREER LAUNCH 2025</h2>
 
       <p>Geïnteresseerd?</p>
-      <button id="btn-register" class="btn">Registreer je nu!</button>
+      <button id="btn-register" class="btn" data-route="/registreer">Registreer je nu!</button>
 
       <p>Al ingeschreven?</p>
-      <button id="btn-login" class="btn">Login</button>
+      <button id="btn-login" class="btn" data-route="/login">Login</button>
     </div>
       <div class="footer-links">
-      <a href="#privacy">Privacy Policy</a>
-      <a href="#contact">Contacteer Ons</a>
-      <a href="#/admin">Admin</a>
+      <a href="/privacy" data-route="/privacy">Privacy Policy</a>
+      <a href="/contact" data-route="/contact">Contacteer Ons</a>
+      <a href="/admin" data-route="/admin">Admin</a>
     </div>
   `;
 
+  // Event listeners voor buttons (als fallback of voor speciale handling)
   const btnReg = document.getElementById('btn-register');
   const btnLog = document.getElementById('btn-login');
 
   btnReg.addEventListener('click', () => {
-    renderRegister(rootElement);
+    Router.navigate('/registreer');
   });
 
   btnLog.addEventListener('click', () => {
-    renderLogin(rootElement);
+    Router.navigate('/login');
   });
 }

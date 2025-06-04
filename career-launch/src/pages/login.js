@@ -1,12 +1,11 @@
-import { renderRegister } from './register.js';
-import { renderStudentProfiel } from './student-profiel.js';
+import Router from '../router.js';
 
 export function renderLogin(rootElement) {
   rootElement.innerHTML = `
     <div class="login-container">
       <div class="login-card">
         <div class="login-header">
-          <button class="back-button" id="back-button">← Terug</button>
+          <button class="back-button" id="back-button" data-route="/">← Terug</button>
           <h1>Inloggen</h1>
           <p>Log je in met je school-email</p>
         </div>
@@ -44,15 +43,14 @@ export function renderLogin(rootElement) {
           </svg>
           Sign in with LinkedIn
         </button>
-        
-        <div class="footer-links">
-          <a href="#" id="privacy-link">Privacy Policy</a>
-          <a href="#" id="contact-link">Contacteer Ons</a>
+          <div class="footer-links">
+          <a href="/privacy" data-route="/privacy">Privacy Policy</a>
+          <a href="/contact" data-route="/contact">Contacteer Ons</a>
         </div>
         
         <div class="register-link">
           <p>Heb je nog geen account? 
-            <a id="register-link" style="cursor:pointer;">Registreren</a>
+            <a id="register-link" data-route="/registreer" style="cursor:pointer;">Registreren</a>
           </p>
         </div>
       </div>
@@ -63,16 +61,16 @@ export function renderLogin(rootElement) {
   const form = document.getElementById('loginForm');
   form.addEventListener('submit', (e) => handleLogin(e, rootElement));
 
-  // 2) Event listener voor de “Registreren”-link
+  // 2) Event listener voor de "Registreren"-link
   const registerLink = document.getElementById('register-link');
   registerLink.addEventListener('click', () => {
-    renderRegister(rootElement);
+    Router.navigate('/registreer');
   });
 
-  // Back button (naar home of vorige pagina)
+  // Back button
   const backButton = document.getElementById('back-button');
   backButton.addEventListener('click', () => {
-    alert('Navigatie naar home pagina nog niet geïmplementeerd');
+    Router.navigate('/');
   });
 
   // LinkedIn button
@@ -126,7 +124,6 @@ function handleLogin(event, rootElement) {
     profilePictureUrl: '/src/Images/default.jpg'
   };
 
-  // Ga naar student-profiel
-  renderStudentProfiel(rootElement, studentData);
-  //aaaa
+  // Ga naar student-profiel via router
+  Router.navigate('/Student/Student-Profiel');
 }

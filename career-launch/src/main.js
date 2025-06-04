@@ -10,12 +10,17 @@ import { renderStudentProfiel } from './pages/student-profiel.js';
 import { renderSearchCriteriaStudent } from './pages/search-criteria-student.js';
 import { renderAdmin } from './pages/admin.js';
 import { renderAdminDashboard } from './pages/admin-dashboard.js';
+import { renderPrivacy } from './pages/privacy.js';
+import { renderContact } from './pages/contact.js';
 
-// functie om de 404 pagina te renderen (Nog aanpassen)
+// functie om de 404 pagina te renderen
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
-        <h1>404 - Pagina niet gevonden</h1>
-        <p>De pagina die je zoekt bestaat niet.</p>
+        <div class="not-found-container">
+            <h1>404 - Pagina niet gevonden</h1>
+            <p>De pagina die je zoekt bestaat niet.</p>
+            <a href="/" data-route="/">Terug naar home</a>
+        </div>
     `;
 }
 
@@ -29,8 +34,12 @@ const routes = {
   '/Student/Zoek-Criteria': renderSearchCriteriaStudent,
   '/admin': renderAdmin,
   '/admin/admin-dashboard': renderAdminDashboard,
+  '/privacy': renderPrivacy,
+  '/contact': renderContact,
 };
 
+// Initialize router
 const router = new Router(routes);
 
-window.addEventListener('popstate', () => router.handleRouteChange());
+// Make router globally available for pages to use
+window.appRouter = router;
