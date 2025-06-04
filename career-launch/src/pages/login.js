@@ -1,4 +1,5 @@
 import { renderRegister } from './register.js';
+import { renderStudentProfiel } from './student-profiel.js';
 
 export function renderLogin(rootElement) {
   rootElement.innerHTML = `
@@ -44,7 +45,7 @@ export function renderLogin(rootElement) {
 
   // 1) Event listener voor het login-formulier
   const form = document.getElementById('loginForm');
-  form.addEventListener('submit', handleLogin);
+  form.addEventListener('submit', (e) => handleLogin(e, rootElement));
 
   // 2) Event listener voor de “Registreren”-link
   const registerLink = document.getElementById('register-link');
@@ -53,7 +54,7 @@ export function renderLogin(rootElement) {
   });
 }
 
-function handleLogin(event) {
+function handleLogin(event, rootElement) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
@@ -70,8 +71,19 @@ function handleLogin(event) {
     return;
   }
 
-  // TODO: stuur credentials naar je backend
+  // TODO: stuur credentials naar je backend en controleer succes
   console.log('Inlogdata:', { email, password });
-  alert(`Welkom terug, ${email}!`);
 
+  // Simuleer ontvangen data van de student na succesvolle login
+  const studentData = {
+    firstName: 'Jan',
+    lastName: 'Jansen',
+    email: email,
+    studyProgram: 'Webontwikkeling',
+    year: '2e Bachelor',
+    profilePictureUrl: '/src/Images/default.jpg'
+  };
+
+  // Ga naar student-profiel
+  renderStudentProfiel(rootElement, studentData);
 }

@@ -5,6 +5,8 @@ import './style.css';
 // importeer de pagina's
 import { renderHome } from './pages/home.js';
 import { renderRegister } from './pages/register.js';
+import { renderLogin } from './pages/login.js';
+import { renderStudentProfiel } from './pages/student-profiel.js';
 
 // functie om de 404 pagina te renderen (Nog aanpassen)
 function renderNotFound(rootElement) {
@@ -19,6 +21,10 @@ const routes = {
   '/': renderHome,
   '/404': renderNotFound,
   '/registreer': renderRegister,
+  '/login' : renderLogin,
+  'Student-Profiel': renderStudentProfiel
+
+
 };
 
 const router = new Router(routes);
