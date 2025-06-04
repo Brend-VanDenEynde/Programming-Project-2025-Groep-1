@@ -1,5 +1,5 @@
-//import { renderLogin } from './login.js';
-//import { renderRegister } from './register.js';
+import { renderLogin } from './login.js';
+import { renderRegister } from './register.js';
 
 export function renderHome(rootElement) {
   rootElement.innerHTML = `
