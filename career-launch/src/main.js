@@ -29,7 +29,7 @@ const routes = {
   '/': renderHome,
   '/404': renderNotFound,
   '/registreer': renderRegister,
-  '/login' : renderLogin,
+  '/login': renderLogin,
   '/Student/Student-Profiel': renderStudentProfiel,
   '/Student/Zoek-Criteria': renderSearchCriteriaStudent,
   '/admin': renderAdmin,

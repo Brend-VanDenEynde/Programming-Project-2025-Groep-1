@@ -64,7 +64,9 @@ export function renderContact(rootElement) {
   const contactForm = document.getElementById('contactForm');
   contactForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    alert('Bedankt voor je bericht! We nemen zo snel mogelijk contact met je op.');
+    alert(
+      'Bedankt voor je bericht! We nemen zo snel mogelijk contact met je op.'
+    );
     contactForm.reset();
   });
 }

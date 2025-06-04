@@ -121,7 +121,7 @@ function handleLogin(event, rootElement) {
     email: email,
     studyProgram: 'Webontwikkeling',
     year: '2e Bachelor',
-    profilePictureUrl: '/src/Images/default.jpg'
+    profilePictureUrl: '/src/Images/default.jpg',
   };
 
   // Ga naar student-profiel via router
