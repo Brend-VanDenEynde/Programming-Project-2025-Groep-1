@@ -6,18 +6,22 @@ export function renderHome(rootElement) {
     <div class="home-container">
       <img 
         src="/src/Images/EhB-logo-transparant.png" 
-        alt="EHB Logo" 
-        style="max-width: 200px; margin-bottom: 24px;"
+        alt="Erasmus Hogeschool Brussels Logo" 
       />
 
-      <h1>Erasmus Hogeschool</h1>
-      <h2>Career Launch</h2>
+     
+      <h2>CAREER LAUNCH 2025</h2>
 
       <p>Geïnteresseerd?</p>
-      <button id="btn-register" class="btn">Registreer nu!</button>
+      <button id="btn-register" class="btn">Registreer je nu!</button>
 
       <p>Al ingeschreven?</p>
       <button id="btn-login" class="btn">Login</button>
+    </div>
+    
+    <div class="footer-links">
+      <a href="#privacy">Privacy Policy</a>
+      <a href="#contact">Contacteer Ons</a>
     </div>
   `;
 
