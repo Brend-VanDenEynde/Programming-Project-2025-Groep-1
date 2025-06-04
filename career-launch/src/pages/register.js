@@ -61,6 +61,11 @@ export function renderRegister(rootElement) {
                             placeholder="Herhaal je wachtwoord"
                             minlength="8"
                         >
+                         
+                        <input type="radio" id="student" name="rol" value="student" required>
+  <label for="student">Student</label><br>
+  <input type="radio" id="bedrijf" name="rol" value="bedrijf">
+  <label for="bedrijf">Bedrijf</label>
                     </div>
                     
                     <button type="submit" class="register-btn">Registreren</button>
