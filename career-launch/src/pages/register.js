@@ -3,93 +3,123 @@ import { renderLogin } from './login.js';
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `
     <div class="register-container">
-      <div class="register-form">
-        <h1>Registreren</h1>
-        <p>Maak je account aan om te beginnen</p>
+      <div class="register-card">
+        <div class="register-header">
+          <button class="back-button" id="back-button">← Terug</button>
+          <h1>Registreren</h1>
+          <p>Vermeld je school-email en een wachtwoord voor je account</p>
+        </div>
         
         <form id="registerForm">
-          <div class="form-group">
-            <label for="firstName">Voornaam</label>
+          <div class="form-row">
             <input 
               type="text" 
               id="firstName" 
               name="firstName" 
               required 
-              placeholder="Je voornaam"
+              placeholder="Voornaam"
+              class="register-input"
             >
-          </div>
-          
-          <div class="form-group">
-            <label for="lastName">Achternaam</label>
             <input 
               type="text" 
               id="lastName" 
               name="lastName" 
               required 
-              placeholder="Je achternaam"
+              placeholder="Achternaam"
+              class="register-input"
             >
           </div>
           
-          <div class="form-group">
-            <label for="email">E-mailadres</label>
-            <input 
-              type="email" 
-              id="email" 
-              name="email" 
-              required 
-              placeholder="je.email@voorbeeld.com"
-            >
-          </div>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            required 
+            placeholder="Email"
+            class="register-input full-width"
+          >
           
-          <div class="form-group">
-            <label for="password">Wachtwoord</label>
-            <input 
-              type="password" 
-              id="password" 
-              name="password" 
-              required 
-              placeholder="Minimaal 8 karakters"
-              minlength="8"
-            >
-          </div>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            required 
+            placeholder="Wachtwoord"
+            minlength="8"
+            class="register-input full-width"
+          >
           
-          <div class="form-group">
-            <label for="confirmPassword">Bevestig wachtwoord</label>
-            <input 
-              type="password" 
-              id="confirmPassword" 
-              name="confirmPassword" 
-              required 
-              placeholder="Herhaal je wachtwoord"
-              minlength="8"
-            >
-          </div>
+          <input 
+            type="password" 
+            id="confirmPassword" 
+            name="confirmPassword" 
+            required 
+            placeholder="Bevestig wachtwoord"
+            minlength="8"
+            class="register-input full-width"
+          >
 
-          <div class="form-group">
-            <input type="radio" id="student" name="rol" value="student" required>
-            <label for="student">Student</label><br>
-            <input type="radio" id="bedrijf" name="rol" value="bedrijf">
-            <label for="bedrijf">Bedrijf</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" id="student" name="rol" value="student" required>
+              <span class="radio-checkmark"></span>
+              Student
+            </label>
+            <label class="radio-option">
+              <input type="radio" id="bedrijf" name="rol" value="bedrijf">
+              <span class="radio-checkmark"></span>
+              Bedrijf
+            </label>
           </div>
           
-          <button type="submit" class="register-btn">Registreren</button>
+          <button type="submit" class="register-btn">Registreer</button>
         </form>
         
-        <div class="login-link">
-          <p>Heb je al een account? <a id="login-link" style="cursor:pointer;">Inloggen</a></p>
+        <div class="divider">
+          <hr>
+        </div>
+        
+        <button class="linkedin-btn" id="linkedin-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          </svg>
+          Sign in with LinkedIn
+        </button>
+        
+        <div class="footer-links">
+          <a href="#" id="privacy-link">Privacy Policy</a>
+          <a href="#" id="contact-link">Contacteer Ons</a>
         </div>
       </div>
     </div>
   `;
-
-  // 1) Event listener voor het registratieformulier
+  // Event listeners
   const form = document.getElementById('registerForm');
   form.addEventListener('submit', handleRegister);
 
-  // 2) Pas wél hier, ná het instellen van innerHTML, de link ophalen en listener koppelen:
-  const loginLink = document.getElementById('login-link');
-  loginLink.addEventListener('click', () => {
+  // Back button
+  const backButton = document.getElementById('back-button');
+  backButton.addEventListener('click', () => {
     renderLogin(rootElement);
+  });
+
+  // LinkedIn button
+  const linkedinButton = document.getElementById('linkedin-btn');
+  linkedinButton.addEventListener('click', () => {
+    alert('LinkedIn integratie nog niet geïmplementeerd');
+  });
+
+  // Footer links
+  const privacyLink = document.getElementById('privacy-link');
+  privacyLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Privacy Policy pagina nog niet geïmplementeerd');
+  });
+
+  const contactLink = document.getElementById('contact-link');
+  contactLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Contact pagina nog niet geïmplementeerd');
   });
 }
 
@@ -103,7 +133,7 @@ function handleRegister(event) {
     email: formData.get('email'),
     password: formData.get('password'),
     confirmPassword: formData.get('confirmPassword'),
-    rol: formData.get('rol')
+    rol: formData.get('rol'),
   };
 
   // Validatie
