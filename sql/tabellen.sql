@@ -1,52 +1,52 @@
-CREATE table if not exists 'rollen'(
-    id integer primary key autoincrement,
-    role text not null
-)
+CREATE TABLE IF NOT EXISTS rollen (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    role TEXT NOT NULL
+);
 
-insert into rollen (role) values ('admin');
-insert into rollen (role) values ('bedrijf');
-insert into rollen (role) values ('student');
-
-
-CREATE table if not exists 'gebruiker'(
-    id integer primary key autoincrement,
-    email text not null unique,
-    wachtwoord text not null,
-    role_id integer not null,
-    voornaam text,
-    achternaam text,
-    linked_in text,
-    profiel_foto text,
-    opleiding text,
-    opleidingsjaar text,
-    positie text,
-    skills text,
-    contactemail text,
-    plaats text,
-    goedkeuring tinyint not null default 0,
+INSERT INTO rollen (role) VALUES 
+    ('admin'),
+    ('bedrijf'),
+    ('student');
+    
+CREATE TABLE IF NOT EXISTS gebruiker (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL UNIQUE,
+    wachtwoord TEXT NOT NULL,
+    role_id INTEGER NOT NULL,
+    voornaam TEXT,
+    achternaam TEXT,
+    linkedin TEXT,
+    profiel_foto TEXT,
+    opleiding TEXT,
+    opleidingsjaar TEXT,
+    positie TEXT,
+    skills TEXT,
+    contactemail TEXT,
+    plaats TEXT,
+    goedkeuring TINYINT NOT NULL DEFAULT 0,
     FOREIGN KEY (role_id) REFERENCES rollen(id) ON DELETE CASCADE ON UPDATE CASCADE
-) 
+);
 
-CREATE table if not exists 'stand'(
-    id integer primary key autoincrement,
-    lokaal text not null,
-    id_gebruiker integer not null,
+CREATE TABLE IF NOT EXISTS stand (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    lokaal TEXT NOT NULL,
+    id_gebruiker INTEGER NOT NULL,
     FOREIGN KEY (id_gebruiker) REFERENCES gebruiker(id) ON DELETE CASCADE ON UPDATE CASCADE
-)
+);
 
-CREATE table if not exists 'Speeddate'(
-    id integer primary key autoincrement,
-    id_student integer not null,
-    id_bedrijf integer not null,
-    datum datetime not null,
-    akkoord tinyint not null default 0,
+CREATE TABLE IF NOT EXISTS Speeddate (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_student INTEGER NOT NULL,
+    id_bedrijf INTEGER NOT NULL,
+    datum DATETIME NOT NULL,
+    akkoord TINYINT NOT NULL DEFAULT 0,
     FOREIGN KEY (id_student) REFERENCES gebruiker(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (id_bedrijf) REFERENCES gebruiker(id) ON DELETE CASCADE ON UPDATE CASCADE
-)
+);
 
-CREATE table if not exists 'finalwork'(
-    id integer primary key autoincrement,
-    id_student integer not null,
-    lokaal text not null,
+CREATE TABLE IF NOT EXISTS finalwork (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_student INTEGER NOT NULL,
+    lokaal TEXT NOT NULL,
     FOREIGN KEY (id_student) REFERENCES gebruiker(id) ON DELETE CASCADE ON UPDATE CASCADE
-)
+);
