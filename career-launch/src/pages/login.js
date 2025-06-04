@@ -128,4 +128,5 @@ function handleLogin(event, rootElement) {
 
   // Ga naar student-profiel
   renderStudentProfiel(rootElement, studentData);
+  //aaaa
 }
