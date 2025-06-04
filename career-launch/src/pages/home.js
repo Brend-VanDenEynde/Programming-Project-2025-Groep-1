@@ -18,10 +18,10 @@ export function renderHome(rootElement) {
       <p>Al ingeschreven?</p>
       <button id="btn-login" class="btn">Login</button>
     </div>
-    
-    <div class="footer-links">
+      <div class="footer-links">
       <a href="#privacy">Privacy Policy</a>
       <a href="#contact">Contacteer Ons</a>
+      <a href="#/admin">Admin</a>
     </div>
   `;
 
