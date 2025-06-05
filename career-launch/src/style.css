@@ -590,22 +590,24 @@ body {
   justify-content: center;
   align-items: flex-start;
   padding: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: white;
 }
 
 .content-card {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   max-width: 800px;
   width: 100%;
   overflow: hidden;
+  border: 1px solid #dee2e6;
 }
 
 .content-card .header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #f8f9fa;
+  color: #333;
   padding: 2rem;
+  border-bottom: 1px solid #dee2e6;
 }
 
 .content-card .header h1 {
@@ -1553,4 +1555,62 @@ body {
     padding: 0.625rem 1.25rem;
     font-size: 0.85rem;
   }
+}
+
+/* Privacy Policy Specific Styling */
+.content-card .content .intro {
+  background: #f8f9fb;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+  margin-bottom: 2rem;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.content-card .content h3 {
+  color: #333;
+  margin: 2rem 0 1rem 0;
+  font-size: 1.2rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.content-card .content ul {
+  margin: 1rem 0 1.5rem 1.5rem;
+  line-height: 1.8;
+}
+
+.content-card .content li {
+  margin-bottom: 0.5rem;
+}
+
+.content-card .content strong {
+  color: #444;
+  font-weight: 600;
+}
+
+.content-card .content p {
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.content-card .content a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.content-card .content a:hover {
+  text-decoration: underline;
+}
+
+.content-card .content .last-updated {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #666;
+  text-align: center;
 }
