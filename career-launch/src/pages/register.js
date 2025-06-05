@@ -1,3 +1,5 @@
+import { renderStudentRegister } from './student-register.js';
+
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `
     <div class="register-container">
@@ -141,5 +143,9 @@ function handleRegister(event) {
   console.log('Registratie data:', data);
   alert(`Account succesvol aangemaakt!`);
 
-  renderLogin(document.getElementById('app'));
+  if (data.rol === 'student') {
+      renderStudentRegister(document.getElementById('app'));
+  } else {
+      renderLogin(document.getElementById('app'));
+  }
 }
