@@ -44,6 +44,7 @@ body {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
+
 /* Terug knop */
 .back-button {
   background: none;
@@ -170,4 +171,21 @@ body {
 .select a {
   color: #004080;
   text-decoration: none;
+}
+
+/* Save knop */
+.save-button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5re    m;
+  border: none;
+  background-color: #004080;
+  color: white;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-button:hover {
+  background-color: #003060;
 }

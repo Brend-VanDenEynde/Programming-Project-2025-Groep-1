@@ -3,7 +3,7 @@ import './student-register.css';
 export function renderStudentOpleiding(rootElement) {
   rootElement.innerHTML = `
     <div style="min-height: 100vh; display: flex; flex-direction: column;">
-    <main class="form-container">
+    <main class="form-container opleiding-container">
       <button class="back-button">← Terug</button>
 
       <h3>Ik ben een</h3>
@@ -22,7 +22,7 @@ export function renderStudentOpleiding(rootElement) {
           <option>Intelligent Robotics</option>
       </select>
 
-      <button class="next-button">SAVE</button>
+      <button class="save-button">SAVE</button>
     </main>
 
     <footer class="footer">
