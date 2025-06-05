@@ -147,4 +147,27 @@ body {
 .footer a:hover {
   text-decoration: underline;
 }
-/* margin */
+
+.select {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: white;
+}
+
+.select option {
+  padding: 0.75rem;
+  background-color: white;
+  color: #333;
+}
+
+.select:focus {
+  border-color: #004080;
+  outline: none;
+}
+
+.select a {
+  color: #004080;
+  text-decoration: none;
+}
