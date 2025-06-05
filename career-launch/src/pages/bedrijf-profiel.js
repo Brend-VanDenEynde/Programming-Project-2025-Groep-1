@@ -15,102 +15,92 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}) {
   } = bedrijfData;
 
   rootElement.innerHTML = `
-    <div class="bedrijf-profile-container">
-      <header class="bedrijf-profile-header">
-        <div class="logo-section">
-          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
-          <span>EhB Career Launch</span>
+  <div class="page-container" style="min-height: 100vh; display: flex; flex-direction: column;">
+    <header style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #ccc;">
+    <div style="display: flex; align-items: center;">
+      <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" style="margin-right: 0.5rem;" />
+      <span>EhB Career Launch</span>
+    </div>
+    <button id="burger-menu" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">☰</button>
+    <ul id="burger-dropdown" style="position: absolute; top: 3rem; right: 1rem; list-style: none; padding: 0.5rem; margin: 0; border: 1px solid #ccc; background: white; display: none; z-index: 100;">
+      <li><button id="nav-dashboard" style="background:none; border:none; width:100%; text-align:left; padding:0.25rem 0;">Dashboard</button></li>
+      <li><button id="nav-settings" style="background:none; border:none; width:100%; text-align:left; padding:0.25rem 0;">Instellingen</button></li>
+      <li><button id="nav-delete-account" style="background:none; border:none; width:100%; text-align:left; padding:0.25rem 0;">Verwijder account</button></li>
+      <li><button id="nav-logout" style="background:none; border:none; width:100%; text-align:left; padding:0.25rem 0;">Log out</button></li>
+    </ul>
+    </header>
+    <div style="display: flex; flex: 1; margin-top: 0.5rem;">
+    <nav id="sidebar" style="width: 180px; border-right: 1px solid #ccc; padding-right: 1rem;">
+      <ul style="list-style: none; padding: 0; margin: 0;">
+        <li><button data-route="profile" class="sidebar-link" style="background:none; border:none; padding:0.25rem 0; width:100%; text-align:left;">Profiel</button></li>
+        <li><button data-route="search" class="sidebar-link" style="background:none; border:none; padding:0.25rem 0; width:100%; text-align:left;">Zoek-criteria</button></li>
+        <li><button data-route="speeddates" class="sidebar-link" style="background:none; border:none; padding:0.25rem 0; width:100%; text-align:left;">Speeddates</button></li>
+        <li><button data-route="requests" class="sidebar-link" style="background:none; border:none; padding:0.25rem 0; width:100%; text-align:left;">Speeddates-verzoeken</button></li>
+      </ul>
+    </nav>
+    <main style="flex: 1; padding: 1rem;">
+      <div id="profile-view">
+        <div class="profile-avatar-section" style="display: flex; justify-content: center; margin-bottom: 1rem;">
+            <img src="${profilePictureUrl}" alt="Profielfoto" id="avatar-display" style="width: 96px; height: 96px; object-fit: cover; border-radius: 50%;" />
         </div>
-        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
-        <ul id="burger-dropdown" class="bedrijf-profile-dropdown" style="display: none;">
-          <li><button id="nav-dashboard">Dashboard</button></li>
-          <li><button id="nav-settings">Instellingen</button></li>
-          <li><button id="nav-delete-account">Verwijder account</button></li>
-          <li><button id="nav-logout">Log out</button></li>
-        </ul>
-      </header>
-
-      <div class="bedrijf-profile-main">
-        <nav class="bedrijf-profile-sidebar">
-          <ul>
-            <li><button data-route="profile" class="sidebar-link active">Profiel</button></li>
-            <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
-            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
-            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
-          </ul>
-        </nav>
-
-        <div class="bedrijf-profile-content">
-          <div class="bedrijf-profile-form-container">
-            <h1 class="bedrijf-profile-title">Profiel</h1>
-            <div id="profile-view" class="bedrijf-profile-form-section">
-              <div class="bedrijf-profile-avatar-section">
-                ${profilePictureUrl ? `<img src="${profilePictureUrl}" alt="Logo ${name}" id="avatar-display" class="bedrijf-profile-avatar" />` : `<div class="bedrijf-profile-avatar-placeholder" id="avatar-display"><span>×</span></div>`}
-              </div>
-              <div class="bedrijf-profile-form-group">
-                <label>Naam:</label>
-                <div class="bedrijf-profile-display-field" id="display-name">${name}</div>
-              </div>
-              <div class="bedrijf-profile-form-group">
-                <label>E-mailadres:</label>
-                <div class="bedrijf-profile-display-field" id="display-email">${email}</div>
-              </div>
-              <div class="bedrijf-profile-form-group">
-                <label>Beschrijving:</label>
-                <div class="bedrijf-profile-display-field" id="display-description">${description}</div>
-              </div>
-              <div class="bedrijf-profile-form-group">
-                <label>LinkedIn:</label>
-                <div class="bedrijf-profile-display-field">
-                  <a id="display-linkedin" href="${linkedIn}" target="_blank" style="color: #007bff; text-decoration: none;">
-                    ${linkedIn ? linkedIn : 'Niet ingesteld'}
-                  </a>
-                </div>
-              </div>
-              <div class="bedrijf-profile-buttons">
-                <button id="edit-profile-btn" class="bedrijf-profile-btn bedrijf-profile-btn-secondary">BEWERK</button>
-                <button id="logout-btn" class="bedrijf-profile-btn bedrijf-profile-btn-primary">UITLOGGEN</button>
-              </div>
-            </div>
-            <div id="profile-edit" class="bedrijf-profile-form-section" style="display: none;">
-              <div class="bedrijf-profile-avatar-section">
-                ${profilePictureUrl ? `<img src="${profilePictureUrl}" alt="Logo preview" id="avatar-preview" class="bedrijf-profile-avatar" />` : `<div class="bedrijf-profile-avatar-placeholder" id="avatar-preview"><span>×</span></div>`}
-              </div>
-              <div class="bedrijf-profile-form-group">
-                <label for="photoInput">Logo (max 2MB)</label>
-                <input type="file" accept="image/*" id="photoInput">
-              </div>
-              <div class="bedrijf-profile-form-group">
-                <label for="nameInput">Bedrijfsnaam</label>
-                <input type="text" id="nameInput" value="${name}" required>
-              </div>
-              <div class="bedrijf-profile-form-group">
-                <label for="emailInput">E-mailadres</label>
-                <input type="email" id="emailInput" value="${email}" required>
-              </div>
-              <div class="bedrijf-profile-form-group">
-                <label for="descriptionInput">Beschrijving</label>
-                <textarea id="descriptionInput" rows="3">${description}</textarea>
-              </div>
-              <div class="bedrijf-profile-form-group">
-                <label for="linkedinInput">LinkedIn-link</label>
-                <input type="url" id="linkedinInput" value="${linkedIn}">
-              </div>
-              <div class="bedrijf-profile-buttons">
-                <button id="cancel-edit-btn" class="bedrijf-profile-btn bedrijf-profile-btn-secondary">RESET</button>
-                <button id="save-profile-btn" class="bedrijf-profile-btn bedrijf-profile-btn-primary">SAVE</button>
-              </div>
-            </div>
-          </div>
+        <div class="profile-info-section" style="text-align: center;">
+  <div>
+    <label>Naam:</label>
+    <span id="display-name">${name}</span>
+  </div>
+        <div>
+            <label>E-mailadres:</label>
+            <span id="display-email">${email}</span>
+        </div>
+        <div>
+            <label>Beschrijving:</label>
+            <span id="display-description">${description}</span>
+        </div>
+        <div>
+            <label>LinkedIn:</label>
+            <a id="display-linkedin" href="${linkedIn}" target="_blank">
+            ${linkedIn ? linkedIn : 'Niet ingesteld'}
+            </a>
+        </div>
+        </div>
+        <div class="profile-buttons" style="text-align: center; margin-top: 1rem;">
+            <button id="edit-profile-btn">Bewerk</button>
+            <button id="logout-btn">Uitloggen</button>
         </div>
       </div>
-
-      <footer class="bedrijf-profile-footer">
+      <div id="profile-edit" style="display: none;">
+        <div>
+          <label for="photoInput">Logo (max 2MB)</label>
+          <input type="file" accept="image/*" id="photoInput">
+        </div>
+        <div>
+          <label for="nameInput">Bedrijfsnaam</label>
+          <input type="text" id="nameInput" value="${name}" required>
+        </div>
+        <div>
+          <label for="emailInput">E-mailadres</label>
+          <input type="email" id="emailInput" value="${email}" required>
+        </div>
+        <div>
+          <label for="descriptionInput">Beschrijving</label>
+          <textarea id="descriptionInput" rows="3">${description}</textarea>
+        </div>
+        <div>
+          <label for="linkedinInput">LinkedIn-link</label>
+          <input type="url" id="linkedinInput" value="${linkedIn}">
+        </div>
+        <button id="cancel-edit-btn">Reset</button>
+        <button id="save-profile-btn">Save</button>
+      </div>
+    </main>
+  </div>
+    
+    <footer style="text-align: center; margin-top: 1rem;">
         <a id="privacy-policy" href="#">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#">Contacteer Ons</a>
-      </footer>
-    </div>
+        <a id="contacteer-ons" href="#">Contacteer ons</a>
+    </footer>
+  </div>
+  
   `;
 
   // Events etc. identiek zoals eerder: sidebar, burger-menu, form-beheer ...
