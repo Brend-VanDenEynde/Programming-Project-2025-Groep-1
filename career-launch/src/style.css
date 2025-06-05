@@ -1024,6 +1024,337 @@ body {
   text-decoration: underline;
 }
 
+/* Contact Pagina Styling - Ultra Minimalistisch */
+.modern-contact-container {
+  min-height: 100vh;
+  background: white;
+  padding: 2rem 1rem;
+}
+
+.modern-contact-header {
+  text-align: center;
+  color: #000;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.modern-back-button {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: white;
+  color: #000;
+  border: 1px solid #ddd;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: border-color 0.2s ease;
+}
+
+.modern-back-button:hover {
+  border-color: #999;
+}
+
+.back-arrow {
+  font-size: 1rem;
+}
+
+.modern-contact-title {
+  font-size: 2rem;
+  font-weight: normal;
+  margin: 0 0 0.5rem 0;
+  color: #000;
+}
+
+.modern-contact-subtitle {
+  font-size: 1rem;
+  font-weight: normal;
+  margin: 0;
+  color: #666;
+}
+
+.modern-contact-content {
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Contact formulier sectie - Ultra Minimalistisch */
+.contact-form-section {
+  background: white;
+  border-radius: 4px;
+  padding: 2rem;
+  border: 1px solid #ddd;
+}
+
+.contact-form-section h2 {
+  color: #000;
+  font-size: 1.3rem;
+  font-weight: normal;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.form-description {
+  color: #666;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+}
+
+.modern-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-group label {
+  color: #000;
+  font-weight: normal;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+  background: white;
+  color: #000;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #000;
+}
+
+.form-group input.valid,
+.form-group textarea.valid {
+  border-color: #000;
+}
+
+.form-group input.error,
+.form-group textarea.error {
+  border-color: #000;
+}
+
+.error-message {
+  color: #000;
+  font-size: 0.8rem;
+  font-weight: normal;
+  display: none;
+  margin-top: 0.25rem;
+}
+
+.character-count {
+  text-align: right;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.modern-submit-button {
+  background: #000;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 2px;
+  font-size: 0.9rem;
+  font-weight: normal;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  opacity: 0.5;
+}
+
+.modern-submit-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.modern-submit-button.enabled {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.modern-submit-button.enabled:hover {
+  opacity: 0.8;
+}
+
+.button-text {
+  flex: 1;
+}
+
+.button-icon {
+  font-size: 0.9rem;
+}
+
+.form-status {
+  padding: 0.75rem;
+  border-radius: 2px;
+  font-weight: normal;
+  text-align: center;
+  display: none;
+  font-size: 0.9rem;
+}
+
+.form-status.success {
+  background: #f0f0f0;
+  color: #000;
+  border: 1px solid #ddd;
+}
+
+.form-status.error {
+  background: #f0f0f0;
+  color: #000;
+  border: 1px solid #ddd;
+}
+
+/* Success Modal - Ultra Minimalistisch */
+.success-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 2px;
+  padding: 0;
+  max-width: 400px;
+  width: 90%;
+  border: 1px solid #ddd;
+  overflow: hidden;
+}
+
+.modal-header {
+  background: white;
+  color: #000;
+  padding: 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.success-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: normal;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.modal-body p {
+  color: #000;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.modal-reference {
+  background: #f5f5f5;
+  padding: 0.75rem;
+  border-radius: 2px;
+  font-weight: normal;
+  color: #000;
+  font-size: 0.9rem;
+}
+
+.modal-footer {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  text-align: center;
+}
+
+.modal-close-button {
+  background: #000;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 2px;
+  font-size: 0.9rem;
+  font-weight: normal;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  min-width: 100px;
+}
+
+.modal-close-button:hover {
+  opacity: 0.8;
+}
+
+/* Loading Overlay - Ultra Minimalistisch */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.loading-spinner {
+  width: 30px;
+  height: 30px;
+  border: 2px solid #f0f0f0;
+  border-top: 2px solid #000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-overlay p {
+  color: #000;
+  font-size: 0.9rem;
+  font-weight: normal;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .home-container h1 {
@@ -1143,5 +1474,72 @@ body {
 
   .student-profile-btn {
     width: 100%;
+  }
+}
+
+@media (max-width: 992px) {
+  .modern-contact-content {
+    max-width: 450px;
+  }
+  
+  .modern-contact-title {
+    font-size: 1.8rem;
+  }
+  
+  .modern-back-button {
+    position: relative;
+    margin: 0 auto 2rem auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .modern-contact-container {
+    padding: 1rem;
+  }
+  
+  .modern-contact-title {
+    font-size: 1.6rem;
+  }
+  
+  .modern-contact-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .contact-form-section {
+    padding: 1.5rem;
+  }
+  
+  .modal-content {
+    width: 95%;
+  }
+  
+  .modal-header,
+  .modal-body {
+    padding: 1.25rem;
+  }
+  
+  .modal-footer {
+    padding: 0 1.25rem 1.25rem 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modern-contact-header {
+    margin-bottom: 2rem;
+  }
+  
+  .modern-contact-title {
+    font-size: 1.4rem;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    padding: 0.625rem;
+    font-size: 0.85rem;
+  }
+  
+  .modern-submit-button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.85rem;
   }
 }
