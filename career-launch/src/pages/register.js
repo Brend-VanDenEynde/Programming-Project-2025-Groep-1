@@ -117,11 +117,10 @@ export function renderRegister(rootElement) {
       Router.navigate('/login');
     });
   }
-
   // LinkedIn button
   const linkedinButton = document.getElementById('linkedin-btn');
   linkedinButton.addEventListener('click', () => {
-    alert('LinkedIn integratie nog niet geïmplementeerd');
+    // LinkedIn integratie nog niet geïmplementeerd
   });
 
   // FOOTER LINKS
@@ -168,10 +167,8 @@ function handleRegister(event) {
     alert('Selecteer “Student” of “Bedrijf”!');
     return;
   }
-
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
-  alert(`Welkom ${data.firstName}! Je account is aangemaakt.`);
 
   // Redirect naar login (of andere actie)
   renderLogin(document.getElementById('app'));

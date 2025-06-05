@@ -195,13 +195,13 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
           // al op dezelfde pagina
           break;
         case 'speeddates':
-          alert('Navigeren naar Speeddates (nog te implementeren)');
+          // Navigeren naar Speeddates (nog te implementeren)
           break;
         case 'requests':
-          alert('Navigeren naar Speeddates-verzoeken (nog te implementeren)');
+          // Navigeren naar Speeddates-verzoeken (nog te implementeren)
           break;
         case 'qr':
-          alert('Navigeren naar QR-code (nog te implementeren)');
+          // Navigeren naar QR-code (nog te implementeren)
           break;
       }
     });
@@ -217,16 +217,16 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
     });
   }
   document.getElementById('nav-dashboard').addEventListener('click', () => {
-    alert('Navigeren naar Dashboard (nog te implementeren)');
+    // Navigeren naar Dashboard (nog te implementeren)
   });
   document.getElementById('nav-settings').addEventListener('click', () => {
-    alert('Navigeren naar Instellingen (nog te implementeren)');
+    // Navigeren naar Instellingen (nog te implementeren)
   });
   document
     .getElementById('nav-delete-account')
     .addEventListener('click', () => {
       if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
-        alert('Account verwijderen (nog te implementeren)');
+        // Account verwijderen (nog te implementeren)
       }
     });
   document.getElementById('nav-logout').addEventListener('click', () => {
@@ -327,10 +327,7 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
     ).map((el) => el.value);
     studentData.criteria.talen = selectedTalen;
 
-    // SkillAndere en TaalAndere blijven zoals eerder ingesteld
-
-    console.log('Opgeslagen Zoek-criteria:', studentData.criteria);
-    alert('Zoek-criteria zijn opgeslagen.');
+    // SkillAndere en TaalAndere blijven zoals eerder ingesteld    console.log('Opgeslagen Zoek-criteria:', studentData.criteria);
     // Geen re-render → checkboxen/radio’s blijven zichtbaar zoals ze staan
   });
   // FOOTER LINKS

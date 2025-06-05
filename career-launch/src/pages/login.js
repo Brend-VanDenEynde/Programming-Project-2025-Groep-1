@@ -73,11 +73,10 @@ export function renderLogin(rootElement) {
   backButton.addEventListener('click', () => {
     Router.navigate('/');
   });
-
   // LinkedIn button
   const linkedinButton = document.getElementById('linkedin-btn');
   linkedinButton.addEventListener('click', () => {
-    alert('LinkedIn integratie nog niet geïmplementeerd');
+    // LinkedIn integratie nog niet geïmplementeerd
   });
 
   // FOOTER LINKS
@@ -114,10 +113,8 @@ function handleLogin(event, rootElement) {
     alert('Wachtwoord moet minimaal 8 karakters bevatten!');
     return;
   }
-
   // TODO: stuur credentials naar je backend
   console.log('Inlogdata:', { email, password });
-  alert(`Welkom terug, ${email}!`);
 
   // Simuleer studentData na succesvolle login
   const studentData = {
