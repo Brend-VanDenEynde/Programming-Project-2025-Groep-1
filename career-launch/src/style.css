@@ -1345,8 +1345,12 @@ body {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-overlay p {
@@ -1481,11 +1485,11 @@ body {
   .modern-contact-content {
     max-width: 450px;
   }
-  
+
   .modern-contact-title {
     font-size: 1.8rem;
   }
-  
+
   .modern-back-button {
     position: relative;
     margin: 0 auto 2rem auto;
@@ -1496,28 +1500,28 @@ body {
   .modern-contact-container {
     padding: 1rem;
   }
-  
+
   .modern-contact-title {
     font-size: 1.6rem;
   }
-  
+
   .modern-contact-subtitle {
     font-size: 0.9rem;
   }
-  
+
   .contact-form-section {
     padding: 1.5rem;
   }
-  
+
   .modal-content {
     width: 95%;
   }
-  
+
   .modal-header,
   .modal-body {
     padding: 1.25rem;
   }
-  
+
   .modal-footer {
     padding: 0 1.25rem 1.25rem 1.25rem;
   }
@@ -1527,17 +1531,17 @@ body {
   .modern-contact-header {
     margin-bottom: 2rem;
   }
-  
+
   .modern-contact-title {
     font-size: 1.4rem;
   }
-  
+
   .form-group input,
   .form-group textarea {
     padding: 0.625rem;
     font-size: 0.85rem;
   }
-  
+
   .modern-submit-button {
     padding: 0.625rem 1.25rem;
     font-size: 0.85rem;

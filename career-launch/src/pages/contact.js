@@ -126,18 +126,18 @@ function initializeContactPage() {
   const validationRules = {
     email: {
       required: true,
-      pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+      pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
     },
     subject: {
       required: true,
       minLength: 5,
-      maxLength: 100
+      maxLength: 100,
     },
     message: {
       required: true,
       minLength: 10,
-      maxLength: 1000
-    }
+      maxLength: 1000,
+    },
   };
 
   // Functie voor het valideren van individuele velden
@@ -153,11 +153,12 @@ function initializeContactPage() {
       }
       if (rules.maxLength && value.length > rules.maxLength) {
         errors.push(`Maximaal ${rules.maxLength} tekens toegestaan`);
-      }        if (rules.pattern && !rules.pattern.test(value)) {
-          if (fieldName === 'email') {
-            errors.push('Voer een geldig e-mailadres in');
-          }
+      }
+      if (rules.pattern && !rules.pattern.test(value)) {
+        if (fieldName === 'email') {
+          errors.push('Voer een geldig e-mailadres in');
         }
+      }
     }
 
     return errors;
@@ -166,7 +167,7 @@ function initializeContactPage() {
   function showFieldError(fieldName, errors, showErrors = false) {
     const errorElement = document.getElementById(`${fieldName}-error`);
     const fieldElement = document.getElementById(fieldName);
-    
+
     if (errors.length > 0 && showErrors) {
       errorElement.textContent = errors[0];
       errorElement.style.display = 'block';
@@ -190,7 +191,7 @@ function initializeContactPage() {
       const value = formData.get(fieldName) || '';
       const errors = validateField(fieldName, value);
       showFieldError(fieldName, errors);
-      
+
       if (errors.length > 0) {
         isValid = false;
       }
@@ -203,7 +204,7 @@ function initializeContactPage() {
     return isValid;
   }
   // Realtime validatie voor elk veld
-  [emailField, subjectField, messageField].forEach(field => {
+  [emailField, subjectField, messageField].forEach((field) => {
     // Validatie bij typen (met vertraging)
     let validationTimer;
     field.addEventListener('input', () => {
@@ -233,7 +234,7 @@ function initializeContactPage() {
   messageField.addEventListener('input', () => {
     const currentLength = messageField.value.length;
     charCount.textContent = currentLength;
-    
+
     // Behoud neutrale kleur
     charCount.style.color = '#666';
   });
@@ -241,7 +242,7 @@ function initializeContactPage() {
   // Formulier submit handler
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       showFormStatus('error', 'Gelieve alle velden correct in te vullen');
       return;
@@ -254,36 +255,38 @@ function initializeContactPage() {
   async function submitForm() {
     const loadingOverlay = document.getElementById('loading-overlay');
     const successModal = document.getElementById('success-modal');
-    
+
     try {
       // Toon loading overlay
       loadingOverlay.style.display = 'flex';
-      
+
       // Simuleer API call (in een echte app zou hier een fetch naar de backend komen)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       // Genereer referentienummer
       const referenceNumber = 'CL' + Date.now().toString().slice(-6);
       document.getElementById('reference-number').textContent = referenceNumber;
-      
+
       // Verberg loading en toon success modal
       loadingOverlay.style.display = 'none';
       successModal.style.display = 'flex';
-      
+
       // Reset formulier
       form.reset();
       validateForm();
-        // Reset karakter teller
+      // Reset karakter teller
       charCount.textContent = '0';
       charCount.style.color = '#666';
-        // Verwijder alle validatie klassen
-      [emailField, subjectField, messageField].forEach(field => {
+      // Verwijder alle validatie klassen
+      [emailField, subjectField, messageField].forEach((field) => {
         field.classList.remove('error', 'valid');
       });
-      
     } catch (error) {
       loadingOverlay.style.display = 'none';
-      showFormStatus('error', 'Er is een fout opgetreden. Probeer het later opnieuw.');
+      showFormStatus(
+        'error',
+        'Er is een fout opgetreden. Probeer het later opnieuw.'
+      );
     }
   }
 
@@ -293,7 +296,7 @@ function initializeContactPage() {
     statusElement.className = `form-status ${type}`;
     statusElement.textContent = message;
     statusElement.style.display = 'block';
-    
+
     // Auto-hide na 5 seconden
     setTimeout(() => {
       statusElement.style.display = 'none';
@@ -303,7 +306,7 @@ function initializeContactPage() {
   // Modal sluiten functionaliteit
   const closeModalButton = document.getElementById('close-modal');
   const successModal = document.getElementById('success-modal');
-  
+
   closeModalButton.addEventListener('click', () => {
     successModal.style.display = 'none';
   });

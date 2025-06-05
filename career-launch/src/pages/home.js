@@ -19,7 +19,7 @@ export function renderHome(rootElement) {
       <a href="#/contact" data-route="/contact">Contacteer Ons</a>
       <a href="#/admin" data-route="/admin">Admin</a>
     </div>
-  `;  // Event listeners voor buttons (als fallback of voor speciale handling)
+  `; // Event listeners voor buttons (als fallback of voor speciale handling)
   const btnReg = document.getElementById('btn-register');
   const btnLog = document.getElementById('btn-login');
 
@@ -31,12 +31,13 @@ export function renderHome(rootElement) {
     Router.navigate('/login');
   });
   // Event listeners voor footer links om zeker te zijn dat ze werken
-  document.querySelectorAll('.footer-links a').forEach(link => {
+  document.querySelectorAll('.footer-links a').forEach((link) => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
-      const route = link.getAttribute('data-route') || link.getAttribute('href');
+      const route =
+        link.getAttribute('data-route') || link.getAttribute('href');
       console.log('Footer link clicked:', route);
-      
+
       // Force navigate via Router voor betere controle
       if (route === '/contact') {
         console.log('Navigating to contact page...');

@@ -1,10 +1,11 @@
-class Router {  constructor(routes) {
+class Router {
+  constructor(routes) {
     this.routes = routes;
     this.rootElement = document.getElementById('app');
 
     // Luister naar popstate (browser back/forward)
     window.addEventListener('popstate', () => this.handleRouteChange());
-    
+
     // Luister naar hash changes voor development
     window.addEventListener('hashchange', () => this.handleRouteChange());
 
@@ -13,28 +14,35 @@ class Router {  constructor(routes) {
 
     // Initial route check
     this.handleRouteChange();
-  }  setupLinkHandling() {
+  }
+  setupLinkHandling() {
     // Intercept clicks op interne links
     document.addEventListener('click', (e) => {
-      const link = e.target.closest('a[href^="/"], a[href^="#/"], a[data-route]');
+      const link = e.target.closest(
+        'a[href^="/"], a[href^="#/"], a[data-route]'
+      );
       if (link) {
         e.preventDefault();
         let path = link.getAttribute('href') || link.getAttribute('data-route');
-        
+
         // Als het een hash link is, haal de hash weg
         if (path.startsWith('#')) {
           path = path.slice(1);
         }
-        
+
         console.log('Router: Link clicked, navigating to:', path);
         this.navigate(path);
       }
     });
-  }navigate(path) {
+  }
+  navigate(path) {
     console.log('Router: Navigating to:', path);
-    
+
     // Voor development: gebruik hash-based routing
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    if (
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1'
+    ) {
       // Update hash en trigger hashchange event
       window.location.hash = path;
       // Handmatig triggeren voor als hashchange niet automatisch werkt
@@ -44,11 +52,15 @@ class Router {  constructor(routes) {
       window.history.pushState(null, '', path);
       this.handleRouteChange();
     }
-  }handleRouteChange() {
+  }
+  handleRouteChange() {
     let path = window.location.pathname;
 
     // Voor development: gebruik hash-based routing als we op localhost zijn
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    if (
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1'
+    ) {
       if (window.location.hash) {
         path = window.location.hash.slice(1);
       } else {
@@ -105,9 +117,12 @@ class Router {  constructor(routes) {
   // Helper method voor gebruik in pagina's
   static navigate(path) {
     console.log('Static Router.navigate called with:', path);
-    
+
     // Voor development: gebruik hash-based routing
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    if (
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1'
+    ) {
       window.location.hash = path;
     } else {
       window.history.pushState(null, '', path);
