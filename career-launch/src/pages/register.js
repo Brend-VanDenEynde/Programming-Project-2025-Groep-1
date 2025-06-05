@@ -1,6 +1,3 @@
-import { renderLogin } from './login.js';
-import Router from '../router.js';
-
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `
     <div class="register-container">
@@ -12,25 +9,6 @@ export function renderRegister(rootElement) {
         </div>
         
         <form id="registerForm">
-          <div class="form-row">
-            <input 
-              type="text" 
-              id="firstName" 
-              name="firstName" 
-              required 
-              placeholder="Voornaam"
-              class="register-input"
-            >
-            <input 
-              type="text" 
-              id="lastName" 
-              name="lastName" 
-              required 
-              placeholder="Achternaam"
-              class="register-input"
-            >
-          </div>
-          
           <input 
             type="email" 
             id="email" 
@@ -100,17 +78,14 @@ export function renderRegister(rootElement) {
       </div>
     </div>
   `;
-  // Event listeners
+
   const form = document.getElementById('registerForm');
   form.addEventListener('submit', handleRegister);
 
-  // Back button
-  const backButton = document.getElementById('back-button');
-  backButton.addEventListener('click', () => {
+  document.getElementById('back-button').addEventListener('click', () => {
     Router.navigate('/');
   });
 
-  // Login link
   const loginLink = document.getElementById('login-link');
   if (loginLink) {
     loginLink.addEventListener('click', () => {
@@ -118,24 +93,25 @@ export function renderRegister(rootElement) {
     });
   }
 
-  // LinkedIn button
-  const linkedinButton = document.getElementById('linkedin-btn');
-  linkedinButton.addEventListener('click', () => {
+  document.getElementById('linkedin-btn').addEventListener('click', () => {
     alert('LinkedIn integratie nog niet geïmplementeerd');
   });
 
-  // Footer links
   const privacyLink = document.getElementById('privacy-link');
-  privacyLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Privacy Policy pagina nog niet geïmplementeerd');
-  });
+  if (privacyLink) {
+    privacyLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      alert('Privacy Policy pagina nog niet geïmplementeerd');
+    });
+  }
 
   const contactLink = document.getElementById('contact-link');
-  contactLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Contact pagina nog niet geïmplementeerd');
-  });
+  if (contactLink) {
+    contactLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      alert('Contact pagina nog niet geïmplementeerd');
+    });
+  }
 }
 
 function handleRegister(event) {
@@ -143,15 +119,12 @@ function handleRegister(event) {
 
   const formData = new FormData(event.target);
   const data = {
-    firstName: formData.get('firstName'),
-    lastName: formData.get('lastName'),
     email: formData.get('email'),
     password: formData.get('password'),
     confirmPassword: formData.get('confirmPassword'),
     rol: formData.get('rol'),
   };
 
-  // Validatie
   if (data.password !== data.confirmPassword) {
     alert('Wachtwoorden komen niet overeen!');
     return;
@@ -165,10 +138,8 @@ function handleRegister(event) {
     return;
   }
 
-  // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
-  alert(`Welkom ${data.firstName}! Je account is aangemaakt.`);
+  alert(`Account succesvol aangemaakt!`);
 
-  // Redirect naar login (of andere actie)
   renderLogin(document.getElementById('app'));
 }
