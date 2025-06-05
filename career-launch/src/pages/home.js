@@ -13,12 +13,12 @@ export function renderHome(rootElement) {
 
       <p>Geïnteresseerd?</p>
       <button id="btn-register" class="btn" data-route="/registreer">Registreer je nu!</button>      <p>Al ingeschreven?</p>
-      <button id="btn-login" class="btn" data-route="/login">Login</button>
-    </div><div class="footer-links">
-      <a href="#/privacy" data-route="/privacy">Privacy Policy</a>
-      <a href="#/contact" data-route="/contact">Contacteer Ons</a>
-      <a href="#/admin" data-route="/admin">Admin</a>
-    </div>
+      <button id="btn-login" class="btn" data-route="/login">Login</button>    </div>
+      <!-- FOOTER -->
+      <footer class="student-profile-footer">
+        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+      </footer>
   `; // Event listeners voor buttons (als fallback of voor speciale handling)
   const btnReg = document.getElementById('btn-register');
   const btnLog = document.getElementById('btn-login');
@@ -26,25 +26,25 @@ export function renderHome(rootElement) {
   btnReg.addEventListener('click', () => {
     Router.navigate('/registreer');
   });
-
   btnLog.addEventListener('click', () => {
     Router.navigate('/login');
   });
-  // Event listeners voor footer links om zeker te zijn dat ze werken
-  document.querySelectorAll('.footer-links a').forEach((link) => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const route =
-        link.getAttribute('data-route') || link.getAttribute('href');
-      console.log('Footer link clicked:', route);
 
-      // Force navigate via Router voor betere controle
-      if (route === '/contact') {
-        console.log('Navigating to contact page...');
-        Router.navigate('/contact');
-      } else {
-        Router.navigate(route);
-      }
+  // FOOTER LINKS
+  document.getElementById('privacy-policy').addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/privacy');
+    });
+  });
+
+  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      // Use absolute path to ensure correct navigation regardless of current path
+      Router.navigate('/contact');
     });
   });
 }

@@ -86,18 +86,18 @@ export function renderRegister(rootElement) {
           </svg>
           Sign in with LinkedIn
         </button>
-        
-        <div class="login-link">
+          <div class="login-link">
           <p>Heb je al een account? 
             <a id="login-link" data-route="/login" style="cursor:pointer;">Inloggen</a>
           </p>
         </div>
-        
-        <div class="footer-links">
-          <a href="/privacy" data-route="/privacy">Privacy Policy</a>
-          <a href="/contact" data-route="/contact">Contacteer Ons</a>
-        </div>
       </div>
+      
+      <!-- FOOTER -->
+      <footer class="student-profile-footer">
+        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+      </footer>
     </div>
   `;
   // Event listeners
@@ -124,17 +124,21 @@ export function renderRegister(rootElement) {
     alert('LinkedIn integratie nog niet geïmplementeerd');
   });
 
-  // Footer links
-  const privacyLink = document.getElementById('privacy-link');
-  privacyLink.addEventListener('click', (e) => {
+  // FOOTER LINKS
+  document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    alert('Privacy Policy pagina nog niet geïmplementeerd');
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/privacy');
+    });
   });
 
-  const contactLink = document.getElementById('contact-link');
-  contactLink.addEventListener('click', (e) => {
+  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    alert('Contact pagina nog niet geïmplementeerd');
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/contact');
+    });
   });
 }
 

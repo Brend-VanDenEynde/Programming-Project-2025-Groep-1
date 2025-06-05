@@ -18,10 +18,15 @@ export function renderAdminDashboard(rootElement) {
                     <button id="logout-btn" class="logout-btn">Uitloggen</button>
                 </div>
             </header>
-            
-            <main class="admin-content">
+              <main class="admin-content">
                 <!-- Admin dashboard content wordt hier toegevoegd -->
             </main>
+            
+            <!-- FOOTER -->
+            <footer class="student-profile-footer">
+                <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
+                <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+            </footer>
         </div>
     `;
 
@@ -30,9 +35,24 @@ export function renderAdminDashboard(rootElement) {
   logoutBtn.addEventListener('click', () => {
     // Clear session
     sessionStorage.removeItem('adminLoggedIn');
-    sessionStorage.removeItem('adminUsername');
-
-    // Redirect to admin login
+    sessionStorage.removeItem('adminUsername'); // Redirect to admin login
     window.location.hash = '#/admin';
+  });
+
+  // FOOTER LINKS
+  document.getElementById('privacy-policy').addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/privacy');
+    });
+  });
+
+  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/contact');
+    });
   });
 }

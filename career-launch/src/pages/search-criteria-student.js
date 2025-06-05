@@ -112,12 +112,11 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
             <button id="btn-reset" style="margin-right: 1rem;">RESET</button>
             <button id="btn-save">SAVE</button>
           </div>
-        </div>
-      </main>
+        </div>      </main>
     </div>    <!-- FOOTER -->
-    <footer style="text-align: center; margin-top: 1rem;">
+    <footer class="student-profile-footer">
       <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-      <a id="contacteer-ons" href="#/contact">Contacteer ons</a>
+      <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
     </footer>
   `;
 

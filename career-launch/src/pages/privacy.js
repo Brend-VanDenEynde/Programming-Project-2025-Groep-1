@@ -33,14 +33,35 @@ export function renderPrivacy(rootElement) {
           <p>Je gegevens worden alleen gedeeld met werkgevers waarmee je expliciet contact wilt.</p>
           
           <h3>4. Contact</h3>
-          <p>Voor vragen over privacy kun je contact opnemen via: privacy@ehb.be</p>
-        </div>
+          <p>Voor vragen over privacy kun je contact opnemen via: privacy@ehb.be</p>        </div>
       </div>
+      
+      <!-- FOOTER -->
+      <footer class="student-profile-footer">
+        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+      </footer>
     </div>
   `;
-
   const backButton = document.getElementById('back-button');
   backButton.addEventListener('click', () => {
     Router.navigate('/');
+  });
+
+  // FOOTER LINKS
+  document.getElementById('privacy-policy').addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/privacy');
+    });
+  });
+
+  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/contact');
+    });
   });
 }

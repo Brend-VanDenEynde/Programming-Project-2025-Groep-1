@@ -96,11 +96,16 @@ export function renderContact(rootElement) {
       </div>
     </div>
 
-    <!-- Loading overlay -->
-    <div id="loading-overlay" class="loading-overlay">
+    <!-- Loading overlay -->    <div id="loading-overlay" class="loading-overlay">
       <div class="loading-spinner"></div>
       <p>Bericht wordt verzonden...</p>
     </div>
+    
+    <!-- FOOTER -->
+    <footer class="student-profile-footer">
+      <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
+      <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+    </footer>
   `;
 
   // Initialiseer alle event listeners en functionaliteit
@@ -327,4 +332,21 @@ function initializeContactPage() {
 
   // Initiële validatie
   validateForm();
+
+  // FOOTER LINKS
+  document.getElementById('privacy-policy').addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/privacy');
+    });
+  });
+
+  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/contact');
+    });
+  });
 }
