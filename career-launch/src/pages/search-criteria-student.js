@@ -8,21 +8,16 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
   // Maak criteria-object als het nog niet bestaat
   if (!studentData.criteria) {
     studentData.criteria = {
-      zoekType: '',        // enkelvoud, want radio-buttons
-      skills: [],          // array van strings
-      skillAndere: '',     // ingevulde “Andere” skil
-      talen: [],           // array van strings
-      taalAndere: ''       // ingevulde “Andere” taal
+      zoekType: '', // enkelvoud, want radio-buttons
+      skills: [], // array van strings
+      skillAndere: '', // ingevulde “Andere” skil
+      talen: [], // array van strings
+      taalAndere: '', // ingevulde “Andere” taal
     };
   }
 
-  const {
-    zoekType,
-    skills,
-    skillAndere,
-    talen,
-    taalAndere
-  } = studentData.criteria;
+  const { zoekType, skills, skillAndere, talen, taalAndere } =
+    studentData.criteria;
 
   rootElement.innerHTML = `
     <!-- HEADER -->
@@ -119,12 +114,10 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
           </div>
         </div>
       </main>
-    </div>
-
-    <!-- FOOTER -->
+    </div>    <!-- FOOTER -->
     <footer style="text-align: center; margin-top: 1rem;">
-      <a id="privacy-policy" href="#">Privacy Policy</a> |
-      <a id="contacteer-ons" href="#">Contacteer ons</a>
+      <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
+      <a id="contacteer-ons" href="#/contact">Contacteer ons</a>
     </footer>
   `;
 
@@ -132,13 +125,17 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
   const restoreCriteria = () => {
     // Radio-buttons: enkelvoudige keuze
     if (zoekType) {
-      const radio = document.querySelector(`#fieldset-jobType input[value="${zoekType}"]`);
+      const radio = document.querySelector(
+        `#fieldset-jobType input[value="${zoekType}"]`
+      );
       if (radio) radio.checked = true;
     }
 
     // Skills: bewaar checkboxes, en maak dynamische “Andere” opnieuw
-    skills.forEach(val => {
-      let checkbox = document.querySelector(`#fieldset-skills input[value="${val}"]`);
+    skills.forEach((val) => {
+      let checkbox = document.querySelector(
+        `#fieldset-skills input[value="${val}"]`
+      );
       if (checkbox) {
         checkbox.checked = true;
       } else {
@@ -160,8 +157,10 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
     }
 
     // Talen: bewaar checkboxes, en maak dynamische “Andere” opnieuw
-    talen.forEach(val => {
-      let checkbox = document.querySelector(`#fieldset-talen input[value="${val}"]`);
+    talen.forEach((val) => {
+      let checkbox = document.querySelector(
+        `#fieldset-talen input[value="${val}"]`
+      );
       if (checkbox) {
         checkbox.checked = true;
       } else {
@@ -186,8 +185,8 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
   restoreCriteria();
 
   // SIDEBAR NAVIGATIE (naar profiel of andere pagina’s)
-  document.querySelectorAll('.sidebar-link').forEach(btn => {
-    btn.addEventListener('click', e => {
+  document.querySelectorAll('.sidebar-link').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
       const route = e.currentTarget.getAttribute('data-route');
       switch (route) {
         case 'profile':
@@ -214,7 +213,8 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
   const dropdown = document.getElementById('burger-dropdown');
   if (burger && dropdown) {
     burger.addEventListener('click', () => {
-      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+      dropdown.style.display =
+        dropdown.style.display === 'block' ? 'none' : 'block';
     });
   }
   document.getElementById('nav-dashboard').addEventListener('click', () => {
@@ -223,20 +223,24 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
   document.getElementById('nav-settings').addEventListener('click', () => {
     alert('Navigeren naar Instellingen (nog te implementeren)');
   });
-  document.getElementById('nav-delete-account').addEventListener('click', () => {
-    if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
-      alert('Account verwijderen (nog te implementeren)');
-    }
-  });
+  document
+    .getElementById('nav-delete-account')
+    .addEventListener('click', () => {
+      if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
+        alert('Account verwijderen (nog te implementeren)');
+      }
+    });
   document.getElementById('nav-logout').addEventListener('click', () => {
     renderLogin(rootElement);
   });
 
   // RESET-KNOP
   document.getElementById('btn-reset').addEventListener('click', () => {
-    document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(chk => {
-      chk.checked = false;
-    });
+    document
+      .querySelectorAll('input[type="checkbox"], input[type="radio"]')
+      .forEach((chk) => {
+        chk.checked = false;
+      });
     document.getElementById('skill-andere-text').value = '';
     document.getElementById('taal-andere-text').value = '';
     // Reset opgeslagen criteria
@@ -245,7 +249,7 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
       skills: [],
       skillAndere: '',
       talen: [],
-      taalAndere: ''
+      taalAndere: '',
     };
   });
 
@@ -257,7 +261,9 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
       skillAndereCheckbox.checked = false; // uncheck originele
       // Voeg dynamische checkbox toe
       const fieldsetSkills = document.getElementById('fieldset-skills');
-      const existing = fieldsetSkills.querySelector(`input[value="${textValue}"]`);
+      const existing = fieldsetSkills.querySelector(
+        `input[value="${textValue}"]`
+      );
       if (!existing) {
         const newId = `skill-${textValue.replace(/\s+/g, '-').toLowerCase()}`;
         const wrapper = document.createElement('div');
@@ -283,7 +289,9 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
       taalAndereCheckbox.checked = false;
       // Voeg dynamische checkbox toe
       const fieldsetTalen = document.getElementById('fieldset-talen');
-      const existing = fieldsetTalen.querySelector(`input[value="${textValue}"]`);
+      const existing = fieldsetTalen.querySelector(
+        `input[value="${textValue}"]`
+      );
       if (!existing) {
         const newId = `taal-${textValue.replace(/\s+/g, '-').toLowerCase()}`;
         const wrapper = document.createElement('div');
@@ -303,17 +311,21 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
   // SAVE-KNOP: bewaar radiokeuze, checkboxes, maar re-render niet
   document.getElementById('btn-save').addEventListener('click', () => {
     // Radiokoze: enkel één waarde
-    const selectedRadio = document.querySelector('input[name="jobType"]:checked');
+    const selectedRadio = document.querySelector(
+      'input[name="jobType"]:checked'
+    );
     studentData.criteria.zoekType = selectedRadio ? selectedRadio.value : '';
 
     // Skills: alle checked (inclusief dynamische)
-    const selectedSkills = Array.from(document.querySelectorAll('input[name="skills"]:checked'))
-      .map(el => el.value);
+    const selectedSkills = Array.from(
+      document.querySelectorAll('input[name="skills"]:checked')
+    ).map((el) => el.value);
     studentData.criteria.skills = selectedSkills;
 
     // Talen: alle checked
-    const selectedTalen = Array.from(document.querySelectorAll('input[name="talen"]:checked'))
-      .map(el => el.value);
+    const selectedTalen = Array.from(
+      document.querySelectorAll('input[name="talen"]:checked')
+    ).map((el) => el.value);
     studentData.criteria.talen = selectedTalen;
 
     // SkillAndere en TaalAndere blijven zoals eerder ingesteld
@@ -322,14 +334,20 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
     alert('Zoek-criteria zijn opgeslagen.');
     // Geen re-render → checkboxen/radio’s blijven zichtbaar zoals ze staan
   });
-
   // FOOTER LINKS
-  document.getElementById('privacy-policy').addEventListener('click', e => {
+  document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    alert('Privacy Policy pagina wordt hier geladen.');
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/privacy');
+    });
   });
-  document.getElementById('contacteer-ons').addEventListener('click', e => {
+
+  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    alert('Contacteer ons formulier wordt hier geladen.');
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/contact');
+    });
   });
 }

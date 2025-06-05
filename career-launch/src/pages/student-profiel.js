@@ -186,9 +186,8 @@ export function renderStudentProfiel(rootElement, studentData = {}) {
       </div>
 
       <!-- FOOTER -->
-      <footer class="student-profile-footer">
-        <a id="privacy-policy" href="#">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#">Contacteer Ons</a>
+      <footer class="student-profile-footer">        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
       </footer>
     </div>
   `;
@@ -301,15 +300,22 @@ export function renderStudentProfiel(rootElement, studentData = {}) {
     renderStudentProfiel(rootElement, updatedData);
     alert('Profielgegevens succesvol opgeslagen.');
   });
-
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    alert('Privacy Policy pagina wordt hier geladen.');
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/privacy');
+    });
   });
+
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    alert('Contacteer ons formulier wordt hier geladen.');
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      // Use absolute path to ensure correct navigation regardless of current path
+      Router.navigate('/contact');
+    });
   });
   //aaaaa
 }
