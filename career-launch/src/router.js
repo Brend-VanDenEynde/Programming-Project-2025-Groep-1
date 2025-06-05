@@ -12,42 +12,37 @@ class Router {
     // Initial route check
     this.handleRouteChange();
   }
-
   setupLinkHandling() {
     // Intercept clicks op interne links
     document.addEventListener('click', (e) => {
       const link = e.target.closest('a[href^="/"], a[data-route]');
       if (link) {
         e.preventDefault();
-        const path =
-          link.getAttribute('href') || link.getAttribute('data-route');
+        let path = link.getAttribute('href') || link.getAttribute('data-route');
+
+        console.log('Router: Link clicked, navigating to:', path);
         this.navigate(path);
       }
     });
   }
-
   navigate(path) {
-    // Update browser URL zonder pagina reload
+    console.log('Router: Navigating to:', path);
+
+    // Gebruik altijd normale URL routing (geen hash)
     window.history.pushState(null, '', path);
     this.handleRouteChange();
   }
-
   handleRouteChange() {
     let path = window.location.pathname;
-
-    // Als we op localhost zijn, moet je development setup misschien nog hash gebruiken
-    // Dit check of we hash-based routing gebruiken als fallback
-    if (path === '/' && window.location.hash) {
-      path = window.location.hash.slice(1);
-    }
 
     // Zorg ervoor dat path begint met /
     if (!path.startsWith('/')) {
       path = '/' + path;
     }
 
-    // Check admin access
-    if (path === '/admin-dashboard' || path === '/admin/admin-dashboard') {
+    // Clean up any double slashes
+    path = path.replace(/\/+/g, '/'); // Check admin access
+    if (path === '/admin-dashboard') {
       const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
       if (!isLoggedIn || isLoggedIn !== 'true') {
         this.navigate('/admin');
@@ -67,7 +62,6 @@ class Router {
     console.log('Navigated to:', path);
     console.log('Route exists?', !!this.routes[path]);
   }
-
   updateTitle(path) {
     const titles = {
       '/': 'Career Launch 2025 - Home',
@@ -76,15 +70,18 @@ class Router {
       '/Student/Student-Profiel': 'Student Profiel - Career Launch 2025',
       '/Student/Zoek-Criteria': 'Zoek Criteria - Career Launch 2025',
       '/admin': 'Admin Login - Career Launch 2025',
-      '/admin/admin-dashboard': 'Admin Dashboard - Career Launch 2025',
+      '/admin-dashboard': 'Admin Dashboard - Career Launch 2025',
+      '/contact': 'Contacteer ons - Career Launch 2025',
+      '/privacy': 'Privacy Beleid - Career Launch 2025',
       '/404': 'Pagina niet gevonden - Career Launch 2025',
     };
 
     document.title = titles[path] || 'Career Launch 2025';
-  }
-
-  // Helper method voor gebruik in pagina's
+  } // Helper method voor gebruik in pagina's
   static navigate(path) {
+    console.log('Static Router.navigate called with:', path);
+
+    // Gebruik altijd normale URL routing (geen hash)
     window.history.pushState(null, '', path);
     // Trigger een custom event zodat de router weet dat er genavigeerd is
     window.dispatchEvent(new PopStateEvent('popstate'));

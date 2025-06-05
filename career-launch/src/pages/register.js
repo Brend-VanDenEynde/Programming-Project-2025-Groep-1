@@ -66,18 +66,17 @@ export function renderRegister(rootElement) {
           </svg>
           Sign in with LinkedIn
         </button>
-        
-        <div class="login-link">
+          <div class="login-link">
           <p>Heb je al een account? 
             <a id="login-link" data-route="/login" style="cursor:pointer;">Inloggen</a>
           </p>
         </div>
-        
-        <div class="footer-links">
-          <a href="/privacy" data-route="/privacy">Privacy Policy</a>
-          <a href="/contact" data-route="/contact">Contacteer Ons</a>
-        </div>
       </div>
+        <!-- FOOTER -->
+      <footer class="student-profile-footer">
+        <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
+      </footer>
     </div>
   `;
 
@@ -95,25 +94,24 @@ export function renderRegister(rootElement) {
     });
   }
 
-  document.getElementById('linkedin-btn').addEventListener('click', () => {
+  // LinkedIn button
+  const linkedinButton = document.getElementById('linkedin-btn');
+  linkedinButton.addEventListener('click', () => {
     alert('LinkedIn integratie nog niet geïmplementeerd');
   });
 
+  // Footer links
   const privacyLink = document.getElementById('privacy-link');
-  if (privacyLink) {
-    privacyLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      alert('Privacy Policy pagina nog niet geïmplementeerd');
-    });
-  }
+  privacyLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Privacy Policy pagina nog niet geïmplementeerd');
+  });
 
   const contactLink = document.getElementById('contact-link');
-  if (contactLink) {
-    contactLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      alert('Contact pagina nog niet geïmplementeerd');
-    });
-  }
+  contactLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Contact pagina nog niet geïmplementeerd');
+  });
 }
 
 function handleRegister(event) {
@@ -140,8 +138,9 @@ function handleRegister(event) {
     return;
   }
 
+  // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
-  alert(`Account succesvol aangemaakt!`);
+  alert(`Welkom ${data.firstName}! Je account is aangemaakt.`);
 
   if (data.rol === 'student') {
       renderStudentRegister(document.getElementById('app'));
