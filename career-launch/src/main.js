@@ -12,6 +12,8 @@ import { renderAdmin } from './pages/admin.js';
 import { renderAdminDashboard } from './pages/admin-dashboard.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
+import { renderBedrijfProfiel } from './pages/bedrijf-profiel.js';
+import { renderSearchCriteriaBedrijf } from './pages/search-criteria-bedrijf.js';
 
 // functie om de 404 pagina te renderen
 function renderNotFound(rootElement) {
@@ -36,6 +38,8 @@ const routes = {
   '/admin/admin-dashboard': renderAdminDashboard,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
+  '/Bedrijf/Bedrijf-Profiel': renderBedrijfProfiel,
+  '/Bedrijf/Zoek-Criteria': renderSearchCriteriaBedrijf,
 };
 
 // Initialize router

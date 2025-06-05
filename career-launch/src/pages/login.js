@@ -114,6 +114,9 @@ function handleLogin(event, rootElement) {
   console.log('Inlogdata:', { email, password });
   alert(`Welkom terug, ${email}!`);
 
+  
+  /* Student data terugsteken
+
   // Simuleer studentData na succesvolle login
   const studentData = {
     firstName: 'Jan',
@@ -126,4 +129,23 @@ function handleLogin(event, rootElement) {
 
   // Ga naar student-profiel via router
   Router.navigate('/Student/Student-Profiel');
+
+  */
+
+  // Simuleer bedrijfData na succesvolle login
+const bedrijfData = {
+  companyName: 'Microsoft',
+  email: email,
+  description: 'Wij zijn een technologiebedrijf dat innovatieve oplossingen biedt.',
+  linkedIn: 'https://www.linkedin.com/company/microsoft',
+  profilePictureUrl: '/src/Images/default.jpg',
+};
+
+// Sla bedrijfData eventueel tijdelijk op (bijv. in geheugen, lokale opslag of context)
+window.sessionStorage.setItem('bedrijfData', JSON.stringify(bedrijfData));
+
+// Navigeer naar bedrijf-profiel via router
+Router.navigate('/Bedrijf/Bedrijf-Profiel');
+
 }
+// renderBedrijfProfiel(rootElement, bedrijfData);
