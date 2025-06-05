@@ -113,11 +113,10 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
             <button id="btn-save">SAVE</button>
           </div>
         </div>      </main>
-    </div>    <!-- FOOTER -->
-    <footer class="student-profile-footer">
-      <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-      <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
-    </footer>
+    </div>    <!-- FOOTER -->      <footer class="student-profile-footer">
+      <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
+      <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
+      </footer>
   `;
 
   // FUNCTIE: herstel opgeslagen criteria

@@ -1,12 +1,13 @@
 // Admin dashboard pagina
+import Router from '../router.js';
+
 export function renderAdminDashboard(rootElement) {
   // Check if user is logged in
   const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
   const adminUsername = sessionStorage.getItem('adminUsername');
-
   if (!isLoggedIn || isLoggedIn !== 'true') {
     // Redirect to admin login if not logged in
-    window.location.hash = '#/admin';
+    Router.navigate('/admin');
     return;
   }
   rootElement.innerHTML = `
@@ -21,22 +22,21 @@ export function renderAdminDashboard(rootElement) {
               <main class="admin-content">
                 <!-- Admin dashboard content wordt hier toegevoegd -->
             </main>
-            
-            <!-- FOOTER -->
+              <!-- FOOTER -->
             <footer class="student-profile-footer">
-                <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-                <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+                <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
+                <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
             </footer>
         </div>
     `;
-
   // Handle logout
   const logoutBtn = document.getElementById('logout-btn');
   logoutBtn.addEventListener('click', () => {
     // Clear session
     sessionStorage.removeItem('adminLoggedIn');
-    sessionStorage.removeItem('adminUsername'); // Redirect to admin login
-    window.location.hash = '#/admin';
+    sessionStorage.removeItem('adminUsername');
+    // Redirect to admin login
+    Router.navigate('/admin');
   });
 
   // FOOTER LINKS

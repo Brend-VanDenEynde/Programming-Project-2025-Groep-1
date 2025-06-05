@@ -13,11 +13,10 @@ export function renderHome(rootElement) {
 
       <p>Geïnteresseerd?</p>
       <button id="btn-register" class="btn" data-route="/registreer">Registreer je nu!</button>      <p>Al ingeschreven?</p>
-      <button id="btn-login" class="btn" data-route="/login">Login</button>    </div>
-      <!-- FOOTER -->
+      <button id="btn-login" class="btn" data-route="/login">Login</button>    </div>      <!-- FOOTER -->
       <footer class="student-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+        <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
       </footer>
   `; // Event listeners voor buttons (als fallback of voor speciale handling)
   const btnReg = document.getElementById('btn-register');

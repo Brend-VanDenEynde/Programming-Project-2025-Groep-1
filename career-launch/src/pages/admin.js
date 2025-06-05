@@ -1,4 +1,6 @@
 // Admin login pagina
+import Router from '../router.js';
+
 export function renderAdmin(rootElement) {
   rootElement.innerHTML = `
         <div class="admin-container">
@@ -16,11 +18,10 @@ export function renderAdmin(rootElement) {
                     </div>
                     <button type="submit" class="admin-btn">Inloggen</button>                </form>
             </div>
-            
-            <!-- FOOTER -->
+              <!-- FOOTER -->
             <footer class="student-profile-footer">
-                <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-                <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+                <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
+                <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
             </footer>
         </div>
     `;
@@ -48,10 +49,8 @@ export function renderAdmin(rootElement) {
     ) {
       // Set session
       sessionStorage.setItem('adminLoggedIn', 'true');
-      sessionStorage.setItem('adminUsername', username);
-
-      // Redirect to dashboard
-      window.location.hash = '#/admin-dashboard';
+      sessionStorage.setItem('adminUsername', username); // Redirect to dashboard
+      Router.navigate('/admin-dashboard');
     } else {
       // Show error message
       errorMessage.textContent = 'Ongeldige gebruikersnaam of wachtwoord!';

@@ -49,11 +49,10 @@ export function renderLogin(rootElement) {
           </p>
         </div>
       </div>
-      
-      <!-- FOOTER -->
+        <!-- FOOTER -->
       <footer class="student-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+        <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
       </footer>
     </div>
   `;

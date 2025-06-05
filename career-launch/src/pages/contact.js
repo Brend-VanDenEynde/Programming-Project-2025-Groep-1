@@ -101,11 +101,10 @@ export function renderContact(rootElement) {
       <p>Bericht wordt verzonden...</p>
     </div>
     
-    <!-- FOOTER -->
-    <footer class="student-profile-footer">
-      <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-      <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
-    </footer>
+    <!-- FOOTER -->      <footer class="student-profile-footer">
+      <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
+      <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
+      </footer>
   `;
 
   // Initialiseer alle event listeners en functionaliteit

@@ -5,6 +5,8 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
+    // Enable history API fallback for client-side routing
+    historyApiFallback: true,
   },
 
   // Build configuratie
