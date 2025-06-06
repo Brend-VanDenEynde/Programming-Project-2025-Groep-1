@@ -1,3 +1,4 @@
+import { renderStudentSkills } from './student-skills.js';
 import './student-register.css';
 import Router from '../router.js';
 
@@ -59,6 +60,19 @@ function handleJaarRegister(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
+
+  const jaar = formData.get('jaar');
+  const opleiding = formData.get('opleiding');
+
+  if (!jaar) {
+    alert('Selecteer een jaar!');
+    return;
+  }
+  if (!opleiding || opleiding === 'Opleiding') {
+    alert('Selecteer een opleiding!');
+    return;
+  }
+
   const data = {
     jaar: formData.get('jaar'), // geselecteerde radio
     opleiding: formData.get('opleiding'), // geselecteerde optie uit select
