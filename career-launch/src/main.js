@@ -36,7 +36,7 @@ const routes = {
   '/Student/Student-Profiel': renderStudentProfiel,
   '/Student/Zoek-Criteria': renderSearchCriteriaStudent,
   '/admin': renderAdmin,
-  '/admin/admin-dashboard': renderAdminDashboard,
+  '/admin-dashboard': renderAdminDashboard,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
   '/Bedrijf/Bedrijf-Profiel': renderBedrijfProfiel,

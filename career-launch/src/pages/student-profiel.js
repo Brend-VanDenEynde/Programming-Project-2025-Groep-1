@@ -185,10 +185,8 @@ export function renderStudentProfiel(rootElement, studentData = {}) {
         </div>
       </div>
 
-      <!-- FOOTER -->
-      <footer class="student-profile-footer">
-        <a id="privacy-policy" href="#">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#">Contacteer Ons</a>
+      <!-- FOOTER -->      <footer class="student-profile-footer">        <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
       </footer>
     </div>
   `;
@@ -210,19 +208,18 @@ export function renderStudentProfiel(rootElement, studentData = {}) {
         dropdown.style.display === 'block' ? 'none' : 'block';
     });
   }
-
   // Hamburger‐opties: Dashboard, Instellingen, Verwijder account, Log out
   document.getElementById('nav-dashboard').addEventListener('click', () => {
-    alert('Navigeren naar Dashboard (nog te implementeren)');
+    // Navigeren naar Dashboard (nog te implementeren)
   });
   document.getElementById('nav-settings').addEventListener('click', () => {
-    alert('Navigeren naar Instellingen (nog te implementeren)');
+    // Navigeren naar Instellingen (nog te implementeren)
   });
   document
     .getElementById('nav-delete-account')
     .addEventListener('click', () => {
       if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
-        alert('Account verwijderen (nog te implementeren)');
+        // Account verwijderen (nog te implementeren)
       }
     });
   document.getElementById('nav-logout').addEventListener('click', () => {
@@ -295,21 +292,25 @@ export function renderStudentProfiel(rootElement, studentData = {}) {
       return;
     }
 
-    // TODO: stuur updatedData naar backend
-
-    // Toon opnieuw de view‐sectie met bijgewerkte data
+    // TODO: stuur updatedData naar backend    // Toon opnieuw de view‐sectie met bijgewerkte data
     renderStudentProfiel(rootElement, updatedData);
-    alert('Profielgegevens succesvol opgeslagen.');
   });
-
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    alert('Privacy Policy pagina wordt hier geladen.');
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/privacy');
+    });
   });
+
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    alert('Contacteer ons formulier wordt hier geladen.');
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      // Use absolute path to ensure correct navigation regardless of current path
+      Router.navigate('/contact');
+    });
   });
   //aaaaa
 }

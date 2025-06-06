@@ -66,18 +66,17 @@ export function renderRegister(rootElement) {
           </svg>
           Sign in with LinkedIn
         </button>
-        
-        <div class="login-link">
+          <div class="login-link">
           <p>Heb je al een account? 
             <a id="login-link" data-route="/login" style="cursor:pointer;">Inloggen</a>
           </p>
         </div>
-        
-        <div class="footer-links">
-          <a href="/privacy" data-route="/privacy">Privacy Policy</a>
-          <a href="/contact" data-route="/contact">Contacteer Ons</a>
-        </div>
       </div>
+        <!-- FOOTER -->
+      <footer class="student-profile-footer">
+        <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
+      </footer>
     </div>
   `;
 
@@ -94,26 +93,28 @@ export function renderRegister(rootElement) {
       Router.navigate('/login');
     });
   }
-
-  document.getElementById('linkedin-btn').addEventListener('click', () => {
-    alert('LinkedIn integratie nog niet geïmplementeerd');
+  // LinkedIn button
+  const linkedinButton = document.getElementById('linkedin-btn');
+  linkedinButton.addEventListener('click', () => {
+    // LinkedIn integratie nog niet geïmplementeerd
   });
 
-  const privacyLink = document.getElementById('privacy-link');
-  if (privacyLink) {
-    privacyLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      alert('Privacy Policy pagina nog niet geïmplementeerd');
+  // FOOTER LINKS
+  document.getElementById('privacy-policy').addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/privacy');
     });
-  }
+  });
 
-  const contactLink = document.getElementById('contact-link');
-  if (contactLink) {
-    contactLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      alert('Contact pagina nog niet geïmplementeerd');
+  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/contact');
     });
-  }
+  });
 }
 
 function handleRegister(event) {
@@ -139,9 +140,8 @@ function handleRegister(event) {
     alert('Selecteer “Student” of “Bedrijf”!');
     return;
   }
-
+  // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
-  alert(`Account succesvol aangemaakt!`);
 
   if (data.rol === 'student') {
       renderStudentRegister(document.getElementById('app'));
