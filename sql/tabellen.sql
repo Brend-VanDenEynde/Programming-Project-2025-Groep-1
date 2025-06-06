@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS gebruiker (
     email TEXT NOT NULL UNIQUE,
     wachtwoord TEXT NOT NULL,
     is_admin TINYINT NOT NULL DEFAULT 0,
-    created_ad DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- tabel voor een bedrijf 
