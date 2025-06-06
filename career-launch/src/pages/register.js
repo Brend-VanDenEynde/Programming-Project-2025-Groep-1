@@ -1,4 +1,6 @@
 import { renderStudentRegister } from './student-register.js';
+import { renderLogin } from './login.js';
+import Router from '../router.js';
 
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `
@@ -93,13 +95,11 @@ export function renderRegister(rootElement) {
       Router.navigate('/login');
     });
   }
-<<<<<<< HEAD
   // LinkedIn button
   const linkedinButton = document.getElementById('linkedin-btn');
   linkedinButton.addEventListener('click', () => {
     // LinkedIn integratie nog niet geïmplementeerd
   });
-
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
@@ -115,26 +115,6 @@ export function renderRegister(rootElement) {
       const Router = module.default;
       Router.navigate('/contact');
     });
-=======
-
-  // LinkedIn button
-  const linkedinButton = document.getElementById('linkedin-btn');
-  linkedinButton.addEventListener('click', () => {
-    alert('LinkedIn integratie nog niet geïmplementeerd');
-  });
-
-  // Footer links
-  const privacyLink = document.getElementById('privacy-link');
-  privacyLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Privacy Policy pagina nog niet geïmplementeerd');
-  });
-
-  const contactLink = document.getElementById('contact-link');
-  contactLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Contact pagina nog niet geïmplementeerd');
->>>>>>> Register
   });
 }
 
@@ -161,19 +141,12 @@ function handleRegister(event) {
     alert('Selecteer “Student” of “Bedrijf”!');
     return;
   }
-<<<<<<< HEAD
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
-=======
-
-  // Data naar server sturen (voorbeeld)
-  console.log('Registratie data:', data);
-  alert(`Welkom ${data.firstName}! Je account is aangemaakt.`);
->>>>>>> Register
 
   if (data.rol === 'student') {
-      renderStudentRegister(document.getElementById('app'));
+    renderStudentRegister(document.getElementById('app'));
   } else {
-      renderLogin(document.getElementById('app'));
+    renderLogin(document.getElementById('app'));
   }
 }
