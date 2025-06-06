@@ -1,5 +1,11 @@
 import { renderLogin } from './login.js';
 import Router from '../router.js';
+import {
+  createUserRegistrationJSON,
+  sendRegistrationToAPI,
+  validateRegistrationData,
+  mockRegistrationAPI,
+} from '../utils/registration-api.js';
 
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `
@@ -140,11 +146,12 @@ export function renderRegister(rootElement) {
   });
 }
 
+// Nieuwe handleRegister functie met JSON-structurering en API-call
 function handleRegister(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
-  const data = {
+  const rawData = {
     firstName: formData.get('firstName'),
     lastName: formData.get('lastName'),
     email: formData.get('email'),
@@ -153,22 +160,345 @@ function handleRegister(event) {
     rol: formData.get('rol'),
   };
 
-  // Validatie
-  if (data.password !== data.confirmPassword) {
-    alert('Wachtwoorden komen niet overeen!');
+  // Uitgebreide validatie
+  const validation = validateRegistrationData(rawData);
+  if (!validation.isValid) {
+    showErrorMessage(validation.errors.join(', '));
     return;
   }
-  if (data.password.length < 8) {
-    alert('Wachtwoord moet minimaal 8 karakters bevatten!');
-    return;
-  }
-  if (!data.rol) {
-    alert('Selecteer “Student” of “Bedrijf”!');
-    return;
-  }
-  // Data naar server sturen (voorbeeld)
-  console.log('Registratie data:', data);
+  // Maak gestructureerd JSON-object klaar voor API
+  const userRegistrationData = createUserRegistrationJSON(rawData);
 
-  // Redirect naar login (of andere actie)
-  renderLogin(document.getElementById('app'));
+  // Log het JSON-object voor debugging
+  console.log('=== GESTRUCTUREERD JSON-OBJECT VOOR API ===');
+  console.log(JSON.stringify(userRegistrationData, null, 2));
+  console.log('=== EINDE JSON-OBJECT ===');
+
+  // Toon het JSON ook visueel in een modal voor eenvoudige inspectie
+  showJSONPreview(userRegistrationData);
+
+  // Voorlopig niet doorgan naar API call - wacht op bevestiging
+  console.log(
+    '⚠️  API-call wordt NIET uitgevoerd - JSON is gelogd voor inspectie'
+  );
+  showInfoMessage(
+    'JSON-object is gegenereerd en gelogd in de console. Open Developer Tools (F12) om het te bekijken.'
+  );
+
+  // Uncomment de volgende regel om de API-call uit te voeren:
+  // performRegistration(userRegistrationData);
+}
+
+/**
+ * Voert de registratie uit met de backend API
+ * @param {Object} userData - Het gestructureerde JSON-object
+ */
+async function performRegistration(userData) {
+  try {
+    // Toon loading indicator
+    showLoadingState(true);
+
+    // Gebruik mockAPI voor development, echte API voor productie
+    const isDevelopment =
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1';
+
+    let result;
+    if (isDevelopment) {
+      // Gebruik mock API voor testing
+      console.log('Development modus: gebruik mock API');
+      result = await mockRegistrationAPI(userData);
+    } else {
+      // Gebruik echte API
+      result = await sendRegistrationToAPI(userData);
+    }
+
+    // Verberg loading indicator
+    showLoadingState(false);
+
+    if (result.success) {
+      console.log('Registratie succesvol:', result);
+
+      // Toon successmelding
+      showSuccessMessage(
+        result.message ||
+          'Registratie succesvol! Je ontvangt een bevestigingsmail.'
+      );
+
+      // Redirect naar login pagina na korte delay
+      setTimeout(() => {
+        Router.navigate('/login');
+      }, 2500);
+    }
+  } catch (error) {
+    showLoadingState(false);
+    console.error('Registratie gefaald:', error);
+    showErrorMessage(
+      error.message || 'Er is een fout opgetreden tijdens de registratie.'
+    );
+  }
+}
+
+/**
+ * Toont/verbergt loading state
+ * @param {boolean} isLoading
+ */
+function showLoadingState(isLoading) {
+  const submitButton = document.querySelector('.register-btn');
+  if (submitButton) {
+    if (isLoading) {
+      submitButton.disabled = true;
+      submitButton.textContent = 'Registreren...';
+      submitButton.style.opacity = '0.7';
+      submitButton.style.cursor = 'not-allowed';
+    } else {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Registreer';
+      submitButton.style.opacity = '1';
+      submitButton.style.cursor = 'pointer';
+    }
+  }
+}
+
+/**
+ * Toont een successmelding
+ * @param {string} message
+ */
+function showSuccessMessage(message) {
+  removeExistingMessages();
+
+  const messageDiv = document.createElement('div');
+  messageDiv.className = 'success-message';
+  messageDiv.style.cssText = `
+    background-color: #d4edda;
+    color: #155724;
+    padding: 12px 16px;
+    border: 1px solid #c3e6cb;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    text-align: center;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  `;
+  messageDiv.innerHTML = `
+    <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+      <span style="font-size: 16px;">✅</span>
+      <span>${message}</span>
+    </div>
+  `;
+
+  const form = document.getElementById('registerForm');
+  form.parentNode.insertBefore(messageDiv, form);
+
+  // Auto-remove na 5 seconden
+  setTimeout(() => {
+    if (messageDiv.parentNode) {
+      messageDiv.remove();
+    }
+  }, 5000);
+}
+
+/**
+ * Toont een errormelding
+ * @param {string} message
+ */
+function showErrorMessage(message) {
+  removeExistingMessages();
+
+  const messageDiv = document.createElement('div');
+  messageDiv.className = 'error-message';
+  messageDiv.style.cssText = `
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 12px 16px;
+    border: 1px solid #f5c6cb;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    text-align: center;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  `;
+  messageDiv.innerHTML = `
+    <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+      <span style="font-size: 16px;">❌</span>
+      <span>${message}</span>
+    </div>
+  `;
+
+  const form = document.getElementById('registerForm');
+  form.parentNode.insertBefore(messageDiv, form);
+
+  // Auto-remove na 8 seconden
+  setTimeout(() => {
+    if (messageDiv.parentNode) {
+      messageDiv.remove();
+    }
+  }, 8000);
+}
+
+/**
+ * Toont het JSON-object in een visuele preview modal
+ * @param {Object} jsonData
+ */
+function showJSONPreview(jsonData) {
+  // Verwijder eventuele bestaande preview
+  const existingPreview = document.querySelector('.json-preview-modal');
+  if (existingPreview) {
+    existingPreview.remove();
+  }
+
+  const modal = document.createElement('div');
+  modal.className = 'json-preview-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+  `;
+
+  const content = document.createElement('div');
+  content.style.cssText = `
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  `;
+
+  content.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px;">
+      <h3 style="margin: 0; color: #333;">📄 JSON Object Preview</h3>
+      <button id="closeJsonPreview" style="
+        background: #ff4757;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 14px;
+      ">Sluiten ✕</button>
+    </div>
+    
+    <div style="margin-bottom: 15px;">
+      <strong>Dit JSON-object wordt naar de backend API verzonden:</strong>
+    </div>
+    
+    <pre style="
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.4;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
+    ">${JSON.stringify(jsonData, null, 2)}</pre>
+    
+    <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 4px; border-left: 4px solid #2196F3;">
+      <strong>💡 Tip:</strong> Open Developer Tools (F12) → Console tab voor meer details en kopieerbare JSON.
+    </div>
+    
+    <div style="margin-top: 15px; text-align: center;">
+      <button id="continueRegistration" style="
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 12px 24px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-right: 10px;
+      ">✅ JSON is OK - Doorgaan met registratie</button>
+      
+      <button id="cancelRegistration" style="
+        background: #757575;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 12px 24px;
+        cursor: pointer;
+        font-size: 16px;
+      ">❌ Annuleren</button>
+    </div>
+  `;
+
+  modal.appendChild(content);
+  document.body.appendChild(modal);
+
+  // Event listeners voor knoppen
+  document.getElementById('closeJsonPreview').onclick = () => modal.remove();
+  document.getElementById('cancelRegistration').onclick = () => modal.remove();
+  document.getElementById('continueRegistration').onclick = () => {
+    modal.remove();
+    // Nu pas de API-call uitvoeren
+    performRegistration(jsonData);
+  };
+
+  // Sluit modal bij klikken buiten content
+  modal.onclick = (e) => {
+    if (e.target === modal) {
+      modal.remove();
+    }
+  };
+}
+
+/**
+ * Toont een info-melding (blauwe kleur)
+ * @param {string} message
+ */
+function showInfoMessage(message) {
+  removeExistingMessages();
+
+  const messageDiv = document.createElement('div');
+  messageDiv.className = 'info-message';
+  messageDiv.style.cssText = `
+    background-color: #d1ecf1;
+    color: #0c5460;
+    padding: 12px 16px;
+    border: 1px solid #bee5eb;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    text-align: center;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  `;
+  messageDiv.innerHTML = `
+    <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+      <span style="font-size: 16px;">ℹ️</span>
+      <span>${message}</span>
+    </div>
+  `;
+
+  const form = document.getElementById('registerForm');
+  form.parentNode.insertBefore(messageDiv, form);
+
+  // Auto-remove na 10 seconden
+  setTimeout(() => {
+    if (messageDiv.parentNode) {
+      messageDiv.remove();
+    }
+  }, 10000);
+}
+
+/**
+ * Verwijdert bestaande success/error/info meldingen
+ */
+function removeExistingMessages() {
+  const existingMessages = document.querySelectorAll(
+    '.success-message, .error-message, .info-message'
+  );
+  existingMessages.forEach((msg) => msg.remove());
 }

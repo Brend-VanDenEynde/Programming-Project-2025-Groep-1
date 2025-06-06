@@ -34,6 +34,9 @@ const routes = {
   '/Student/Zoek-Criteria': renderSearchCriteriaStudent,
   '/admin': renderAdmin,
   '/admin-dashboard': renderAdminDashboard,
+  '/admin-dashboard/ingeschreven-studenten': renderAdminDashboard,
+  '/admin-dashboard/ingeschreven-bedrijven': renderAdminDashboard,
+  '/admin-dashboard/bedrijven-in-behandeling': renderAdminDashboard,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
 };
