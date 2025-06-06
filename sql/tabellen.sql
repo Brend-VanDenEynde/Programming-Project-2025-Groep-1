@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS gebruiker (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT NOT NULL UNIQUE,
     wachtwoord TEXT NOT NULL,
-    is_admin TINYINT NOT NULL DEFAULT 0
+    is_admin TINYINT NOT NULL DEFAULT 0,
+    creared_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 );
 
 -- tabel voor een bedrijf 
