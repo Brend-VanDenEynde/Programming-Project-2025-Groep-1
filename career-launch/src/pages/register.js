@@ -117,6 +117,7 @@ export function renderRegister(rootElement) {
   });
 }
 
+// Nieuwe handleRegister functie met JSON-structurering en API-call
 function handleRegister(event) {
   event.preventDefault();
 
@@ -144,8 +145,8 @@ function handleRegister(event) {
   console.log('Registratie data:', data);
 
   if (data.rol === 'student') {
-      renderStudentRegister(document.getElementById('app'));
+    renderStudentRegister(document.getElementById('app'));
   } else {
-      renderLogin(document.getElementById('app'));
+    renderLogin(document.getElementById('app'));
   }
 }

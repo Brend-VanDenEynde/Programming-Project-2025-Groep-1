@@ -42,7 +42,7 @@ class Router {
 
     // Clean up any double slashes
     path = path.replace(/\/+/g, '/'); // Check admin access
-    if (path === '/admin-dashboard') {
+    if (path === '/admin-dashboard' || path.startsWith('/admin-dashboard/')) {
       const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
       if (!isLoggedIn || isLoggedIn !== 'true') {
         this.navigate('/admin');
@@ -71,6 +71,12 @@ class Router {
       '/Student/Zoek-Criteria': 'Zoek Criteria - Career Launch 2025',
       '/admin': 'Admin Login - Career Launch 2025',
       '/admin-dashboard': 'Admin Dashboard - Career Launch 2025',
+      '/admin-dashboard/ingeschreven-studenten':
+        'Ingeschreven Studenten - Admin Dashboard',
+      '/admin-dashboard/ingeschreven-bedrijven':
+        'Ingeschreven Bedrijven - Admin Dashboard',
+      '/admin-dashboard/bedrijven-in-behandeling':
+        'Bedrijven in Behandeling - Admin Dashboard',
       '/contact': 'Contacteer ons - Career Launch 2025',
       '/privacy': 'Privacy Beleid - Career Launch 2025',
       '/404': 'Pagina niet gevonden - Career Launch 2025',
