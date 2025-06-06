@@ -2,7 +2,7 @@
 import './student-register.css';
 import Router from '../router.js';
 
-export function renderStudentRegister(rootElement) {
+export function renderBedrijfRegister(rootElement) {
   rootElement.innerHTML = `
   
   <div style="min-height: 100vh; display: flex; flex-direction: column;">
@@ -16,8 +16,7 @@ export function renderStudentRegister(rootElement) {
 
       <form class="naamForm" id="naamForm">
         <div class="name-row">
-          <input type="voornaam" id="voornaam" name="voornaam" required placeholder="Voornaam" class="input-half" />
-          <input type="achternaam" id="achternaam" name="achternaam" required placeholder="Achternaam" class="input-half" />
+          <input type="bedrijfnaam" id="bedrijfnaam" name="bedrijfnaam" required placeholder="Bedrijfnaam" class="input-half" />
         </div>
         <input type="linkedin" id="linkedin" name"linkedin" placeholder="LinkedIn-link" class="input-full" />
 

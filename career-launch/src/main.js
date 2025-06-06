@@ -17,6 +17,7 @@ import { renderSearchCriteriaBedrijf } from './pages/search-criteria-bedrijf.js'
 import { renderStudentRegister } from './pages/student-register.js';
 import { renderStudentOpleiding } from './pages/student-opleiding.js';
 import { renderStudentSkills } from './pages/student-skills.js';
+import { renderBedrijfRegister } from './pages/bedrijf-register.js';
 
 // functie om de 404 pagina te renderen
 function renderNotFound(rootElement) {
@@ -46,6 +47,7 @@ const routes = {
   '/Student-Register': renderStudentRegister,
   '/Student-Opleiding': renderStudentOpleiding,
   '/Student-Skills': renderStudentSkills,
+  '/Bedrijf-Register': renderBedrijfRegister,
 };
 
 // Initialize router

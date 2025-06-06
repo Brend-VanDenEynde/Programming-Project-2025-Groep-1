@@ -1,4 +1,6 @@
 import { renderStudentRegister } from './student-register.js';
+import { renderBedrijfRegister } from './bedrijf-register.js';
+import Router from '../router.js';
 
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `
