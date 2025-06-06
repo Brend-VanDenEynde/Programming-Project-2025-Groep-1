@@ -1,12 +1,9 @@
+import './student-register.css';
+
 export function renderStudentRegister(rootElement) {
   rootElement.innerHTML = `
-  <header class="header">
-      <div class="header-left">
-        <div class="logo-placeholder">Logo</div>
-        <span>EhB Career Launch</span>
-      </div>
-    </header>
-
+  
+  <div style="min-height: 100vh; display: flex; flex-direction: column;">
     <main class="form-container">
       <button class="back-button">← Terug</button>
 
@@ -20,7 +17,6 @@ export function renderStudentRegister(rootElement) {
           <input type="text" placeholder="Voornaam" class="input-half" />
           <input type="text" placeholder="Achternaam" class="input-half" />
         </div>
-        <input type="email" placeholder="Contact-Email" class="input-full" />
         <input type="url" placeholder="LinkedIn-link" class="input-full" />
       </div>
 
@@ -30,5 +26,26 @@ export function renderStudentRegister(rootElement) {
     <footer class="footer">
       <a href="#">Privacy Policy</a> | <a href="#">Contacteer Ons</a>
     </footer>
+  </div>
   `;
+
+  const form = document.getElementById('registerForm');
+  form.addEventListener('submit', handleRegister);
+
+  document.getElementById('back-button').addEventListener('click', () => {
+    Router.navigate('/');
+  });
+
+  // Footer links
+  const privacyLink = document.getElementById('privacy-link');
+  privacyLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Privacy Policy pagina nog niet geïmplementeerd');
+  });
+
+  const contactLink = document.getElementById('contact-link');
+  contactLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Contact pagina nog niet geïmplementeerd');
+  });
 }

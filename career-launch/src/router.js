@@ -74,6 +74,10 @@ class Router {
       '/contact': 'Contacteer ons - Career Launch 2025',
       '/privacy': 'Privacy Beleid - Career Launch 2025',
       '/404': 'Pagina niet gevonden - Career Launch 2025',
+      '/Bedrijf/Bedrijf-Profiel': 'Bedrijf Profiel - Career Launch 2025',
+      '/Bedrijf/Zoek-Criteria': 'Zoek Criteria Bedrijf - Career Launch 2025',
+      '/Student-Register': 'Student Registreren - Career Launch 2025',
+      '/Student-Opleiding': 'Student Opleiding - Career Launch 2025',
     };
 
     document.title = titles[path] || 'Career Launch 2025';
