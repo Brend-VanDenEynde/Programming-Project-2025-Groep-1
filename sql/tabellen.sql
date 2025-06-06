@@ -45,17 +45,6 @@ CREATE TABLE IF NOT EXISTS student (
 );
 
 
--- Tabel voor de opleidingen die studenten kunnen volgen
--- Dit maakt het mogelijk om studenten te koppelen aan hun opleiding
-CREATE TABLE IF NOT EXISTS opleiding (
-    id INTEGER AUTO_INCREMENT PRIMARY KEY ,
-    naam TEXT NOT NULL UNIQUE,
-    type TEXT NOT NULL CHECK (type IN ('Bachelor', 'Graduaat', 'Master'))
-);
--- Alvast enkele opleidingen toe te voegen
-INSERT INTO opleiding (naam, type) VALUES ('Toegepaste Informatica', 'Bachelor');
-INSERT INTO opleiding (naam, type) VALUES ('Programmeren', 'Graduaat');
-
 
 -- Tabel voor de stands die bedrijven kunnen hebben
 CREATE TABLE IF NOT EXISTS stand (
