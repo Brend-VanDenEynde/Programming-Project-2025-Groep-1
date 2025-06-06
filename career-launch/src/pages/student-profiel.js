@@ -1,9 +1,11 @@
 // src/views/student-profile.js
 
 import defaultAvatar from '../Images/default.jpg'; // import default profielfoto
-import logoIcon from '../Icons/favicon-32x32.png'; // import logo‐icoon
 import { renderLogin } from './login.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
+import { renderSpeeddates } from './student-speeddates.js';
+import { renderQRPopup } from './student-qr-popup.js';
+import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 
 export function renderStudentProfiel(rootElement, studentData = {}) {
   // Destructure met fallback‐waarden
@@ -25,7 +27,7 @@ export function renderStudentProfiel(rootElement, studentData = {}) {
       <header class="student-profile-header">
         <div class="logo-section">
           <img 
-            src="${logoIcon}" 
+            src="src/Icons/favicon-32x32.png" 
             alt="Logo EhB Career Launch" 
             width="32" 
             height="32"
@@ -191,13 +193,25 @@ export function renderStudentProfiel(rootElement, studentData = {}) {
     </div>
   `;
 
-  // Sidebar-navigatie: “Zoek-criteria” link
-  const searchBtn = document.querySelector('[data-route="search"]');
-  if (searchBtn) {
-    searchBtn.addEventListener('click', () => {
-      renderSearchCriteriaStudent(rootElement, studentData);
+  document.querySelectorAll('.sidebar-link').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const route = e.currentTarget.getAttribute('data-route');
+      switch (route) {
+        case 'requests':
+          renderSpeeddatesRequests(rootElement, studentData);
+          break;
+        case 'search':
+          renderSearchCriteriaStudent(rootElement, studentData);
+          break;
+        case 'speeddates':
+          renderSpeeddates(rootElement, studentData);
+          break;
+        case 'qr':
+          renderQRPopup(rootElement, studentData);
+          break;
+      }
     });
-  }
+    });
 
   // Sidebar toggler (burger-menu)
   const burger = document.getElementById('burger-menu');

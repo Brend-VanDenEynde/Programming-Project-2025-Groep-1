@@ -1614,3 +1614,64 @@ body {
   color: #666;
   text-align: center;
 }
+.criteria-form label.radio-option,
+.criteria-form label.checkbox-option {
+  margin-bottom: 0.6rem;
+  margin-right: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.02rem;
+  cursor: pointer;
+}
+
+.criteria-form input[type="radio"],
+.criteria-form input[type="checkbox"] {
+  margin-right: 0.5em;
+  width: 1.1em;
+  height: 1.1em;
+  accent-color: #007bff;
+  border-radius: 3px;
+}
+
+.search-fieldset {
+  margin-bottom: 1.8rem;
+  border: none;
+  border-radius: 10px;
+  background: #f2f2f2;
+  padding: 1rem 1.5rem 1rem 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.criteria-form input[type="text"].form-input {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-size: 1rem;
+  background: #fff;
+  margin-left: 0.4rem;
+}
+
+.student-profile-buttons {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.student-profile-btn {
+  font-size: 1.12rem;
+  border-radius: 7px;
+  min-height: 2.6rem;
+  letter-spacing: 1px;
+}
+
+.student-profile-btn-primary {
+  background: #212121;
+  color: #fff;
+}
+
+.student-profile-btn-secondary {
+  background: #8c8c8c;
+  color: #fff;
+}

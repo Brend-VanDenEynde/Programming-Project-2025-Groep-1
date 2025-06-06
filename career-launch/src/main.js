@@ -12,6 +12,10 @@ import { renderAdmin } from './pages/admin.js';
 import { renderAdminDashboard } from './pages/admin-dashboard.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
+import { renderQRPopup } from './pages/student-qr-popup.js';
+import { renderSpeeddates } from './pages/student-speeddates.js';
+import { renderSpeeddatesRequests } from './pages/student-speeddates-verzoeken.js';
+
 
 // functie om de 404 pagina te renderen
 function renderNotFound(rootElement) {
@@ -33,10 +37,13 @@ const routes = {
   '/Student/Student-Profiel': renderStudentProfiel,
   '/Student/Zoek-Criteria': renderSearchCriteriaStudent,
   '/admin': renderAdmin,
-  '/admin-dashboard': renderAdminDashboard,
+  '/admin/admin-dashboard': renderAdminDashboard,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
-};
+  '/Student/Student-QR-Popup' : renderQRPopup,
+  '/Student/Student-Speeddates': renderSpeeddates,
+  '/Student/Student-Speeddates-Verzoeken': renderSpeeddatesRequests
+}
 
 // Initialize router
 const router = new Router(routes);
