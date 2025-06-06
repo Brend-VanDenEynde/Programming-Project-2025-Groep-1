@@ -1,10 +1,10 @@
 -- tabel van de user
 CREATE TABLE IF NOT EXISTS gebruiker (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY ,
     email TEXT NOT NULL UNIQUE,
     wachtwoord TEXT NOT NULL,
     is_admin TINYINT NOT NULL DEFAULT 0,
-    creared_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_ad DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- tabel voor een bedrijf 
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS student (
 -- Tabel voor de opleidingen die studenten kunnen volgen
 -- Dit maakt het mogelijk om studenten te koppelen aan hun opleiding
 CREATE TABLE IF NOT EXISTS opleiding (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY ,
     naam TEXT NOT NULL UNIQUE,
     type TEXT NOT NULL CHECK (type IN ('Bachelor', 'Graduaat', 'Master'))
 );
@@ -47,7 +47,7 @@ INSERT INTO opleiding (naam, type) VALUES ('Programmeren', 'Graduaat');
 
 -- Tabel voor de stands die bedrijven kunnen hebben
 CREATE TABLE IF NOT EXISTS stand (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
     lokaal TEXT NOT NULL,
     id_bedrijf INTEGER NOT NULL,
     FOREIGN KEY (id_bedrijf) REFERENCES bedrijf(gebruiker_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS stand (
 -- Tabel voor de speeddate afspraken tussen studenten en bedrijven
 -- Dit maakt het mogelijk om afspraken te plannen voor speeddate sessies
 CREATE TABLE IF NOT EXISTS speeddate (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER  AUTO_INCREMENT PRIMARY KEY,
     id_student INTEGER NOT NULL,
     id_bedrijf INTEGER NOT NULL,
     datum DATETIME NOT NULL,
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS speeddate (
 -- Tabel voor de final works die studenten aanbieden
 -- Dit maakt het mogelijk om studenten hun final works te laten aanbieden
 CREATE TABLE IF NOT EXISTS finalwork (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
     id_student INTEGER NOT NULL,
     lokaal TEXT NOT NULL,
     FOREIGN KEY (id_student) REFERENCES student(gebruiker_id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS finalwork (
 
 -- tabel voor de skills die bedrijven en studenten kunnen hebben
 CREATE TABLE IF NOT EXISTS skills (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
     skill TEXT NOT NULL UNIQUE
 );
 
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS gebruiker_skills (
 
 -- functie bevat de verschillende functies die een student kan zoeken en een bedrijf kan aanbieden
 CREATE TABLE IF NOT EXISTS functie (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
     naam TEXT NOT NULL UNIQUE
 );
 -- Voorbeelden van functies
@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS bedrijf_functie (
 -- contactformulier
 -- Deze tabel slaat de berichten op die studenten of bedrijven  kunnen sturen via het contactformulier zodat een admin deze kan bekijken
 CREATE TABLE IF NOT EXISTS contact (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
     gebruiker_id INTEGER NOT NULL,
     onderwerp TEXT NOT NULL,   
     bericht TEXT NOT NULL,
