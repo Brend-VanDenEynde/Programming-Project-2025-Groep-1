@@ -1,11 +1,13 @@
 import './student-register.css';
+import Router from '../router.js';
 
 export function renderStudentOpleiding(rootElement) {
   rootElement.innerHTML = `
     <div style="min-height: 100vh; display: flex; flex-direction: column;">
     <main class="form-container opleiding-container">
-      <button class="back-button">← Terug</button>
+      <button class="back-button" id="back-button">← Terug</button>
 
+      <form class="jaarForm" id="jaarForm">
       <h3>Ik ben een</h3>
         <div class="radio-group">
           <label><input type="radio" name="jaar" value="1"> 1ste jaar</label>
@@ -14,7 +16,7 @@ export function renderStudentOpleiding(rootElement) {
         </div>
 
 
-      <select class="opleiding-select">
+      <select class="opleiding-select" name="opleiding">
           <option selected disabled>Opleiding</option>
           <option>Business IT</option>
           <option>Networks & Security</option>
@@ -23,11 +25,48 @@ export function renderStudentOpleiding(rootElement) {
       </select>
 
       <button class="save-button">SAVE</button>
+      </form>
     </main>
 
     <footer class="footer">
-      <a href="#">Privacy Policy</a> | <a href="#">Contacteer Ons</a>
+      <a href="#" id="privacy-link">Privacy Policy</a> | <a href="#" id="contact-link">Contacteer Ons</a>
     </footer>
   </div>
   `;
+
+  const form = document.getElementById('jaarForm');
+  form.addEventListener('submit', handleJaarRegister);
+
+  document.getElementById('back-button').addEventListener('click', () => {
+    Router.navigate('/Student-Register');
+  });
+
+  // Footer links
+  const privacyLink = document.getElementById('privacy-link');
+  privacyLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Privacy Policy pagina nog niet geïmplementeerd');
+  });
+
+  const contactLink = document.getElementById('contact-link');
+  contactLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Contact pagina nog niet geïmplementeerd');
+  });
 }
+
+function handleJaarRegister(event) {
+  event.preventDefault();
+
+  const formData = new FormData(event.target);
+  const data = {
+    jaar: formData.get('jaar'), // geselecteerde radio
+    opleiding: formData.get('opleiding'), // geselecteerde optie uit select
+  };
+  
+  // Data naar server sturen (voorbeeld)
+  console.log('Registratie data:', data);
+
+  renderStudentSkills(document.getElementById('app'));
+}
+//href
