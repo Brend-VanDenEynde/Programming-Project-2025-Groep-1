@@ -144,7 +144,7 @@ function handleRegister(event) {
 
   if (data.rol === 'student') {
       renderStudentRegister(document.getElementById('app'));
-  } else {
-      renderLogin(document.getElementById('app'));
+  } else if (data.rol === 'bedrijf') {
+      renderBedrijfRegister(document.getElementById('app'));
   }
 }
