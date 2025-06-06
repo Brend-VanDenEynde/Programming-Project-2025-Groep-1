@@ -1,4 +1,11 @@
-import { renderStudentRegister } from './student-register.js';
+import { renderLogin } from './login.js';
+import Router from '../router.js';
+import {
+  createUserRegistrationJSON,
+  sendRegistrationToAPI,
+  validateRegistrationData,
+  mockRegistrationAPI,
+} from '../utils/registration-api.js';
 
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `
@@ -123,12 +130,15 @@ function handleRegister(event) {
 
   const formData = new FormData(event.target);
   const data = {
+    firstName: formData.get('firstName'),
+    lastName: formData.get('lastName'),
     email: formData.get('email'),
     password: formData.get('password'),
     confirmPassword: formData.get('confirmPassword'),
     rol: formData.get('rol'),
   };
 
+  // Validatie
   if (data.password !== data.confirmPassword) {
     alert('Wachtwoorden komen niet overeen!');
     return;
@@ -144,9 +154,6 @@ function handleRegister(event) {
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
 
-  if (data.rol === 'student') {
-    renderStudentRegister(document.getElementById('app'));
-  } else {
-    renderLogin(document.getElementById('app'));
-  }
+  // Redirect naar login (of andere actie)
+  renderLogin(document.getElementById('app'));
 }
