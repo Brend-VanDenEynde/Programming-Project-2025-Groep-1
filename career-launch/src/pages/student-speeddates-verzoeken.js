@@ -43,8 +43,16 @@ if (!document.getElementById('speeddates-verzoeken-styles')) {
       vertical-align: middle;
       text-align: center;
     }
-    .speeddates-table td {
-      text-align: center;
+   .speeddates-table td {
+  text-align: center;
+  
+  max-width: 180px;
+}
+
+    .speeddates-table td.status-cell,
+    .speeddates-table th:last-child {
+      min-width: 220px;
+      max-width: 280px;
     }
     .speeddates-table tbody tr:last-child td {
       border-bottom: none;
@@ -52,22 +60,27 @@ if (!document.getElementById('speeddates-verzoeken-styles')) {
     .status-cell {
       display: flex;
       align-items: center;
-      gap: 14px;
-      min-height: 56px;
       justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      min-height: 56px;
+      width: 100%;
     }
     .accept-btn, .deny-btn {
       min-width: 110px;
+      max-width: 135px;
+      width: 100%;
       padding: 9px 0;
       border: none;
       border-radius: 22px;
       font-weight: 700;
       font-size: 1rem;
       cursor: pointer;
-      margin: 0 3px;
+      margin: 0 2px;
       box-shadow: 0 2px 6px 0 rgba(44,44,44,0.05);
       transition: background 0.17s, color 0.17s, box-shadow 0.17s;
       display: inline-block;
+      flex: 1 1 110px;
     }
     .accept-btn {
       background: linear-gradient(90deg, #3dd686 0%, #28bb8a 100%);
@@ -111,10 +124,21 @@ if (!document.getElementById('speeddates-verzoeken-styles')) {
       font-size: 1.05rem;
       border: none;
     }
-    @media (max-width: 700px) {
+    @media (max-width: 900px) {
       .speeddates-table-container {padding: 0;}
-      .speeddates-table th, .speeddates-table td {padding: 13px 4px;font-size:0.98rem;}
-      .accept-btn, .deny-btn, .badge-accepted, .badge-denied {min-width:80px;padding:7px 0;}
+      .speeddates-table th, .speeddates-table td {padding: 13px 4px;font-size:0.97rem;}
+      .speeddates-table th, .speeddates-table td {max-width: 90px;}
+      .status-cell {
+        gap: 7px;
+        min-width: 120px;
+      }
+      .accept-btn, .deny-btn, .badge-accepted, .badge-denied {min-width:82px;padding:7px 0;font-size:0.98rem;}
+    }
+    @media (max-width: 600px) {
+      .speeddates-table-container {max-width: 100vw;}
+      .speeddates-table th, .speeddates-table td {padding: 6px 2px; font-size:0.93rem;}
+      .status-cell {flex-direction: column; gap:6px; min-width: 10px;}
+      .accept-btn, .deny-btn, .badge-accepted, .badge-denied {min-width:65px;max-width:95px;font-size:0.88rem;}
     }
   `;
   document.head.appendChild(style);
@@ -162,19 +186,17 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
                   <td>${v.bedrijf}</td>
                   <td>${v.lokaal}</td>
                   <td>${v.tijd}</td>
-                  <td>
-                    <div class="status-cell">
-                      ${
-                        v.status === 'Geaccepteerd'
-                          ? `<span class="badge-accepted">Geaccepteerd</span>`
-                          : v.status === 'Geweigerd'
-                            ? `<span class="badge-denied">Geweigerd</span>`
-                            : `
-                              <button class="accept-btn" data-idx="${idx}">Accepteer</button>
-                              <button class="deny-btn" data-idx="${idx}">Weiger</button>
-                            `
-                      }
-                    </div>
+                  <td class="status-cell">
+                    ${
+                      v.status === 'Geaccepteerd'
+                        ? `<span class="badge-accepted">Geaccepteerd</span>`
+                        : v.status === 'Geweigerd'
+                          ? `<span class="badge-denied">Geweigerd</span>`
+                          : `
+                            <button class="accept-btn" data-idx="${idx}">Accepteer</button>
+                            <button class="deny-btn" data-idx="${idx}">Weiger</button>
+                          `
+                    }
                   </td>
                 </tr>
               `).join('')}
@@ -209,9 +231,7 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
         <ul id="burger-dropdown" class="student-profile-dropdown" style="display: none;">
-          <li><button id="nav-dashboard">Dashboard</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
-          <li><button id="nav-delete-account">Verwijder account</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
       </header>
@@ -263,20 +283,39 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     });
   });
 
-  const burger = document.getElementById('burger-menu');
-  const dropdown = document.getElementById('burger-dropdown');
-  if (burger && dropdown) {
-    burger.addEventListener('click', () => {
-      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-    });
-  }
-  document.getElementById('nav-dashboard').addEventListener('click', () => {});
-  document.getElementById('nav-settings').addEventListener('click', () => {});
-  document.getElementById('nav-delete-account').addEventListener('click', () => {
-    if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
-      // Account verwijderen (nog te implementeren)
+ const burger = document.getElementById('burger-menu');
+const dropdown = document.getElementById('burger-dropdown');
+
+if (burger && dropdown) {
+  // Toggle hamburger-menu bij klik
+  burger.addEventListener('click', (event) => {
+    event.stopPropagation();
+    dropdown.style.display =
+      dropdown.style.display === 'block' ? 'none' : 'block';
+  });
+
+  // Sluit het menu bij klik buiten het menu
+  document.addEventListener('click', function(event) {
+    if (dropdown.style.display === 'block') {
+      if (!dropdown.contains(event.target) && event.target !== burger) {
+        dropdown.style.display = 'none';
+      }
     }
   });
+
+  // Sluit het menu bij klikken op een menu-item
+  document.getElementById('nav-settings').addEventListener('click', () => {
+    dropdown.style.display = 'none';
+    // Navigeren naar Instellingen (eventueel logica hier)
+  });
+  document.getElementById('nav-logout').addEventListener('click', () => {
+    dropdown.style.display = 'none';
+    renderLogin(rootElement);
+  });
+}
+
+  document.getElementById('nav-settings').addEventListener('click', () => {});
+
   document.getElementById('nav-logout').addEventListener('click', () => {
     renderLogin(rootElement);
   });

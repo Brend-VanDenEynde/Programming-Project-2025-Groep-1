@@ -19,10 +19,8 @@ export function renderQRPopup(rootElement, studentData = {}) {
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
         <ul id="burger-dropdown" class="student-profile-dropdown" style="display: none;">
-          <li><button id="nav-dashboard">Dashboard</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
-          <li><button id="nav-delete-account">Verwijder account</button></li>
-          <li><button id="nav-logout">Log out</button></li>
+                    <li><button id="nav-logout">Log out</button></li>
         </ul>
       </header>
 
@@ -76,28 +74,44 @@ export function renderQRPopup(rootElement, studentData = {}) {
       }
     });
   });
- // BURGER-MENU
-  const burger = document.getElementById('burger-menu');
-  const dropdown = document.getElementById('burger-dropdown');
-  if (burger && dropdown) {
-    burger.addEventListener('click', () => {
-      dropdown.style.display =
-        dropdown.style.display === 'block' ? 'none' : 'block';
-    });
-  }
-  document.getElementById('nav-dashboard').addEventListener('click', () => {
-    // Navigeren naar Dashboard (nog te implementeren)
+const burger = document.getElementById('burger-menu');
+const dropdown = document.getElementById('burger-dropdown');
+
+if (burger && dropdown) {
+  // Toggle hamburger-menu bij klik
+  burger.addEventListener('click', (event) => {
+    event.stopPropagation();
+    dropdown.style.display =
+      dropdown.style.display === 'block' ? 'none' : 'block';
   });
+
+  // Sluit het menu bij klik buiten het menu
+  document.addEventListener('click', function(event) {
+    if (dropdown.style.display === 'block') {
+      if (!dropdown.contains(event.target) && event.target !== burger) {
+        dropdown.style.display = 'none';
+      }
+    }
+  });
+
+  // Sluit het menu bij klikken op een menu-item
+  document.getElementById('nav-settings').addEventListener('click', () => {
+    dropdown.style.display = 'none';
+    // Navigeren naar Instellingen (eventueel logica hier)
+  });
+  document.getElementById('nav-logout').addEventListener('click', () => {
+    dropdown.style.display = 'none';
+    renderLogin(rootElement);
+  });
+}
+
+  
   document.getElementById('nav-settings').addEventListener('click', () => {
     // Navigeren naar Instellingen (nog te implementeren)
   });
-  document
-    .getElementById('nav-delete-account')
-    .addEventListener('click', () => {
-      if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
-        // Account verwijderen (nog te implementeren)
-      }
-    });
+
+   
+   
   document.getElementById('nav-logout').addEventListener('click', () => {
     renderLogin(rootElement);
   });
