@@ -9,7 +9,7 @@ export function renderStudentSkills(rootElement) {
 
       <form class="skillsForm" id="skillsForm">
       <div class="Job-Search">
-      <h3>Ik ben een</h3>
+      <h3>Ik zoek een</h3>
         <div class="radio-group">
           <label><input type="radio" name="job" value="fulltime"> Fultime</label>
           <label><input type="radio" name="job" value="parttime"> Parttime</label>
