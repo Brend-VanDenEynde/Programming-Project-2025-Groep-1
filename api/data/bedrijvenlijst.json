@@ -1,0 +1,986 @@
+[
+  {
+    "name": "Accenture",
+    "url": "https://www.accenture.com/be-en",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things",
+      "Graduaat Elektromechanische Systemen"
+    ],
+    "speeddates": false,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Acolad Digital",
+    "url": "https://www.acolad.com/nl.html",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica"
+    ],
+    "speeddates": false,
+    "aanbiedingen": [
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Amista",
+    "url": "www.amista.be/careers",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Programmeren"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "ARHS Group",
+    "url": "https://www.arhs-group.com/about-us/",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Programmeren"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Ausy Belgium",
+    "url": "www.ausy.be",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Avelon",
+    "url": "https://www.avelon.be/",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Axxes",
+    "url": "https://www.axxes.com/",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "B_Robots",
+    "url": "https://b-robots.be/",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Programmeren",
+      "Graduaat Internet of Things"
+    ],
+    "speeddates": false,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Bizztalent",
+    "url": "https://www.bizztalent.be/",
+    "doelgroep_jaar": [
+      "1e jaarsstudenten",
+      "2de jaarsstudenten",
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things",
+      "Graduaat Elektromechanische Systemen"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Blents",
+    "url": "https://www.blents.be/careers/",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Programmeren",
+      "Graduaat Internet of Things"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "BNP Paribas Fortis",
+    "url": "www.bnpparibasfortis.com/jobs",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Bulls-i",
+    "url": "https://www.bulls-i.company/",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "BuSI",
+    "url": "www.busi.eu",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Programmeren"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Canguru",
+    "url": "www.cangurusolutions.com",
+    "doelgroep_jaar": [
+      "1e jaarsstudenten",
+      "2de jaarsstudenten",
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Capgemini",
+    "url": "https://www.capgemini.com/",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "CHRLY",
+    "url": "www.chrly.be",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things",
+      "Graduaat Elektromechanische Systemen"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Colibri Consulting BV",
+    "url": "https://www.colibri.consulting",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Systeem- & Netwerkbeheer"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Colruyt Group",
+    "url": "jobs.colruytgroup.com",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things",
+      "Graduaat Elektromechanische Systemen"
+    ],
+    "speeddates": false,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)",
+      "Studentenjob(s)"
+    ]
+  },
+  {
+    "name": "Computacenter",
+    "url": "https://www.computacenter.com/en-be/who-we-are",
+    "doelgroep_jaar": [
+      "1e jaarsstudenten",
+      "2de jaarsstudenten",
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Cookie Crunchers (Talent-IT)",
+    "url": "https://www.cookiecrunchers.be/",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren"
+    ],
+    "speeddates": false,
+    "aanbiedingen": [
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "delaware BeLux",
+    "url": "https://www.delaware.pro/nl-be/careers/junior",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Devoteam NV/SA",
+    "url": "https://www.linkedin.com/company/devoteam/",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Dilaco",
+    "url": "https://www.linkedin.com/company/dilaco-belgium/mycompany/",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Systeem- & Netwerkbeheer"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Eezee-IT",
+    "url": "eezee-it.com",
+    "doelgroep_jaar": [
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Systeem- & Netwerkbeheer"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "EQUANS",
+    "url": "https://jobs.equans.be/nl/",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Internet of Things",
+      "Graduaat Elektromechanische Systemen"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Euricom",
+    "url": "https://www.linkedin.com/company/euricom/",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Exclusive Networks",
+    "url": "https://www.exclusive-networks.com/be/",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)",
+      "Studentenjob(s)"
+    ]
+  },
+  {
+    "name": "Fabulor",
+    "url": "www.fabulor.eu",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Flexso",
+    "url": "www.flexso.com",
+    "doelgroep_jaar": [
+      "1e jaarsstudenten",
+      "2de jaarsstudenten",
+      "3de jaarsstudenten"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Grasshoppers Academy",
+    "url": "www.ghac.eu",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)",
+      "Studentenjob(s)"
+    ]
+  },
+  {
+    "name": "Gumption",
+    "url": "https://www.gumption.eu",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)",
+      "Studentenjob(s)"
+    ]
+  },
+  {
+    "name": "Harvey Nash BELGIUM",
+    "url": "WWW.harveynash.com",
+    "doelgroep_jaar": [
+      "1e jaarsstudenten",
+      "2de jaarsstudenten",
+      "3de jaarsstudenten"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things",
+      "Graduaat Elektromechanische Systemen"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "ICT Talents",
+    "url": "https://www.houseoftalents.be/nl/ict-talents",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things",
+      "Graduaat Elektromechanische Systemen"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "undefined"
+    ]
+  },
+  {
+    "name": "Inetum-Realdolmen",
+    "url": "www.realdolmen.com",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things",
+      "Graduaat Elektromechanische Systemen"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Keleos",
+    "url": "https://www.linkedin.com/company/keleosbe/",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Programmeren",
+      "Graduaat Internet of Things"
+    ],
+    "speeddates": false,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Launch.Career",
+    "url": "https://launch.career/",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things",
+      "Graduaat Elektromechanische Systemen"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Nexios IT",
+    "url": "https://www.nexiosit.com/",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Programmeren"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Nomios",
+    "url": "https://www.nomios.be/",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Systeem- & Netwerkbeheer"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Ordina",
+    "url": "https://www.ordina.be/",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Persolis",
+    "url": "https://persolis.be/",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Proclus BV",
+    "url": "www.proclus.be",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Programmeren",
+      "Graduaat Internet of Things"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "RP One",
+    "url": "https://www.linkedin.com/company/rp-one/mycompany/?viewAsMember=true",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Safran Aircraft Engine Services Brussels",
+    "url": "www.safran-group.com",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Graduaat Elektromechanische Systemen"
+    ],
+    "speeddates": false,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Simac",
+    "url": "https://www.simac.be/nl/",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Elektromechanische Systemen"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)",
+      "Studentenjob(s)"
+    ]
+  },
+  {
+    "name": "Smals",
+    "url": "https://www.smals.be/nl/jobs",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Sopra Steria",
+    "url": "www.soprasteria.be",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things",
+      "Graduaat Elektromechanische Systemen"
+    ],
+    "speeddates": false,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "SPIE ICS IT Talent Solutions SA",
+    "url": "https://www.spie-ics.be/",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Systeem- & Netwerkbeheer"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "TheValueChain",
+    "url": "www.thevaluechain.eu",
+    "doelgroep_jaar": [
+      "1e jaarsstudenten",
+      "2de jaarsstudenten",
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Programmeren",
+      "Graduaat Internet of Things"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)",
+      "Studentenjob(s)"
+    ]
+  },
+  {
+    "name": "Userfull",
+    "url": "https://userfull.be",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Internet of Things",
+      "Graduaat Elektromechanische Systemen"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)",
+      "Studentenjob(s)"
+    ]
+  },
+  {
+    "name": "UZ Brussel",
+    "url": "www.uzbrusselict.be",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Programmeren",
+      "Graduaat Systeem- & Netwerkbeheer"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)",
+      "Studentenjob(s)"
+    ]
+  },
+  {
+    "name": "YPTO",
+    "url": "https://www.ypto.be/",
+    "doelgroep_jaar": [
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Graduaat Systeem- & Netwerkbeheer",
+      "Graduaat Elektromechanische Systemen"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Job(s)"
+    ]
+  },
+  {
+    "name": "Yteria",
+    "url": "https://www.yteria.com",
+    "doelgroep_jaar": [
+      "2de jaarsstudenten",
+      "3de jaarsstudenten",
+      "Alumni"
+    ],
+    "doelgroep_opleiding": [
+      "Bachelor Toegepaste Informatica",
+      "Bachelor Multimedia & Creative Technologies"
+    ],
+    "speeddates": true,
+    "aanbiedingen": [
+      "Stage(s)",
+      "Bachelorproef",
+      "Job(s)",
+      "Studentenjob(s)"
+    ]
+  }
+]
