@@ -25,7 +25,7 @@ Zorg dat de volgende software is geïnstalleerd:
 ### Stap 1: Repository klonen
 
 ```bash
-git clone https://github.com/groep1/ehbo-careerlaunch.git
+git clone https://github.com/Brend-VanDenEynde/Programming-Project-2025-Groep-1.git
 cd ehbo-careerlaunch
 ```
 
