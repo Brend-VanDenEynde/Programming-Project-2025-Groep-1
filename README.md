@@ -26,7 +26,7 @@ Zorg dat de volgende software is geïnstalleerd:
 
 ```bash
 git clone https://github.com/Brend-VanDenEynde/Programming-Project-2025-Groep-1.git
-cd ehbo-careerlaunch
+cd Programming-Project-2025-Groep-1
 ```
 
 ### Stap 2: Database configureren
