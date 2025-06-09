@@ -43,25 +43,25 @@ export function renderAdminIngeschrevenStudenten(rootElement) {
           
           <div class="admin-content-area" id="content-area">
             <div class="student-list">
-              <div class="student-item">
+              <div class="student-item clickable-student" data-student-id="tiberius-kirk">
                 <span class="student-name">Tiberius Kirk</span>
               </div>
-              <div class="student-item">
+              <div class="student-item clickable-student" data-student-id="john-smith">
                 <span class="student-name">John Smith</span>
               </div>
-              <div class="student-item">
+              <div class="student-item clickable-student" data-student-id="jean-luc-picard">
                 <span class="student-name">Jean-Luc Picard</span>
               </div>
-              <div class="student-item">
+              <div class="student-item clickable-student" data-student-id="daniel-vonkman">
                 <span class="student-name">Daniel Vonkman</span>
               </div>
-              <div class="student-item">
+              <div class="student-item clickable-student" data-student-id="len-jaxtyn">
                 <span class="student-name">Len Jaxtyn</span>
               </div>
-              <div class="student-item">
+              <div class="student-item clickable-student" data-student-id="kimberley-hester">
                 <span class="student-name">Kimberley Hester</span>
               </div>
-              <div class="student-item">
+              <div class="student-item clickable-student" data-student-id="ed-marvin">
                 <span class="student-name">Ed Marvin</span>
               </div>
             </div>
@@ -112,6 +112,15 @@ export function renderAdminIngeschrevenStudenten(rootElement) {
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
     Router.navigate('/contact');
+  });
+
+  // Add click handlers for student items
+  const studentItems = document.querySelectorAll('.clickable-student');
+  studentItems.forEach((item) => {
+    item.addEventListener('click', () => {
+      const studentId = item.dataset.studentId;
+      Router.navigate(`/admin-dashboard/student-detail?id=${studentId}`);
+    });
   });
 
   document.title = 'Ingeschreven Studenten - Admin Dashboard';

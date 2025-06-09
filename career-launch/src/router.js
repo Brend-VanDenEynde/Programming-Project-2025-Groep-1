@@ -83,6 +83,7 @@ class Router {
         'Ingeschreven Bedrijven - Admin Dashboard',
       '/admin-dashboard/bedrijven-in-behandeling':
         'Bedrijven in Behandeling - Admin Dashboard',
+      '/admin-dashboard/student-detail': 'Student Details - Admin Dashboard',
       '/contact': 'Contacteer ons - Career Launch 2025',
       '/privacy': 'Privacy Beleid - Career Launch 2025',
       '/404': 'Pagina niet gevonden - Career Launch 2025',
