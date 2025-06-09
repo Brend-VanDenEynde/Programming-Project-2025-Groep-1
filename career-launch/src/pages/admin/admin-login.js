@@ -1,5 +1,5 @@
 // Admin login pagina
-import Router from '../router.js';
+import Router from '../../router.js';
 
 export function renderAdmin(rootElement) {
   rootElement.innerHTML = `
@@ -50,7 +50,9 @@ export function renderAdmin(rootElement) {
       // Set session
       sessionStorage.setItem('adminLoggedIn', 'true');
       sessionStorage.setItem('adminUsername', username); // Redirect to dashboard
-      Router.navigate('/admin-dashboard');
+      // Redirect to admin dashboard or specific section
+      // For now, redirecting to a new selection page
+      Router.navigate('/admin-select-dashboard');
     } else {
       // Show error message
       errorMessage.textContent = 'Ongeldige gebruikersnaam of wachtwoord!';
@@ -65,21 +67,14 @@ export function renderAdmin(rootElement) {
       }, 5000);
     }
   });
-
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/privacy');
-    });
+    Router.navigate('/privacy');
   });
 
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/contact');
-    });
+    Router.navigate('/contact');
   });
 }

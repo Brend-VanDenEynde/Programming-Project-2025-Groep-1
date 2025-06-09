@@ -3,6 +3,7 @@
 import logoIcon from '../Icons/favicon-32x32.png';
 import { renderLogin } from './login.js';
 import { renderStudentProfiel } from './student-profiel.js';
+import Router from '../router.js';
 
 export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
   // Maak criteria-object als het nog niet bestaat
@@ -328,22 +329,15 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
 
     // SkillAndere en TaalAndere blijven zoals eerder ingesteld    console.log('Opgeslagen Zoek-criteria:', studentData.criteria);
     // Geen re-render → checkboxen/radio’s blijven zichtbaar zoals ze staan
-  });
-  // FOOTER LINKS
+  });  // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/privacy');
-    });
+    Router.navigate('/privacy');
   });
 
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/contact');
-    });
+    Router.navigate('/contact');
   });
 }
 // restore

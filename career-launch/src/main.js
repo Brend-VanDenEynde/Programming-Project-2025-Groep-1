@@ -8,8 +8,12 @@ import { renderRegister } from './pages/register.js';
 import { renderLogin } from './pages/login.js';
 import { renderStudentProfiel } from './pages/student-profiel.js';
 import { renderSearchCriteriaStudent } from './pages/search-criteria-student.js';
-import { renderAdmin } from './pages/admin.js';
-import { renderAdminDashboard } from './pages/admin-dashboard.js';
+import { renderAdmin } from './pages/admin/admin-login.js';
+import { renderAdminDashboard } from './pages/admin/admin-dashboard.js';
+import { renderAdminSelectDashboard } from './pages/admin/admin-select-dashboard.js';
+import { renderAdminIngeschrevenStudenten } from './pages/admin/admin-ingeschreven-studenten.js';
+import { renderAdminIngeschrevenBedrijven } from './pages/admin/admin-ingeschreven-bedrijven.js';
+import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven-in-behandeling.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
 import { renderBedrijfProfiel } from './pages/bedrijf-profiel.js';
@@ -33,13 +37,12 @@ const routes = {
   '/404': renderNotFound,
   '/registreer': renderRegister,
   '/login': renderLogin,
-  '/Student/Student-Profiel': renderStudentProfiel,
-  '/Student/Zoek-Criteria': renderSearchCriteriaStudent,
-  '/admin': renderAdmin,
+  '/Student/Student-Profiel': renderStudentProfiel,  '/Student/Zoek-Criteria': renderSearchCriteriaStudent,  '/admin': renderAdmin,
+  '/admin-select-dashboard': renderAdminSelectDashboard,
   '/admin-dashboard': renderAdminDashboard,
-  '/admin-dashboard/ingeschreven-studenten': renderAdminDashboard,
-  '/admin-dashboard/ingeschreven-bedrijven': renderAdminDashboard,
-  '/admin-dashboard/bedrijven-in-behandeling': renderAdminDashboard,
+  '/admin-dashboard/ingeschreven-studenten': renderAdminIngeschrevenStudenten,
+  '/admin-dashboard/ingeschreven-bedrijven': renderAdminIngeschrevenBedrijven,
+  '/admin-dashboard/bedrijven-in-behandeling': renderAdminBedrijvenInBehandeling,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
   '/Bedrijf/Bedrijf-Profiel': renderBedrijfProfiel,
