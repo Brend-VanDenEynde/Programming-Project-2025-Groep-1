@@ -396,13 +396,14 @@ function setupEventHandlers() {
       Router.navigate(route);
     });
   });
-
   // Mobile menu toggle
   const menuToggle = document.getElementById('menu-toggle');
   const sidebar = document.querySelector('.admin-sidebar-clean');
   menuToggle.addEventListener('click', () => {
     sidebar.classList.toggle('active');
-  }); // Admin action buttons
+  });
+
+  // Admin action buttons
   const contactBtn = document.getElementById('contact-student-btn');
   contactBtn.addEventListener('click', () => {
     // Get current student ID from URL

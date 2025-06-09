@@ -98,8 +98,22 @@ export function renderAdminCompanyDetail(rootElement) {
                 </div>
               </div>
             </div>
+          </div>        </main>
+      </div>
+      
+      <!-- Speeddates Modal -->
+      <div id="speeddates-modal" class="speeddates-modal" style="display: none;">
+        <div class="speeddates-modal-content">
+          <div class="speeddates-modal-header">
+            <h2>Speeddates</h2>
+            <button id="close-modal" class="close-modal-btn">&times;</button>
           </div>
-        </main>
+          <div class="speeddates-modal-body">
+            <div id="speeddates-list" class="speeddates-list">
+              <!-- Speeddates will be populated here -->
+            </div>
+          </div>
+        </div>
       </div>
         
       <!-- FOOTER -->
@@ -212,12 +226,21 @@ function setupEventHandlers() {
   // Admin action buttons
   const contactBtn = document.getElementById('contact-company-btn');
   contactBtn.addEventListener('click', () => {
-    alert('Contact functionaliteit zou hier geïmplementeerd worden.');
+    // Get current company ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const companyId = urlParams.get('id') || 'demo';
+
+    // Get company data to access email
+    const companyData = getCompanyData(companyId);
+
+    // Create mailto link and open it
+    const mailtoLink = `mailto:${companyData.email}`;
+    window.location.href = mailtoLink;
   });
 
   const speedDatesBtn = document.getElementById('view-speeddates-btn');
   speedDatesBtn.addEventListener('click', () => {
-    alert('Speeddates overzicht zou hier getoond worden.');
+    openSpeedDatesModal();
   });
 
   const deleteBtn = document.getElementById('delete-company-btn');
@@ -237,4 +260,117 @@ function setupEventHandlers() {
     e.preventDefault();
     Router.navigate('/contact');
   });
+}
+
+// Modal functionality for speeddates
+function openSpeedDatesModal() {
+  const modal = document.getElementById('speeddates-modal');
+  const speedDatesList = document.getElementById('speeddates-list');
+
+  // Get current company ID from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const companyId = urlParams.get('id') || 'demo';
+
+  // Get speeddates data for this company
+  const speeddates = getCompanySpeedDates(companyId);
+
+  // Clear existing content
+  speedDatesList.innerHTML = '';
+
+  if (speeddates.length === 0) {
+    speedDatesList.innerHTML =
+      '<div class="no-speeddates">Geen speeddates gevonden</div>';
+  } else {
+    speeddates.forEach((speeddate) => {
+      const speedDateItem = document.createElement('div');
+      speedDateItem.className = 'speeddate-item';
+      speedDateItem.innerHTML = `
+        <div class="speeddate-info">
+          <span class="speeddate-time">${speeddate.time}</span>
+          <span class="speeddate-student">${speeddate.student}</span>
+        </div>
+        <button class="speeddate-cancel-btn" data-speeddate-id="${speeddate.id}" title="Annuleren">✕</button>
+      `;
+      speedDatesList.appendChild(speedDateItem);
+    });
+
+    // Add event listeners for cancel buttons
+    const cancelButtons = speedDatesList.querySelectorAll(
+      '.speeddate-cancel-btn'
+    );
+    cancelButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const speedDateId = btn.dataset.speeddateId;
+        if (confirm('Weet je zeker dat je deze speeddate wilt annuleren?')) {
+          btn.closest('.speeddate-item').remove();
+          // Later, make an API call to cancel the speeddate
+          console.log(`Speeddate ${speedDateId} geannuleerd`);
+
+          // Check if list is now empty
+          if (speedDatesList.children.length === 0) {
+            speedDatesList.innerHTML =
+              '<div class="no-speeddates">Geen speeddates gevonden</div>';
+          }
+        }
+      });
+    });
+  }
+
+  modal.style.display = 'flex';
+
+  // Add event listeners for closing modal
+  const closeBtn = document.getElementById('close-modal');
+  const modalOverlay = modal;
+
+  closeBtn.addEventListener('click', closeSpeedDatesModal);
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+      closeSpeedDatesModal();
+    }
+  });
+
+  // ESC key to close modal
+  document.addEventListener('keydown', function escKeyHandler(e) {
+    if (e.key === 'Escape') {
+      closeSpeedDatesModal();
+      document.removeEventListener('keydown', escKeyHandler);
+    }
+  });
+}
+
+function closeSpeedDatesModal() {
+  const modal = document.getElementById('speeddates-modal');
+  modal.style.display = 'none';
+}
+
+function getCompanySpeedDates(companyId) {
+  // Mock speeddate data for companies - later this would come from an API
+  const speedDatesDatabase = {
+    carrefour: [
+      { id: 1, time: '12u40', student: 'Tiberius Kirk' },
+      { id: 2, time: '12u40', student: 'Jean-Luc Picard' },
+      { id: 3, time: '13u00', student: 'John Smith' },
+    ],
+    delhaize: [
+      { id: 4, time: '12u45', student: 'Daniel Vonkman' },
+      { id: 5, time: '13u10', student: 'Ed Marvin' },
+    ],
+    colruyt: [
+      { id: 6, time: '12u50', student: 'Kimberley Hester' },
+      { id: 7, time: '13u05', student: 'Len Jaxtyn' },
+    ],
+    proximus: [
+      { id: 8, time: '12u55', student: 'Tiberius Kirk' },
+      { id: 9, time: '13u15', student: 'Jean-Luc Picard' },
+      { id: 10, time: '13u25', student: 'John Smith' },
+    ],
+    kbc: [
+      { id: 11, time: '12u45', student: 'Daniel Vonkman' },
+      { id: 12, time: '13u05', student: 'Ed Marvin' },
+      { id: 13, time: '13u20', student: 'Len Jaxtyn' },
+    ],
+  };
+
+  return speedDatesDatabase[companyId] || [];
 }

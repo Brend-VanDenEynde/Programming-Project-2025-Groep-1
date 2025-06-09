@@ -634,6 +634,12 @@
   flex: 1;
 }
 
+.speeddate-student {
+  color: white;
+  font-size: 1rem;
+  flex: 1;
+}
+
 .speeddate-cancel-btn {
   background-color: #dc3545;
   color: white;
