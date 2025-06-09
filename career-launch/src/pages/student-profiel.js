@@ -295,7 +295,7 @@ export function renderStudentProfiel(rootElement, studentData = {}) {
 
     // TODO: stuur updatedData naar backend    // Toon opnieuw de view‐sectie met bijgewerkte data
     renderStudentProfiel(rootElement, updatedData);
-  });  // FOOTER LINKS
+  }); // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
     Router.navigate('/privacy');

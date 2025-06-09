@@ -45,11 +45,11 @@ class Router {
     }
 
     // Clean up any double slashes
-    path = path.replace(/\/+/g, '/');    // Check admin access
+    path = path.replace(/\/+/g, '/'); // Check admin access
     if (path === '/admin-dashboard' || path.startsWith('/admin-dashboard/')) {
       const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
       if (!isLoggedIn || isLoggedIn !== 'true') {
-        this.navigate('/admin');
+        this.navigate('/admin-login');
         return;
       }
     }
@@ -74,7 +74,8 @@ class Router {
       '/Student/Student-Profiel': 'Student Profiel - Career Launch 2025',
       '/Student/Zoek-Criteria': 'Zoek Criteria - Career Launch 2025',
       '/admin': 'Admin Login - Career Launch 2025',
-      '/admin-select-dashboard': 'Admin Selectie - Career Launch 2025', // Added title
+      '/admin-login': 'Admin Login - Career Launch 2025',
+      '/admin-select-dashboard': 'Admin Selectie - Career Launch 2025',
       '/admin-dashboard': 'Admin Dashboard - Career Launch 2025',
       '/admin-dashboard/ingeschreven-studenten':
         'Ingeschreven Studenten - Admin Dashboard',

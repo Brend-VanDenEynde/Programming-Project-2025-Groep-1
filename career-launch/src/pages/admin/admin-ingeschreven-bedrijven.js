@@ -7,7 +7,7 @@ export function renderAdminIngeschrevenBedrijven(rootElement) {
   const adminUsername = sessionStorage.getItem('adminUsername');
   if (!isLoggedIn || isLoggedIn !== 'true') {
     // Redirect to admin login if not logged in
-    Router.navigate('/admin');
+    Router.navigate('/admin-login');
     return;
   }
 
@@ -66,7 +66,7 @@ export function renderAdminIngeschrevenBedrijven(rootElement) {
     sessionStorage.removeItem('adminLoggedIn');
     sessionStorage.removeItem('adminUsername');
     // Redirect to admin login
-    Router.navigate('/admin');
+    Router.navigate('/admin-login');
   });
 
   // Handle navigation between sections

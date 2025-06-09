@@ -31,18 +31,27 @@ function renderNotFound(rootElement) {
     `;
 }
 
+// functie om redirect naar admin-login te maken
+function redirectToAdminLogin(rootElement) {
+  Router.navigate('/admin-login');
+}
+
 // Definieer de routes
 const routes = {
   '/': renderHome,
   '/404': renderNotFound,
   '/registreer': renderRegister,
   '/login': renderLogin,
-  '/Student/Student-Profiel': renderStudentProfiel,  '/Student/Zoek-Criteria': renderSearchCriteriaStudent,  '/admin': renderAdmin,
+  '/Student/Student-Profiel': renderStudentProfiel,
+  '/Student/Zoek-Criteria': renderSearchCriteriaStudent,
+  '/admin': redirectToAdminLogin,
+  '/admin-login': renderAdmin,
   '/admin-select-dashboard': renderAdminSelectDashboard,
   '/admin-dashboard': renderAdminDashboard,
   '/admin-dashboard/ingeschreven-studenten': renderAdminIngeschrevenStudenten,
   '/admin-dashboard/ingeschreven-bedrijven': renderAdminIngeschrevenBedrijven,
-  '/admin-dashboard/bedrijven-in-behandeling': renderAdminBedrijvenInBehandeling,
+  '/admin-dashboard/bedrijven-in-behandeling':
+    renderAdminBedrijvenInBehandeling,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
   '/Bedrijf/Bedrijf-Profiel': renderBedrijfProfiel,

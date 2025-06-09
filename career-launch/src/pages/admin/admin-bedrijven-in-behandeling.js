@@ -7,7 +7,7 @@ export function renderAdminBedrijvenInBehandeling(rootElement) {
   const adminUsername = sessionStorage.getItem('adminUsername');
   if (!isLoggedIn || isLoggedIn !== 'true') {
     // Redirect to admin login if not logged in
-    Router.navigate('/admin');
+    Router.navigate('/admin-login');
     return;
   }
 
@@ -62,11 +62,10 @@ export function renderAdminBedrijvenInBehandeling(rootElement) {
   // Handle logout
   const logoutBtn = document.getElementById('logout-btn');
   logoutBtn.addEventListener('click', () => {
-    // Clear session
-    sessionStorage.removeItem('adminLoggedIn');
+    // Clear session    sessionStorage.removeItem('adminLoggedIn');
     sessionStorage.removeItem('adminUsername');
     // Redirect to admin login
-    Router.navigate('/admin');
+    Router.navigate('/admin-login');
   });
 
   // Handle navigation between sections

@@ -329,7 +329,7 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}) {
 
     // SkillAndere en TaalAndere blijven zoals eerder ingesteld    console.log('Opgeslagen Zoek-criteria:', studentData.criteria);
     // Geen re-render → checkboxen/radio’s blijven zichtbaar zoals ze staan
-  });  // FOOTER LINKS
+  }); // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
     Router.navigate('/privacy');

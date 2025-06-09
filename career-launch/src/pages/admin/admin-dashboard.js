@@ -6,10 +6,11 @@ export function renderAdminDashboard(rootElement) {
   const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
   if (!isLoggedIn || isLoggedIn !== 'true') {
     // Redirect to admin login if not logged in
-    Router.navigate('/admin');
+    Router.navigate('/admin-login');
     return;
   }
-  
+
   // Always redirect to admin selection dashboard
   Router.navigate('/admin-select-dashboard');
-  return;}
+  return;
+}
