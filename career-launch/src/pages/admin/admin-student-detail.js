@@ -112,7 +112,21 @@ export function renderAdminStudentDetail(rootElement) {
           </div>
         </main>
       </div>
-        
+          <!-- Speeddates Modal -->
+      <div id="speeddates-modal" class="speeddates-modal" style="display: none;">
+        <div class="speeddates-modal-content">
+          <div class="speeddates-modal-header">
+            <h2>Speeddates</h2>
+            <button id="close-modal" class="close-modal-btn">&times;</button>
+          </div>
+          <div class="speeddates-modal-body">
+            <div id="speeddates-list" class="speeddates-list">
+              <!-- Speeddates will be populated here -->
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- FOOTER -->
       <footer class="student-profile-footer">
         <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
@@ -123,8 +137,117 @@ export function renderAdminStudentDetail(rootElement) {
 
   // Event handlers
   setupEventHandlers();
-
   document.title = `Student Details: ${studentData.firstName} ${studentData.lastName} - Admin Dashboard`;
+}
+
+// Modal functionality for speeddates
+function openSpeedDatesModal() {
+  const modal = document.getElementById('speeddates-modal');
+  const speedDatesList = document.getElementById('speeddates-list');
+
+  // Get current student ID from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const studentId = urlParams.get('id') || 'demo';
+
+  // Get speeddates data for this student
+  const speeddates = getStudentSpeedDates(studentId);
+
+  // Clear existing content
+  speedDatesList.innerHTML = '';
+
+  if (speeddates.length === 0) {
+    speedDatesList.innerHTML =
+      '<div class="no-speeddates">Geen speeddates gevonden</div>';
+  } else {
+    speeddates.forEach((speeddate) => {
+      const speedDateItem = document.createElement('div');
+      speedDateItem.className = 'speeddate-item';
+      speedDateItem.innerHTML = `
+        <div class="speeddate-info">
+          <span class="speeddate-time">${speeddate.time}</span>
+          <span class="speeddate-company">${speeddate.company}</span>
+        </div>
+        <button class="speeddate-cancel-btn" data-speeddate-id="${speeddate.id}" title="Annuleren">✕</button>
+      `;
+      speedDatesList.appendChild(speedDateItem);
+    });
+
+    // Add event listeners for cancel buttons
+    const cancelButtons = speedDatesList.querySelectorAll(
+      '.speeddate-cancel-btn'
+    );
+    cancelButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const speedDateId = btn.dataset.speeddateId;
+        if (confirm('Weet je zeker dat je deze speeddate wilt annuleren?')) {
+          btn.closest('.speeddate-item').remove();
+          // In a real app, you would make an API call here to cancel the speeddate
+          console.log(`Speeddate ${speedDateId} geannuleerd`);
+
+          // Check if list is now empty
+          if (speedDatesList.children.length === 0) {
+            speedDatesList.innerHTML =
+              '<div class="no-speeddates">Geen speeddates gevonden</div>';
+          }
+        }
+      });
+    });
+  }
+
+  modal.style.display = 'flex';
+
+  // Add event listeners for closing modal
+  const closeBtn = document.getElementById('close-modal');
+  const modalOverlay = modal;
+
+  closeBtn.addEventListener('click', closeSpeedDatesModal);
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+      closeSpeedDatesModal();
+    }
+  });
+
+  // ESC key to close modal
+  document.addEventListener('keydown', function escKeyHandler(e) {
+    if (e.key === 'Escape') {
+      closeSpeedDatesModal();
+      document.removeEventListener('keydown', escKeyHandler);
+    }
+  });
+}
+
+function closeSpeedDatesModal() {
+  const modal = document.getElementById('speeddates-modal');
+  modal.style.display = 'none';
+}
+
+function getStudentSpeedDates(studentId) {
+  // Mock speeddate data - in real app this would come from API
+  const speedDatesDatabase = {
+    'tiberius-kirk': [
+      { id: 1, time: '12u40', company: 'Carrefour' },
+      { id: 2, time: '13u00', company: 'Microsoft' },
+      { id: 3, time: '13u20', company: 'Amazon' },
+    ],
+    'john-smith': [
+      { id: 4, time: '12u45', company: 'Philips' },
+      { id: 5, time: '13u10', company: 'Amazon' },
+    ],
+    'jean-luc-picard': [
+      { id: 6, time: '12u40', company: 'Carrefour' },
+      { id: 7, time: '12u45', company: 'Philips' },
+      { id: 8, time: '13u00', company: 'Microsoft' },
+      { id: 9, time: '13u10', company: 'Amazon' },
+    ],
+    'daniel-vonkman': [
+      { id: 10, time: '12u50', company: 'Bol.com' },
+      { id: 11, time: '13u15', company: 'MediaMarkt' },
+    ],
+    'len-jaxtyn': [{ id: 12, time: '12u55', company: 'Google' }],
+  };
+
+  return speedDatesDatabase[studentId] || [];
 }
 
 function getStudentData(studentId) {
@@ -285,10 +408,9 @@ function setupEventHandlers() {
   contactBtn.addEventListener('click', () => {
     alert('Contact functionaliteit zou hier geïmplementeerd worden.');
   });
-
   const speedDatesBtn = document.getElementById('view-speeddates-btn');
   speedDatesBtn.addEventListener('click', () => {
-    alert('Speeddates overzicht zou hier getoond worden.');
+    openSpeedDatesModal();
   });
 
   const deleteBtn = document.getElementById('delete-account-btn');
