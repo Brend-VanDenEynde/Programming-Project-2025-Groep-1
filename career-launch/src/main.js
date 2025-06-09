@@ -17,6 +17,7 @@ import { renderAdminIngeschrevenBedrijven } from './pages/admin/admin-ingeschrev
 import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven-in-behandeling.js';
 import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js';
 import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
+import { renderAdminProcessingCompanyDetail } from './pages/admin/admin-processing-company-detail.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
 import { renderBedrijfProfiel } from './pages/bedrijf-profiel.js';
@@ -57,6 +58,8 @@ const routes = {
     renderAdminBedrijvenInBehandeling,
   '/admin-dashboard/student-detail': renderAdminStudentDetail,
   '/admin-dashboard/company-detail': renderAdminCompanyDetail,
+  '/admin-dashboard/processing-company-detail':
+    renderAdminProcessingCompanyDetail,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
   '/Bedrijf/Bedrijf-Profiel': renderBedrijfProfiel,

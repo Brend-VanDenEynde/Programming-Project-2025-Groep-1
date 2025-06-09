@@ -50,43 +50,42 @@ export function renderAdminStudentDetail(rootElement) {
             <h1 id="section-title">Student Details: ${studentData.firstName} ${
     studentData.lastName
   }</h1>
-          </div>
-            <div class="admin-content-area" id="content-area" style="background-color: white;">
-            <div class="student-detail-container">
-              <div class="student-detail-main-layout">
+          </div>            <div class="admin-content-area" id="content-area" style="background-color: white;">
+            <div class="detail-container">
+              <div class="detail-main-layout">
                 <!-- Left side - Student Information -->
-                <div class="student-detail-left">
+                <div class="detail-left">
                   <!-- Profile Picture Section -->
-                  <div class="student-detail-avatar-section">
+                  <div class="detail-logo-section">
                     <img 
                       src="${studentData.profilePictureUrl || defaultAvatar}" 
                       alt="Profielfoto ${studentData.firstName} ${
     studentData.lastName
   }" 
-                      class="student-detail-avatar"
+                      class="detail-logo"
                     />
                   </div>
                   
                   <!-- Student Information -->
-                  <div class="student-detail-info">
-                    <div class="student-detail-field">
+                  <div class="detail-info">
+                    <div class="detail-field">
                       <label>Naam:</label>
                       <span>${studentData.firstName} ${
     studentData.lastName
   }</span>
                     </div>
                     
-                    <div class="student-detail-field">
+                    <div class="detail-field">
                       <label>Contact-Email:</label>
                       <span>${studentData.email}</span>
                     </div>
                     
-                    <div class="student-detail-field">
+                    <div class="detail-field">
                       <label>LinkedIn-profiel:</label>
                       <span>
                         ${
                           studentData.linkedIn
-                            ? `<a href="${studentData.linkedIn}" target="_blank" style="color: #007bff;">${studentData.linkedIn}</a>`
+                            ? `<a href="${studentData.linkedIn}" target="_blank" class="linkedin-link">${studentData.linkedIn}</a>`
                             : 'Niet ingesteld'
                         }
                       </span>
@@ -95,15 +94,15 @@ export function renderAdminStudentDetail(rootElement) {
                 </div>
                 
                 <!-- Right side - Action Buttons -->
-                <div class="student-detail-right">
-                  <div class="student-detail-actions">
-                    <button id="view-speeddates-btn" class="student-action-btn speeddates">
+                <div class="detail-right">
+                  <div class="detail-actions">
+                    <button id="view-speeddates-btn" class="detail-action-btn speeddates">
                       Speeddates
                     </button>
-                    <button id="contact-student-btn" class="student-action-btn contact">
+                    <button id="contact-student-btn" class="detail-action-btn contact">
                       Contact
                     </button>
-                    <button id="delete-account-btn" class="student-action-btn delete">
+                    <button id="delete-account-btn" class="detail-action-btn delete">
                       Verwijder account
                     </button>
                   </div>

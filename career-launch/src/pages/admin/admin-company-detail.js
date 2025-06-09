@@ -49,34 +49,33 @@ export function renderAdminCompanyDetail(rootElement) {
             <button id="back-btn" class="back-btn">← Terug naar bedrijven</button>
             <h1 id="section-title">Bedrijf Details: ${companyData.name}</h1>
           </div>
-          
-          <div class="admin-content-area" id="content-area" style="background-color: white;">
-            <div class="company-detail-container">
-              <div class="company-detail-main-layout">
+            <div class="admin-content-area" id="content-area" style="background-color: white;">
+            <div class="detail-container">
+              <div class="detail-main-layout">
                 <!-- Left side - Company Information -->
-                <div class="company-detail-left">
+                <div class="detail-left">
                   <!-- Company Logo Section -->
-                  <div class="company-detail-logo-section">
+                  <div class="detail-logo-section">
                     <img 
                       src="${companyData.logoUrl || defaultCompanyLogo}" 
                       alt="Logo ${companyData.name}" 
-                      class="company-detail-logo"
+                      class="detail-logo"
                     />
                   </div>
                   
                   <!-- Company Information -->
-                  <div class="company-detail-info">
-                    <div class="company-detail-field">
+                  <div class="detail-info">
+                    <div class="detail-field">
                       <label>Naam:</label>
                       <span>${companyData.name}</span>
                     </div>
                     
-                    <div class="company-detail-field">
+                    <div class="detail-field">
                       <label>Contact-Email:</label>
                       <span>${companyData.email}</span>
                     </div>
                     
-                    <div class="company-detail-field">
+                    <div class="detail-field">
                       <label>Locatie:</label>
                       <span>${companyData.location}</span>
                     </div>
@@ -84,15 +83,15 @@ export function renderAdminCompanyDetail(rootElement) {
                 </div>
                 
                 <!-- Right side - Action Buttons -->
-                <div class="company-detail-right">
-                  <div class="company-detail-actions">
-                    <button id="view-speeddates-btn" class="company-action-btn speeddates">
+                <div class="detail-right">
+                  <div class="detail-actions">
+                    <button id="view-speeddates-btn" class="detail-action-btn speeddates">
                       Speeddates
                     </button>
-                    <button id="contact-company-btn" class="company-action-btn contact">
+                    <button id="contact-company-btn" class="detail-action-btn contact">
                       Contacteren
                     </button>
-                    <button id="delete-company-btn" class="company-action-btn delete">
+                    <button id="delete-company-btn" class="detail-action-btn delete">
                       Verwijderen
                     </button>
                   </div>

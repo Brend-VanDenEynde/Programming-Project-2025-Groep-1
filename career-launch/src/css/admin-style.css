@@ -446,6 +446,87 @@
   background-color: #0056b3;
 }
 
+/* Processing Companies Styles */
+.processing-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.processing-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: white;
+}
+
+.processing-company-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+}
+
+.processing-company-name.clickable {
+  cursor: pointer;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.processing-company-name.clickable:hover {
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.processing-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.approve-btn,
+.reject-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.approve-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.approve-btn:hover {
+  background-color: #1e7e34;
+  transform: scale(1.1);
+}
+
+.reject-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.reject-btn:hover {
+  background-color: #c82333;
+  transform: scale(1.1);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
+}
+
 /* Admin Responsive Design */
 @media (max-width: 768px) {
   .admin-header {
@@ -665,6 +746,16 @@
   background-color: #f8f9fa;
 }
 
+/* Processing item hover effects - matches student list behavior */
+.clickable-processing {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clickable-processing:hover {
+  background-color: #f8f9fa;
+}
+
 /* Company Detail Page Styles */
 .company-detail-container {
   background-color: white;
@@ -793,6 +884,194 @@
   font-size: 16px;
   font-weight: 500;
   color: #333;
+}
+
+/* Unified Detail Page Styles - Used by all detail pages */
+.detail-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.detail-main-layout {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.detail-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.detail-right {
+  flex: 0 0 200px;
+  display: flex;
+  justify-content: center;
+}
+
+.detail-logo-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.detail-logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 3px solid #ddd;
+}
+
+.detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.detail-field label {
+  font-weight: bold;
+  color: #555;
+  font-size: 14px;
+}
+
+.detail-field span {
+  color: #333;
+  font-size: 16px;
+  padding: 8px 0;
+}
+
+.detail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.detail-action-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-align: center;
+  min-width: 120px;
+}
+
+/* Button color schemes */
+.detail-action-btn.speeddates {
+  background-color: #007bff;
+  color: white;
+}
+
+.detail-action-btn.speeddates:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.detail-action-btn.contact {
+  background-color: #6c757d;
+  color: white;
+}
+
+.detail-action-btn.contact:hover {
+  background-color: #5a6268;
+  transform: translateY(-1px);
+}
+
+.detail-action-btn.accept {
+  background-color: #28a745;
+  color: white;
+}
+
+.detail-action-btn.accept:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+}
+
+.detail-action-btn.reject {
+  background-color: #dc3545;
+  color: white;
+}
+
+.detail-action-btn.reject:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+}
+
+.detail-action-btn.delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.detail-action-btn.delete:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+}
+
+.linkedin-link {
+  color: #0077b5;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 8px 0;
+  transition: color 0.3s ease;
+}
+
+.linkedin-link:hover {
+  color: #005885;
+  text-decoration: underline;
+}
+
+.back-btn {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.back-btn:hover {
+  background-color: #5a6268;
+}
+
+/* Responsive design for all detail pages */
+@media (max-width: 768px) {
+  .detail-main-layout {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .detail-right {
+    flex: none;
+    width: 100%;
+  }
+
+  .detail-actions {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .detail-action-btn {
+    flex: 1;
+    min-width: auto;
+    margin: 0 2px;
+  }
 }
 
 /* Responsive design */
