@@ -170,9 +170,10 @@ export function renderAdminProcessingCompanyDetail(rootElement) {
   const contactBtn = document.getElementById('contact-btn');
   const acceptBtn = document.getElementById('accept-btn');
   const rejectBtn = document.getElementById('reject-btn');
-
   contactBtn.addEventListener('click', () => {
-    alert(`Contact opgenomen met ${company.name} (${company.email})`);
+    // Create mailto link and open it
+    const mailtoLink = `mailto:${company.email}`;
+    window.location.href = mailtoLink;
   });
 
   acceptBtn.addEventListener('click', () => {
