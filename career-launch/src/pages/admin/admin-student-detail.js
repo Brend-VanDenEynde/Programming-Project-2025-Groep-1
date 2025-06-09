@@ -402,11 +402,19 @@ function setupEventHandlers() {
   const sidebar = document.querySelector('.admin-sidebar-clean');
   menuToggle.addEventListener('click', () => {
     sidebar.classList.toggle('active');
-  });
-  // Admin action buttons
+  }); // Admin action buttons
   const contactBtn = document.getElementById('contact-student-btn');
   contactBtn.addEventListener('click', () => {
-    alert('Contact functionaliteit zou hier geïmplementeerd worden.');
+    // Get current student ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const studentId = urlParams.get('id') || 'demo';
+
+    // Get student data to access email
+    const studentData = getStudentData(studentId);
+
+    // Create mailto link and open it
+    const mailtoLink = `mailto:${studentData.email}`;
+    window.location.href = mailtoLink;
   });
   const speedDatesBtn = document.getElementById('view-speeddates-btn');
   speedDatesBtn.addEventListener('click', () => {
