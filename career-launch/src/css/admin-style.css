@@ -372,25 +372,24 @@
 .student-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
 }
 
 .student-item {
-  background: #f8f9fa;
-  padding: 1rem 1.5rem;
-  border-radius: 8px;
-  border: 1px solid #dee2e6;
-  transition: background-color 0.2s ease;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: white;
 }
 
 .student-item:hover {
-  background: #e9ecef;
+  background-color: #f8f9fa;
 }
 
 .student-name {
-  color: #333;
-  font-size: 1rem;
+  font-size: 16px;
   font-weight: 500;
+  color: #333;
 }
 
 /* Empty State */
@@ -666,6 +665,136 @@
   background-color: #f8f9fa;
 }
 
+/* Company Detail Page Styles */
+.company-detail-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.company-detail-main-layout {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.company-detail-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.company-detail-right {
+  flex: 0 0 200px;
+  display: flex;
+  justify-content: center;
+}
+
+.company-detail-logo-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.company-detail-logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 3px solid #ddd;
+}
+
+.company-detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.company-detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.company-detail-field label {
+  font-weight: bold;
+  color: #555;
+  font-size: 14px;
+}
+
+.company-detail-field span {
+  color: #333;
+  font-size: 16px;
+  padding: 8px 0;
+}
+
+.company-detail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.company-action-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  color: white;
+}
+
+.company-action-btn.speeddates {
+  background-color: #007bff;
+}
+
+.company-action-btn.speeddates:hover {
+  background-color: #0056b3;
+}
+
+.company-action-btn.contact {
+  background-color: #28a745;
+}
+
+.company-action-btn.contact:hover {
+  background-color: #1e7e34;
+}
+
+.company-action-btn.delete {
+  background-color: #dc3545;
+}
+
+.company-action-btn.delete:hover {
+  background-color: #c82333;
+}
+
+.clickable-company {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clickable-company:hover {
+  background-color: #f8f9fa;
+}
+
+.company-item {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: white;
+}
+
+.company-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .student-detail-main-layout {
@@ -684,6 +813,26 @@
   }
 
   .student-action-btn {
+    flex: 1;
+    margin: 0 5px;
+  }
+
+  .company-detail-main-layout {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .company-detail-right {
+    flex: none;
+    width: 100%;
+  }
+
+  .company-detail-actions {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .company-action-btn {
     flex: 1;
     margin: 0 5px;
   }

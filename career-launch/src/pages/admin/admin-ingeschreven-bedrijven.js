@@ -40,11 +40,22 @@ export function renderAdminIngeschrevenBedrijven(rootElement) {
           <div class="admin-section-header">
             <h1 id="section-title">Ingeschreven Bedrijven</h1>
           </div>
-          
-          <div class="admin-content-area" id="content-area">
+            <div class="admin-content-area" id="content-area">
             <div class="companies-list">
-              <div class="empty-state">
-                <p>Geen bedrijven ingeschreven</p>
+              <div class="company-item clickable-company" data-company-id="carrefour">
+                <span class="company-name">Carrefour</span>
+              </div>
+              <div class="company-item clickable-company" data-company-id="delhaize">
+                <span class="company-name">Delhaize</span>
+              </div>
+              <div class="company-item clickable-company" data-company-id="colruyt">
+                <span class="company-name">Colruyt</span>
+              </div>
+              <div class="company-item clickable-company" data-company-id="proximus">
+                <span class="company-name">Proximus</span>
+              </div>
+              <div class="company-item clickable-company" data-company-id="kbc">
+                <span class="company-name">KBC Bank</span>
               </div>
             </div>
           </div>
@@ -90,10 +101,18 @@ export function renderAdminIngeschrevenBedrijven(rootElement) {
     e.preventDefault();
     Router.navigate('/privacy');
   });
-
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
     Router.navigate('/contact');
+  });
+
+  // Add click handlers for company items
+  const companyItems = document.querySelectorAll('.clickable-company');
+  companyItems.forEach((item) => {
+    item.addEventListener('click', () => {
+      const companyId = item.dataset.companyId;
+      Router.navigate(`/admin-dashboard/company-detail?id=${companyId}`);
+    });
   });
 
   document.title = 'Ingeschreven Bedrijven - Admin Dashboard';
