@@ -1,6 +1,7 @@
 // main.js file
 import Router from './router.js';
-import './style.css';
+import './css/style.css';
+import './css/admin-style.css';
 
 // importeer de pagina's
 import { renderHome } from './pages/home.js';
