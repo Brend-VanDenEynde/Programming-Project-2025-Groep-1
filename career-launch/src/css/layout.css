@@ -130,36 +130,42 @@
 
 .content-card {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  padding: 3rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   max-width: 800px;
   width: 100%;
-  margin-top: 2rem;
+  overflow: hidden;
+  border: 1px solid #dee2e6;
 }
 
-.content-card h1 {
+.content-card .header {
+  background: #f8f9fa;
   color: #333;
-  margin-bottom: 2rem;
-  font-size: 2.5rem;
-  text-align: center;
+  padding: 2rem;
+  border-bottom: 1px solid #dee2e6;
 }
 
-.content-card h2 {
+.content-card .header h1 {
+  margin: 0.5rem 0 0 0;
+  font-size: 2rem;
+}
+
+.content-card .content {
+  padding: 2rem;
+  line-height: 1.6;
+}
+
+.content-card .content h2 {
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.content-card .content h3 {
   color: #555;
-  margin: 2rem 0 1rem 0;
-  font-size: 1.5rem;
-  border-bottom: 2px solid #f0f0f0;
-  padding-bottom: 0.5rem;
+  margin: 1.5rem 0 0.5rem 0;
 }
 
-.content-card p {
-  color: #666;
-  margin-bottom: 1rem;
-  line-height: 1.7;
-}
-
-.content-card ul {
+.content-card .content ul {
   margin: 0.5rem 0 1rem 1.5rem;
 }
 
@@ -204,9 +210,8 @@
 
 .contact-form {
   margin-top: 2rem;
-  padding: 2rem;
-  background: #f8f9fa;
-  border-radius: 8px;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
 }
 
 .contact-form h3 {
@@ -214,27 +219,24 @@
   color: #333;
 }
 
+.contact-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .contact-form input,
 .contact-form textarea {
-  width: 100%;
   padding: 0.75rem;
-  margin-bottom: 1rem;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 1rem;
+  transition: border-color 0.3s ease;
 }
 
-.contact-form button {
-  background: #667eea;
-  color: white;
-  padding: 0.75rem 2rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background 0.3s ease;
-}
-
-.contact-form button:hover {
-  background: #5a6fd8;
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
 }
