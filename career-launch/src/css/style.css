@@ -1318,42 +1318,422 @@ body.darkmode .qr-code-description {
   color: #e0f7fa !important;
 }
 
-@media (max-width: 600px) {
-  .settings-popup-card {
-    padding: 1rem 2vw;
-    min-width: 0;
-    max-width: 98vw;
+/* Modern Contact Page Styles */
+.modern-contact-container {
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modern-contact-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  max-width: 600px;
+}
+
+.modern-back-button {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  background: white;
+  border: 1px solid #e1e5e9;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modern-back-button:hover {
+  background: #f8f9fa;
+  border-color: #ccc;
+}
+
+.back-arrow {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.modern-contact-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.modern-contact-subtitle {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 0;
+  font-weight: 400;
+}
+
+.modern-contact-content {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+  border: 1px solid #e1e5e9;
+}
+
+.contact-form-section {
+  margin-bottom: 1.5rem;
+}
+
+.contact-form-section h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.modern-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  position: relative;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.3rem;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e1e5e9;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background: white;
+  color: #333;
+  transition: border-color 0.2s ease;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #00bcd4;
+}
+
+.form-group input.error,
+.form-group textarea.error {
+  border-color: #dc3545;
+}
+
+.form-group input.valid,
+.form-group textarea.valid {
+  border-color: #28a745;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: none;
+}
+
+.character-count {
+  font-size: 0.8rem;
+  color: #666;
+  text-align: right;
+  margin-top: 0.25rem;
+}
+
+.modern-submit-button {
+  background: #00bcd4;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.modern-submit-button:hover:not(:disabled) {
+  background: #00acc1;
+}
+
+.modern-submit-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.button-icon {
+  font-size: 1.2rem;
+}
+
+.form-status {
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+  font-weight: 500;
+  display: none;
+}
+
+.form-status.error {
+  background: #fff5f5;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+}
+
+.form-status.success {
+  background: #f0fff4;
+  color: #28a745;
+  border: 1px solid #28a745;
+}
+
+/* Success Modal Styles */
+.success-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  padding: 0;
+  max-width: 450px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  text-align: center;
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.success-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.modal-header h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #28a745;
+  margin: 0;
+}
+
+.modal-body {
+  padding: 1rem 1.5rem;
+  text-align: center;
+}
+
+.modal-body p {
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.modal-reference {
+  background: #f8f9fa;
+  padding: 0.75rem;
+  border-radius: 4px;
+  border-left: 3px solid #00bcd4;
+  margin-top: 0.75rem;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem 1.5rem;
+  text-align: center;
+}
+
+.modal-close-button {
+  background: #00bcd4;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.modal-close-button:hover {
+  background: #00acc1;
+}
+
+/* Loading Overlay Styles */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid #00bcd4;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
   }
-  .login-card,
-  .register-card {
-    margin-bottom: 32px;
-  }
-  .student-profile-footer {
-    font-size: 0.88rem;
-    padding: 13px 0 10px 0;
+  100% {
+    transform: rotate(360deg);
   }
 }
 
-@media (max-width: 900px) {
-  .student-profile-form-container,
-  .speeddates-table-container,
-  .criteria-form {
-    max-width: 98vw;
-    padding-left: 1rem;
-    padding-right: 1rem;
+.loading-overlay p {
+  color: white;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+/* Dark mode adjustments for contact page */
+body.darkmode .modern-contact-container {
+  background: #1a1a1a;
+}
+
+body.darkmode .modern-contact-content {
+  background: #2d2d2d;
+  color: #f5f5f5;
+  border-color: #444;
+}
+
+body.darkmode .contact-form-section h2,
+body.darkmode .modern-contact-title {
+  color: #f5f5f5;
+}
+
+body.darkmode .form-group label {
+  color: #e0e0e0;
+}
+
+body.darkmode .form-group input,
+body.darkmode .form-group textarea {
+  background: #333;
+  border-color: #555;
+  color: #f5f5f5;
+}
+
+body.darkmode .form-group input:focus,
+body.darkmode .form-group textarea:focus {
+  border-color: #00bcd4;
+}
+
+body.darkmode .modern-back-button {
+  background: #2d2d2d;
+  border-color: #555;
+  color: #f5f5f5;
+}
+
+body.darkmode .modern-back-button:hover {
+  background: #333;
+}
+
+body.darkmode .modal-content {
+  background: #2d2d2d;
+  color: #f5f5f5;
+}
+
+body.darkmode .modal-header {
+  border-bottom-color: #555;
+}
+
+body.darkmode .modal-reference {
+  background: #333;
+  color: #f5f5f5;
+}
+
+/* Responsive Design for Contact Page */
+@media (max-width: 768px) {
+  .modern-contact-container {
+    padding: 1rem 0.5rem;
   }
-  .speeddates-table-container {
-    max-width: 98vw;
-    padding-left: 1rem;
-    padding-right: 1rem;
+
+  .modern-back-button {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin-bottom: 1.5rem;
   }
-  .speeddates-table th,
-  .speeddates-table td {
-    padding: 13px 4px;
-    font-size: 0.98rem;
+
+  .modern-contact-title {
+    font-size: 2rem;
   }
-  .status-badge {
-    min-width: 80px;
-    padding: 7px 0;
+
+  .modern-contact-content {
+    padding: 1.5rem;
+    margin: 0 0.5rem;
+  }
+
+  .modal-content {
+    width: 95%;
+    margin: 0 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modern-contact-title {
+    font-size: 1.8rem;
+  }
+
+  .modern-contact-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .modern-contact-content {
+    padding: 1rem;
+  }
+
+  .contact-form-section h2 {
+    font-size: 1.3rem;
+  }
+
+  .modern-submit-button {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.9rem;
   }
 }
