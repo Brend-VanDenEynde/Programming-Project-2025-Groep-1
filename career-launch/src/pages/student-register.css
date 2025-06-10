@@ -98,6 +98,10 @@ body {
   margin-bottom: 1rem;
 }
 
+.form-spacing {
+  margin-bottom: 1rem;
+}
+
 .input-half {
   flex: 1;
   padding: 0.75rem;
