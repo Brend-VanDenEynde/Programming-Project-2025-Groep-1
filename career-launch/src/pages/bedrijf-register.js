@@ -11,12 +11,12 @@ export function renderBedrijfRegister(rootElement) {
 
       <div class="upload-section">
         <div class="upload-icon">⬆</div>
-        <label>Foto</label>
+        <label>Logo</label>
       </div>
 
       <form class="naamForm" id="naamForm">
         <div class="name-row">
-          <input type="bedrijfnaam" id="bedrijfnaam" name="bedrijfnaam" required placeholder="Bedrijfnaam" class="input-half" />
+          <input type="bedrijfnaam" id="bedrijfnaam" name="bedrijfnaam" required placeholder="Bedrijfsnaam" class="input-half" />
         </div>
         <input type="linkedin" id="linkedin" name"linkedin" placeholder="LinkedIn-link" class="input-full" />
 

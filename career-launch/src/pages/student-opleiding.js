@@ -16,16 +16,18 @@ export function renderStudentOpleiding(rootElement) {
           <label><input type="radio" name="jaar" value="3"> 3de jaar</label>
         </div>
 
-
-      <select class="opleiding-select" name="opleiding">
+      <div class="select-container">
+        <select class="opleiding-select" name="opleiding">
           <option selected disabled>Opleiding</option>
           <option>Business IT</option>
           <option>Networks & Security</option>
           <option>Software Engineering</option>
           <option>Intelligent Robotics</option>
-      </select>
-
-      <button class="save-button">SAVE</button>
+        </select>
+      </div>
+      <div class="save-register">
+        <button class="save-button">SAVE</button>
+      </div>
       </form>
     </main>
 

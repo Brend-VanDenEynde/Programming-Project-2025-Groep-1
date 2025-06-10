@@ -175,6 +175,8 @@ body {
 }
 
 /* Save knop */
+
+
 .save-button {
   margin-top: 2rem;
   padding: 0.75rem 1.5rem;
@@ -214,3 +216,10 @@ body {
   width: 100%;
   margin-top: 2rem;
 }
+
+.select-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
