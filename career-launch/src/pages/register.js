@@ -142,7 +142,7 @@ function handleRegister(event) {
 
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
-  alert(`Welkom ${data.firstName}! Je account is aangemaakt.`);
+  alert(`Welkom ${data.email}! Je account is aangemaakt.`);
 
   if (data.rol === 'student') {
       renderStudentRegister(document.getElementById('app'));
