@@ -5,6 +5,7 @@ import { renderQRPopup } from './student-qr-popup.js';
 import { renderLogin } from './login.js';
 import { showSettingsPopup } from './student-settings.js';
 import Router from '../router.js';
+import logoIcon from '../Icons/favicon-32x32.png';
 
 export function renderSearchCriteriaStudent(
   rootElement,
@@ -80,7 +81,7 @@ export function renderSearchCriteriaStudent(
     <div class="student-profile-container">
       <header class="student-profile-header">
         <div class="logo-section">
-          <img src="src/Icons/favicon-32x32.png" alt="Logo EhB Career Launch" width="32" height="32" />
+          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>

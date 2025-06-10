@@ -1,4 +1,5 @@
 // src/views/student-speeddates-verzoeken.js
+import logoIcon from '../Icons/favicon-32x32.png';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddates } from './student-speeddates.js';
@@ -92,7 +93,7 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     <div class="student-profile-container">
       <header class="student-profile-header">
         <div class="logo-section">
-          <img src="src/Icons/favicon-32x32.png" alt="Logo EhB Career Launch" width="32" height="32" />
+          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>

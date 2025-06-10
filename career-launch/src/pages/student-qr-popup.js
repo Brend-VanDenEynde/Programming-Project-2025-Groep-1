@@ -1,4 +1,5 @@
 import logoIcon from '../Icons/favicon-32x32.png';
+import defaultAvatar from '../Images/default.jpg';
 import { renderLogin } from './login.js';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
@@ -13,7 +14,7 @@ export function renderQRPopup(rootElement, studentData = {}) {
     <div class="student-profile-container">
       <header class="student-profile-header">
         <div class="logo-section">
-          <img src="src/Icons/favicon-32x32.png" alt="Logo EhB Career Launch" width="32" height="32" />
+          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
@@ -37,7 +38,7 @@ export function renderQRPopup(rootElement, studentData = {}) {
             <h1 class="student-profile-title">Jouw QR-code</h1>
             <div class="qr-code-section">
               <div class="qr-code-label">Laat deze QR-code scannen door bedrijven of tijdens events</div>
-              <img src="/src/Images/default.jpg" alt="QR code" class="qr-code-img">
+              <img src="${defaultAvatar}" alt="QR code" class="qr-code-img">
               <div class="qr-code-description">(Niet delen op sociale media)</div>
             </div>
           </div>
