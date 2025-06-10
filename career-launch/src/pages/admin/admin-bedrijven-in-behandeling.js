@@ -107,14 +107,15 @@ export function renderAdminBedrijvenInBehandeling(rootElement) {
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
     Router.navigate('/contact');
-  });  // Handle approve/reject buttons
+  }); // Handle approve/reject buttons
   const approveButtons = document.querySelectorAll('.approve-btn');
   const rejectButtons = document.querySelectorAll('.reject-btn');
-  
+
   // Handle clicking on entire processing items to go to detail page
   const clickableProcessingItems = document.querySelectorAll(
     '.clickable-processing'
-  );  clickableProcessingItems.forEach((item) => {
+  );
+  clickableProcessingItems.forEach((item) => {
     item.addEventListener('click', (e) => {
       // Don't navigate if clicking on action buttons
       if (
