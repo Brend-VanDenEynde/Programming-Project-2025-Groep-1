@@ -77,5 +77,6 @@ function handleSkillsRegister(event) {
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
 
-    // Navigeren naar de volgende pagina
+  // Navigeren naar de volgende pagina
+  Router.navigate('/Student/Student-Profiel');
 }
