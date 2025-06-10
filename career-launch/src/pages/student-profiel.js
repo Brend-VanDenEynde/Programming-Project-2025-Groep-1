@@ -4,6 +4,7 @@ import defaultAvatar from '../Images/default.jpg'; // import default profielfoto
 import logoIcon from '../Icons/favicon-32x32.png'; // import logo‐icoon
 import { renderLogin } from './login.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
+import Router from '../router.js';
 
 export function renderStudentProfiel(rootElement, studentData = {}) {
   // Destructure met fallback‐waarden
@@ -294,23 +295,15 @@ export function renderStudentProfiel(rootElement, studentData = {}) {
 
     // TODO: stuur updatedData naar backend    // Toon opnieuw de view‐sectie met bijgewerkte data
     renderStudentProfiel(rootElement, updatedData);
-  });
-  // FOOTER LINKS
+  }); // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/privacy');
-    });
+    Router.navigate('/privacy');
   });
 
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      // Use absolute path to ensure correct navigation regardless of current path
-      Router.navigate('/contact');
-    });
+    Router.navigate('/contact');
   });
   //aaaaa
 }

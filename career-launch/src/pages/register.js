@@ -1,6 +1,11 @@
-import { renderStudentRegister } from './student-register.js';
 import { renderLogin } from './login.js';
 import Router from '../router.js';
+import {
+  createUserRegistrationJSON,
+  sendRegistrationToAPI,
+  validateRegistrationData,
+  mockRegistrationAPI,
+} from '../utils/registration-api.js';
 
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `
@@ -103,32 +108,30 @@ export function renderRegister(rootElement) {
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/privacy');
-    });
+    Router.navigate('/privacy');
   });
 
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/contact');
-    });
+    Router.navigate('/contact');
   });
 }
 
+// Nieuwe handleRegister functie met JSON-structurering en API-call
 function handleRegister(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
   const data = {
+    firstName: formData.get('firstName'),
+    lastName: formData.get('lastName'),
     email: formData.get('email'),
     password: formData.get('password'),
     confirmPassword: formData.get('confirmPassword'),
     rol: formData.get('rol'),
   };
 
+  // Validatie
   if (data.password !== data.confirmPassword) {
     alert('Wachtwoorden komen niet overeen!');
     return;

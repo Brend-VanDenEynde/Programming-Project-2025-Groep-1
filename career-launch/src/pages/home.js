@@ -28,22 +28,14 @@ export function renderHome(rootElement) {
   btnLog.addEventListener('click', () => {
     Router.navigate('/login');
   });
-
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/privacy');
-    });
+    Router.navigate('/privacy');
   });
 
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      // Use absolute path to ensure correct navigation regardless of current path
-      Router.navigate('/contact');
-    });
+    Router.navigate('/contact');
   });
 }

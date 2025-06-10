@@ -77,22 +77,15 @@ export function renderLogin(rootElement) {
   linkedinButton.addEventListener('click', () => {
     // LinkedIn integratie nog niet geïmplementeerd
   });
-
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/privacy');
-    });
+    Router.navigate('/privacy');
   });
 
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/contact');
-    });
+    Router.navigate('/contact');
   });
 }
 
@@ -115,7 +108,6 @@ function handleLogin(event, rootElement) {
   // TODO: stuur credentials naar je backend
   console.log('Inlogdata:', { email, password });
 
-  
   /* Student data terugsteken
 
   // Simuleer studentData na succesvolle login
@@ -134,19 +126,19 @@ function handleLogin(event, rootElement) {
   */
 
   // Simuleer bedrijfData na succesvolle login
-const bedrijfData = {
-  companyName: 'Microsoft',
-  email: email,
-  description: 'Wij zijn een technologiebedrijf dat innovatieve oplossingen biedt.',
-  linkedIn: 'https://www.linkedin.com/company/microsoft',
-  profilePictureUrl: '/src/Images/default.jpg',
-};
+  const bedrijfData = {
+    companyName: 'Microsoft',
+    email: email,
+    description:
+      'Wij zijn een technologiebedrijf dat innovatieve oplossingen biedt.',
+    linkedIn: 'https://www.linkedin.com/company/microsoft',
+    profilePictureUrl: '/src/Images/default.jpg',
+  };
 
-// Sla bedrijfData eventueel tijdelijk op (bijv. in geheugen, lokale opslag of context)
-window.sessionStorage.setItem('bedrijfData', JSON.stringify(bedrijfData));
+  // Sla bedrijfData eventueel tijdelijk op (bijv. in geheugen, lokale opslag of context)
+  window.sessionStorage.setItem('bedrijfData', JSON.stringify(bedrijfData));
 
-// Navigeer naar bedrijf-profiel via router
-Router.navigate('/Bedrijf/Bedrijf-Profiel');
-
+  // Navigeer naar bedrijf-profiel via router
+  Router.navigate('/Bedrijf/Bedrijf-Profiel');
 }
 // renderBedrijfProfiel(rootElement, bedrijfData);
