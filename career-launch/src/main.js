@@ -42,7 +42,9 @@ const routes = {
   '/contact': renderContact,
   '/Student/Student-QR-Popup' : renderQRPopup,
   '/Student/Student-Speeddates': renderSpeeddates,
-  '/Student/Student-Speeddates-Verzoeken': renderSpeeddatesRequests
+  '/Student/Student-Speeddates-Verzoeken': renderSpeeddatesRequests,
+  '/Student/Student-Settings': showSettingsPopup,
+  
 }
 
 // Initialize router
@@ -50,3 +52,8 @@ const router = new Router(routes);
 
 // Make router globally available for pages to use
 window.appRouter = router;
+
+// Redirect naar https als we op http zitten (client side fallback)
+if (window.location.protocol === 'http:' && !window.location.hostname.includes('localhost')) {
+  window.location.href = window.location.href.replace('http:', 'https:');
+}

@@ -323,7 +323,7 @@ body.darkmode .footer-links {
 
 .login-btn {
   width: 100%;
-  background-color: grey;
+  background-color: #00acc1;
   color: white;
   border: none;
   padding: 14px;
@@ -336,7 +336,7 @@ body.darkmode .footer-links {
 }
 
 .login-btn:hover {
-  background-color: #00acc1;
+  background-color: #01bdd6;
 }
 
 .register-link {
