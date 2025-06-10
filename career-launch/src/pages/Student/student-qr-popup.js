@@ -1,44 +1,15 @@
-// src/views/student-speeddates.js
-import logoIcon from '../Icons/favicon-32x32.png';
-import { renderLogin } from './login.js';
+import { renderLogin } from '../login.js';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
+import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
-import { renderQRPopup } from './student-qr-popup.js';
 import { showSettingsPopup } from './student-settings.js';
 
-export function renderSpeeddates(rootElement, studentData = {}) {
-  const speeddates = [
-    {
-      bedrijf: 'Web & Co',
-      tijd: '10:00',
-      locatie: 'Stand A101',
-      status: 'Bevestigd',
-    },
-    {
-      bedrijf: 'DesignXperts',
-      tijd: '14:30',
-      locatie: 'Stand B202',
-      status: 'Bevestigd',
-    },
-    {
-      bedrijf: 'SoftDev BV',
-      tijd: '09:00',
-      locatie: 'Stand C303',
-      status: 'In afwachting',
-    },
-  ];
 
-  function getStatusBadge(status) {
-    if (status === 'Bevestigd') {
-      return `<span class="status-badge badge-bevestigd">Bevestigd</span>`;
-    } else if (status === 'In afwachting') {
-      return `<span class="status-badge badge-waiting">In afwachting</span>`;
-    } else {
-      return `<span class="status-badge badge-anders">${status}</span>`;
-    }
-  }
+// src/views/student-qr-popup.js
 
+
+export function renderQRPopup(rootElement, studentData = {}) {
   rootElement.innerHTML = `
     <div class="student-profile-container">
       <header class="student-profile-header">
@@ -52,59 +23,27 @@ export function renderSpeeddates(rootElement, studentData = {}) {
           <li><button id="nav-logout">Log out</button></li>
         </ul>
       </header>
-
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
             <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
-            <li><button data-route="speeddates" class="sidebar-link active">Speeddates</button></li>
+            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
+            <li><button data-route="qr" class="sidebar-link active">QR-code</button></li>
           </ul>
         </nav>
-
         <div class="student-profile-content">
           <div class="student-profile-form-container">
-            <h1 class="student-profile-title" style="text-align:center;width:100%;">Mijn Speeddates</h1>
-            <div>
-              ${
-                speeddates.length === 0
-                  ? `<p style="text-align:center;">Je hebt nog geen speeddates ingepland.</p>`
-                  : `
-                    <div class="speeddates-table-container">
-                      <table class="speeddates-table">
-                        <thead>
-                          <tr>
-                            <th>Bedrijf</th>
-                            <th>Tijd</th>
-                            <th>Locatie</th>
-                            <th>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          ${speeddates
-                            .map(
-                              (s) => `
-                            <tr>
-                              <td>${s.bedrijf}</td>
-                              <td>${s.tijd}</td>
-                              <td>${s.locatie}</td>
-                              <td>${getStatusBadge(s.status)}</td>
-                            </tr>
-                          `
-                            )
-                            .join('')}
-                        </tbody>
-                      </table>
-                    </div>
-                  `
-              }
+            <h1 class="student-profile-title">Jouw QR-code</h1>
+            <div class="qr-code-section">
+              <div class="qr-code-label">Laat deze QR-code scannen door bedrijven of tijdens events</div>
+              <img src="/src/Images/default.jpg" alt="QR code" class="qr-code-img">
+              <div class="qr-code-description">(Niet delen op sociale media)</div>
             </div>
           </div>
         </div>
       </div>
-
       <footer class="student-profile-footer">
         <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
         <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
@@ -112,7 +51,7 @@ export function renderSpeeddates(rootElement, studentData = {}) {
     </div>
   `;
 
-  document.querySelectorAll('.sidebar-link').forEach((btn) => {
+ document.querySelectorAll('.sidebar-link').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       const route = e.currentTarget.getAttribute('data-route');
       switch (route) {
@@ -122,16 +61,16 @@ export function renderSpeeddates(rootElement, studentData = {}) {
         case 'search':
           renderSearchCriteriaStudent(rootElement, studentData);
           break;
+        case 'speeddates':
+          renderSpeeddates(rootElement, studentData);
+          break;
         case 'requests':
           renderSpeeddatesRequests(rootElement, studentData);
           break;
-        case 'qr':
-          renderQRPopup(rootElement, studentData);
-          break;
+       
       }
     });
   });
-
 const burger = document.getElementById('burger-menu');
 const dropdown = document.getElementById('burger-dropdown');
 
@@ -153,39 +92,42 @@ if (burger && dropdown) {
   });
 
   // Sluit het menu bij klikken op een menu-item
-  document.getElementById('nav-settings').addEventListener('click', () => {
-    dropdown.style.display = 'none';
-    showSettingsPopup();
-  });
+document.getElementById('nav-settings').addEventListener('click', () => {
+  dropdown.style.display = 'none';
+  showSettingsPopup();
+});
   document.getElementById('nav-logout').addEventListener('click', () => {
     dropdown.style.display = 'none';
     renderLogin(rootElement);
   });
 }
 
-
+  
   document.getElementById('nav-settings').addEventListener('click', () => {
     // Navigeren naar Instellingen (nog te implementeren)
   });
-  
+
+   
+   
   document.getElementById('nav-logout').addEventListener('click', () => {
     renderLogin(rootElement);
   });
 
+ 
+
+  // Footer links
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/privacy');
     });
   });
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/contact');
     });
   });
-
-  
 }

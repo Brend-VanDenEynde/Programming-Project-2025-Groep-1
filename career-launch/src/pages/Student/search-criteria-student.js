@@ -2,7 +2,7 @@ import { renderStudentProfiel } from './student-profiel.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { renderQRPopup } from './student-qr-popup.js';
-import { renderLogin } from './login.js';
+import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
 
 export function renderSearchCriteriaStudent(rootElement, studentData = {}, readonlyMode = true) {
@@ -54,6 +54,19 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
       </label>
     `).join('');
   }
+
+  // --------- HIER KOMT DE DYNAMISCHE BUTTONS LOGICA ----------
+  function renderButtons() {
+    if (readonlyMode) {
+      return `<button id="btn-edit" type="button" class="student-profile-btn student-profile-btn-secondary">EDIT</button>`;
+    } else {
+      return `
+        <button id="btn-save" type="submit" class="student-profile-btn student-profile-btn-primary">SAVE</button>
+        <button id="btn-reset" type="button" class="student-profile-btn student-profile-btn-secondary">RESET</button>
+      `;
+    }
+  }
+  // -----------------------------------------------------------
 
   rootElement.innerHTML = `
     <div class="student-profile-container">
@@ -121,9 +134,7 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
                 }
               </fieldset>
               <div class="student-profile-buttons">
-                <button id="btn-edit" type="button" class="student-profile-btn student-profile-btn-secondary" style="${readonlyMode ? '' : 'display:none;'}">EDIT</button>
-                <button id="btn-save" type="submit" class="student-profile-btn student-profile-btn-primary" style="${readonlyMode ? 'display:none;' : ''}">SAVE</button>
-                <button id="btn-reset" type="button" class="student-profile-btn student-profile-btn-secondary" style="${readonlyMode ? 'display:none;' : ''}">RESET</button>
+                ${renderButtons()}
               </div>
             </form>
           </div>
@@ -157,14 +168,12 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
   const dropdown = document.getElementById('burger-dropdown');
 
   if (burger && dropdown) {
-    // Toggle hamburger-menu bij klik
     burger.addEventListener('click', (event) => {
       event.stopPropagation();
       dropdown.style.display =
         dropdown.style.display === 'block' ? 'none' : 'block';
     });
 
-    // Sluit het menu bij klik buiten het menu
     document.addEventListener('click', function(event) {
       if (dropdown.style.display === 'block') {
         if (!dropdown.contains(event.target) && event.target !== burger) {
@@ -173,7 +182,6 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
       }
     });
 
-    // Sluit het menu bij klikken op een menu-item
     document.getElementById('nav-settings').addEventListener('click', () => {
       dropdown.style.display = 'none';
       showSettingsPopup();
@@ -242,7 +250,6 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
     const inputSkill = document.getElementById('skill-andere-text');
     const addSkillBtn = document.getElementById('add-skill-btn');
     function addCustomSkill(val) {
-      // Sla eerst de huidige selectie op
       const checkedSkills = [...document.querySelectorAll('input[name="skills"]:checked')].map(cb => cb.value);
       studentData.criteria.skills = checkedSkills;
       const textValue = val.trim();
@@ -266,7 +273,6 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
     const inputTaal = document.getElementById('taal-andere-text');
     const addTaalBtn = document.getElementById('add-taal-btn');
     function addCustomTaal(val) {
-      // Sla eerst de huidige selectie op
       const checkedTalen = [...document.querySelectorAll('input[name="talen"]:checked')].map(cb => cb.value);
       studentData.criteria.talen = checkedTalen;
       const textValue = val.trim();
@@ -290,14 +296,14 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
   // Footer links
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/privacy');
     });
   });
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/contact');
     });

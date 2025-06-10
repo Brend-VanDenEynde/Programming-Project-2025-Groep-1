@@ -1,6 +1,5 @@
 // src/views/student-profile.js
-import defaultAvatar from '../Images/default.jpg';
-import { renderLogin } from './login.js';
+import { renderLogin } from '../login.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderQRPopup } from './student-qr-popup.js';
@@ -13,7 +12,7 @@ const defaultProfile = {
   email: 'student@voorbeeld.com',
   studyProgram: 'Opleiding',
   year: '1',
-  profilePictureUrl: defaultAvatar,
+  profilePictureUrl: 'src/Images/default.jpg',
   linkedIn: '',
   birthDate: '',
   description: '',
@@ -108,8 +107,8 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
                 ${
                   readonlyMode
                     ? `
-                      <button id="btn-edit-profile" type="button" class="student-profile-btn student-profile-btn-secondary">BEWERK</button>
-                      <button id="logout-btn" type="button" class="student-profile-btn student-profile-btn-secondary">UITLOGGEN</button>
+                      <button id="btn-edit-profile" type="button" class="student-profile-btn student-profile-btn-secondary">EDIT</button>
+                      <button id="logout-btn" type="button" class="student-profile-btn student-profile-btn-secondary">LOG OUT</button>
                     `
                     : `
                       <button id="btn-save-profile" type="submit" class="student-profile-btn student-profile-btn-primary">SAVE</button>
@@ -255,14 +254,14 @@ if (burger && dropdown) {
 
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/privacy');
     });
   });
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/contact');
     });

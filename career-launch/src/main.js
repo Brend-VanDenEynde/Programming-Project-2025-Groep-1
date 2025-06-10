@@ -6,16 +6,16 @@ import './style.css';
 import { renderHome } from './pages/home.js';
 import { renderRegister } from './pages/register.js';
 import { renderLogin } from './pages/login.js';
-import { renderStudentProfiel } from './pages/student-profiel.js';
-import { renderSearchCriteriaStudent } from './pages/search-criteria-student.js';
-import { renderAdmin } from './pages/admin.js';
-import { renderAdminDashboard } from './pages/admin-dashboard.js';
+import { renderStudentProfiel } from './pages/Student/student-profiel.js';
+import { renderSearchCriteriaStudent } from './pages/Student/search-criteria-student.js';
+import { renderAdmin } from './pages/Admin/admin.js';
+import { renderAdminDashboard } from './pages/Admin/admin-dashboard.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
-import { renderQRPopup } from './pages/student-qr-popup.js';
-import { renderSpeeddates } from './pages/student-speeddates.js';
-import { renderSpeeddatesRequests } from './pages/student-speeddates-verzoeken.js';
-
+import { renderQRPopup } from './pages/Student/student-qr-popup.js';
+import { renderSpeeddates } from './pages/Student/student-speeddates.js';
+import { renderSpeeddatesRequests } from './pages/Student/student-speeddates-verzoeken.js';
+import { showSettingsPopup } from './pages/Student/student-settings.js';
 
 // functie om de 404 pagina te renderen
 function renderNotFound(rootElement) {

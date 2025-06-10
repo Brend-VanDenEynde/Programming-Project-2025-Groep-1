@@ -50,9 +50,9 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
                   <td class="status-cell">
                     ${
                       v.status === 'Geaccepteerd'
-                        ? `<span class="badge-accepted">Geaccepteerd</span>`
+                        ? `<span class="status-badge badge-accepted">Geaccepteerd</span>`
                         : v.status === 'Geweigerd'
-                          ? `<span class="badge-denied">Geweigerd</span>`
+                          ? `<span class="status-badge badge-denied">Geweigerd</span>`
                           : `
                             <button class="accept-btn" data-idx="${idx}">Accepteer</button>
                             <button class="deny-btn" data-idx="${idx}">Weiger</button>
@@ -177,14 +177,14 @@ if (burger && dropdown) {
 
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/privacy');
     });
   });
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/contact');
     });

@@ -1,5 +1,5 @@
 // Admin login pagina
-import Router from '../router.js';
+import Router from '../../router.js';
 
 export function renderAdmin(rootElement) {
   rootElement.innerHTML = `
@@ -69,7 +69,7 @@ export function renderAdmin(rootElement) {
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/privacy');
     });
@@ -77,7 +77,7 @@ export function renderAdmin(rootElement) {
 
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/contact');
     });

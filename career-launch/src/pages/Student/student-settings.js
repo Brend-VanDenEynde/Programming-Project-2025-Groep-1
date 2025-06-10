@@ -1,4 +1,4 @@
-import { renderLogin } from './login.js';
+import { renderLogin } from '../login.js';
 
 // Fallback voor t() en setLanguage() als deze niet bestaan
 if (typeof window.t !== 'function') {

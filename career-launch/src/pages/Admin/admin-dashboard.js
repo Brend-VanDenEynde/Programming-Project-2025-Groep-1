@@ -1,5 +1,5 @@
 // Admin dashboard pagina
-import Router from '../router.js';
+import Router from '../../router.js';
 
 export function renderAdminDashboard(rootElement) {
   // Check if user is logged in
@@ -42,7 +42,7 @@ export function renderAdminDashboard(rootElement) {
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/privacy');
     });
@@ -50,7 +50,7 @@ export function renderAdminDashboard(rootElement) {
 
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/contact');
     });
