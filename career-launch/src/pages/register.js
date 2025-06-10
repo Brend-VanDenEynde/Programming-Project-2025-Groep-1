@@ -1,6 +1,7 @@
-import { renderLogin } from './login.js';
+import { renderStudentRegister } from './student-register.js';
+import { renderBedrijfRegister } from './bedrijf-register.js';
 import Router from '../router.js';
-import {
+import { renderLogin } from './login.js';import {
   createUserRegistrationJSON,
   sendRegistrationToAPI,
   validateRegistrationData,
@@ -148,8 +149,10 @@ function handleRegister(event) {
   console.log('Registratie data:', data);
 
   if (data.rol === 'student') {
-    renderStudentRegister(document.getElementById('app'));
+      renderStudentRegister(document.getElementById('app'));
+  } else if (data.rol === 'bedrijf') {
+      renderBedrijfRegister(document.getElementById('app'));
   } else {
-    renderLogin(document.getElementById('app'));
+      renderLogin(document.getElementById('app'));
   }
 }

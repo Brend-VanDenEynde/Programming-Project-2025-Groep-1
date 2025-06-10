@@ -89,6 +89,7 @@ body {
 .name-row {
   display: flex;
   gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .input-half {
@@ -176,11 +177,11 @@ body {
 /* Save knop */
 .save-button {
   margin-top: 2rem;
-  padding: 0.75rem 1.5re    m;
+  padding: 0.75rem 1.5rem;
   border: none;
   background-color: #004080;
   color: white;
-  border-radius: 8px;
+  border-radius: 2px;
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -188,4 +189,28 @@ body {
 
 .save-button:hover {
   background-color: #003060;
+}
+
+/* Skip knop */
+.skip-button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: grey;
+  color: white;
+  border-radius: 2px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.skip-button:hover {
+  background-color: #555;
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 2rem;
 }

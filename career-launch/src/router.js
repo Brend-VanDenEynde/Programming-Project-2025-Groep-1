@@ -91,6 +91,8 @@ class Router {
       '/Bedrijf/Zoek-Criteria': 'Zoek Criteria Bedrijf - Career Launch 2025',
       '/Student-Register': 'Student Registreren - Career Launch 2025',
       '/Student-Opleiding': 'Student Opleiding - Career Launch 2025',
+      '/Student-Skills': 'Student Skills - Career Launch 2025',
+      '/Bedrijf-Register': 'Bedrijf Registreren - Career Launch 2025',
     };
 
     document.title = titles[path] || 'Career Launch 2025';
