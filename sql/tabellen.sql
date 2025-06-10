@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS bedrijf (
     naam TEXT NOT NULL,
     plaats TEXT NOT NULL,
     contact_email TEXT NOT NULL UNIQUE,
-    linkedin TEXT
+    linkedin TEXT,
+    goedkeuring TINYINT NOT NULL DEFAULT 0
 );
 
 -- Tabel voor de studenten
@@ -41,6 +42,7 @@ CREATE TABLE IF NOT EXISTS student (
     profiel_foto TEXT,
     studiejaar INTEGER NOT NULL,
     opleiding_id INTEGER NOT NULL,
+    date_of_birth DATE not NULL DEFAULT '1970-01-01',
     FOREIGN KEY (opleiding_id) REFERENCES opleiding(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
