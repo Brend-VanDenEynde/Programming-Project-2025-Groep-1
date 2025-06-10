@@ -189,7 +189,7 @@ body {
 
 .register-btn {
   width: 100%;
-  background-color: #00bcd4;
+  background-color: grey;
   color: white;
   border: none;
   padding: 12px;
@@ -323,7 +323,7 @@ body.darkmode .footer-links {
 
 .login-btn {
   width: 100%;
-  background-color: #00bcd4;
+  background-color: grey;
   color: white;
   border: none;
   padding: 14px;
@@ -883,7 +883,7 @@ body.darkmode .footer-links {
 .student-profile-sidebar button.active,
 .student-profile-sidebar button:hover {
   background: #e1e5e9;
-  border-left: 4px solid #00bcd4;
+  border-left: 4px solid grey;
 }
 
 .student-profile-content {
@@ -970,7 +970,7 @@ body.darkmode .footer-links {
 .student-profile-form-group input[type="url"]:focus,
 .student-profile-form-group select:focus,
 .student-profile-form-group textarea:focus {
-  border-color: #1de9b6;
+  border-color: grey;
   background: #f6fffa;
 }
 
@@ -994,7 +994,7 @@ body.darkmode .footer-links {
 }
 
 .student-profile-btn-primary {
-  background: #00bcd4;
+  background: grey;
   color: #fff;
 }
 
@@ -1062,7 +1062,7 @@ body.darkmode .student-profile-btn-secondary:hover {
 body.darkmode .student-profile-btn:active,
 body.darkmode .student-profile-btn-primary:active,
 body.darkmode .student-profile-btn-secondary:active {
-  background-color: #00bcd4 !important;
+  background-color: grey !important;
   color: #fff !important;
   box-shadow: 0 2px 4px rgba(0,230,239,0.10) !important;
   transform: translateY(0) !important;
@@ -1123,7 +1123,7 @@ body.darkmode .student-profile-btn-secondary:active {
 
 .checkbox-option input[type="checkbox"],
 .checkbox-option input[type="radio"] {
-  accent-color: #00bcd4;
+  accent-color: grey;
   width: 20px;
   height: 20px;
   margin: 0 6px 0 0;
@@ -1132,8 +1132,8 @@ body.darkmode .student-profile-btn-secondary:active {
 
 .checkbox-option input[type="checkbox"]:checked + span,
 .checkbox-option input[type="checkbox"]:checked {
-  color: #00bcd4 !important;
-  border-color: #00bcd4;
+  color: grey !important;
+  border-color: grey;
 }
 
 .add-custom-wrapper {
@@ -1155,12 +1155,12 @@ body.darkmode .student-profile-btn-secondary:active {
 }
 
 .form-input:focus {
-  border-color: #00bcd4;
+  border-color: grey;
   background: #f6fffa;
 }
 
 .add-btn {
-  background: #00bcd4;
+  background: lightgrey;
   color: #fff;
   border: none;
   font-weight: 700;
@@ -1238,7 +1238,7 @@ body.darkmode .student-profile-btn-secondary:active {
 }
 
 .settings-action-btn:hover {
-  background: #00bcd4;
+  background: grey;
   color: #fff;
 }
 
@@ -1266,7 +1266,7 @@ body.darkmode .student-profile-btn-secondary:active {
 /* --- UNIFORME BUTTON-STIJL VOOR PROFIELACTIEKNOPPEN (login/register look) --- */
 .student-profile-btn,
 .student-profile-btn-primary {
-  background-color: #00bcd4 !important;
+  background-color: grey !important;
   color: #fff !important;
   border: none !important;
   border-radius: 8px !important;
@@ -1343,7 +1343,7 @@ body.darkmode .student-profile-btn-secondary:hover {
 body.darkmode .student-profile-btn:active,
 body.darkmode .student-profile-btn-primary:active,
 body.darkmode .student-profile-btn-secondary:active {
-  background-color: #00bcd4 !important;
+  background-color: grey !important;
   color: #fff !important;
   box-shadow: 0 2px 4px rgba(0,230,239,0.10) !important;
   transform: translateY(0) !important;
@@ -1404,7 +1404,7 @@ body.darkmode .student-profile-btn-secondary:active {
 
 .checkbox-option input[type="checkbox"],
 .checkbox-option input[type="radio"] {
-  accent-color: #00bcd4;
+  accent-color: grey;
   width: 20px;
   height: 20px;
   margin: 0 6px 0 0;
@@ -1413,8 +1413,8 @@ body.darkmode .student-profile-btn-secondary:active {
 
 .checkbox-option input[type="checkbox"]:checked + span,
 .checkbox-option input[type="checkbox"]:checked {
-  color: #00bcd4 !important;
-  border-color: #00bcd4;
+  color: grey !important;
+  border-color: grey;
 }
 
 .add-custom-wrapper {
@@ -1436,12 +1436,12 @@ body.darkmode .student-profile-btn-secondary:active {
 }
 
 .form-input:focus {
-  border-color: #00bcd4;
+  border-color: grey;
   background: #f6fffa;
 }
 
 .add-btn {
-  background: #00bcd4;
+  background: grey;
   color: #fff;
   border: none;
   font-weight: 700;
@@ -1519,7 +1519,7 @@ body.darkmode .student-profile-btn-secondary:active {
 }
 
 .settings-action-btn:hover {
-  background: #00bcd4;
+  background: grey;
   color: #fff;
 }
 
@@ -1685,7 +1685,7 @@ body.darkmode .form-input:focus,
 body.darkmode input:focus,
 body.darkmode select:focus,
 body.darkmode textarea:focus {
-  border-color: #00e6ef !important;
+  border-color: lightgrey !important;
   background: #181c1f !important;
 }
 body.darkmode .form-input::placeholder,
@@ -1734,7 +1734,7 @@ body.darkmode .speeddates-table tr:last-child td {
 
 /* --- DARKMODE: UNIFORME TURQUOISE ACCENT, OVERZICHTELIJKE UI, ALLES BLIJFT WERKEN --- */
 body.darkmode {
-  --accent: #00e6ef;
+  --accent: lightgrey;
   --accent-contrast: #181c1f;
   --header-logo: url('/src/Images/EhB-logo-transparant-558-DarkMode.png');
   background: #000 !important;
@@ -1945,7 +1945,7 @@ body.darkmode textarea:focus {
 body.darkmode .form-input::placeholder,
 body.darkmode input::placeholder,
 body.darkmode textarea::placeholder {
-  color: #7defff !important;
+  color: grey !important;
   opacity: 1;
 }
 body.darkmode .checkbox-option {
@@ -2179,7 +2179,7 @@ body.darkmode .student-profile-header .logo-section span {
 /* --- UNIFORME BUTTON-STIJL VOOR PROFIELACTIEKNOPPEN (login/register look) --- */
 .student-profile-btn,
 .student-profile-btn-primary {
-  background-color: #00bcd4 !important;
+  background-color: grey !important;
   color: #fff !important;
   border: none !important;
   border-radius: 8px !important;
@@ -2239,8 +2239,8 @@ body.darkmode .student-profile-header .logo-section span {
 body.darkmode .student-profile-btn,
 body.darkmode .student-profile-btn-primary,
 body.darkmode .student-profile-btn-secondary {
-  background-color: #232323 !important;
-  color: #00e6ef !important;
+  background-color: #2a2929 !important;
+  color: lightgray !important;
   border-radius: 8px !important;
   border: none !important;
   box-shadow: 0 2px 8px rgba(0,230,239,0.10) !important;
@@ -2249,18 +2249,18 @@ body.darkmode .student-profile-btn:hover,
 body.darkmode .student-profile-btn-primary:hover,
 body.darkmode .student-profile-btn-secondary:hover {
   background-color: #181c1f !important;
-  color: #00e6ef !important;
+  color: lightgray !important;
   box-shadow: 0 4px 16px rgba(0,230,239,0.13) !important;
   transform: translateY(-2px) !important;
 }
 body.darkmode .student-profile-btn:active,
 body.darkmode .student-profile-btn-primary:active,
 body.darkmode .student-profile-btn-secondary:active {
-  background-color: #00bcd4 !important;}
+  background-color: grey !important;}
 
   /* --- UNIFORME BUTTON STIJL VOOR LOGOUT EN DELETE IN SETTINGS --- */
 .settings-action-btn.logout {
-  background: #00bcd4 !important;
+  background: grey !important;
   color: #fff !important;
   border: none !important;
   border-radius: 8px !important;
