@@ -18,7 +18,11 @@ export function renderStudentOpleiding(rootElement) {
 
 
       <select class="opleiding-select" name="opleiding">
-
+          <option selected disabled>Opleiding</option>
+          <option>Business IT</option>
+          <option>Networks & Security</option>
+          <option>Software Engineering</option>
+          <option>Intelligent Robotics</option>
       </select>
 
       <button class="save-button">SAVE</button>
@@ -44,53 +48,12 @@ export function renderStudentOpleiding(rootElement) {
     e.preventDefault();
     alert('Privacy Policy pagina nog niet geïmplementeerd');
   });
+
   const contactLink = document.getElementById('contact-link');
   contactLink.addEventListener('click', (e) => {
     e.preventDefault();
     alert('Contact pagina nog niet geïmplementeerd');
   });
-
-  // Fetch opleidingen from API and populate dropdown
-  loadOpleidingen();
-}
-
-async function loadOpleidingen() {
-  try {
-    const response = await fetch('https://api.ehb-match.me/opleidingen/', {
-      method: 'GET',
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    const opleidingen = await response.json();
-    const opleidingSelect = document.querySelector('.opleiding-select');
-    opleidingSelect.innerHTML = ''; // Clear all existing options
-
-    const defaultOption = document.createElement('option');
-    defaultOption.selected = true;
-    defaultOption.disabled = true;
-    defaultOption.textContent = 'Opleiding';
-    opleidingSelect.appendChild(defaultOption); // Add default option
-
-    if (opleidingen.length === 0) {
-      const option = document.createElement('option');
-      option.disabled = true;
-      option.textContent = 'Geen opleidingen beschikbaar';
-      opleidingSelect.appendChild(option);
-    } else {
-      opleidingen.forEach((opleiding) => {
-        const option = document.createElement('option');
-        option.value = opleiding.id; // Use `id` as the value
-        option.textContent = opleiding.naam; // Use `naam` for the display text
-        opleidingSelect.appendChild(option);
-      });
-    }
-  } catch (error) {
-    console.error('Fout bij het ophalen van opleidingen:', error);
-    alert('Er is een fout opgetreden bij het ophalen van opleidingen.');
-  }
 }
 
 function handleJaarRegister(event) {
@@ -114,9 +77,10 @@ function handleJaarRegister(event) {
     jaar: formData.get('jaar'), // geselecteerde radio
     opleiding: formData.get('opleiding'), // geselecteerde optie uit select
   };
-
+  
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
 
   renderStudentSkills(document.getElementById('app'));
 }
+//href
