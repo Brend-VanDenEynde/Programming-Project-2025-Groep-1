@@ -4,6 +4,7 @@ import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
+import { showSettingsPopup } from './student-settings.js';
 
 
 // src/views/student-qr-popup.js
@@ -20,10 +21,9 @@ export function renderQRPopup(rootElement, studentData = {}) {
         <button id="burger-menu" class="student-profile-burger">☰</button>
         <ul id="burger-dropdown" class="student-profile-dropdown" style="display: none;">
           <li><button id="nav-settings">Instellingen</button></li>
-                    <li><button id="nav-logout">Log out</button></li>
+          <li><button id="nav-logout">Log out</button></li>
         </ul>
       </header>
-
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
@@ -34,19 +34,17 @@ export function renderQRPopup(rootElement, studentData = {}) {
             <li><button data-route="qr" class="sidebar-link active">QR-code</button></li>
           </ul>
         </nav>
-
         <div class="student-profile-content">
-          <div class="student-profile-form-container" style="display: flex; flex-direction: column; align-items: center;">
-            <h1 class="student-profile-title" style="text-align:center;width:100%;">Jouw QR-code</h1>
-            <div style="margin: 2rem 0;">
-              <!-- Je zou een echte QR-code kunnen genereren met een backend service. Hier placeholder -->
-              <img src=" /src/Images/default.jpg" alt="QR code" style="width: 180px; height: 180px; border: 4px solid #dee2e6; border-radius: 12px; background: #fff;">
+          <div class="student-profile-form-container">
+            <h1 class="student-profile-title">Jouw QR-code</h1>
+            <div class="qr-code-section">
+              <div class="qr-code-label">Laat deze QR-code scannen door bedrijven of tijdens events</div>
+              <img src="/src/Images/default.jpg" alt="QR code" class="qr-code-img">
+              <div class="qr-code-description">(Niet delen op sociale media)</div>
             </div>
-            <p style="text-align:center;">Laat deze QR-code scannen door bedrijven of tijdens events.<br><span style="font-size:0.95rem;color:#888;">(Niet delen op sociale media)</span></p>
           </div>
         </div>
       </div>
-
       <footer class="student-profile-footer">
         <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
         <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
@@ -95,10 +93,10 @@ if (burger && dropdown) {
   });
 
   // Sluit het menu bij klikken op een menu-item
-  document.getElementById('nav-settings').addEventListener('click', () => {
-    dropdown.style.display = 'none';
-    // Navigeren naar Instellingen (eventueel logica hier)
-  });
+document.getElementById('nav-settings').addEventListener('click', () => {
+  dropdown.style.display = 'none';
+  showSettingsPopup();
+});
   document.getElementById('nav-logout').addEventListener('click', () => {
     dropdown.style.display = 'none';
     renderLogin(rootElement);

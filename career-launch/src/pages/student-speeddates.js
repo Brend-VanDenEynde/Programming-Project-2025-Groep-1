@@ -5,81 +5,7 @@ import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { renderQRPopup } from './student-qr-popup.js';
-
-if (!document.getElementById('speeddates-table-styles')) {
-  const style = document.createElement('style');
-  style.id = 'speeddates-table-styles';
-  style.innerHTML = `
-    .speeddates-table-container {
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 2px 16px 0 rgba(44,44,44,0.08);
-      padding: 18px 10px 32px 10px;
-      margin: 32px auto 0 auto;
-      max-width: 960px;
-    }
-    .speeddates-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      font-size: 1.08rem;
-      background: none;
-    }
-    .speeddates-table thead tr {
-      background: #f6f7fb;
-      font-size: 1.12rem;
-    }
-    .speeddates-table th, .speeddates-table td {
-      padding: 20px 18px;
-      border-bottom: 1.5px solid #ececec;
-      vertical-align: middle;
-      font-weight: 500;
-    }
-    .speeddates-table th {
-      color: #22293c;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      background: #f6f7fb;
-      border-bottom: 2px solid #e1e6ef;
-      vertical-align: middle;
-      text-align: center;
-    }
-    .speeddates-table td {
-      text-align: center;
-    }
-    .speeddates-table tbody tr:last-child td {
-      border-bottom: none;
-    }
-    .status-badge {
-      display: inline-block;
-      min-width: 130px;
-      text-align: center;
-      font-size: 1.05rem;
-      border-radius: 22px;
-      font-weight: 700;
-      padding: 10px 32px;
-      border: none;
-    }
-    .badge-bevestigd {
-      background: #e1f9ec;
-      color: #2aa97b !important;
-    }
-    .badge-waiting {
-      background: #fff8e3;
-      color: #fdac1b !important;
-    }
-    .badge-anders {
-      background: #e4eafd;
-      color: #2863df !important;
-    }
-    @media (max-width: 700px) {
-      .speeddates-table-container {padding: 0;}
-      .speeddates-table th, .speeddates-table td {padding: 13px 4px;font-size:0.98rem;}
-      .status-badge {min-width:80px;padding:7px 0;}
-    }
-  `;
-  document.head.appendChild(style);
-}
+import { showSettingsPopup } from './student-settings.js';
 
 export function renderSpeeddates(rootElement, studentData = {}) {
   const speeddates = [
@@ -229,7 +155,7 @@ if (burger && dropdown) {
   // Sluit het menu bij klikken op een menu-item
   document.getElementById('nav-settings').addEventListener('click', () => {
     dropdown.style.display = 'none';
-    // Navigeren naar Instellingen (eventueel logica hier)
+    showSettingsPopup();
   });
   document.getElementById('nav-logout').addEventListener('click', () => {
     dropdown.style.display = 'none';

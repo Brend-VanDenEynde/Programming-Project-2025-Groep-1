@@ -3,162 +3,7 @@ import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { renderQRPopup } from './student-qr-popup.js';
 import { renderLogin } from './login.js';
-
-// Voeg stijl 1x toe
-if (!document.getElementById('search-criteria-student-styles')) {
-  const style = document.createElement('style');
-  style.id = 'search-criteria-student-styles';
-  style.innerHTML = `
-    .student-profile-form-container {
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 2px 16px 0 rgba(44,44,44,0.08);
-      padding: 36px 18px 38px 18px;
-      margin: 38px auto 0 auto;
-      max-width: 670px;
-    }
-    .student-profile-title {
-      font-size: 2.2rem;
-      font-weight: 800;
-      margin-bottom: 38px;
-      color: #23294b;
-      text-align: center;
-      letter-spacing: 0.02em;
-    }
-    .search-fieldset {
-      border: none;
-      margin-bottom: 26px;
-      padding: 0;
-      background: #f6f7fb;
-      border-radius: 18px;
-      padding: 22px 16px 12px 18px;
-      box-shadow: 0 1px 8px 0 rgba(44,44,44,0.04);
-    }
-    .search-fieldset legend {
-      font-size: 1.19rem;
-      font-weight: 700;
-      margin-bottom: 16px;
-      color: #222845;
-      padding-bottom: 3px;
-      border-bottom: none;
-      display: block;
-      letter-spacing: 0.03em;
-    }
-    .checkbox-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px 18px;
-      margin-bottom: 0.5rem;
-    }
-    .checkbox-option {
-      font-weight: 600;
-      color: #29335b;
-      background: #fff;
-      border-radius: 13px;
-      padding: 13px 26px 12px 17px;
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      min-width: 120px;
-      border: 2px solid #e3e7ef;
-      cursor: pointer;
-      font-size: 1.13rem;
-      box-shadow: 0 2px 8px 0 rgba(44,44,44,0.07);
-      margin-bottom: 0;
-      transition: border 0.15s, background 0.15s, color 0.15s;
-      user-select: none;
-    }
-    .checkbox-option input[type="checkbox"] {
-      accent-color: #22d088;
-      width: 20px;
-      height: 20px;
-      margin: 0 6px 0 0;
-      border-radius: 6px;
-    }
-    .checkbox-option input[type="checkbox"]:checked + span,
-    .checkbox-option input[type="checkbox"]:checked {
-      color: #24ba86 !important;
-      border-color: #22d088;
-    }
-    .add-custom-wrapper {
-      display: flex;
-      gap: 10px;
-      margin: 9px 0 0 0;
-      align-items: center;
-    }
-    .form-input, .add-btn {
-      font-size: 1.08rem;
-      padding: 10px 13px;
-      border-radius: 9px;
-      border: 2px solid #e2e6f0;
-      outline: none;
-      background: #f8fafc;
-      transition: border .16s;
-    }
-    .form-input:focus { border-color: #22d088; background: #f6fffa; }
-    .add-btn {
-      background: linear-gradient(90deg, #3dd686 0%, #28bb8a 100%);
-      color: #fff;
-      border: none;
-      font-weight: 700;
-      padding: 10px 20px;
-      cursor: pointer;
-      transition: background .18s, color .18s, box-shadow .18s;
-      min-width: 92px;
-      box-shadow: 0 2px 6px 0 rgba(44,44,44,0.05);
-      font-size: 1.05rem;
-    }
-    .add-btn:hover, .add-btn:active {
-      background: linear-gradient(90deg, #28bb8a 0%, #3dd686 100%);
-      color: #fff;
-      box-shadow: 0 3px 16px 0 rgba(61,214,134,0.13);
-    }
-    .student-profile-buttons {
-      display: flex;
-      justify-content: flex-end;
-      gap: 14px;
-      margin-top: 22px;
-    }
-    .student-profile-btn {
-      min-width: 120px;
-      border: none;
-      border-radius: 22px;
-      font-weight: 800;
-      font-size: 1.1rem;
-      padding: 13px 0;
-      cursor: pointer;
-      transition: background .18s, color .18s, box-shadow .18s;
-      box-shadow: 0 2px 8px 0 rgba(44,44,44,0.06);
-      letter-spacing: .04em;
-    }
-    .student-profile-btn-primary {
-      background: linear-gradient(90deg, #3dd686 0%, #28bb8a 100%);
-      color: #fff;
-    }
-    .student-profile-btn-primary:hover {
-      background: linear-gradient(90deg, #28bb8a 0%, #3dd686 100%);
-      color: #fff;
-      box-shadow: 0 4px 14px 0 rgba(61,214,134,0.16);
-    }
-    .student-profile-btn-secondary {
-      background: linear-gradient(90deg, #e4eafd 0%, #cfd7ea 100%);
-      color: #234;
-    }
-    .student-profile-btn-secondary:hover {
-      background: linear-gradient(90deg, #cfd7ea 0%, #e4eafd 100%);
-      color: #222;
-      box-shadow: 0 4px 14px 0 rgba(44,44,44,0.08);
-    }
-    @media (max-width: 700px) {
-      .student-profile-form-container {padding: 10px 2px 18px 2px;}
-      .student-profile-title {font-size: 1.2rem;}
-      .add-btn {padding:7px 8px; min-width:65px;}
-      .checkbox-group {gap: 12px 5px;}
-      .checkbox-option {padding: 9px 8px; font-size:1rem; min-width: 80px;}
-    }
-  `;
-  document.head.appendChild(style);
-}
+import { showSettingsPopup } from './student-settings.js';
 
 export function renderSearchCriteriaStudent(rootElement, studentData = {}, readonlyMode = true) {
   if (!studentData.criteria) {
@@ -308,41 +153,36 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
   });
 
   // Burger menu
- const burger = document.getElementById('burger-menu');
-const dropdown = document.getElementById('burger-dropdown');
+  const burger = document.getElementById('burger-menu');
+  const dropdown = document.getElementById('burger-dropdown');
 
-if (burger && dropdown) {
-  // Toggle hamburger-menu bij klik
-  burger.addEventListener('click', (event) => {
-    event.stopPropagation();
-    dropdown.style.display =
-      dropdown.style.display === 'block' ? 'none' : 'block';
-  });
+  if (burger && dropdown) {
+    // Toggle hamburger-menu bij klik
+    burger.addEventListener('click', (event) => {
+      event.stopPropagation();
+      dropdown.style.display =
+        dropdown.style.display === 'block' ? 'none' : 'block';
+    });
 
-  // Sluit het menu bij klik buiten het menu
-  document.addEventListener('click', function(event) {
-    if (dropdown.style.display === 'block') {
-      if (!dropdown.contains(event.target) && event.target !== burger) {
-        dropdown.style.display = 'none';
+    // Sluit het menu bij klik buiten het menu
+    document.addEventListener('click', function(event) {
+      if (dropdown.style.display === 'block') {
+        if (!dropdown.contains(event.target) && event.target !== burger) {
+          dropdown.style.display = 'none';
+        }
       }
-    }
-  });
+    });
 
-  // Sluit het menu bij klikken op een menu-item
-  document.getElementById('nav-settings').addEventListener('click', () => {
-    dropdown.style.display = 'none';
-    // Navigeren naar Instellingen (eventueel logica hier)
-  });
-  document.getElementById('nav-logout').addEventListener('click', () => {
-    dropdown.style.display = 'none';
-    renderLogin(rootElement);
-  });
-}
-ent.getElementById('nav-settings').addEventListener('click', () => {});
-  
-  document.getElementById('nav-logout').addEventListener('click', () => {
-    renderLogin(rootElement);
-  });
+    // Sluit het menu bij klikken op een menu-item
+    document.getElementById('nav-settings').addEventListener('click', () => {
+      dropdown.style.display = 'none';
+      showSettingsPopup();
+    });
+    document.getElementById('nav-logout').addEventListener('click', () => {
+      dropdown.style.display = 'none';
+      renderLogin(rootElement);
+    });
+  }
 
   // Form
   const form = document.getElementById('criteriaForm');
@@ -363,7 +203,8 @@ ent.getElementById('nav-settings').addEventListener('click', () => {});
 
   // RESET: wis alles (ook custom velden) en ga naar editmode
   if (btnReset) {
-    btnReset.addEventListener('click', () => {
+    btnReset.addEventListener('click', (e) => {
+      e.preventDefault();
       studentData.criteria = {
         zoekType: '',
         skills: [],
@@ -401,6 +242,9 @@ ent.getElementById('nav-settings').addEventListener('click', () => {});
     const inputSkill = document.getElementById('skill-andere-text');
     const addSkillBtn = document.getElementById('add-skill-btn');
     function addCustomSkill(val) {
+      // Sla eerst de huidige selectie op
+      const checkedSkills = [...document.querySelectorAll('input[name="skills"]:checked')].map(cb => cb.value);
+      studentData.criteria.skills = checkedSkills;
       const textValue = val.trim();
       if (textValue && !studentData.criteria.customSkills.includes(textValue)) {
         studentData.criteria.customSkills.push(textValue);
@@ -422,6 +266,9 @@ ent.getElementById('nav-settings').addEventListener('click', () => {});
     const inputTaal = document.getElementById('taal-andere-text');
     const addTaalBtn = document.getElementById('add-taal-btn');
     function addCustomTaal(val) {
+      // Sla eerst de huidige selectie op
+      const checkedTalen = [...document.querySelectorAll('input[name="talen"]:checked')].map(cb => cb.value);
+      studentData.criteria.talen = checkedTalen;
       const textValue = val.trim();
       if (textValue && !studentData.criteria.customTalen.includes(textValue)) {
         studentData.criteria.customTalen.push(textValue);

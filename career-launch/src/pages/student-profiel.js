@@ -5,6 +5,7 @@ import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderQRPopup } from './student-qr-popup.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
+import { showSettingsPopup } from './student-settings.js';
 
 const defaultProfile = {
   firstName: 'Voornaam',
@@ -17,125 +18,6 @@ const defaultProfile = {
   birthDate: '',
   description: '',
 };
-
-if (!document.getElementById('student-profile-styles')) {
-  const style = document.createElement('style');
-  style.id = 'student-profile-styles';
-  style.innerHTML = `
-    .student-profile-form-container {
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 2px 16px 0 rgba(44,44,44,0.08);
-      padding: 30px 22px 38px 22px;
-      margin: 38px auto 0 auto;
-      max-width: 620px;
-    }
-    .student-profile-title {
-      font-size: 2rem;
-      font-weight: 800;
-      margin-bottom: 32px;
-      color: #1e2a45;
-      text-align: center;
-    }
-    .student-profile-form-group {
-      margin-bottom: 20px;
-    }
-    .student-profile-form-group label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #344164;
-      font-size: 1.07rem;
-      letter-spacing: .01em;
-    }
-    .student-profile-form-group input[type="text"],
-    .student-profile-form-group input[type="email"],
-    .student-profile-form-group input[type="date"],
-    .student-profile-form-group input[type="url"],
-    .student-profile-form-group select,
-    .student-profile-form-group textarea {
-      width: 100%;
-      border: 1.3px solid #e1e6ef;
-      background: #f6f7fb;
-      border-radius: 10px;
-      font-size: 1.07rem;
-      padding: 12px 15px;
-      margin-top: 2px;
-      color: #1e2a45;
-      outline: none;
-      transition: border .17s;
-      resize: none;
-    }
-    .student-profile-form-group input:disabled,
-    .student-profile-form-group select:disabled,
-    .student-profile-form-group textarea:disabled {
-      color: #98a0b3;
-      background: #f6f7fb;
-      border-color: #e9ebf0;
-    }
-    .student-profile-form-group input[type="file"] {
-      margin-top: 7px;
-      padding: 0;
-      border: none;
-      background: none;
-    }
-    .student-profile-avatar-section {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    .student-profile-avatar {
-      object-fit: cover;
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      box-shadow: 0 2px 8px #0001;
-      border: 3px solid #f6f7fb;
-      background: #fff;
-    }
-    .student-profile-buttons {
-      display: flex;
-      justify-content: flex-end;
-      gap: 14px;
-      margin-top: 14px;
-    }
-    .student-profile-btn {
-      min-width: 110px;
-      border: none;
-      border-radius: 22px;
-      font-weight: 700;
-      font-size: 1rem;
-      padding: 11px 0;
-      cursor: pointer;
-      transition: background .17s, color .17s, box-shadow .17s;
-      box-shadow: 0 2px 8px 0 rgba(44,44,44,0.06);
-      letter-spacing: .04em;
-    }
-    .student-profile-btn-primary {
-      background: linear-gradient(90deg, #3dd686 0%, #28bb8a 100%);
-      color: #fff;
-    }
-    .student-profile-btn-primary:hover {
-      background: linear-gradient(90deg, #28bb8a 0%, #3dd686 100%);
-      color: #fff;
-      box-shadow: 0 4px 14px 0 rgba(61,214,134,0.16);
-    }
-    .student-profile-btn-secondary {
-      background: linear-gradient(90deg, #e4eafd 0%, #cfd7ea 100%);
-      color: #234;
-    }
-    .student-profile-btn-secondary:hover {
-      background: linear-gradient(90deg, #cfd7ea 0%, #e4eafd 100%);
-      color: #222;
-      box-shadow: 0 4px 14px 0 rgba(44,44,44,0.08);
-    }
-    @media (max-width: 700px) {
-      .student-profile-form-container {padding: 10px 2px 20px 2px;}
-      .student-profile-title {font-size: 1.3rem;}
-      .student-profile-avatar {width:78px;height:78px;}
-    }
-  `;
-  document.head.appendChild(style);
-}
 
 export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode = true) {
   const {
@@ -283,10 +165,10 @@ if (burger && dropdown) {
   // Sluit het menu bij klikken op een menu-item
   document.getElementById('nav-settings').addEventListener('click', () => {
     dropdown.style.display = 'none';
-    // Navigeren naar Instellingen (eventueel logica hier)
+    showSettingsPopup();
   });
   document.getElementById('nav-logout').addEventListener('click', () => {
-    dropdown.style.display = 'none';
+    document.getElementById('burger-dropdown').style.display = 'none';
     renderLogin(rootElement);
   });
 }

@@ -1,148 +1,9 @@
 // src/views/student-speeddates-verzoeken.js
-import { renderLogin } from './login.js';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderQRPopup } from './student-qr-popup.js';
-
-if (!document.getElementById('speeddates-verzoeken-styles')) {
-  const style = document.createElement('style');
-  style.id = 'speeddates-verzoeken-styles';
-  style.innerHTML = `
-    .speeddates-table-container {
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 2px 16px 0 rgba(44,44,44,0.08);
-      padding: 18px 10px 32px 10px;
-      margin: 32px auto 0 auto;
-      max-width: 960px;
-    }
-    .speeddates-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      font-size: 1.08rem;
-      background: none;
-    }
-    .speeddates-table thead tr {
-      background: #f6f7fb;
-      font-size: 1.12rem;
-    }
-    .speeddates-table th, .speeddates-table td {
-      padding: 20px 18px;
-      border-bottom: 1.5px solid #ececec;
-      vertical-align: middle;
-      font-weight: 500;
-    }
-    .speeddates-table th {
-      color: #22293c;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      background: #f6f7fb;
-      border-bottom: 2px solid #e1e6ef;
-      vertical-align: middle;
-      text-align: center;
-    }
-   .speeddates-table td {
-  text-align: center;
-  
-  max-width: 180px;
-}
-
-    .speeddates-table td.status-cell,
-    .speeddates-table th:last-child {
-      min-width: 220px;
-      max-width: 280px;
-    }
-    .speeddates-table tbody tr:last-child td {
-      border-bottom: none;
-    }
-    .status-cell {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      flex-wrap: wrap;
-      min-height: 56px;
-      width: 100%;
-    }
-    .accept-btn, .deny-btn {
-      min-width: 110px;
-      max-width: 135px;
-      width: 100%;
-      padding: 9px 0;
-      border: none;
-      border-radius: 22px;
-      font-weight: 700;
-      font-size: 1rem;
-      cursor: pointer;
-      margin: 0 2px;
-      box-shadow: 0 2px 6px 0 rgba(44,44,44,0.05);
-      transition: background 0.17s, color 0.17s, box-shadow 0.17s;
-      display: inline-block;
-      flex: 1 1 110px;
-    }
-    .accept-btn {
-      background: linear-gradient(90deg, #3dd686 0%, #28bb8a 100%);
-      color: #fff;
-    }
-    .accept-btn:hover {
-      background: linear-gradient(90deg, #28bb8a 0%, #3dd686 100%);
-      color: #fff;
-      box-shadow: 0 3px 16px 0 rgba(61,214,134,0.13);
-    }
-    .deny-btn {
-      background: linear-gradient(90deg, #fa626a 0%, #fd7855 100%);
-      color: #fff;
-    }
-    .deny-btn:hover {
-      background: linear-gradient(90deg, #fd7855 0%, #fa626a 100%);
-      color: #fff;
-      box-shadow: 0 3px 16px 0 rgba(250,98,106,0.13);
-    }
-    .badge-accepted {
-      background: #e1f9ec;
-      color: #2aa97b !important;
-      padding: 10px 32px;
-      border-radius: 22px;
-      font-weight: 700;
-      display: inline-block;
-      min-width: 130px;
-      text-align: center;
-      font-size: 1.05rem;
-      border: none;
-    }
-    .badge-denied {
-      background: #fff2f3;
-      color: #ee2b43 !important;
-      padding: 10px 32px;
-      border-radius: 22px;
-      font-weight: 700;
-      display: inline-block;
-      min-width: 130px;
-      text-align: center;
-      font-size: 1.05rem;
-      border: none;
-    }
-    @media (max-width: 900px) {
-      .speeddates-table-container {padding: 0;}
-      .speeddates-table th, .speeddates-table td {padding: 13px 4px;font-size:0.97rem;}
-      .speeddates-table th, .speeddates-table td {max-width: 90px;}
-      .status-cell {
-        gap: 7px;
-        min-width: 120px;
-      }
-      .accept-btn, .deny-btn, .badge-accepted, .badge-denied {min-width:82px;padding:7px 0;font-size:0.98rem;}
-    }
-    @media (max-width: 600px) {
-      .speeddates-table-container {max-width: 100vw;}
-      .speeddates-table th, .speeddates-table td {padding: 6px 2px; font-size:0.93rem;}
-      .status-cell {flex-direction: column; gap:6px; min-width: 10px;}
-      .accept-btn, .deny-btn, .badge-accepted, .badge-denied {min-width:65px;max-width:95px;font-size:0.88rem;}
-    }
-  `;
-  document.head.appendChild(style);
-}
+import { showSettingsPopup } from './student-settings.js';
 
 export function renderSpeeddatesRequests(rootElement, studentData = {}) {
   let verzoeken = [
@@ -306,19 +167,13 @@ if (burger && dropdown) {
   // Sluit het menu bij klikken op een menu-item
   document.getElementById('nav-settings').addEventListener('click', () => {
     dropdown.style.display = 'none';
-    // Navigeren naar Instellingen (eventueel logica hier)
+    showSettingsPopup();
   });
   document.getElementById('nav-logout').addEventListener('click', () => {
     dropdown.style.display = 'none';
     renderLogin(rootElement);
   });
 }
-
-  document.getElementById('nav-settings').addEventListener('click', () => {});
-
-  document.getElementById('nav-logout').addEventListener('click', () => {
-    renderLogin(rootElement);
-  });
 
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
