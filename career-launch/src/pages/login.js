@@ -90,7 +90,7 @@ export function renderLogin(rootElement) {
 }
 
 async function loginUser(email, password) {
-  const apiUrl = 'https://api.ehb.match.me/auth/login';
+  const apiUrl = 'https://api.ehb-match.me/auth/login';
   const loginData = { email, password };
 
   try {
