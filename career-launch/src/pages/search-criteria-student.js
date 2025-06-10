@@ -6,7 +6,11 @@ import { renderLogin } from './login.js';
 import { showSettingsPopup } from './student-settings.js';
 import Router from '../router.js';
 
-export function renderSearchCriteriaStudent(rootElement, studentData = {}, readonlyMode = true) {
+export function renderSearchCriteriaStudent(
+  rootElement,
+  studentData = {},
+  readonlyMode = true
+) {
   if (!studentData.criteria) {
     studentData.criteria = {
       zoekType: '',
@@ -30,30 +34,46 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
       { value: 'java', label: 'Java' },
       { value: 'css', label: 'CSS' },
     ];
-    const custom = (studentData.criteria.customSkills || []);
-    const result = standaard.concat(custom.map(c => ({ value: c, label: c })));
-    return result.map(skill => `
+    const custom = studentData.criteria.customSkills || [];
+    const result = standaard.concat(
+      custom.map((c) => ({ value: c, label: c }))
+    );
+    return result
+      .map(
+        (skill) => `
       <label class="checkbox-option">
-        <input type="checkbox" name="skills" value="${skill.value}" ${studentData.criteria.skills.includes(skill.value) ? 'checked' : ''} ${readonlyMode ? 'disabled' : ''} />
+        <input type="checkbox" name="skills" value="${skill.value}" ${
+          studentData.criteria.skills.includes(skill.value) ? 'checked' : ''
+        } ${readonlyMode ? 'disabled' : ''} />
         <span>${skill.label}</span>
       </label>
-    `).join('');
+    `
+      )
+      .join('');
   }
 
   function renderTalenCheckboxes() {
     const standaard = [
       { value: 'nederlands', label: 'Nederlands' },
       { value: 'frans', label: 'Frans' },
-      { value: 'english', label: 'English' }
+      { value: 'english', label: 'English' },
     ];
-    const custom = (studentData.criteria.customTalen || []);
-    const result = standaard.concat(custom.map(c => ({ value: c, label: c })));
-    return result.map(taal => `
+    const custom = studentData.criteria.customTalen || [];
+    const result = standaard.concat(
+      custom.map((c) => ({ value: c, label: c }))
+    );
+    return result
+      .map(
+        (taal) => `
       <label class="checkbox-option">
-        <input type="checkbox" name="talen" value="${taal.value}" ${studentData.criteria.talen.includes(taal.value) ? 'checked' : ''} ${readonlyMode ? 'disabled' : ''}/>
+        <input type="checkbox" name="talen" value="${taal.value}" ${
+          studentData.criteria.talen.includes(taal.value) ? 'checked' : ''
+        } ${readonlyMode ? 'disabled' : ''}/>
         <span>${taal.label}</span>
       </label>
-    `).join('');
+    `
+      )
+      .join('');
   }
 
   rootElement.innerHTML = `
@@ -87,13 +107,27 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
                 <legend>Ik zoek</legend>
                 <div class="checkbox-group">
                   <label class="checkbox-option" style="border-radius:18px;">
-                    <input type="radio" name="jobType" value="fulltime" ${studentData.criteria.zoekType === 'fulltime' ? 'checked' : ''} ${readonlyMode ? 'disabled' : ''}/> <span>Fulltime</span>
+                    <input type="radio" name="jobType" value="fulltime" ${
+                      studentData.criteria.zoekType === 'fulltime'
+                        ? 'checked'
+                        : ''
+                    } ${readonlyMode ? 'disabled' : ''}/> <span>Fulltime</span>
                   </label>
                   <label class="checkbox-option" style="border-radius:18px;">
-                    <input type="radio" name="jobType" value="parttime" ${studentData.criteria.zoekType === 'parttime' ? 'checked' : ''} ${readonlyMode ? 'disabled' : ''}/> <span>Parttime</span>
+                    <input type="radio" name="jobType" value="parttime" ${
+                      studentData.criteria.zoekType === 'parttime'
+                        ? 'checked'
+                        : ''
+                    } ${readonlyMode ? 'disabled' : ''}/> <span>Parttime</span>
                   </label>
                   <label class="checkbox-option" style="border-radius:18px;">
-                    <input type="radio" name="jobType" value="stagiaire" ${studentData.criteria.zoekType === 'stagiaire' ? 'checked' : ''} ${readonlyMode ? 'disabled' : ''}/> <span>Stagiair(e)</span>
+                    <input type="radio" name="jobType" value="stagiaire" ${
+                      studentData.criteria.zoekType === 'stagiaire'
+                        ? 'checked'
+                        : ''
+                    } ${
+    readonlyMode ? 'disabled' : ''
+  }/> <span>Stagiair(e)</span>
                   </label>
                 </div>
               </fieldset>
@@ -102,11 +136,11 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
                 <div class="checkbox-group" id="skills-list">${renderSkillCheckboxes()}</div>
                 ${
                   !readonlyMode
-                  ? `<div class="add-custom-wrapper">
+                    ? `<div class="add-custom-wrapper">
                         <input type="text" id="skill-andere-text" name="skillAndereText" placeholder="Andere skill..." class="form-input" style="width:180px;"/>
                         <button id="add-skill-btn" class="add-btn" type="button">+ Toevoegen</button>
                     </div>`
-                  : ''
+                    : ''
                 }
               </fieldset>
               <fieldset class="search-fieldset">
@@ -114,17 +148,23 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
                 <div class="checkbox-group" id="talen-list">${renderTalenCheckboxes()}</div>
                 ${
                   !readonlyMode
-                  ? `<div class="add-custom-wrapper">
+                    ? `<div class="add-custom-wrapper">
                         <input type="text" id="taal-andere-text" name="taalAndereText" placeholder="Andere taal..." class="form-input" style="width:180px;"/>
                         <button id="add-taal-btn" class="add-btn" type="button">+ Toevoegen</button>
                     </div>`
-                  : ''
+                    : ''
                 }
               </fieldset>
               <div class="student-profile-buttons">
-                <button id="btn-edit" type="button" class="student-profile-btn student-profile-btn-secondary" style="${readonlyMode ? '' : 'display:none;'}">EDIT</button>
-                <button id="btn-save" type="submit" class="student-profile-btn student-profile-btn-primary" style="${readonlyMode ? 'display:none;' : ''}">SAVE</button>
-                <button id="btn-reset" type="button" class="student-profile-btn student-profile-btn-secondary" style="${readonlyMode ? 'display:none;' : ''}">RESET</button>
+                <button id="btn-edit" type="button" class="student-profile-btn student-profile-btn-secondary" style="${
+                  readonlyMode ? '' : 'display:none;'
+                }">EDIT</button>
+                <button id="btn-save" type="submit" class="student-profile-btn student-profile-btn-primary" style="${
+                  readonlyMode ? 'display:none;' : ''
+                }">SAVE</button>
+                <button id="btn-reset" type="button" class="student-profile-btn student-profile-btn-secondary" style="${
+                  readonlyMode ? 'display:none;' : ''
+                }">RESET</button>
               </div>
             </form>
           </div>
@@ -144,11 +184,21 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
     btn.addEventListener('click', (e) => {
       const route = e.currentTarget.getAttribute('data-route');
       switch (route) {
-        case 'profile': renderStudentProfiel(rootElement, studentData); break;
-        case 'search': renderSearchCriteriaStudent(rootElement, studentData, true); break;
-        case 'speeddates': renderSpeeddates(rootElement, studentData); break;
-        case 'requests': renderSpeeddatesRequests(rootElement, studentData); break;
-        case 'qr': renderQRPopup(rootElement, studentData); break;
+        case 'profile':
+          renderStudentProfiel(rootElement, studentData);
+          break;
+        case 'search':
+          renderSearchCriteriaStudent(rootElement, studentData, true);
+          break;
+        case 'speeddates':
+          renderSpeeddates(rootElement, studentData);
+          break;
+        case 'requests':
+          renderSpeeddatesRequests(rootElement, studentData);
+          break;
+        case 'qr':
+          renderQRPopup(rootElement, studentData);
+          break;
       }
     });
   });
@@ -166,7 +216,7 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
     });
 
     // Sluit het menu bij klik buiten het menu
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
       if (dropdown.style.display === 'block') {
         if (!dropdown.contains(event.target) && event.target !== burger) {
           dropdown.style.display = 'none';
@@ -191,12 +241,12 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
   const btnSave = document.getElementById('btn-save');
   const btnReset = document.getElementById('btn-reset');
 
-  Array.from(form.elements).forEach(el => {
+  Array.from(form.elements).forEach((el) => {
     if (
-      el.tagName !== "BUTTON"
-      && el.type !== "button"
-      && el.type !== "submit"
-      && el.type !== "reset"
+      el.tagName !== 'BUTTON' &&
+      el.type !== 'button' &&
+      el.type !== 'submit' &&
+      el.type !== 'reset'
     ) {
       el.disabled = readonlyMode;
     }
@@ -232,8 +282,12 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
       e.preventDefault();
       const data = new FormData(form);
       studentData.criteria.zoekType = data.get('jobType') || '';
-      studentData.criteria.skills = [...form.querySelectorAll('input[name="skills"]:checked')].map(cb => cb.value);
-      studentData.criteria.talen = [...form.querySelectorAll('input[name="talen"]:checked')].map(cb => cb.value);
+      studentData.criteria.skills = [
+        ...form.querySelectorAll('input[name="skills"]:checked'),
+      ].map((cb) => cb.value);
+      studentData.criteria.talen = [
+        ...form.querySelectorAll('input[name="talen"]:checked'),
+      ].map((cb) => cb.value);
       renderSearchCriteriaStudent(rootElement, studentData, true);
     });
   }
@@ -244,7 +298,9 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
     const addSkillBtn = document.getElementById('add-skill-btn');
     function addCustomSkill(val) {
       // Sla eerst de huidige selectie op
-      const checkedSkills = [...document.querySelectorAll('input[name="skills"]:checked')].map(cb => cb.value);
+      const checkedSkills = [
+        ...document.querySelectorAll('input[name="skills"]:checked'),
+      ].map((cb) => cb.value);
       studentData.criteria.skills = checkedSkills;
       const textValue = val.trim();
       if (textValue && !studentData.criteria.customSkills.includes(textValue)) {
@@ -257,7 +313,7 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
       addCustomSkill(inputSkill.value);
     });
     inputSkill.addEventListener('keydown', (e) => {
-      if (e.key === "Enter") {
+      if (e.key === 'Enter') {
         e.preventDefault();
         addCustomSkill(inputSkill.value);
       }
@@ -268,7 +324,9 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
     const addTaalBtn = document.getElementById('add-taal-btn');
     function addCustomTaal(val) {
       // Sla eerst de huidige selectie op
-      const checkedTalen = [...document.querySelectorAll('input[name="talen"]:checked')].map(cb => cb.value);
+      const checkedTalen = [
+        ...document.querySelectorAll('input[name="talen"]:checked'),
+      ].map((cb) => cb.value);
       studentData.criteria.talen = checkedTalen;
       const textValue = val.trim();
       if (textValue && !studentData.criteria.customTalen.includes(textValue)) {
@@ -277,7 +335,7 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
       }
       studentData.criteria.taalAndere = textValue;
     }
-  });
+  }
 
   // SAVE-KNOP: bewaar radiokeuze, checkboxes, maar re-render niet
   document.getElementById('btn-save').addEventListener('click', () => {
