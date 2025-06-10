@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS bedrijf (
     plaats TEXT NOT NULL,
     contact_email TEXT NOT NULL UNIQUE,
     linkedin TEXT,
+    profiel_foto TEXT,
     goedkeuring TINYINT NOT NULL DEFAULT 0
 );
 
