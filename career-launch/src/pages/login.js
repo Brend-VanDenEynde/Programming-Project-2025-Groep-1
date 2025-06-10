@@ -89,7 +89,34 @@ export function renderLogin(rootElement) {
   });
 }
 
-function handleLogin(event, rootElement) {
+async function loginUser(email, password) {
+  const apiUrl = 'https://api.ehb.match.me/auth/login';
+  const loginData = { email, password };
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Include cookies in the request
+      body: JSON.stringify(loginData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('API call successful:', data);
+    return data;
+  } catch (error) {
+    // Re-throw the error so it can be caught by the calling function (handleLogin)
+    throw error;
+  }
+}
+
+async function handleLogin(event, rootElement) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
@@ -105,40 +132,72 @@ function handleLogin(event, rootElement) {
     alert('Wachtwoord moet minimaal 8 karakters bevatten!');
     return;
   }
-  // TODO: stuur credentials naar je backend
-  console.log('Inlogdata:', { email, password });
 
-  /* Student data terugsteken
+  try {
+    // Call the API to authenticate the user
+    const response = await loginUser(email, password);
 
-  // Simuleer studentData na succesvolle login
-  const studentData = {
-    firstName: 'Jan',
-    lastName: 'Jansen',
-    email: email,
-    studyProgram: 'Webontwikkeling',
-    year: '2e Bachelor',
-    profilePictureUrl: '/src/Images/default.jpg',
-  };
+    // Handle successful login based on user type
+    if (response.userType === 'student') {
+      // Handle student login
+      const studentData = {
+        firstName: response.firstName || 'Student',
+        lastName: response.lastName || 'User',
+        email: email,
+        studyProgram: response.studyProgram || 'Webontwikkeling',
+        year: response.year || '2e Bachelor',
+        profilePictureUrl:
+          response.profilePictureUrl || '/src/Images/default.jpg',
+      };
 
-  // Ga naar student-profiel via router
-  Router.navigate('/Student/Student-Profiel');
+      // Store student data
+      window.sessionStorage.setItem('studentData', JSON.stringify(studentData));
+      window.sessionStorage.setItem('authToken', response.token);
 
-  */
+      // Navigate to student profile
+      Router.navigate('/Student/Student-Profiel');
+    } else if (response.userType === 'company') {
+      // Handle company login
+      const bedrijfData = {
+        companyName: response.companyName || 'Microsoft',
+        email: email,
+        description:
+          response.description ||
+          'Wij zijn een technologiebedrijf dat innovatieve oplossingen biedt.',
+        linkedIn:
+          response.linkedIn || 'https://www.linkedin.com/company/microsoft',
+        profilePictureUrl:
+          response.profilePictureUrl || '/src/Images/default.jpg',
+      };
 
-  // Simuleer bedrijfData na succesvolle login
-  const bedrijfData = {
-    companyName: 'Microsoft',
-    email: email,
-    description:
-      'Wij zijn een technologiebedrijf dat innovatieve oplossingen biedt.',
-    linkedIn: 'https://www.linkedin.com/company/microsoft',
-    profilePictureUrl: '/src/Images/default.jpg',
-  };
+      // Store company data
+      window.sessionStorage.setItem('bedrijfData', JSON.stringify(bedrijfData));
+      window.sessionStorage.setItem('authToken', response.token);
 
-  // Sla bedrijfData eventueel tijdelijk op (bijv. in geheugen, lokale opslag of context)
-  window.sessionStorage.setItem('bedrijfData', JSON.stringify(bedrijfData));
+      // Navigate to company profile
+      Router.navigate('/Bedrijf/Bedrijf-Profiel');
+    } else {
+      alert('Onbekend gebruikerstype. Contacteer de administrator.');
+    }
+  } catch (error) {
+    console.error('Login error:', error);
 
-  // Navigeer naar bedrijf-profiel via router
-  Router.navigate('/Bedrijf/Bedrijf-Profiel');
+    // Handle different types of errors
+    if (error.message.includes('401')) {
+      alert('Ongeldige inloggegevens. Controleer je email en wachtwoord.');
+    } else if (error.message.includes('403')) {
+      alert(
+        'Account niet geactiveerd of geblokkeerd. Contacteer de administrator.'
+      );
+    } else if (error.message.includes('404')) {
+      alert('Login service niet beschikbaar. Probeer later opnieuw.');
+    } else if (error.message.includes('500')) {
+      alert('Server error. Probeer later opnieuw.');
+    } else {
+      alert(
+        'Er is een fout opgetreden tijdens het inloggen. Controleer je internetverbinding en probeer opnieuw.'
+      );
+    }
+  }
 }
 // renderBedrijfProfiel(rootElement, bedrijfData);
