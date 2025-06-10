@@ -42,7 +42,13 @@ body {
   padding: 2rem;
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
+
 
 
 /* Terug knop */
@@ -223,3 +229,4 @@ body {
   gap: 1rem;
 }
 
+/* .form-container */
