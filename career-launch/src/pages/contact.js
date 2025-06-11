@@ -3,16 +3,9 @@ import Router from '../router.js';
 // Hoofdfunctie voor het renderen van de contactpagina
 export function renderContact(rootElement) {
   rootElement.innerHTML = `
-    <div class="modern-contact-container">
-      <!-- Header sectie met terug knop en titel -->
-      <div class="modern-contact-header">
-        <button class="modern-back-button" id="back-button">
-          <span class="back-arrow">←</span>
-          Terug naar Home
-        </button>
-        <h1 class="modern-contact-title">Contacteer Ons</h1>
-        <p class="modern-contact-subtitle">We helpen je graag verder</p>
-      </div>      <div class="modern-contact-content">
+    <div class="contact-container">
+      <button class="back-button" id="back-button">← Terug</button>
+      <div class="modern-contact-content">
         <!-- Contactformulier sectie -->
         <div class="contact-form-section">
           <h2>Stuur ons een bericht</h2>
@@ -116,7 +109,7 @@ function initializeContactPage() {
   // Terug knop functionaliteit
   const backButton = document.getElementById('back-button');
   backButton.addEventListener('click', () => {
-    Router.navigate('/');
+    window.history.back();
   });
   // Formulier elementen ophalen
   const form = document.getElementById('modernContactForm');
@@ -334,11 +327,13 @@ function initializeContactPage() {
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    Router.navigate('/privacy');
+    import('../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/privacy');
+    });
   });
-
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    Router.navigate('/contact');
+    window.history.back();
   });
 }
