@@ -189,7 +189,7 @@ body {
 
 .register-btn {
   width: 100%;
-  background-color: grey;
+  background-color: #00acc1;
   color: white;
   border: none;
   padding: 12px;
@@ -202,7 +202,7 @@ body {
 }
 
 .register-btn:hover {
-  background-color: #00acc1;
+  background-color: #01bdd6;
 }
 
 .divider {
@@ -2312,4 +2312,15 @@ body.darkmode .student-profile-btn-secondary:active {
   color: #fff !important;
   box-shadow: 0 2px 4px rgba(250, 98, 106, 0.14) !important;
   transform: translateY(0) !important;
+}
+
+body.darkmode #burger-menu:hover{
+  background-color: lightgray !important;
+}
+
+.student-profile-dropdown {
+  display: none;
+}
+.student-profile-dropdown.open {
+  display: block;
 }

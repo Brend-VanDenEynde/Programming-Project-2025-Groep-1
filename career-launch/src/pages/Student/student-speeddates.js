@@ -51,7 +51,7 @@ export function renderSpeeddates(rootElement, studentData = {}) {
           <span>EhB Career Launch</span>
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
-        <ul id="burger-dropdown" class="student-profile-dropdown" style="display: none;">
+        <ul id="burger-dropdown" class="student-profile-dropdown">
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
@@ -116,54 +116,58 @@ export function renderSpeeddates(rootElement, studentData = {}) {
     </div>
   `;
 
-  document.querySelectorAll('.sidebar-link').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      const route = e.currentTarget.getAttribute('data-route');
-      switch (route) {
-        case 'profile':
-          renderStudentProfiel(rootElement, studentData);
-          break;
-        case 'search':
-          renderSearchCriteriaStudent(rootElement, studentData);
-          break;
-        case 'requests':
-          renderSpeeddatesRequests(rootElement, studentData);
-          break;
-        case 'qr':
-          renderQRPopup(rootElement, studentData);
-          break;
-      }
-    });
+document.querySelectorAll('.sidebar-link').forEach((btn) => {
+  btn.addEventListener('click', (e) => {
+    const route = e.currentTarget.getAttribute('data-route');
+    switch (route) {
+      case 'profile':
+        window.appRouter.navigate('/Student/Student-Profiel');
+        break;
+      case 'search':
+        window.appRouter.navigate('/Student/Zoek-Criteria');
+        break;
+      case 'speeddates':
+        window.appRouter.navigate('/Student/Student-Speeddates');
+        break;
+      case 'requests':
+        window.appRouter.navigate('/Student/Student-Speeddates-Verzoeken');
+        break;
+      case 'qr':
+        window.appRouter.navigate('/Student/Student-QR-Popup');
+        break;
+    }
   });
+});
 
 const burger = document.getElementById('burger-menu');
 const dropdown = document.getElementById('burger-dropdown');
 
 if (burger && dropdown) {
-  // Toggle hamburger-menu bij klik
+  // Toggle menu bij klik op burger
   burger.addEventListener('click', (event) => {
     event.stopPropagation();
-    dropdown.style.display =
-      dropdown.style.display === 'block' ? 'none' : 'block';
+    dropdown.classList.toggle('open');
   });
 
-  // Sluit het menu bij klik buiten het menu
+  // Sluit menu bij klik buiten menu of burger
   document.addEventListener('click', function(event) {
-    if (dropdown.style.display === 'block') {
-      if (!dropdown.contains(event.target) && event.target !== burger) {
-        dropdown.style.display = 'none';
-      }
+    if (
+      dropdown.classList.contains('open') &&
+      !dropdown.contains(event.target) &&
+      event.target !== burger
+    ) {
+      dropdown.classList.remove('open');
     }
   });
 
-  // Sluit het menu bij klikken op een menu-item
+  // Navigeer via de router!
   document.getElementById('nav-settings').addEventListener('click', () => {
-    dropdown.style.display = 'none';
-    showSettingsPopup();
+    dropdown.classList.remove('open');
+    showSettingsPopup(() => renderSpeeddates(rootElement));
   });
   document.getElementById('nav-logout').addEventListener('click', () => {
-    dropdown.style.display = 'none';
-    renderLogin(rootElement);
+    dropdown.classList.remove('open');
+    window.appRouter.navigate('/login');
   });
 }
 

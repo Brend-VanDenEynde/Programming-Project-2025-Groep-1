@@ -1,8 +1,6 @@
-// main.js file
 import Router from './router.js';
 import './style.css';
 
-// importeer de pagina's
 import { renderHome } from './pages/home.js';
 import { renderRegister } from './pages/register.js';
 import { renderLogin } from './pages/login.js';
@@ -17,18 +15,16 @@ import { renderSpeeddates } from './pages/Student/student-speeddates.js';
 import { renderSpeeddatesRequests } from './pages/Student/student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './pages/Student/student-settings.js';
 
-// functie om de 404 pagina te renderen
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
-        <div class="not-found-container">
-            <h1>404 - Pagina niet gevonden</h1>
-            <p>De pagina die je zoekt bestaat niet.</p>
-            <a href="/" data-route="/">Terug naar home</a>
-        </div>
-    `;
+    <div class="not-found-container">
+      <h1>404 - Pagina niet gevonden</h1>
+      <p>De pagina die je zoekt bestaat niet.</p>
+      <a href="/" data-route="/">Terug naar home</a>
+    </div>
+  `;
 }
 
-// Definieer de routes
 const routes = {
   '/': renderHome,
   '/404': renderNotFound,
@@ -40,20 +36,15 @@ const routes = {
   '/admin/admin-dashboard': renderAdminDashboard,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
-  '/Student/Student-QR-Popup' : renderQRPopup,
+  '/Student/Student-QR-Popup': renderQRPopup,
   '/Student/Student-Speeddates': renderSpeeddates,
   '/Student/Student-Speeddates-Verzoeken': renderSpeeddatesRequests,
   '/Student/Student-Settings': showSettingsPopup,
-  
-}
+};
 
-// Initialize router
 const router = new Router(routes);
-
-// Make router globally available for pages to use
 window.appRouter = router;
 
-// Redirect naar https als we op http zitten (client side fallback)
 if (window.location.protocol === 'http:' && !window.location.hostname.includes('localhost')) {
   window.location.href = window.location.href.replace('http:', 'https:');
 }

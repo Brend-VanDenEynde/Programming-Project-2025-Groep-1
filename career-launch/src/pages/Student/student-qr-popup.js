@@ -18,7 +18,7 @@ export function renderQRPopup(rootElement, studentData = {}) {
           <span>EhB Career Launch</span>
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
-        <ul id="burger-dropdown" class="student-profile-dropdown" style="display: none;">
+        <ul id="burger-dropdown" class="student-profile-dropdown">
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
@@ -38,7 +38,7 @@ export function renderQRPopup(rootElement, studentData = {}) {
             <h1 class="student-profile-title">Jouw QR-code</h1>
             <div class="qr-code-section">
               <div class="qr-code-label">Laat deze QR-code scannen door bedrijven of tijdens events</div>
-              <img src="/src/Images/default.jpg" alt="QR code" class="qr-code-img">
+              <img id="qr-img" src="/src/Images/default.jpg" alt="QR code" class="qr-code-img">
               <div class="qr-code-description">(Niet delen op sociale media)</div>
             </div>
           </div>
@@ -51,56 +51,61 @@ export function renderQRPopup(rootElement, studentData = {}) {
     </div>
   `;
 
- document.querySelectorAll('.sidebar-link').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      const route = e.currentTarget.getAttribute('data-route');
-      switch (route) {
-        case 'profile':
-          renderStudentProfiel(rootElement, studentData);
-          break;
-        case 'search':
-          renderSearchCriteriaStudent(rootElement, studentData);
-          break;
-        case 'speeddates':
-          renderSpeeddates(rootElement, studentData);
-          break;
-        case 'requests':
-          renderSpeeddatesRequests(rootElement, studentData);
-          break;
-       
-      }
-    });
+document.querySelectorAll('.sidebar-link').forEach((btn) => {
+  btn.addEventListener('click', (e) => {
+    const route = e.currentTarget.getAttribute('data-route');
+    switch (route) {
+      case 'profile':
+        window.appRouter.navigate('/Student/Student-Profiel');
+        break;
+      case 'search':
+        window.appRouter.navigate('/Student/Zoek-Criteria');
+        break;
+      case 'speeddates':
+        window.appRouter.navigate('/Student/Student-Speeddates');
+        break;
+      case 'requests':
+        window.appRouter.navigate('/Student/Student-Speeddates-Verzoeken');
+        break;
+      case 'qr':
+        window.appRouter.navigate('/Student/Student-QR-Popup');
+        break;
+    }
   });
+});
+
 const burger = document.getElementById('burger-menu');
 const dropdown = document.getElementById('burger-dropdown');
 
 if (burger && dropdown) {
-  // Toggle hamburger-menu bij klik
+  // Toggle menu bij klik op burger
   burger.addEventListener('click', (event) => {
     event.stopPropagation();
-    dropdown.style.display =
-      dropdown.style.display === 'block' ? 'none' : 'block';
+    dropdown.classList.toggle('open');
   });
 
-  // Sluit het menu bij klik buiten het menu
+  // Sluit menu bij klik buiten menu of burger
   document.addEventListener('click', function(event) {
-    if (dropdown.style.display === 'block') {
-      if (!dropdown.contains(event.target) && event.target !== burger) {
-        dropdown.style.display = 'none';
-      }
+    if (
+      dropdown.classList.contains('open') &&
+      !dropdown.contains(event.target) &&
+      event.target !== burger
+    ) {
+      dropdown.classList.remove('open');
     }
   });
 
-  // Sluit het menu bij klikken op een menu-item
-document.getElementById('nav-settings').addEventListener('click', () => {
-  dropdown.style.display = 'none';
-  showSettingsPopup();
-});
+  // Navigeer via de router!
+  document.getElementById('nav-settings').addEventListener('click', () => {
+    dropdown.classList.remove('open');
+    showSettingsPopup(() => renderQRPopup(rootElement));
+  });
   document.getElementById('nav-logout').addEventListener('click', () => {
-    dropdown.style.display = 'none';
-    renderLogin(rootElement);
+    dropdown.classList.remove('open');
+    window.appRouter.navigate('/login');
   });
 }
+
 
   
   document.getElementById('nav-settings').addEventListener('click', () => {
@@ -129,5 +134,46 @@ document.getElementById('nav-settings').addEventListener('click', () => {
       const Router = module.default;
       Router.navigate('/contact');
     });
+  });
+}
+
+// Voeg QR popup functionaliteit toe
+const qrImg = document.getElementById('qr-img');
+if (qrImg) {
+  qrImg.style.cursor = 'pointer';
+  qrImg.addEventListener('click', () => {
+    // Popup overlay maken
+    let overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = 0;
+    overlay.style.left = 0;
+    overlay.style.width = '100vw';
+    overlay.style.height = '100vh';
+    overlay.style.background = 'rgba(0,0,0,0.7)';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.zIndex = 3000;
+    overlay.id = 'qr-img-popup-overlay';
+
+    // Grote QR img
+    let bigImg = document.createElement('img');
+    bigImg.src = qrImg.src;
+    bigImg.alt = 'QR code groot';
+    bigImg.style.maxWidth = '80vw';
+    bigImg.style.maxHeight = '80vh';
+    bigImg.style.borderRadius = '18px';
+    bigImg.style.boxShadow = '0 8px 40px 0 rgba(44,44,44,0.18)';
+    bigImg.style.background = '#fff';
+    bigImg.style.padding = '18px';
+
+    // Sluit popup bij klik op overlay
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.remove();
+      }
+    });
+    overlay.appendChild(bigImg);
+    document.body.appendChild(overlay);
   });
 }

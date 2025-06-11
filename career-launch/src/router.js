@@ -33,10 +33,9 @@ class Router {
     path = path.replace(/\/+/g, '/');
 
     // Protected route check
-    if (path === '/admin-dashboard') {
+    if (path === '/admin/admin-dashboard') {
       const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
       if (!isLoggedIn || isLoggedIn !== 'true') {
-        // Sla gewenste URL op en redirect (vervang current history entry!)
         sessionStorage.setItem('redirectAfterLogin', path);
         this.navigate('/admin', {replace: true});
         return;
@@ -51,28 +50,25 @@ class Router {
     }
   }
 
-updateTitle(path) {
-  const titles = {
-    '/': 'Career Launch 2025 - Home',
-    '/registreer': 'Registreren - Career Launch 2025',
-    '/login': 'Inloggen - Career Launch 2025',
-    '/Student/Student-Profiel': 'Student Profiel - Career Launch 2025',
-    '/Student/Zoek-Criteria': 'Zoek Criteria - Career Launch 2025',
-    '/Student/Student-QR-Popup': 'Jouw QR-code - Career Launch 2025',
-    '/Student/Student-Speeddates': 'Jouw Speeddates - Career Launch 2025',
-    '/Student/Student-Speeddates-Verzoeken': 'Speeddate Verzoeken - Career Launch 2025',
-    '/Student/Student-Settings': 'Instellingen - Career Launch 2025',
-    '/Student/Student-Settings': 'Instellingen - Career Launch 2025',
-    '/admin': 'Admin Login - Career Launch 2025',
-    '/admin/admin-dashboard': 'Admin Dashboard - Career Launch 2025',
-    '/contact': 'Contacteer ons - Career Launch 2025',
-    '/privacy': 'Privacy Beleid - Career Launch 2025',
-    '/404': 'Pagina niet gevonden - Career Launch 2025',
-    
-  };
-  document.title = titles[path] || 'Career Launch 2025';
-}
-
+  updateTitle(path) {
+    const titles = {
+      '/': 'Career Launch 2025 - Home',
+      '/registreer': 'Registreren - Career Launch 2025',
+      '/login': 'Inloggen - Career Launch 2025',
+      '/Student/Student-Profiel': 'Student Profiel - Career Launch 2025',
+      '/Student/Zoek-Criteria': 'Zoek Criteria - Career Launch 2025',
+      '/Student/Student-QR-Popup': 'Jouw QR-code - Career Launch 2025',
+      '/Student/Student-Speeddates': 'Jouw Speeddates - Career Launch 2025',
+      '/Student/Student-Speeddates-Verzoeken': 'Speeddate Verzoeken - Career Launch 2025',
+      '/Student/Student-Settings': 'Instellingen - Career Launch 2025',
+      '/admin': 'Admin Login - Career Launch 2025',
+      '/admin/admin-dashboard': 'Admin Dashboard - Career Launch 2025',
+      '/contact': 'Contacteer ons - Career Launch 2025',
+      '/privacy': 'Privacy Beleid - Career Launch 2025',
+      '/404': 'Pagina niet gevonden - Career Launch 2025',
+    };
+    document.title = titles[path] || 'Career Launch 2025';
+  }
 
   static navigate(path) {
     window.history.pushState(null, '', path);
