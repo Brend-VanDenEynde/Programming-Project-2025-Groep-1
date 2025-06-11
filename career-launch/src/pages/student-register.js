@@ -11,7 +11,8 @@ export function renderStudentRegister(rootElement) {
 
       <div class="upload-section">
         <div class="upload-icon">⬆</div>
-        <label>Foto</label>
+        <label for="profielFoto">Foto</label>
+        <input type="file" id="profielFoto" name="profielFoto" accept="image/*" />
       </div>
 
       <form class="naamForm" id="naamForm">
@@ -25,7 +26,8 @@ export function renderStudentRegister(rootElement) {
         <div class="form-spacing">
           <input type="text" id="linkedin" name="linkedin" placeholder="LinkedIn-link" class="input-full" />
         </div>
-
+        <input type="linkedin" id="linkedin" name="linkedin" placeholder="LinkedIn-link" class="input-full" />
+        <label id="error-label" class="error-label" style="color: red; display: none;"></label>
         <button type="submit" class="next-button">Volgende →</button>
       </form>
 
@@ -65,17 +67,28 @@ function handleNaamRegister(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
-  const data = {
+  const currentData = {
     voornaam: formData.get('voornaam'),
     achternaam: formData.get('achternaam'),
-    geboortedatum: formData.get('geboortedatum'),
-    linkedinLink: formData.get('linkedin'),
+    linkedin: formData.get('linkedin'),
+    profielFoto: formData.get('profielFoto') ? formData.get('profielFoto').name : null, // Get uploaded file name
   };
 
-  
+  const errorLabel = document.getElementById('error-label');
+  errorLabel.style.display = 'none';
 
-  // Data naar server sturen (voorbeeld)
-  console.log('Registratie data:', data);
+  if (!currentData.voornaam || !currentData.achternaam) {
+    errorLabel.textContent = 'Voornaam en achternaam zijn verplicht.';
+    errorLabel.style.display = 'block';
+    return;
+  }
+
+  const previousData = JSON.parse(localStorage.getItem('userData')) || {};
+
+  const mergedData = { ...previousData, ...currentData };
+
+  // Store merged data securely in localStorage
+  localStorage.setItem('userData', JSON.stringify(mergedData));
 
   renderStudentOpleiding(document.getElementById('app'));
 }

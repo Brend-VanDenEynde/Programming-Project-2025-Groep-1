@@ -17,12 +17,15 @@ export function renderStudentOpleiding(rootElement) {
           <label><input type="radio" name="jaar" value="3"> 3de jaar</label>
         </div>
 
-
       <select class="opleiding-select" name="opleiding">
 
       </select>
 
-      <button class="save-button">SAVE</button>
+      <input type="date" id="birthdate" name="birthdate" required placeholder="Geboortedatum" class="input-full" />
+
+      <label id="error-label" class="error-label" style="color: red; display: none;"></label>
+
+      <button class="save-button">Account Aanmaken</button>
       </form>
     </main>
 
@@ -43,12 +46,16 @@ export function renderStudentOpleiding(rootElement) {
   const privacyLink = document.getElementById('privacy-link');
   privacyLink.addEventListener('click', (e) => {
     e.preventDefault();
-    alert('Privacy Policy pagina nog niet geïmplementeerd');
+    const errorLabel = document.getElementById('error-label');
+    errorLabel.textContent = 'Privacy Policy pagina nog niet geïmplementeerd';
+    errorLabel.style.display = 'block';
   });
   const contactLink = document.getElementById('contact-link');
   contactLink.addEventListener('click', (e) => {
     e.preventDefault();
-    alert('Contact pagina nog niet geïmplementeerd');
+    const errorLabel = document.getElementById('error-label');
+    errorLabel.textContent = 'Contact pagina nog niet geïmplementeerd';
+    errorLabel.style.display = 'block';
   });
 
   // Fetch opleidingen from API and populate dropdown
@@ -57,7 +64,7 @@ export function renderStudentOpleiding(rootElement) {
 
 async function loadOpleidingen() {
   try {
-    const opleidingen = await apiGet('http://localhost:3001/opleiding/');
+    const opleidingen = await apiGet('https://api.ehb-match.me/opleidingen/');
     const opleidingSelect = document.querySelector('.opleiding-select');
     opleidingSelect.innerHTML = ''; // Clear all existing options
 
@@ -86,31 +93,75 @@ async function loadOpleidingen() {
   }
 }
 
-function handleJaarRegister(event) {
+async function handleJaarRegister(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
 
   const jaar = formData.get('jaar');
   const opleiding = formData.get('opleiding');
+  const birthdate = formData.get('birthdate');
+
+  const errorLabel = document.getElementById('error-label');
+  errorLabel.style.display = 'none';
 
   if (!jaar) {
-    alert('Selecteer een jaar!');
+    errorLabel.textContent = 'Selecteer een jaar!';
+    errorLabel.style.display = 'block';
     return;
   }
   if (!opleiding || opleiding === 'Opleiding') {
-    alert('Selecteer een opleiding!');
+    errorLabel.textContent = 'Selecteer een opleiding!';
+    errorLabel.style.display = 'block';
+    return;
+  }
+  if (!birthdate) {
+    errorLabel.textContent = 'Vul je geboortedatum in!';
+    errorLabel.style.display = 'block';
+    return;
+  }
+  const today = new Date();
+  const birthdateDate = new Date(birthdate);
+  if (birthdateDate > today) {
+    errorLabel.textContent = 'Geboortedatum kan niet in de toekomst liggen!';
+    errorLabel.style.display = 'block';
     return;
   }
 
+  const previousData = JSON.parse(localStorage.getItem('userData')) || {};
+
   const data = {
-    jaar: formData.get('jaar'), // geselecteerde radio
-    opleiding: formData.get('opleiding'), // geselecteerde optie uit select
+    email: previousData.email || '',
+    password: previousData.password || '',
+    voornaam: previousData.voornaam || 'Jan',
+    achternaam: previousData.achternaam || 'Jansen',
+    linkedin: previousData.linkedin || 'linkedinlink',
+    profielFoto: previousData.profielFoto || 'default.jpg',
+    studiejaar: parseInt(jaar, 10),
+    opleiding_id: parseInt(opleiding, 10),
+    date_of_birth: birthdate,
   };
 
-  // Data naar server sturen (voorbeeld)
-  console.log('Registratie data:', data);
+  try {
+    const response = await fetch('https://api.ehb-match.me/auth/register/student', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
 
-  // Navigeren naar de volgende pagina
-  renderStudentSkills(document.getElementById('app'));
+    if (!response.ok) {
+      throw new Error('Fout bij het aanmaken van account.');
+    }
+
+    const result = await response.json();
+    console.log('Account succesvol aangemaakt:', result);
+
+    Router.navigate('/login');
+  } catch (error) {
+    console.error('Fout bij het aanmaken van account:', error);
+    errorLabel.textContent = 'Er is een fout opgetreden bij het aanmaken van je account.';
+    errorLabel.style.display = 'block';
+  }
 }
