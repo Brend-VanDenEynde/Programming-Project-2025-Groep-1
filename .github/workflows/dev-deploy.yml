@@ -31,6 +31,9 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.DEV_DEPLOY_KEY }}
 
+      - name: Add server to known_hosts
+        run: ssh-keyscan ehb-match.me >> ~/.ssh/known_hosts
+
       - name: Deploy via rsync
         working-directory: ./career-launch
         run: |
