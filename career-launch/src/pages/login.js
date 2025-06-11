@@ -104,14 +104,34 @@ async function loginUser(email, password) {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      // Probeer de error response te lezen voor meer details
+      let errorMessage = `HTTP error! Status: ${response.status}`;
+
+      try {
+        const errorData = await response.json();
+        if (errorData.message) {
+          errorMessage = `${errorMessage} - ${errorData.message}`;
+        } else if (errorData.error) {
+          errorMessage = `${errorMessage} - ${errorData.error}`;
+        }
+      } catch (jsonError) {
+        // Als we de response niet kunnen parsen als JSON, gebruik de status code
+        console.warn('Could not parse error response as JSON:', jsonError);
+      }
+
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
     console.log('API call successful:', data);
     return data;
   } catch (error) {
-    // Re-throw the error so it can be caught by the calling function (handleLogin)
+    // Als het een fetch error is (netwerkproblemen), geef dit duidelijk aan
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      throw new Error('Network error: Could not connect to server');
+    }
+
+    // Re-throw de error zodat deze opgevangen kan worden door handleLogin
     throw error;
   }
 }
@@ -212,21 +232,43 @@ async function handleLogin(event, rootElement) {
     window.sessionStorage.removeItem('companyData');
     window.sessionStorage.removeItem('userType');
 
-    // User-friendly error messages
-    if (error.message.includes('401')) {
+    // User-friendly error messages based on HTTP status codes and error types
+    if (
+      error.message.includes('401') ||
+      error.message.includes('HTTP error! Status: 401')
+    ) {
       alert('Ongeldig e-mailadres of wachtwoord.');
-    } else if (error.message.includes('403')) {
+    } else if (
+      error.message.includes('400') ||
+      error.message.includes('HTTP error! Status: 400')
+    ) {
+      alert(
+        'Ongeldige inloggegevens. Controleer je e-mailadres en wachtwoord.'
+      );
+    } else if (
+      error.message.includes('403') ||
+      error.message.includes('HTTP error! Status: 403')
+    ) {
       alert('Je account is niet geactiveerd of geblokkeerd.');
-    } else if (error.message.includes('404')) {
+    } else if (
+      error.message.includes('404') ||
+      error.message.includes('HTTP error! Status: 404')
+    ) {
       alert('De dienst is momenteel niet beschikbaar.');
-    } else if (error.message.includes('500')) {
+    } else if (
+      error.message.includes('500') ||
+      error.message.includes('HTTP error! Status: 500')
+    ) {
       alert('Er is een serverfout opgetreden. Probeer het later opnieuw.');
     } else if (error.message.includes('Authentication failed')) {
       alert('Authenticatie mislukt. Controleer je inloggegevens.');
-    } else {
+    } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
       alert(
-        'Er is een netwerkfout opgetreden. Controleer je internetverbinding.'
+        'Kan geen verbinding maken met de server. Controleer je internetverbinding.'
       );
+    } else {
+      // Voor alle andere fouten, geef een specifiekere boodschap
+      alert('Inloggen mislukt. Controleer je e-mailadres en wachtwoord.');
     }
   }
 }
