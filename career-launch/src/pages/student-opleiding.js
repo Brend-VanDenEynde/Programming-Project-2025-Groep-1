@@ -93,7 +93,7 @@ async function loadOpleidingen() {
   }
 }
 
-function handleJaarRegister(event) {
+async function handleJaarRegister(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
@@ -136,11 +136,32 @@ function handleJaarRegister(event) {
     voornaam: previousData.voornaam || 'Jan',
     achternaam: previousData.achternaam || 'Jansen',
     linkedin: previousData.linkedin || 'linkedinlink',
-    profielFoto: previousData.profielFoto || 'foto/janjansen.jpg',
+    profielFoto: previousData.profielFoto || 'default.jpg',
     studiejaar: parseInt(jaar, 10),
     opleiding_id: parseInt(opleiding, 10),
     date_of_birth: birthdate,
   };
 
-  Router.navigate('/login');
+  try {
+    const response = await fetch('https://api.ehb-match.me/auth/register/student', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error('Fout bij het aanmaken van account.');
+    }
+
+    const result = await response.json();
+    console.log('Account succesvol aangemaakt:', result);
+
+    Router.navigate('/login');
+  } catch (error) {
+    console.error('Fout bij het aanmaken van account:', error);
+    errorLabel.textContent = 'Er is een fout opgetreden bij het aanmaken van je account.';
+    errorLabel.style.display = 'block';
+  }
 }
