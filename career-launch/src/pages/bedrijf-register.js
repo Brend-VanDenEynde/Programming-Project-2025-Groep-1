@@ -27,7 +27,7 @@ export function renderBedrijfRegister(rootElement) {
         <div class="form-spacing">
           <input type="text" id="linkedin" name="linkedin" placeholder="LinkedIn-link" class="input-full" />
         </div>
-        <button type="submit" class="next-button">Volgende →</button>
+        <button type="submit" class="next-button">Bevestigen →</button>
       </form>
 
       
@@ -39,8 +39,8 @@ export function renderBedrijfRegister(rootElement) {
   </div>
   `;
 
-  const form = document.getElementById('naamForm');
-  form.addEventListener('submit', handleNaamRegister);
+  const form = document.getElementById('bedrijfForm');
+  form.addEventListener('submit', handleBedrijfRegister);
 
   document.getElementById('back-button').addEventListener('click', () => {
     Router.navigate('/registreer');
@@ -60,7 +60,7 @@ export function renderBedrijfRegister(rootElement) {
   });
 }
 
-function handleNaamRegister(event) {
+function handleBedrijfRegister(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
@@ -77,6 +77,6 @@ function handleNaamRegister(event) {
   console.log('Registratie data:', data);
   alert(`Welkom ${data.bedrijfnaam}! Je account is aangemaakt.`);
 
-  renderStudentOpleiding(document.getElementById('app'));
+  Router.navigate('/Bedrijf/Bedrijf-Profiel');
 }
 // firstName
