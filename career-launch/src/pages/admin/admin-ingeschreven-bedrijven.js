@@ -1,5 +1,6 @@
 // Admin ingeschreven bedrijven pagina
 import Router from '../../router.js';
+import { performLogout } from '../../utils/auth-api.js';
 
 export function renderAdminIngeschrevenBedrijven(rootElement) {
   // Check if user is logged in
@@ -69,15 +70,18 @@ export function renderAdminIngeschrevenBedrijven(rootElement) {
       </footer>
     </div>
   `;
-
   // Handle logout
   const logoutBtn = document.getElementById('logout-btn');
-  logoutBtn.addEventListener('click', () => {
-    // Clear session
-    sessionStorage.removeItem('adminLoggedIn');
-    sessionStorage.removeItem('adminUsername');
-    // Redirect to admin login
-    Router.navigate('/admin-login');
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      const result = await performLogout();
+      console.log('Admin logout result:', result);
+      Router.navigate('/admin-login');
+    } catch (error) {
+      console.error('Admin logout error:', error);
+      // Still navigate to login even if logout API fails
+      Router.navigate('/admin-login');
+    }
   });
 
   // Handle navigation between sections

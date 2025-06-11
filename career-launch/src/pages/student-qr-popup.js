@@ -6,6 +6,7 @@ import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './student-settings.js';
+import { performLogout } from '../utils/auth-api.js';
 
 // src/views/student-qr-popup.js
 
@@ -95,18 +96,33 @@ export function renderQRPopup(rootElement, studentData = {}) {
       dropdown.style.display = 'none';
       showSettingsPopup();
     });
-    document.getElementById('nav-logout').addEventListener('click', () => {
-      dropdown.style.display = 'none';
-      renderLogin(rootElement);
-    });
+    document
+      .getElementById('nav-logout')
+      .addEventListener('click', async () => {
+        dropdown.style.display = 'none';
+        try {
+          const result = await performLogout();
+          console.log('Logout result:', result);
+          renderLogin(rootElement);
+        } catch (error) {
+          console.error('Logout error:', error);
+          renderLogin(rootElement);
+        }
+      });
   }
 
   document.getElementById('nav-settings').addEventListener('click', () => {
     // Navigeren naar Instellingen (nog te implementeren)
   });
-
-  document.getElementById('nav-logout').addEventListener('click', () => {
-    renderLogin(rootElement);
+  document.getElementById('nav-logout').addEventListener('click', async () => {
+    try {
+      const result = await performLogout();
+      console.log('Logout result:', result);
+      renderLogin(rootElement);
+    } catch (error) {
+      console.error('Logout error:', error);
+      renderLogin(rootElement);
+    }
   });
 
   // Footer links

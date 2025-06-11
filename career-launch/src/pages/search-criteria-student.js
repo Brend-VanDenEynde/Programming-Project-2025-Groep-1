@@ -6,6 +6,7 @@ import { renderLogin } from './login.js';
 import { showSettingsPopup } from './student-settings.js';
 import Router from '../router.js';
 import logoIcon from '../Icons/favicon-32x32.png';
+import { performLogout } from '../utils/auth-api.js';
 
 export function renderSearchCriteriaStudent(
   rootElement,
@@ -230,10 +231,19 @@ export function renderSearchCriteriaStudent(
       dropdown.style.display = 'none';
       showSettingsPopup();
     });
-    document.getElementById('nav-logout').addEventListener('click', () => {
-      dropdown.style.display = 'none';
-      renderLogin(rootElement);
-    });
+    document
+      .getElementById('nav-logout')
+      .addEventListener('click', async () => {
+        dropdown.style.display = 'none';
+        try {
+          const result = await performLogout();
+          console.log('Logout result:', result);
+          renderLogin(rootElement);
+        } catch (error) {
+          console.error('Logout error:', error);
+          renderLogin(rootElement);
+        }
+      });
   }
 
   // Form

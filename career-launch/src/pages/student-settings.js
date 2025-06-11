@@ -1,4 +1,5 @@
 import { renderLogin } from './login.js';
+import { performLogout } from '../utils/auth-api.js';
 
 // Fallback voor t() en setLanguage() als deze niet bestaan
 if (typeof window.t !== 'function') {
@@ -18,7 +19,9 @@ if (typeof window.t !== 'function') {
   };
 }
 if (typeof window.setLanguage !== 'function') {
-  window.setLanguage = (lang) => { localStorage.setItem('lang', lang); };
+  window.setLanguage = (lang) => {
+    localStorage.setItem('lang', lang);
+  };
 }
 
 // Main renderfunctie:
@@ -88,7 +91,9 @@ export function showSettingsPopup(onClose) {
         <label style="display:flex;align-items:center;gap:16px;">
           <span style="font-size:1.22em;">🌞</span>
           <span class="switch">
-            <input id="toggle-darkmode" type="checkbox" ${dark ? 'checked' : ''}/>
+            <input id="toggle-darkmode" type="checkbox" ${
+              dark ? 'checked' : ''
+            }/>
             <span class="slider"></span>
           </span>
           <span style="font-size:1.22em;">🌙</span>
@@ -115,24 +120,29 @@ export function showSettingsPopup(onClose) {
   };
 
   // Darkmode toggle
-  document.getElementById('toggle-darkmode').addEventListener('change', e => {
+  document.getElementById('toggle-darkmode').addEventListener('change', (e) => {
     localStorage.setItem('darkmode', e.target.checked);
     document.body.classList.toggle('darkmode', e.target.checked);
   });
 
   // Delete account
-  document.getElementById('btn-delete-account').addEventListener('click', () => {
-    if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
-      localStorage.clear();
-      window.location.reload();
+  document
+    .getElementById('btn-delete-account')
+    .addEventListener('click', () => {
+      if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
+        localStorage.clear();
+        window.location.reload();
+      }
+    });
+  // Logout
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    try {
+      const result = await performLogout();
+      console.log('Logout result:', result);
+      renderLogin(document.getElementById('app'));
+    } catch (error) {
+      console.error('Logout error:', error);
+      renderLogin(document.getElementById('app'));
     }
   });
-
-  // Logout
-  document.getElementById('btn-logout').addEventListener('click', () => {
-    localStorage.removeItem('user');
-    window.location.reload();
-  });
 }
-
-

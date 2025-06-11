@@ -4,6 +4,7 @@ import defaultAvatar from '../Images/BedrijfDefault.jpg';
 import logoIcon from '../Icons/favicon-32x32.png';
 import { renderLogin } from './login.js';
 import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
+import { performLogout } from '../utils/auth-api.js';
 
 export function renderBedrijfProfiel(rootElement, bedrijfData = {}) {
   const {
@@ -140,13 +141,28 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}) {
         alert('Account verwijderen (nog te implementeren)');
       }
     });
-  document.getElementById('nav-logout').addEventListener('click', () => {
-    renderLogin(rootElement);
+  document.getElementById('nav-logout').addEventListener('click', async () => {
+    try {
+      const result = await performLogout();
+      console.log('Logout result:', result);
+      renderLogin(rootElement);
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still navigate to login even if logout API fails
+      renderLogin(rootElement);
+    }
   });
-
   // UITLOGGEN (in profiel‐weergave)
-  document.getElementById('logout-btn').addEventListener('click', () => {
-    renderLogin(rootElement);
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    try {
+      const result = await performLogout();
+      console.log('Logout result:', result);
+      renderLogin(rootElement);
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still navigate to login even if logout API fails
+      renderLogin(rootElement);
+    }
   });
 
   // SCHAKEL WEERGAVE ↔ BEWERKEN
@@ -190,29 +206,28 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}) {
   });
 
   // OPSLAAN‐KNOP (zonder e-mailvalidatie voor bedrijf)
-    document.getElementById('save-profile-btn').addEventListener('click', () => {
-  const updatedData = {
-    ...bedrijfData,
-    name: document.getElementById('nameInput').value.trim(),
-    email: document.getElementById('emailInput').value.trim(),
-    description: document.getElementById('descriptionInput').value.trim(),
-    linkedIn: document.getElementById('linkedinInput').value.trim(),
-    profilePictureUrl: bedrijfData.profilePictureUrl,
-  };
+  document.getElementById('save-profile-btn').addEventListener('click', () => {
+    const updatedData = {
+      ...bedrijfData,
+      name: document.getElementById('nameInput').value.trim(),
+      email: document.getElementById('emailInput').value.trim(),
+      description: document.getElementById('descriptionInput').value.trim(),
+      linkedIn: document.getElementById('linkedinInput').value.trim(),
+      profilePictureUrl: bedrijfData.profilePictureUrl,
+    };
 
-  // Eenvoudige validatie: alleen bedrijfsnaam is verplicht
-  if (!updatedData.name) {
-    alert('De bedrijfsnaam mag niet leeg zijn.');
-    return;
-  }
+    // Eenvoudige validatie: alleen bedrijfsnaam is verplicht
+    if (!updatedData.name) {
+      alert('De bedrijfsnaam mag niet leeg zijn.');
+      return;
+    }
 
-  // TODO: stuur updatedData naar backend
+    // TODO: stuur updatedData naar backend
 
-  // Toon opnieuw de view‐sectie met bijgewerkte data
-  renderBedrijfProfiel(rootElement, updatedData);
-  alert('Profielgegevens succesvol opgeslagen.');
-    });
-
+    // Toon opnieuw de view‐sectie met bijgewerkte data
+    renderBedrijfProfiel(rootElement, updatedData);
+    alert('Profielgegevens succesvol opgeslagen.');
+  });
 
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {

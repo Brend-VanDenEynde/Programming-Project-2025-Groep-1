@@ -3,6 +3,7 @@
 import logoIcon from '../Icons/favicon-32x32.png';
 import { renderLogin } from './login.js';
 import { renderBedrijfProfiel } from './bedrijf-profiel.js';
+import { performLogout } from '../utils/auth-api.js';
 
 export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
   if (!bedrijfData.criteria) {
@@ -11,17 +12,12 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
       skills: [],
       skillAndere: '',
       talen: [],
-      taalAndere: ''
+      taalAndere: '',
     };
   }
 
-  const {
-    zoekType,
-    skills,
-    skillAndere,
-    talen,
-    taalAndere
-  } = bedrijfData.criteria;
+  const { zoekType, skills, skillAndere, talen, taalAndere } =
+    bedrijfData.criteria;
 
   rootElement.innerHTML = `
     <header style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #ccc;">
@@ -106,12 +102,16 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
 
   const restoreCriteria = () => {
     if (zoekType) {
-      const radio = document.querySelector(`#fieldset-jobType input[value="${zoekType}"]`);
+      const radio = document.querySelector(
+        `#fieldset-jobType input[value="${zoekType}"]`
+      );
       if (radio) radio.checked = true;
     }
 
-    skills.forEach(val => {
-      let checkbox = document.querySelector(`#fieldset-skills input[value="${val}"]`);
+    skills.forEach((val) => {
+      let checkbox = document.querySelector(
+        `#fieldset-skills input[value="${val}"]`
+      );
       if (checkbox) {
         checkbox.checked = true;
       } else {
@@ -130,8 +130,10 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
       document.getElementById('skill-andere').checked = true;
     }
 
-    talen.forEach(val => {
-      let checkbox = document.querySelector(`#fieldset-talen input[value="${val}"]`);
+    talen.forEach((val) => {
+      let checkbox = document.querySelector(
+        `#fieldset-talen input[value="${val}"]`
+      );
       if (checkbox) {
         checkbox.checked = true;
       } else {
@@ -153,8 +155,8 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
 
   restoreCriteria();
 
-  document.querySelectorAll('.sidebar-link').forEach(btn => {
-    btn.addEventListener('click', e => {
+  document.querySelectorAll('.sidebar-link').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
       const route = e.currentTarget.getAttribute('data-route');
       switch (route) {
         case 'profile':
@@ -164,8 +166,15 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
     });
   });
 
-  document.getElementById('nav-logout').addEventListener('click', () => {
-    renderLogin(rootElement);
+  document.getElementById('nav-logout').addEventListener('click', async () => {
+    try {
+      const result = await performLogout();
+      console.log('Logout result:', result);
+      renderLogin(rootElement);
+    } catch (error) {
+      console.error('Logout error:', error);
+      renderLogin(rootElement);
+    }
   });
 
   // BURGER-MENU
@@ -173,7 +182,8 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
   const dropdown = document.getElementById('burger-dropdown');
   if (burger && dropdown) {
     burger.addEventListener('click', () => {
-      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+      dropdown.style.display =
+        dropdown.style.display === 'block' ? 'none' : 'block';
     });
   }
   document.getElementById('nav-dashboard').addEventListener('click', () => {
@@ -182,20 +192,31 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
   document.getElementById('nav-settings').addEventListener('click', () => {
     alert('Navigeren naar Instellingen (nog te implementeren)');
   });
-  document.getElementById('nav-delete-account').addEventListener('click', () => {
-    if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
-      alert('Account verwijderen (nog te implementeren)');
+  document
+    .getElementById('nav-delete-account')
+    .addEventListener('click', () => {
+      if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
+        alert('Account verwijderen (nog te implementeren)');
+      }
+    });
+  document.getElementById('nav-logout').addEventListener('click', async () => {
+    try {
+      const result = await performLogout();
+      console.log('Logout result:', result);
+      renderLogin(rootElement);
+    } catch (error) {
+      console.error('Logout error:', error);
+      renderLogin(rootElement);
     }
-  });
-  document.getElementById('nav-logout').addEventListener('click', () => {
-    renderLogin(rootElement);
   });
 
   // RESET-KNOP
   document.getElementById('btn-reset').addEventListener('click', () => {
-    document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(chk => {
-      chk.checked = false;
-    });
+    document
+      .querySelectorAll('input[type="checkbox"], input[type="radio"]')
+      .forEach((chk) => {
+        chk.checked = false;
+      });
     document.getElementById('skill-andere-text').value = '';
     document.getElementById('taal-andere-text').value = '';
     // Reset opgeslagen criteria
@@ -204,7 +225,7 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
       skills: [],
       skillAndere: '',
       talen: [],
-      taalAndere: ''
+      taalAndere: '',
     };
   });
 
@@ -216,7 +237,9 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
       skillAndereCheckbox.checked = false; // uncheck originele
       // Voeg dynamische checkbox toe
       const fieldsetSkills = document.getElementById('fieldset-skills');
-      const existing = fieldsetSkills.querySelector(`input[value="${textValue}"]`);
+      const existing = fieldsetSkills.querySelector(
+        `input[value="${textValue}"]`
+      );
       if (!existing) {
         const newId = `skill-${textValue.replace(/\s+/g, '-').toLowerCase()}`;
         const wrapper = document.createElement('div');
@@ -242,7 +265,9 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
       taalAndereCheckbox.checked = false;
       // Voeg dynamische checkbox toe
       const fieldsetTalen = document.getElementById('fieldset-talen');
-      const existing = fieldsetTalen.querySelector(`input[value="${textValue}"]`);
+      const existing = fieldsetTalen.querySelector(
+        `input[value="${textValue}"]`
+      );
       if (!existing) {
         const newId = `taal-${textValue.replace(/\s+/g, '-').toLowerCase()}`;
         const wrapper = document.createElement('div');
@@ -262,17 +287,21 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
   // SAVE-KNOP: bewaar radiokeuze, checkboxes, maar re-render niet
   document.getElementById('btn-save').addEventListener('click', () => {
     // Radiokoze: enkel één waarde
-    const selectedRadio = document.querySelector('input[name="jobType"]:checked');
+    const selectedRadio = document.querySelector(
+      'input[name="jobType"]:checked'
+    );
     bedrijfData.criteria.zoekType = selectedRadio ? selectedRadio.value : '';
 
     // Skills: alle checked (inclusief dynamische)
-    const selectedSkills = Array.from(document.querySelectorAll('input[name="skills"]:checked'))
-      .map(el => el.value);
+    const selectedSkills = Array.from(
+      document.querySelectorAll('input[name="skills"]:checked')
+    ).map((el) => el.value);
     bedrijfData.criteria.skills = selectedSkills;
 
     // Talen: alle checked
-    const selectedTalen = Array.from(document.querySelectorAll('input[name="talen"]:checked'))
-      .map(el => el.value);
+    const selectedTalen = Array.from(
+      document.querySelectorAll('input[name="talen"]:checked')
+    ).map((el) => el.value);
     bedrijfData.criteria.talen = selectedTalen;
 
     // SkillAndere en TaalAndere blijven zoals eerder ingesteld
@@ -283,11 +312,11 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
   });
 
   // FOOTER LINKS
-  document.getElementById('privacy-policy').addEventListener('click', e => {
+  document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
     alert('Privacy Policy pagina wordt hier geladen.');
   });
-  document.getElementById('contacteer-ons').addEventListener('click', e => {
+  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
     alert('Contacteer ons formulier wordt hier geladen.');
   });

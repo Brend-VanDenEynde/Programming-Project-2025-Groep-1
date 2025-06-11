@@ -1,10 +1,12 @@
 // src/views/student-speeddates-verzoeken.js
 import logoIcon from '../Icons/favicon-32x32.png';
+import { renderLogin } from './login.js';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderQRPopup } from './student-qr-popup.js';
 import { showSettingsPopup } from './student-settings.js';
+import { performLogout } from '../utils/auth-api.js';
 
 export function renderSpeeddatesRequests(rootElement, studentData = {}) {
   let verzoeken = [
@@ -175,10 +177,19 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
       dropdown.style.display = 'none';
       showSettingsPopup();
     });
-    document.getElementById('nav-logout').addEventListener('click', () => {
-      dropdown.style.display = 'none';
-      renderLogin(rootElement);
-    });
+    document
+      .getElementById('nav-logout')
+      .addEventListener('click', async () => {
+        dropdown.style.display = 'none';
+        try {
+          const result = await performLogout();
+          console.log('Logout result:', result);
+          renderLogin(rootElement);
+        } catch (error) {
+          console.error('Logout error:', error);
+          renderLogin(rootElement);
+        }
+      });
   }
 
   document.getElementById('privacy-policy').addEventListener('click', (e) => {

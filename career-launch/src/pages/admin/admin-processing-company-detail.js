@@ -1,5 +1,6 @@
 // Admin processing company detail pagina
 import Router from '../../router.js';
+import { performLogout } from '../../utils/auth-api.js';
 
 export function renderAdminProcessingCompanyDetail(rootElement) {
   // Check if user is logged in
@@ -125,13 +126,18 @@ export function renderAdminProcessingCompanyDetail(rootElement) {
       </footer>
     </div>
   `;
-
   // Handle logout
   const logoutBtn = document.getElementById('logout-btn');
-  logoutBtn.addEventListener('click', () => {
-    sessionStorage.removeItem('adminLoggedIn');
-    sessionStorage.removeItem('adminUsername');
-    Router.navigate('/admin-login');
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      const result = await performLogout();
+      console.log('Admin logout result:', result);
+      Router.navigate('/admin-login');
+    } catch (error) {
+      console.error('Admin logout error:', error);
+      // Still navigate to login even if logout API fails
+      Router.navigate('/admin-login');
+    }
   });
 
   // Handle navigation between sections

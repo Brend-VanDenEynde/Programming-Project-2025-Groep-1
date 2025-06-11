@@ -1,6 +1,7 @@
 // Admin student detail pagina
 import Router from '../../router.js';
 import defaultAvatar from '../../Images/default.jpg';
+import { performLogout } from '../../utils/auth-api.js';
 
 export function renderAdminStudentDetail(rootElement) {
   // Check if user is logged in
@@ -379,13 +380,18 @@ function setupEventHandlers() {
   backBtn.addEventListener('click', () => {
     Router.navigate('/admin-dashboard/ingeschreven-studenten');
   });
-
   // Logout button
   const logoutBtn = document.getElementById('logout-btn');
-  logoutBtn.addEventListener('click', () => {
-    sessionStorage.removeItem('adminLoggedIn');
-    sessionStorage.removeItem('adminUsername');
-    Router.navigate('/admin-login');
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      const result = await performLogout();
+      console.log('Admin logout result:', result);
+      Router.navigate('/admin-login');
+    } catch (error) {
+      console.error('Admin logout error:', error);
+      // Still navigate to login even if logout API fails
+      Router.navigate('/admin-login');
+    }
   });
 
   // Navigation buttons
