@@ -16,10 +16,15 @@ export function renderStudentRegister(rootElement) {
 
       <form class="naamForm" id="naamForm">
         <div class="name-row">
-          <input type="voornaam" id="voornaam" name="voornaam" required placeholder="Voornaam" class="input-half" />
-          <input type="achternaam" id="achternaam" name="achternaam" required placeholder="Achternaam" class="input-half" />
+          <input type="text" id="voornaam" name="voornaam" required placeholder="Voornaam" class="input-half" />
+          <input type="text" id="achternaam" name="achternaam" required placeholder="Achternaam" class="input-half" />
         </div>
-        <input type="linkedin" id="linkedin" name"linkedin" placeholder="LinkedIn-link" class="input-full" />
+        <div class="form-spacing">
+          <input type="date" id="geboortedatum" name="geboortedatum" required placeholder="Geboortedatum" class="input-full" />
+        </div>
+        <div class="form-spacing">
+          <input type="text" id="linkedin" name="linkedin" placeholder="LinkedIn-link" class="input-full" />
+        </div>
 
         <button type="submit" class="next-button">Volgende →</button>
       </form>
@@ -63,6 +68,7 @@ function handleNaamRegister(event) {
   const data = {
     voornaam: formData.get('voornaam'),
     achternaam: formData.get('achternaam'),
+    geboortedatum: formData.get('geboortedatum'),
     linkedinLink: formData.get('linkedin'),
   };
 
@@ -70,7 +76,6 @@ function handleNaamRegister(event) {
 
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
-  alert(`Welkom ${data.voornaam}! Je account is aangemaakt.`);
 
   renderStudentOpleiding(document.getElementById('app'));
 }

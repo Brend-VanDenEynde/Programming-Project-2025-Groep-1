@@ -111,5 +111,6 @@ function handleJaarRegister(event) {
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
 
+  // Navigeren naar de volgende pagina
   renderStudentSkills(document.getElementById('app'));
 }

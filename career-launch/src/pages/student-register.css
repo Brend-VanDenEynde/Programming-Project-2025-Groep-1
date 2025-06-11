@@ -42,8 +42,16 @@ body {
   padding: 2rem;
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
+.bedrijfForm input{
+  width: 300px;
+}
 
 /* Terug knop */
 .back-button {
@@ -89,6 +97,10 @@ body {
 .name-row {
   display: flex;
   gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-spacing {
   margin-bottom: 1rem;
 }
 
@@ -175,6 +187,8 @@ body {
 }
 
 /* Save knop */
+
+
 .save-button {
   margin-top: 2rem;
   padding: 0.75rem 1.5rem;
@@ -213,4 +227,16 @@ body {
   justify-content: space-between;
   width: 100%;
   margin-top: 2rem;
+}
+
+.select-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bedrijfInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
