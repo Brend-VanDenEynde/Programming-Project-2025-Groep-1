@@ -3,7 +3,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   // Development server configuratie
   server: {
-    port: 3000,
+    port: 3001,
     open: true,
     // Enable history API fallback for client-side routing
     historyApiFallback: true,
