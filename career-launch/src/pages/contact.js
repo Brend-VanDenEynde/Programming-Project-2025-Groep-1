@@ -331,21 +331,14 @@ function initializeContactPage() {
 
   // Initiële validatie
   validateForm();
-
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/privacy');
-    });
+    Router.navigate('/privacy');
   });
 
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/contact');
-    });
+    Router.navigate('/contact');
   });
 }

@@ -1,5 +1,6 @@
 import Router from './router.js';
-import './style.css';
+import './css/style.css';
+import './css/admin-style.css';
 
 import { renderHome } from './pages/home.js';
 import { renderRegister } from './pages/register.js';
@@ -32,8 +33,18 @@ const routes = {
   '/login': renderLogin,
   '/Student/Student-Profiel': renderStudentProfiel,
   '/Student/Zoek-Criteria': renderSearchCriteriaStudent,
-  '/admin': renderAdmin,
-  '/admin/admin-dashboard': renderAdminDashboard,
+  '/admin': redirectToAdminLogin,
+  '/admin-login': renderAdmin,
+  '/admin-select-dashboard': renderAdminSelectDashboard,
+  '/admin-dashboard': renderAdminDashboard,
+  '/admin-dashboard/ingeschreven-studenten': renderAdminIngeschrevenStudenten,
+  '/admin-dashboard/ingeschreven-bedrijven': renderAdminIngeschrevenBedrijven,
+  '/admin-dashboard/bedrijven-in-behandeling':
+    renderAdminBedrijvenInBehandeling,
+  '/admin-dashboard/student-detail': renderAdminStudentDetail,
+  '/admin-dashboard/company-detail': renderAdminCompanyDetail,
+  '/admin-dashboard/processing-company-detail':
+    renderAdminProcessingCompanyDetail,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
   '/Student/Student-QR-Popup': renderQRPopup,

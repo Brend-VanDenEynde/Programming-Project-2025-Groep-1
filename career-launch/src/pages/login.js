@@ -100,22 +100,63 @@ export function renderLogin(rootElement) {
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/privacy');
-    });
+    Router.navigate('/privacy');
   });
 
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/contact');
-    });
+    Router.navigate('/contact');
   });
 }
 
-function handleLogin(event, rootElement) {
+async function loginUser(email, password) {
+  const apiUrl = 'https://api.ehb-match.me/auth/login';
+  const loginData = { email, password };
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include', // Include cookies in the request
+      body: JSON.stringify(loginData),
+    });
+
+    if (!response.ok) {
+      // Probeer de error response te lezen voor meer details
+      let errorMessage = `HTTP error! Status: ${response.status}`;
+
+      try {
+        const errorData = await response.json();
+        if (errorData.message) {
+          errorMessage = `${errorMessage} - ${errorData.message}`;
+        } else if (errorData.error) {
+          errorMessage = `${errorMessage} - ${errorData.error}`;
+        }
+      } catch (jsonError) {
+        // Als we de response niet kunnen parsen als JSON, gebruik de status code
+        console.warn('Could not parse error response as JSON:', jsonError);
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    console.log('API call successful:', data);
+    return data;
+  } catch (error) {
+    // Als het een fetch error is (netwerkproblemen), geef dit duidelijk aan
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      throw new Error('Network error: Could not connect to server');
+    }
+
+    // Re-throw de error zodat deze opgevangen kan worden door handleLogin
+    throw error;
+  }
+}
+
+async function handleLogin(event, rootElement) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
@@ -131,19 +172,124 @@ function handleLogin(event, rootElement) {
     alert('Wachtwoord moet minimaal 8 karakters bevatten!');
     return;
   }
-  // TODO: stuur credentials naar je backend
-  console.log('Inlogdata:', { email, password });
+  try {
+    // Call the API to authenticate the user
+    const response = await loginUser(email, password);
 
-  // Simuleer studentData na succesvolle login
-  const studentData = {
-    firstName: 'Jan',
-    lastName: 'Jansen',
-    email: email,
-    studyProgram: 'Webontwikkeling',
-    year: '2e Bachelor',
-    profilePictureUrl: '/src/Images/default.jpg',
-  };
+    // Store authentication token
+    if (response.accessToken) {
+      window.sessionStorage.setItem('authToken', response.accessToken);
+    }
 
-  // Ga naar student-profiel via router
-  Router.navigate('/Student/Student-Profiel');
+    // Debug: Log the response to see what we're getting
+    console.log('Login response structure:', response); // SECURITY: Only proceed if we have a valid response with message "Login successful"
+    if (!response.message || response.message !== 'Login successful') {
+      throw new Error('Invalid login response');
+    }
+
+    // TEMPORARY: Since backend doesn't provide userType yet, we'll use email domain logic
+    // TODO: Remove this when backend adds userType to response
+    let userType = response.userType;
+
+    if (!userType) {
+      // Determine user type based on email domain (temporary solution)
+      if (email.includes('@student.ehb.be') || email.includes('@ehb.be')) {
+        userType = 'student';
+      } else {
+        userType = 'company';
+      }
+      console.warn(
+        'userType not provided by API, using email-based detection:',
+        userType
+      );
+    }
+
+    // Handle successful login based on user type
+    if (userType === 'student') {
+      // Handle student login with API data
+      const studentData = {
+        id: response.user?.id || null,
+        firstName: response.user?.firstName || 'Student',
+        lastName: response.user?.lastName || 'User',
+        email: response.user?.email || email,
+        studyProgram: response.user?.studyProgram || 'Webontwikkeling',
+        year: response.user?.year || '2e Bachelor',
+        profilePictureUrl:
+          response.user?.profilePictureUrl || '/src/Images/default.jpg',
+      };
+
+      // Store student data
+      window.sessionStorage.setItem('studentData', JSON.stringify(studentData));
+      window.sessionStorage.setItem('userType', 'student'); // Navigate to student profile
+      Router.navigate('/Student/Student-Profiel');
+    } else if (userType === 'company') {
+      // Handle company login with API data
+      const companyData = {
+        id: response.user?.id || null,
+        companyName: response.user?.companyName || 'Bedrijf',
+        email: response.user?.email || email,
+        description: response.user?.description || '',
+        linkedIn: response.user?.linkedIn || '',
+        profilePictureUrl:
+          response.user?.profilePictureUrl || '/src/Images/default-company.jpg',
+      };
+
+      // Store company data
+      window.sessionStorage.setItem('companyData', JSON.stringify(companyData));
+      window.sessionStorage.setItem('userType', 'company'); // Navigate to company profile
+      Router.navigate('/Bedrijf/Bedrijf-Profiel');
+    } else {
+      // This should never happen with our email-based logic
+      console.error('Onbekend gebruikerstype:', userType);
+      throw new Error('Authentication failed: Unknown user type');
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+
+    // Clear any stored authentication data on error
+    window.sessionStorage.removeItem('authToken');
+    window.sessionStorage.removeItem('studentData');
+    window.sessionStorage.removeItem('companyData');
+    window.sessionStorage.removeItem('userType');
+
+    // User-friendly error messages based on HTTP status codes and error types
+    if (
+      error.message.includes('401') ||
+      error.message.includes('HTTP error! Status: 401')
+    ) {
+      alert('Ongeldig e-mailadres of wachtwoord.');
+    } else if (
+      error.message.includes('400') ||
+      error.message.includes('HTTP error! Status: 400')
+    ) {
+      alert(
+        'Ongeldige inloggegevens. Controleer je e-mailadres en wachtwoord.'
+      );
+    } else if (
+      error.message.includes('403') ||
+      error.message.includes('HTTP error! Status: 403')
+    ) {
+      alert('Je account is niet geactiveerd of geblokkeerd.');
+    } else if (
+      error.message.includes('404') ||
+      error.message.includes('HTTP error! Status: 404')
+    ) {
+      alert('De dienst is momenteel niet beschikbaar.');
+    } else if (
+      error.message.includes('500') ||
+      error.message.includes('HTTP error! Status: 500')
+    ) {
+      alert('Er is een serverfout opgetreden. Probeer het later opnieuw.');
+    } else if (error.message.includes('Authentication failed')) {
+      alert('Authenticatie mislukt. Controleer je inloggegevens.');
+    } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      alert(
+        'Kan geen verbinding maken met de server. Controleer je internetverbinding.'
+      );
+    } else {
+      // Voor alle andere fouten, geef een specifiekere boodschap
+      alert('Inloggen mislukt. Controleer je e-mailadres en wachtwoord.');
+    }
+  }
 }
+// renderBedrijfProfiel(rootElement, bedrijfData);

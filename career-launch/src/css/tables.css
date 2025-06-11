@@ -1,0 +1,96 @@
+/* --- Speeddates & Speeddates-verzoeken Table Styles --- */
+.speeddates-table-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 3rem 2.5rem 2.5rem 2.5rem;
+  margin: 2.5rem auto 0 auto;
+  max-width: 800px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.speeddates-table-container h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #0077b5;
+  text-align: center;
+}
+
+.speeddates-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.speeddates-table th {
+  background: #0077b5;
+  color: #fff;
+  padding: 16px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.speeddates-table td {
+  padding: 16px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 0.95rem;
+  color: #333;
+  vertical-align: middle;
+}
+
+.speeddates-table tr:last-child td {
+  border-bottom: none;
+}
+
+.speeddates-table tr:hover {
+  background: #f8f9fa;
+}
+
+.speeddates-table .status-pending {
+  color: #ff9800;
+  font-weight: 600;
+}
+
+.speeddates-table .status-confirmed {
+  color: #4caf50;
+  font-weight: 600;
+}
+
+.speeddates-table .status-rejected {
+  color: #f44336;
+  font-weight: 600;
+}
+
+.no-data {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 2rem;
+}
+
+/* Table responsive design */
+@media (max-width: 768px) {
+  .speeddates-table {
+    font-size: 0.8rem;
+  }
+
+  .speeddates-table th,
+  .speeddates-table td {
+    padding: 8px 4px;
+  }
+
+  .speeddates-table th:nth-child(3),
+  .speeddates-table td:nth-child(3) {
+    display: none;
+  }
+}

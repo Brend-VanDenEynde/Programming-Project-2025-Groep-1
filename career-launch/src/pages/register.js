@@ -1,5 +1,12 @@
-import { renderLogin } from './login.js';
+import { renderStudentRegister } from './student-register.js';
+import { renderBedrijfRegister } from './bedrijf-register.js';
 import Router from '../router.js';
+import { renderLogin } from './login.js';import {
+  createUserRegistrationJSON,
+  sendRegistrationToAPI,
+  validateRegistrationData,
+  mockRegistrationAPI,
+} from '../utils/registration-api.js';
 
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `
@@ -12,25 +19,6 @@ export function renderRegister(rootElement) {
         </div>
         
         <form id="registerForm">
-          <div class="form-row">
-            <input 
-              type="text" 
-              id="firstName" 
-              name="firstName" 
-              required 
-              placeholder="Voornaam"
-              class="register-input"
-            >
-            <input 
-              type="text" 
-              id="lastName" 
-              name="lastName" 
-              required 
-              placeholder="Achternaam"
-              class="register-input"
-            >
-          </div>
-          
           <input 
             type="email" 
             id="email" 
@@ -98,17 +86,14 @@ export function renderRegister(rootElement) {
       </footer>
     </div>
   `;
-  // Event listeners
+
   const form = document.getElementById('registerForm');
   form.addEventListener('submit', handleRegister);
 
-  // Back button
-  const backButton = document.getElementById('back-button');
-  backButton.addEventListener('click', () => {
+  document.getElementById('back-button').addEventListener('click', () => {
     Router.navigate('/');
   });
 
-  // Login link
   const loginLink = document.getElementById('login-link');
   if (loginLink) {
     loginLink.addEventListener('click', () => {
@@ -120,22 +105,15 @@ export function renderRegister(rootElement) {
   linkedinButton.addEventListener('click', () => {
     // LinkedIn integratie nog niet geïmplementeerd
   });
-
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/privacy');
-    });
+    Router.navigate('/privacy');
   });
 
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/contact');
-    });
+    Router.navigate('/contact');
   });
 
   // Zet altijd light mode bij laden van register
@@ -171,6 +149,7 @@ export function renderRegister(rootElement) {
   }
 }
 
+// Nieuwe handleRegister functie met JSON-structurering en API-call
 function handleRegister(event) {
   event.preventDefault();
 
@@ -200,6 +179,11 @@ function handleRegister(event) {
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
 
-  // Redirect naar login (of andere actie)
-  renderLogin(document.getElementById('app'));
+  if (data.rol === 'student') {
+      renderStudentRegister(document.getElementById('app'));
+  } else if (data.rol === 'bedrijf') {
+      renderBedrijfRegister(document.getElementById('app'));
+  } else {
+      renderLogin(document.getElementById('app'));
+  }
 }

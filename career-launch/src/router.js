@@ -1,3 +1,7 @@
+import { renderAdmin } from './pages/admin/admin-login.js';
+import { renderAdminDashboard } from './pages/admin/admin-dashboard.js';
+import { renderAdminSelectDashboard } from './pages/admin/admin-select-dashboard.js';
+
 class Router {
   constructor(routes) {
     this.routes = routes;
@@ -66,6 +70,12 @@ class Router {
       '/contact': 'Contacteer ons - Career Launch 2025',
       '/privacy': 'Privacy Beleid - Career Launch 2025',
       '/404': 'Pagina niet gevonden - Career Launch 2025',
+      '/Bedrijf/Bedrijf-Profiel': 'Bedrijf Profiel - Career Launch 2025',
+      '/Bedrijf/Zoek-Criteria': 'Zoek Criteria Bedrijf - Career Launch 2025',
+      '/Student-Register': 'Student Registreren - Career Launch 2025',
+      '/Student-Opleiding': 'Student Opleiding - Career Launch 2025',
+      '/Student-Skills': 'Student Skills - Career Launch 2025',
+      '/Bedrijf-Register': 'Bedrijf Registreren - Career Launch 2025',
     };
     document.title = titles[path] || 'Career Launch 2025';
   }

@@ -1,0 +1,140 @@
+/* Dark mode adjustments */
+body.darkmode {
+  background: #111 !important;
+  color: #f5f5f5 !important;
+}
+
+body.darkmode .student-profile-container,
+body.darkmode .student-profile-form-container,
+body.darkmode .criteria-form,
+body.darkmode .speeddates-table-container,
+body.darkmode .settings-popup-card,
+body.darkmode .register-card,
+body.darkmode .login-card,
+body.darkmode .admin-card,
+body.darkmode .content-card {
+  background: #181c1f !important;
+  color: #f5f5f5 !important;
+  box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.22);
+}
+
+body.darkmode .student-profile-header,
+body.darkmode .student-profile-sidebar {
+  background: #181c1f !important;
+  color: #f5f5f5 !important;
+  border-color: #181c1f !important;
+}
+
+body.darkmode .student-profile-footer {
+  background: none !important;
+  color: #b0b6c6 !important;
+  border-top: 1px solid #232323 !important;
+}
+
+body.darkmode .student-profile-footer a {
+  color: #b0b6c6 !important;
+}
+
+body.darkmode .student-profile-footer a:hover {
+  color: #1de9b6 !important;
+}
+
+body.darkmode .settings-popup-close {
+  color: #1de9b6 !important;
+}
+
+body.darkmode .settings-title {
+  color: #1de9b6 !important;
+}
+
+body.darkmode .settings-action-btn {
+  background: #1de9b6 !important;
+  color: #000 !important;
+}
+
+body.darkmode .settings-action-btn.danger {
+  background: #ff6b6b !important;
+  color: #fff !important;
+}
+
+body.darkmode .footer-links {
+  background: #181c1f !important;
+  border-top: 1px solid #333 !important;
+  color: #b0b6c6 !important;
+}
+
+body.darkmode .footer-links a {
+  color: #b0b6c6 !important;
+  text-decoration: none !important;
+}
+
+body.darkmode .footer-links a:hover {
+  color: #00e6ef !important;
+  text-decoration: underline !important;
+}
+
+body.darkmode .qr-code-img {
+  background: #232323 !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22) !important;
+}
+
+body.darkmode .qr-code-label,
+body.darkmode .qr-code-description {
+  color: #e0f7fa !important;
+}
+
+/* Dark mode form inputs */
+body.darkmode .student-profile-form-group input,
+body.darkmode .student-profile-form-group select,
+body.darkmode .student-profile-form-group textarea,
+body.darkmode .register-input,
+body.darkmode .login-input,
+body.darkmode .form-section select,
+body.darkmode .other-input {
+  background: #232323 !important;
+  color: #f5f5f5 !important;
+  border-color: #444 !important;
+}
+
+body.darkmode .student-profile-form-group input:focus,
+body.darkmode .student-profile-form-group select:focus,
+body.darkmode .student-profile-form-group textarea:focus,
+body.darkmode .register-input:focus,
+body.darkmode .login-input:focus,
+body.darkmode .form-section select:focus,
+body.darkmode .other-input:focus {
+  background: #2a2a2a !important;
+  border-color: #1de9b6 !important;
+}
+
+/* Dark mode buttons */
+body.darkmode .student-profile-btn-secondary {
+  background: #232323 !important;
+  color: #f5f5f5 !important;
+  border-color: #444 !important;
+}
+
+body.darkmode .student-profile-btn-secondary:hover {
+  background: #2a2a2a !important;
+  border-color: #555 !important;
+}
+
+/* Dark mode table */
+body.darkmode .speeddates-table {
+  background: #232323 !important;
+}
+
+body.darkmode .speeddates-table th {
+  background: #1de9b6 !important;
+  color: #000 !important;
+}
+
+body.darkmode .speeddates-table td {
+  background: #232323 !important;
+  color: #f5f5f5 !important;
+  border-color: #444 !important;
+}
+
+body.darkmode .speeddates-table tr:hover {
+  background: #2a2a2a !important;
+}

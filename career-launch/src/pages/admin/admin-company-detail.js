@@ -1,0 +1,376 @@
+// Admin company detail pagina
+import Router from '../../router.js';
+import defaultCompanyLogo from '../../Images/BedrijfDefault.jpg';
+
+export function renderAdminCompanyDetail(rootElement) {
+  // Check if user is logged in
+  const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
+  const adminUsername = sessionStorage.getItem('adminUsername');
+  if (!isLoggedIn || isLoggedIn !== 'true') {
+    // Redirect to admin login if not logged in
+    Router.navigate('/admin-login');
+    return;
+  }
+
+  // Get company ID from URL or use default for demo
+  const urlParams = new URLSearchParams(window.location.search);
+  const companyId = urlParams.get('id') || 'demo';
+
+  // Mock company data - in real app this would come from API
+  const companyData = getCompanyData(companyId);
+
+  rootElement.innerHTML = `
+    <div class="admin-dashboard-clean" style="background-color: white;">
+      <header class="admin-header-clean">
+        <div class="admin-logo-section">
+          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+          <span>EhB Career Launch</span>
+        </div>
+        <div class="admin-header-right">
+          <span class="admin-username">Welkom, ${adminUsername}</span>
+          <button id="logout-btn" class="logout-btn-clean">Uitloggen</button>
+          <button id="menu-toggle" class="menu-toggle-btn">☰</button>
+        </div>
+      </header>
+      
+      <div class="admin-main-layout">
+        <aside class="admin-sidebar-clean">
+          <nav class="admin-nav">
+            <ul>
+              <li><button class="nav-btn" data-route="/admin-dashboard/ingeschreven-studenten">Ingeschreven studenten</button></li>
+              <li><button class="nav-btn" data-route="/admin-dashboard/ingeschreven-bedrijven">Ingeschreven Bedrijven</button></li>
+              <li><button class="nav-btn" data-route="/admin-dashboard/bedrijven-in-behandeling">Bedrijven in behandeling</button></li>
+            </ul>
+          </nav>
+        </aside>
+        
+        <main class="admin-content-clean" style="background-color: white;">
+          <div class="admin-section-header">
+            <button id="back-btn" class="back-btn">← Terug naar bedrijven</button>
+            <h1 id="section-title">Bedrijf Details: ${companyData.name}</h1>
+          </div>
+            <div class="admin-content-area" id="content-area" style="background-color: white;">
+            <div class="detail-container">
+              <div class="detail-main-layout">
+                <!-- Left side - Company Information -->
+                <div class="detail-left">
+                  <!-- Company Logo Section -->
+                  <div class="detail-logo-section">
+                    <img 
+                      src="${companyData.logoUrl || defaultCompanyLogo}" 
+                      alt="Logo ${companyData.name}" 
+                      class="detail-logo"
+                    />
+                  </div>
+                  
+                  <!-- Company Information -->
+                  <div class="detail-info">
+                    <div class="detail-field">
+                      <label>Naam:</label>
+                      <span>${companyData.name}</span>
+                    </div>
+                    
+                    <div class="detail-field">
+                      <label>Contact-Email:</label>
+                      <span>${companyData.email}</span>
+                    </div>
+                    
+                    <div class="detail-field">
+                      <label>Locatie:</label>
+                      <span>${companyData.location}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Right side - Action Buttons -->
+                <div class="detail-right">
+                  <div class="detail-actions">
+                    <button id="view-speeddates-btn" class="detail-action-btn speeddates">
+                      Speeddates
+                    </button>
+                    <button id="contact-company-btn" class="detail-action-btn contact">
+                      Contacteren
+                    </button>
+                    <button id="delete-company-btn" class="detail-action-btn delete">
+                      Verwijderen
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>        </main>
+      </div>
+      
+      <!-- Speeddates Modal -->
+      <div id="speeddates-modal" class="speeddates-modal" style="display: none;">
+        <div class="speeddates-modal-content">
+          <div class="speeddates-modal-header">
+            <h2>Speeddates</h2>
+            <button id="close-modal" class="close-modal-btn">&times;</button>
+          </div>
+          <div class="speeddates-modal-body">
+            <div id="speeddates-list" class="speeddates-list">
+              <!-- Speeddates will be populated here -->
+            </div>
+          </div>
+        </div>
+      </div>
+        
+      <!-- FOOTER -->
+      <footer class="student-profile-footer">
+        <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
+      </footer>
+    </div>
+  `;
+
+  // Event handlers
+  setupEventHandlers();
+
+  document.title = `Bedrijf Details: ${companyData.name} - Admin Dashboard`;
+}
+
+function getCompanyData(companyId) {
+  // Mock data - in real app this would fetch from API
+  const companyDatabase = {
+    carrefour: {
+      name: 'Carrefour',
+      email: 'contact@carrefour.be',
+      location: 'Brussel',
+      logoUrl: null,
+      registrationDate: '2024-08-20',
+      status: 'Actief',
+      lastLogin: '2024-12-08',
+    },
+    delhaize: {
+      name: 'Delhaize',
+      email: 'hr@delhaize.be',
+      location: 'Antwerpen',
+      logoUrl: null,
+      registrationDate: '2024-09-05',
+      status: 'Actief',
+      lastLogin: '2024-12-07',
+    },
+    colruyt: {
+      name: 'Colruyt',
+      email: 'jobs@colruyt.com',
+      location: 'Gent',
+      logoUrl: null,
+      registrationDate: '2024-09-12',
+      status: 'Actief',
+      lastLogin: '2024-12-06',
+    },
+    proximus: {
+      name: 'Proximus',
+      email: 'careers@proximus.be',
+      location: 'Brussel',
+      logoUrl: null,
+      registrationDate: '2024-10-01',
+      status: 'Actief',
+      lastLogin: '2024-12-09',
+    },
+    kbc: {
+      name: 'KBC Bank',
+      email: 'talent@kbc.be',
+      location: 'Leuven',
+      logoUrl: null,
+      registrationDate: '2024-10-15',
+      status: 'Actief',
+      lastLogin: '2024-12-08',
+    },
+    demo: {
+      name: 'Demo Bedrijf',
+      email: 'demo@bedrijf.be',
+      location: 'Demo Stad',
+      logoUrl: null,
+      registrationDate: '2024-01-01',
+      status: 'Actief',
+      lastLogin: '2024-12-09',
+    },
+  };
+
+  return companyDatabase[companyId] || companyDatabase['demo'];
+}
+
+function setupEventHandlers() {
+  // Back button
+  const backBtn = document.getElementById('back-btn');
+  backBtn.addEventListener('click', () => {
+    Router.navigate('/admin-dashboard/ingeschreven-bedrijven');
+  });
+
+  // Logout button
+  const logoutBtn = document.getElementById('logout-btn');
+  logoutBtn.addEventListener('click', () => {
+    sessionStorage.removeItem('adminLoggedIn');
+    sessionStorage.removeItem('adminUsername');
+    Router.navigate('/admin-login');
+  });
+
+  // Navigation buttons
+  const navButtons = document.querySelectorAll('.nav-btn');
+  navButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const route = btn.dataset.route;
+      Router.navigate(route);
+    });
+  });
+
+  // Mobile menu toggle
+  const menuToggle = document.getElementById('menu-toggle');
+  const sidebar = document.querySelector('.admin-sidebar-clean');
+  menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+  });
+
+  // Admin action buttons
+  const contactBtn = document.getElementById('contact-company-btn');
+  contactBtn.addEventListener('click', () => {
+    // Get current company ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const companyId = urlParams.get('id') || 'demo';
+
+    // Get company data to access email
+    const companyData = getCompanyData(companyId);
+
+    // Create mailto link and open it
+    const mailtoLink = `mailto:${companyData.email}`;
+    window.location.href = mailtoLink;
+  });
+
+  const speedDatesBtn = document.getElementById('view-speeddates-btn');
+  speedDatesBtn.addEventListener('click', () => {
+    openSpeedDatesModal();
+  });
+
+  const deleteBtn = document.getElementById('delete-company-btn');
+  deleteBtn.addEventListener('click', () => {
+    if (confirm('Weet je zeker dat je dit bedrijf wilt verwijderen?')) {
+      alert('Bedrijf verwijdering zou hier geïmplementeerd worden.');
+    }
+  });
+
+  // Footer links
+  document.getElementById('privacy-policy').addEventListener('click', (e) => {
+    e.preventDefault();
+    Router.navigate('/privacy');
+  });
+
+  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
+    e.preventDefault();
+    Router.navigate('/contact');
+  });
+}
+
+// Modal functionality for speeddates
+function openSpeedDatesModal() {
+  const modal = document.getElementById('speeddates-modal');
+  const speedDatesList = document.getElementById('speeddates-list');
+
+  // Get current company ID from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const companyId = urlParams.get('id') || 'demo';
+
+  // Get speeddates data for this company
+  const speeddates = getCompanySpeedDates(companyId);
+
+  // Clear existing content
+  speedDatesList.innerHTML = '';
+
+  if (speeddates.length === 0) {
+    speedDatesList.innerHTML =
+      '<div class="no-speeddates">Geen speeddates gevonden</div>';
+  } else {
+    speeddates.forEach((speeddate) => {
+      const speedDateItem = document.createElement('div');
+      speedDateItem.className = 'speeddate-item';
+      speedDateItem.innerHTML = `
+        <div class="speeddate-info">
+          <span class="speeddate-time">${speeddate.time}</span>
+          <span class="speeddate-student">${speeddate.student}</span>
+        </div>
+        <button class="speeddate-cancel-btn" data-speeddate-id="${speeddate.id}" title="Annuleren">✕</button>
+      `;
+      speedDatesList.appendChild(speedDateItem);
+    });
+
+    // Add event listeners for cancel buttons
+    const cancelButtons = speedDatesList.querySelectorAll(
+      '.speeddate-cancel-btn'
+    );
+    cancelButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const speedDateId = btn.dataset.speeddateId;
+        if (confirm('Weet je zeker dat je deze speeddate wilt annuleren?')) {
+          btn.closest('.speeddate-item').remove();
+          // Later, make an API call to cancel the speeddate
+          console.log(`Speeddate ${speedDateId} geannuleerd`);
+
+          // Check if list is now empty
+          if (speedDatesList.children.length === 0) {
+            speedDatesList.innerHTML =
+              '<div class="no-speeddates">Geen speeddates gevonden</div>';
+          }
+        }
+      });
+    });
+  }
+
+  modal.style.display = 'flex';
+
+  // Add event listeners for closing modal
+  const closeBtn = document.getElementById('close-modal');
+  const modalOverlay = modal;
+
+  closeBtn.addEventListener('click', closeSpeedDatesModal);
+  modalOverlay.addEventListener('click', (e) => {
+    if (e.target === modalOverlay) {
+      closeSpeedDatesModal();
+    }
+  });
+
+  // ESC key to close modal
+  document.addEventListener('keydown', function escKeyHandler(e) {
+    if (e.key === 'Escape') {
+      closeSpeedDatesModal();
+      document.removeEventListener('keydown', escKeyHandler);
+    }
+  });
+}
+
+function closeSpeedDatesModal() {
+  const modal = document.getElementById('speeddates-modal');
+  modal.style.display = 'none';
+}
+
+function getCompanySpeedDates(companyId) {
+  // Mock speeddate data for companies - later this would come from an API
+  const speedDatesDatabase = {
+    carrefour: [
+      { id: 1, time: '12u40', student: 'Tiberius Kirk' },
+      { id: 2, time: '12u40', student: 'Jean-Luc Picard' },
+      { id: 3, time: '13u00', student: 'John Smith' },
+    ],
+    delhaize: [
+      { id: 4, time: '12u45', student: 'Daniel Vonkman' },
+      { id: 5, time: '13u10', student: 'Ed Marvin' },
+    ],
+    colruyt: [
+      { id: 6, time: '12u50', student: 'Kimberley Hester' },
+      { id: 7, time: '13u05', student: 'Len Jaxtyn' },
+    ],
+    proximus: [
+      { id: 8, time: '12u55', student: 'Tiberius Kirk' },
+      { id: 9, time: '13u15', student: 'Jean-Luc Picard' },
+      { id: 10, time: '13u25', student: 'John Smith' },
+    ],
+    kbc: [
+      { id: 11, time: '12u45', student: 'Daniel Vonkman' },
+      { id: 12, time: '13u05', student: 'Ed Marvin' },
+      { id: 13, time: '13u20', student: 'Len Jaxtyn' },
+    ],
+  };
+
+  return speedDatesDatabase[companyId] || [];
+}

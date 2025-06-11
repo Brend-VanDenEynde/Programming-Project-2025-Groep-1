@@ -1,0 +1,216 @@
+/* Algemene reset en basisopmaak */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f7f9fb;
+  color: #333;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #004080;
+  color: white;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo-placeholder {
+  width: 40px;
+  height: 40px;
+  background-color: white;
+  color: #004080;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+/* Main container */
+.form-container {
+  max-width: 500px;
+  margin: 2rem auto;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Terug knop */
+.back-button {
+  background: none;
+  border: none;
+  color: #004080;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+/* Upload sectie */
+.upload-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.upload-icon {
+  font-size: 2.5rem;
+  background-color: #e0e7ff;
+  color: #004080;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin: 0 auto 0.5rem;
+}
+
+.upload-section label {
+  display: block;
+  font-weight: bold;
+}
+
+/* Form fields */
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.name-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.input-half {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.input-full {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* Volgende knop */
+.next-button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: #004080;
+  color: white;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.next-button:hover {
+  background-color: #003060;
+}
+
+/* Footer */
+.form-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+  padding: 1rem 0;
+  border-top: 1px solid #ccc;
+}
+
+.footer a {
+  color: #004080;
+  text-decoration: none;
+  margin: 0 0.5rem;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+.select {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: white;
+}
+
+.select option {
+  padding: 0.75rem;
+  background-color: white;
+  color: #333;
+}
+
+.select:focus {
+  border-color: #004080;
+  outline: none;
+}
+
+.select a {
+  color: #004080;
+  text-decoration: none;
+}
+
+/* Save knop */
+.save-button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: #004080;
+  color: white;
+  border-radius: 2px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-button:hover {
+  background-color: #003060;
+}
+
+/* Skip knop */
+.skip-button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: grey;
+  color: white;
+  border-radius: 2px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.skip-button:hover {
+  background-color: #555;
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 2rem;
+}

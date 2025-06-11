@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JSON Registratie Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      .test-section {
+        background: #f5f5f5;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+      pre {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        padding: 15px;
+        border-radius: 5px;
+        overflow-x: auto;
+      }
+      button {
+        background: #007acc;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #005a9e;
+      }
+      .form-container {
+        background: white;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      .form-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+      input,
+      select {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        flex: 1;
+      }
+      .output {
+        background: #e8f5e8;
+        border: 1px solid #4caf50;
+        padding: 15px;
+        border-radius: 5px;
+        margin-top: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🧪 JSON Registratie Test</h1>
+    <p>Deze pagina test de JSON-generatie voor gebruikersregistratie.</p>
+
+    <div class="test-section">
+      <h2>📝 Test Formulier</h2>
+      <div class="form-container">
+        <form id="testForm">
+          <div class="form-row">
+            <input
+              type="text"
+              id="firstName"
+              placeholder="Voornaam"
+              value="Jan"
+              required
+            />
+            <input
+              type="text"
+              id="lastName"
+              placeholder="Achternaam"
+              value="Janssen"
+              required
+            />
+          </div>
+          <div class="form-row">
+            <input
+              type="email"
+              id="email"
+              placeholder="Email"
+              value="jan.janssen@student.hu.nl"
+              required
+            />
+          </div>
+          <div class="form-row">
+            <input
+              type="password"
+              id="password"
+              placeholder="Wachtwoord"
+              value="SecurePass123!"
+              required
+            />
+          </div>
+          <div class="form-row">
+            <select id="rol" required>
+              <option value="">Selecteer rol</option>
+              <option value="student" selected>Student</option>
+              <option value="bedrijf">Bedrijf</option>
+            </select>
+          </div>
+          <button type="submit">Genereer JSON</button>
+        </form>
+        <div id="output" class="output" style="display: none">
+          <h3>📄 Gegenereerde JSON:</h3>
+          <pre id="jsonOutput"></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>🎯 Voorgedefinieerde Tests</h2>
+      <button onclick="testStudent()">Test Student JSON</button>
+      <button onclick="testBedrijf()">Test Bedrijf JSON</button>
+      <button onclick="testValidatie()">Test Validatie</button>
+      <button onclick="showSQLExample()">Toon SQL Voorbeeld</button>
+    </div>
+
+    <div id="testResults" class="test-section" style="display: none">
+      <h3>📊 Test Resultaten</h3>
+      <pre id="testOutput"></pre>
+    </div>
+
+    <script type="module">
+      // Simuleer de createUserRegistrationJSON functie
+      function createUserRegistrationJSON(formData) {
+        return {
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          email: formData.email.toLowerCase().trim(),
+          password: formData.password,
+          role: formData.rol,
+        };
+      }
+
+      // Form handler
+      document
+        .getElementById('testForm')
+        .addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          const formData = {
+            firstName: document.getElementById('firstName').value,
+            lastName: document.getElementById('lastName').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+            rol: document.getElementById('rol').value,
+          };
+
+          const jsonResult = createUserRegistrationJSON(formData);
+
+          document.getElementById('jsonOutput').textContent = JSON.stringify(
+            jsonResult,
+            null,
+            2
+          );
+          document.getElementById('output').style.display = 'block';
+        });
+
+      // Test functies
+      window.testStudent = function () {
+        const studentData = {
+          firstName: 'Emma',
+          lastName: 'de Vries',
+          email: 'Emma.deVries@student.hu.nl',
+          password: 'StudentPass123!',
+          rol: 'student',
+        };
+
+        const result = createUserRegistrationJSON(studentData);
+        showTestResult('Student JSON Test', result);
+      };
+
+      window.testBedrijf = function () {
+        const bedrijfData = {
+          firstName: 'Mark',
+          lastName: 'van Bergen',
+          email: 'mark@innovatiebedrijf.nl',
+          password: 'CompanyPass456!',
+          rol: 'bedrijf',
+        };
+
+        const result = createUserRegistrationJSON(bedrijfData);
+        showTestResult('Bedrijf JSON Test', result);
+      };
+
+      window.testValidatie = function () {
+        // Test met verschillende validatie scenarios
+        const tests = [
+          {
+            name: 'Geldige data',
+            data: {
+              firstName: 'Test',
+              lastName: 'User',
+              email: 'test@example.com',
+              password: 'Pass123!',
+              rol: 'student',
+            },
+          },
+          {
+            name: 'Email trimming',
+            data: {
+              firstName: '  Spatie  ',
+              lastName: '  User  ',
+              email: '  TEST@EXAMPLE.COM  ',
+              password: 'Pass123!',
+              rol: 'bedrijf',
+            },
+          },
+        ];
+
+        let output = '';
+        tests.forEach((test) => {
+          const result = createUserRegistrationJSON(test.data);
+          output += `\\n=== ${test.name} ===\\n`;
+          output += `Input: ${JSON.stringify(test.data, null, 2)}\\n`;
+          output += `Output: ${JSON.stringify(result, null, 2)}\\n`;
+        });
+
+        document.getElementById('testOutput').textContent = output;
+        document.getElementById('testResults').style.display = 'block';
+      };
+
+      window.showSQLExample = function () {
+        const exampleData = createUserRegistrationJSON({
+          firstName: 'Database',
+          lastName: 'Voorbeeld',
+          email: 'db@voorbeeld.nl',
+          password: 'SecureHash123',
+          rol: 'student',
+        });
+
+        const sqlExample = `
+=== SQL DATABASE VOORBEELD ===
+
+1. CREATE TABLE statement:
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    firstName VARCHAR(100) NOT NULL,
+    lastName VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('student', 'bedrijf') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+2. INSERT statement (met gehashte wachtwoord):
+INSERT INTO users (firstName, lastName, email, password, role) 
+VALUES (
+    '${exampleData.firstName}', 
+    '${exampleData.lastName}', 
+    '${exampleData.email}', 
+    '$2b$10$hashedPasswordExample', 
+    '${exampleData.role}'
+);
+
+3. JSON data voor API:
+${JSON.stringify(exampleData, null, 2)}
+
+4. Backend Node.js voorbeeld:
+app.post('/api/register', async (req, res) => {
+    const { firstName, lastName, email, password, role } = req.body;
+    
+    // Hash het wachtwoord
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // Opslaan in database
+    const user = await db.query(
+        'INSERT INTO users (firstName, lastName, email, password, role) VALUES (?, ?, ?, ?, ?)',
+        [firstName, lastName, email, hashedPassword, role]
+    );
+    
+    res.json({ success: true, userId: user.insertId });
+});
+            `;
+
+        document.getElementById('testOutput').textContent = sqlExample;
+        document.getElementById('testResults').style.display = 'block';
+      };
+
+      function showTestResult(testName, result) {
+        const output = `=== ${testName} ===\\n${JSON.stringify(
+          result,
+          null,
+          2
+        )}`;
+        document.getElementById('testOutput').textContent = output;
+        document.getElementById('testResults').style.display = 'block';
+      }
+
+      // Auto-load student example
+      setTimeout(() => {
+        document.getElementById('firstName').value = 'Jan';
+        document.getElementById('lastName').value = 'Janssen';
+        document.getElementById('email').value = 'jan.janssen@student.hu.nl';
+        document.getElementById('password').value = 'SecurePass123!';
+        document.getElementById('rol').value = 'student';
+      }, 100);
+    </script>
+  </body>
+</html>

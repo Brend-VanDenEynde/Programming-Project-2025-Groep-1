@@ -1,91 +1,46 @@
-// src/views/student-speeddates-verzoeken.js
+// src/views/student-speeddates.js
+// import logoIcon from '../Icons/favicon-32x32.png';
+import { renderLogin } from '../login.js';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
-import { renderSpeeddates } from './student-speeddates.js';
+import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { renderQRPopup } from './student-qr-popup.js';
 import { showSettingsPopup } from './student-settings.js';
 
-export function renderSpeeddatesRequests(rootElement, studentData = {}) {
-  let verzoeken = [
+export function renderSpeeddates(rootElement, studentData = {}) {
+  const speeddates = [
     {
       bedrijf: 'Web & Co',
-      lokaal: 'B102',
-      tijd: '13:30',
-      status: 'Geaccepteerd',
+      tijd: '10:00',
+      locatie: 'Stand A101',
+      status: 'Bevestigd',
     },
     {
       bedrijf: 'DesignXperts',
-      lokaal: 'A201',
-      tijd: '11:00',
-      status: 'In afwachting',
+      tijd: '14:30',
+      locatie: 'Stand B202',
+      status: 'Bevestigd',
     },
     {
       bedrijf: 'SoftDev BV',
-      lokaal: 'C004',
-      tijd: '15:00',
+      tijd: '09:00',
+      locatie: 'Stand C303',
       status: 'In afwachting',
     },
   ];
 
-  function renderTable() {
-    const tableHtml =
-      verzoeken.length === 0
-        ? `<p style="text-align:center;">Nog geen speeddates-verzoeken gevonden.</p>`
-        : `
-        <div class="speeddates-table-container">
-          <table class="speeddates-table">
-            <thead>
-              <tr>
-                <th>Bedrijf</th>
-                <th>Lokaal</th>
-                <th>Tijd</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${verzoeken
-                .map(
-                  (v, idx) => `
-                <tr>
-                  <td>${v.bedrijf}</td>
-                  <td>${v.lokaal}</td>
-                  <td>${v.tijd}</td>
-                  <td class="status-cell">
-                    ${
-                      v.status === 'Geaccepteerd'
-                        ? `<span class="status-badge badge-accepted">Geaccepteerd</span>`
-                        : v.status === 'Geweigerd'
-                        ? `<span class="status-badge badge-denied">Geweigerd</span>`
-                        : `
-                            <button class="accept-btn" data-idx="${idx}">Accepteer</button>
-                            <button class="deny-btn" data-idx="${idx}">Weiger</button>
-                          `
-                    }
-                  </td>
-                </tr>
-              `
-                )
-                .join('')}
-            </tbody>
-          </table>
-        </div>
-      `;
-    document.getElementById('speeddates-requests-table').innerHTML = tableHtml;
-
-    document.querySelectorAll('.accept-btn').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        const idx = parseInt(e.currentTarget.getAttribute('data-idx'));
-        verzoeken[idx].status = 'Geaccepteerd';
-        renderTable();
-      });
-    });
-    document.querySelectorAll('.deny-btn').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        const idx = parseInt(e.currentTarget.getAttribute('data-idx'));
-        verzoeken[idx].status = 'Geweigerd';
-        renderTable();
-      });
-    });
+  function getStatusBadge(status) {
+    if (status === 'Bevestigd') {
+      return `<span class="status-badge badge-accepted">Bevestigd</span>`;
+    } else if (status === 'In afwachting') {
+      return `<span class="status-badge badge-waiting">In afwachting</span>`;
+    } else if (status === 'Geweigerd') {
+      return `<span class="status-badge badge-denied">Geweigerd</span>`;
+    } else if (status === 'Geaccepteerd') {
+      return `<span class="status-badge badge-accepted">Geaccepteerd</span>`;
+    } else {
+      return `<span class="status-badge badge-other">${status}</span>`;
+    }
   }
 
   rootElement.innerHTML = `
@@ -107,15 +62,49 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
           <ul>
             <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
-            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
-            <li><button data-route="requests" class="sidebar-link active">Speeddates-verzoeken</button></li>
+            <li><button data-route="speeddates" class="sidebar-link active">Speeddates</button></li>
+            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
             <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
           </ul>
         </nav>
+
         <div class="student-profile-content">
           <div class="student-profile-form-container">
-            <h1 class="student-profile-title" style="text-align:center;width:100%;">Speeddates-verzoeken</h1>
-            <div id="speeddates-requests-table"></div>
+            <h1 class="student-profile-title" style="text-align:center;width:100%;">Mijn Speeddates</h1>
+            <div>
+              ${
+                speeddates.length === 0
+                  ? `<p style="text-align:center;">Je hebt nog geen speeddates ingepland.</p>`
+                  : `
+                    <div class="speeddates-table-container">
+                      <table class="speeddates-table">
+                        <thead>
+                          <tr>
+                            <th>Bedrijf</th>
+                            <th>Tijd</th>
+                            <th>Locatie</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          ${speeddates
+                            .map(
+                              (s) => `
+                            <tr>
+                              <td>${s.bedrijf}</td>
+                              <td>${s.tijd}</td>
+                              <td>${s.locatie}</td>
+                              <td>${getStatusBadge(s.status)}</td>
+                            </tr>
+                          `
+                            )
+                            .join('')}
+                        </tbody>
+                      </table>
+                    </div>
+                  `
+              }
+            </div>
           </div>
         </div>
       </div>
@@ -126,8 +115,6 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
       </footer>
     </div>
   `;
-
-  renderTable();
 
 document.querySelectorAll('.sidebar-link').forEach((btn) => {
   btn.addEventListener('click', (e) => {
@@ -152,18 +139,9 @@ document.querySelectorAll('.sidebar-link').forEach((btn) => {
   });
 });
 
-  const burger = document.getElementById('burger-menu');
-  const dropdown = document.getElementById('burger-dropdown');
 const burger = document.getElementById('burger-menu');
 const dropdown = document.getElementById('burger-dropdown');
 
-  if (burger && dropdown) {
-    // Toggle hamburger-menu bij klik
-    burger.addEventListener('click', (event) => {
-      event.stopPropagation();
-      dropdown.style.display =
-        dropdown.style.display === 'block' ? 'none' : 'block';
-    });
 if (burger && dropdown) {
   // Toggle menu bij klik op burger
   burger.addEventListener('click', (event) => {
@@ -185,14 +163,24 @@ if (burger && dropdown) {
   // Navigeer via de router!
   document.getElementById('nav-settings').addEventListener('click', () => {
     dropdown.classList.remove('open');
-    showSettingsPopup(() => renderSpeeddatesRequests(rootElement));
+    showSettingsPopup(() => renderSpeeddates(rootElement));
   });
   document.getElementById('nav-logout').addEventListener('click', () => {
     dropdown.classList.remove('open');
+    localStorage.setItem('darkmode', 'false');
+    document.body.classList.remove('darkmode');
     window.appRouter.navigate('/login');
   });
 }
 
+
+  document.getElementById('nav-settings').addEventListener('click', () => {
+    // Navigeren naar Instellingen (nog te implementeren)
+  });
+  
+  document.getElementById('nav-logout').addEventListener('click', () => {
+    renderLogin(rootElement);
+  });
 
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
@@ -208,4 +196,6 @@ if (burger && dropdown) {
       Router.navigate('/contact');
     });
   });
+
+  
 }

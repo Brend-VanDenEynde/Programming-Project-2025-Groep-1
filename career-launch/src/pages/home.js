@@ -1,4 +1,5 @@
 import Router from '../router.js';
+import ehbLogo from '../Images/EhB-logo-transparant.png';
 
 export function renderHome(rootElement) {
   // Zet altijd light mode bij laden van home
@@ -8,7 +9,7 @@ export function renderHome(rootElement) {
   rootElement.innerHTML = `
     <div class="home-container">
       <img 
-        src="/src/Images/EhB-logo-transparant.png" 
+        src="${ehbLogo}"
         alt="Erasmus Hogeschool Brussels Logo" 
       />
 
@@ -32,22 +33,14 @@ export function renderHome(rootElement) {
   btnLog.addEventListener('click', () => {
     Router.navigate('/login');
   });
-
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/privacy');
-    });
+    Router.navigate('/privacy');
   });
 
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      // Use absolute path to ensure correct navigation regardless of current path
-      Router.navigate('/contact');
-    });
+    Router.navigate('/contact');
   });
 }
