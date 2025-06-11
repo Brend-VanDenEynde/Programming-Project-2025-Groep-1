@@ -14,12 +14,19 @@ export function renderBedrijfRegister(rootElement) {
         <label>Logo</label>
       </div>
 
-      <form class="naamForm" id="naamForm">
-        <div class="name-row">
-          <input type="bedrijfnaam" id="bedrijfnaam" name="bedrijfnaam" required placeholder="Bedrijfsnaam" class="input-half" />
+      <form class="bedrijfForm" id="bedrijfForm">
+        <div class="form-spacing">
+          <input type="text" id="bedrijfnaam" name="bedrijfnaam" required placeholder="Bedrijfsnaam" class="input-full" />
         </div>
-        <input type="linkedin" id="linkedin" name"linkedin" placeholder="LinkedIn-link" class="input-full" />
-
+        <div class="form-spacing">
+          <input type="text" id="contactpersoon" name="contactpersoon" required placeholder="Naam contactpersoon" class="input-full" />
+        </div>
+        <div class="form-spacing">
+          <input type="tel" id="telefoon" name="telefoon" required placeholder="Telefoonnummer contactpersoon" class="input-full" />
+        </div>
+        <div class="form-spacing">
+          <input type="text" id="linkedin" name="linkedin" placeholder="LinkedIn-link" class="input-full" />
+        </div>
         <button type="submit" class="next-button">Volgende →</button>
       </form>
 
@@ -58,8 +65,9 @@ function handleNaamRegister(event) {
 
   const formData = new FormData(event.target);
   const data = {
-    voornaam: formData.get('voornaam'),
-    achternaam: formData.get('achternaam'),
+    bedrijfnaam: formData.get('bedrijfnaam'),
+    contactpersoon: formData.get('contactpersoon'),
+    telefoon: formData.get('telefoon'),
     linkedinLink: formData.get('linkedin'),
   };
 
@@ -67,7 +75,7 @@ function handleNaamRegister(event) {
 
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
-  alert(`Welkom ${data.voornaam}! Je account is aangemaakt.`);
+  alert(`Welkom ${data.bedrijfnaam}! Je account is aangemaakt.`);
 
   renderStudentOpleiding(document.getElementById('app'));
 }
