@@ -1,6 +1,10 @@
 import Router from '../router.js';
 
 export function renderHome(rootElement) {
+  // Zet altijd light mode bij laden van home
+  localStorage.setItem('darkmode', 'false');
+  document.body.classList.remove('darkmode');
+
   rootElement.innerHTML = `
     <div class="home-container">
       <img 

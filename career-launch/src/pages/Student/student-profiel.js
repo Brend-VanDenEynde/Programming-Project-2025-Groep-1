@@ -256,6 +256,8 @@ if (burger && dropdown) {
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
+      localStorage.setItem('darkmode', 'false');
+      document.body.classList.remove('darkmode');
       renderLogin(rootElement);
     });
   }

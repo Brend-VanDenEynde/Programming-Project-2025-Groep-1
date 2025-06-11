@@ -124,14 +124,18 @@ export function showSettingsPopup(onClose) {
   document.getElementById('btn-delete-account').addEventListener('click', () => {
     if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
       localStorage.clear();
-      window.location.reload();
+      localStorage.setItem('darkmode', 'false');
+      document.body.classList.remove('darkmode');
+      window.location.href = '/';
     }
   });
 
   // Logout
   document.getElementById('btn-logout').addEventListener('click', () => {
     localStorage.removeItem('user');
-    window.location.reload();
+    localStorage.setItem('darkmode', 'false');
+    document.body.classList.remove('darkmode');
+    window.location.href = '/';
   });
 }
 

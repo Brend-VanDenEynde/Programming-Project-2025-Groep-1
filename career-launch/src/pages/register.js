@@ -138,6 +138,10 @@ export function renderRegister(rootElement) {
       Router.navigate('/contact');
     });
   });
+
+  // Zet altijd light mode bij laden van register
+  localStorage.setItem('darkmode', 'false');
+  document.body.classList.remove('darkmode');
 }
 
 function handleRegister(event) {

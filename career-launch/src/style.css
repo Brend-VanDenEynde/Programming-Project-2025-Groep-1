@@ -1544,34 +1544,6 @@ body.darkmode .student-profile-btn-secondary:active {
   filter: brightness(1.07) drop-shadow(0 0 12px #3dd68625);
 }
 
-/* Footer altijd onderaan student-profiel-achtige pagina's en geen onderlijning op links */
-.student-profile-footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100vw;
-  background: #f5f6f7;
-  color: #7a7a7a;
-  border-top: 1px solid #e1e5e9;
-  text-align: center;
-  font-size: 0.95rem;
-  padding: 18px 0 14px 0;
-  margin: 0;
-  box-shadow: none;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  z-index: 100;
-}
-
-.student-profile-footer a {
-  color: #7a7a7a;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.student-profile-footer a:hover {
-  color: #009ca6;
-  text-decoration: underline;
-}
 
 body.darkmode {
   font-family: 'Arial', sans-serif;
@@ -2323,4 +2295,17 @@ body.darkmode #burger-menu:hover{
 }
 .student-profile-dropdown.open {
   display: block;
+}
+
+.student-profile-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  background: #fff;
+  border-top: 1px solid #e1e5e9;
+  text-align: center;
+  padding: 12px 0 10px 0;
+  z-index: 100;
 }

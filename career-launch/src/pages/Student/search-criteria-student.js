@@ -203,6 +203,8 @@ if (burger && dropdown) {
   });
   document.getElementById('nav-logout').addEventListener('click', () => {
     dropdown.classList.remove('open');
+    localStorage.setItem('darkmode', 'false');
+    document.body.classList.remove('darkmode');
     window.appRouter.navigate('/login');
   });
 }
