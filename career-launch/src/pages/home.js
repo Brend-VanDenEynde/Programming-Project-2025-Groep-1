@@ -1,10 +1,11 @@
 import Router from '../router.js';
+import ehbLogo from '../Images/EhB-logo-transparant.png';
 
 export function renderHome(rootElement) {
   rootElement.innerHTML = `
     <div class="home-container">
       <img 
-        src="/src/Images/EhB-logo-transparant.png" 
+        src="${ehbLogo}"
         alt="Erasmus Hogeschool Brussels Logo" 
       />
 
