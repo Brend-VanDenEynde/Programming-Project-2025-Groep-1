@@ -34,7 +34,10 @@ jobs:
       - name: Add server to known_hosts
         run: ssh-keyscan ehb-match.me >> ~/.ssh/known_hosts
 
+      - name: Test SSH connection
+        run: ssh -o StrictHostKeyChecking=no dev-deploy-ehb-match@ehb-match.me "echo SSH OK"
+
       - name: Deploy via rsync
         working-directory: ./career-launch
         run: |
-          rsync -avz --delete ./dist/ deploy-ehb-match@ehb-match.me:/var/www/ehb-match.me
+          rsync -avz --delete -e "ssh" ./dist/ deploy-ehb-match@ehb-match.me:/var/www/ehb-match.me
