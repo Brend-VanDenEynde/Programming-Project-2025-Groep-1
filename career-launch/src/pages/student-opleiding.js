@@ -1,6 +1,7 @@
 import { renderStudentSkills } from './student-skills.js';
 import './student-register.css';
 import Router from '../router.js';
+import { apiGet, apiPost } from '../utils/api.js';
 
 export function renderStudentOpleiding(rootElement) {
   rootElement.innerHTML = `
@@ -56,15 +57,7 @@ export function renderStudentOpleiding(rootElement) {
 
 async function loadOpleidingen() {
   try {
-    const response = await fetch('https://api.ehb-match.me/opleidingen/', {
-      method: 'GET',
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    const opleidingen = await response.json();
+    const opleidingen = await apiGet('http://localhost:3001/opleiding/');
     const opleidingSelect = document.querySelector('.opleiding-select');
     opleidingSelect.innerHTML = ''; // Clear all existing options
 

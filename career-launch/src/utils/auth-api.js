@@ -50,6 +50,57 @@ export async function logoutUser() {
 }
 
 /**
+ * Calls the refresh endpoint to refresh the authentication token
+ * @returns {Promise<Object>} API response with new tokens
+ */
+export async function refreshToken() {
+  const apiUrl = 'https://api.ehb-match.me/auth/refresh';
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Include authorization header if we have a token
+        ...(window.sessionStorage.getItem('authToken') && {
+          Authorization: `Bearer ${window.sessionStorage.getItem('authToken')}`,
+        }),
+      },
+      credentials: 'include', // Include cookies in the request (for refresh token)
+    });
+
+    if (!response.ok) {
+      throw new Error(`Token refresh failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Token refresh successful:', data);
+
+    // Update the stored auth token if a new one was provided
+    if (data.accessToken) {
+      window.sessionStorage.setItem('authToken', data.accessToken);
+      console.log('Auth token updated in session storage');
+    }
+
+    return {
+      success: true,
+      message: data.message || 'Token refreshed successfully',
+      data: data,
+      accessToken: data.accessToken,
+      accessTokenExpiresAt: data.accessTokenExpiresAt,
+      refreshTokenExpiresAt: data.refreshTokenExpiresAt,
+    };
+  } catch (error) {
+    console.error('Token refresh error:', error);
+    return {
+      success: false,
+      message: 'Failed to refresh token',
+      error: error.message,
+    };
+  }
+}
+
+/**
  * Clears all authentication-related data from session storage
  */
 export function clearAuthData() {
@@ -118,6 +169,65 @@ export function getCurrentUserType() {
   }
 
   return window.sessionStorage.getItem('userType');
+}
+
+/**
+ * Attempts to refresh tokens and retry a failed API call
+ * @param {Function} apiCall - The API function to retry after token refresh
+ * @param {...any} args - Arguments to pass to the API function
+ * @returns {Promise<Object>} Result of the retried API call or refresh failure
+ */
+export async function retryWithTokenRefresh(apiCall, ...args) {
+  try {
+    // First, try to refresh the token
+    const refreshResult = await refreshToken();
+
+    if (!refreshResult.success) {
+      console.error('Token refresh failed, cannot retry API call');
+      return {
+        success: false,
+        message: 'Authentication failed - please log in again',
+        error: 'Token refresh failed',
+      };
+    }
+
+    console.log('Token refreshed successfully, retrying API call');
+
+    // Retry the original API call with the new token
+    return await apiCall(...args);
+  } catch (error) {
+    console.error('Error during token refresh and retry:', error);
+    return {
+      success: false,
+      message: 'Authentication error occurred',
+      error: error.message,
+    };
+  }
+}
+
+/**
+ * Checks if an error response indicates that the token has expired
+ * @param {Response|Object} response - The response object or error
+ * @returns {boolean} True if the error indicates token expiration
+ */
+export function isTokenExpiredError(response) {
+  // Check for 401 Unauthorized status
+  if (response.status === 401) {
+    return true;
+  }
+
+  // Check for specific error messages that indicate token expiration
+  if (response.message) {
+    const message = response.message.toLowerCase();
+    return (
+      message.includes('token') &&
+      (message.includes('expired') ||
+        message.includes('invalid') ||
+        message.includes('unauthorized'))
+    );
+  }
+
+  return false;
 }
 
 /**
