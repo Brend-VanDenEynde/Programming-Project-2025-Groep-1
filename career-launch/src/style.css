@@ -356,9 +356,7 @@ body.darkmode .footer-links {
   font-weight: 500;
 }
 
-.register-link a:hover {
-  text-decoration: underline;
-}
+
 
 /* Admin styles */
 .admin-container {
@@ -892,7 +890,10 @@ body.darkmode .footer-links {
   justify-content: center;
   padding: 2rem;
 }
-
+body.darkmode .student-profile-content {
+  background: black;
+  color: #e0f7fa;
+}
 .student-profile-form-container {
   background: #fff;
   border-radius: 12px;
@@ -1985,7 +1986,6 @@ body.darkmode .student-profile-footer a {
 }
 body.darkmode .student-profile-footer a:hover {
   color: var(--accent) !important;
-  text-decoration: underline !important;
 }
 
 /* --- BADGES & SPEEDDATE ACTIE BUTTONS: UNIFORM & COMPACT --- */
@@ -2308,4 +2308,43 @@ body.darkmode #burger-menu:hover{
   text-align: center;
   padding: 12px 0 10px 0;
   z-index: 100;
+  text-decoration: none;
+}
+
+
+
+/* Algemene link-stijlen */
+a {
+  color: #0077b5;
+  transition: color 0.18s;
+}
+a:hover {
+  color: #28bb8a;
+}
+body.darkmode a {
+  color: #00e6ef;
+  transition: color 0.18s;
+}
+body.darkmode a:hover {
+  color: #3dd686;
+}
+
+
+/* Links in .student-profile-footer zijn standaard niet onderlijnd, maar wel bij hover. Dit geldt voor zowel light als darkmode. */
+.student-profile-footer a {
+  color: #232846;
+  text-decoration: none;
+  transition: color 0.18s;
+}
+.student-profile-footer a:hover {
+  color: #28bb8a;
+  text-decoration: underline;
+}
+body.darkmode .student-profile-footer a {
+  color: #00e6ef;
+  text-decoration: none;
+}
+body.darkmode .student-profile-footer a:hover {
+  color: #3dd686;
+  text-decoration: underline;
 }

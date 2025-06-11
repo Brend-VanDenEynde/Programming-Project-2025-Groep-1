@@ -96,10 +96,6 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
                 <input type="date" id="birthDateInput" value="${birthDate}" ${readonlyMode ? 'disabled' : ''}>
               </div>
               <div class="student-profile-form-group">
-                <label for="descriptionInput">Beschrijving</label>
-                <textarea id="descriptionInput" rows="3" ${readonlyMode ? 'disabled' : ''}>${description}</textarea>
-              </div>
-              <div class="student-profile-form-group">
                 <label for="linkedinInput">LinkedIn-link</label>
                 <input type="url" id="linkedinInput" value="${linkedIn}" ${readonlyMode ? 'disabled' : ''}>
               </div>
