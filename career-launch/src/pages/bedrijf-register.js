@@ -75,7 +75,7 @@ function handleBedrijfRegister(event) {
 
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
-  alert(`Welkom ${data.bedrijfnaam}! Je account is aangemaakt.`);
+  alert(`Je account is nu in orde.`);
 
   Router.navigate('/Bedrijf/Bedrijf-Profiel');
 }
