@@ -132,70 +132,100 @@ async function handleLogin(event, rootElement) {
     alert('Wachtwoord moet minimaal 8 karakters bevatten!');
     return;
   }
-
   try {
     // Call the API to authenticate the user
     const response = await loginUser(email, password);
 
+    // Store authentication token
+    if (response.accessToken) {
+      window.sessionStorage.setItem('authToken', response.accessToken);
+    }
+
+    // Debug: Log the response to see what we're getting
+    console.log('Login response structure:', response); // SECURITY: Only proceed if we have a valid response with message "Login successful"
+    if (!response.message || response.message !== 'Login successful') {
+      throw new Error('Invalid login response');
+    }
+
+    // TEMPORARY: Since backend doesn't provide userType yet, we'll use email domain logic
+    // TODO: Remove this when backend adds userType to response
+    let userType = response.userType;
+
+    if (!userType) {
+      // Determine user type based on email domain (temporary solution)
+      if (email.includes('@student.ehb.be') || email.includes('@ehb.be')) {
+        userType = 'student';
+      } else {
+        userType = 'company';
+      }
+      console.warn(
+        'userType not provided by API, using email-based detection:',
+        userType
+      );
+    }
+
     // Handle successful login based on user type
-    if (response.userType === 'student') {
-      // Handle student login
+    if (userType === 'student') {
+      // Handle student login with API data
       const studentData = {
-        firstName: response.firstName || 'Student',
-        lastName: response.lastName || 'User',
-        email: email,
-        studyProgram: response.studyProgram || 'Webontwikkeling',
-        year: response.year || '2e Bachelor',
+        id: response.user?.id || null,
+        firstName: response.user?.firstName || 'Student',
+        lastName: response.user?.lastName || 'User',
+        email: response.user?.email || email,
+        studyProgram: response.user?.studyProgram || 'Webontwikkeling',
+        year: response.user?.year || '2e Bachelor',
         profilePictureUrl:
-          response.profilePictureUrl || '/src/Images/default.jpg',
+          response.user?.profilePictureUrl || '/src/Images/default.jpg',
       };
 
       // Store student data
       window.sessionStorage.setItem('studentData', JSON.stringify(studentData));
-      window.sessionStorage.setItem('authToken', response.token);
-
-      // Navigate to student profile
+      window.sessionStorage.setItem('userType', 'student'); // Navigate to student profile
       Router.navigate('/Student/Student-Profiel');
-    } else if (response.userType === 'company') {
-      // Handle company login
-      const bedrijfData = {
-        companyName: response.companyName || 'Microsoft',
-        email: email,
-        description:
-          response.description ||
-          'Wij zijn een technologiebedrijf dat innovatieve oplossingen biedt.',
-        linkedIn:
-          response.linkedIn || 'https://www.linkedin.com/company/microsoft',
+    } else if (userType === 'company') {
+      // Handle company login with API data
+      const companyData = {
+        id: response.user?.id || null,
+        companyName: response.user?.companyName || 'Bedrijf',
+        email: response.user?.email || email,
+        description: response.user?.description || '',
+        linkedIn: response.user?.linkedIn || '',
         profilePictureUrl:
-          response.profilePictureUrl || '/src/Images/default.jpg',
+          response.user?.profilePictureUrl || '/src/Images/default-company.jpg',
       };
 
       // Store company data
-      window.sessionStorage.setItem('bedrijfData', JSON.stringify(bedrijfData));
-      window.sessionStorage.setItem('authToken', response.token);
-
-      // Navigate to company profile
+      window.sessionStorage.setItem('companyData', JSON.stringify(companyData));
+      window.sessionStorage.setItem('userType', 'company'); // Navigate to company profile
       Router.navigate('/Bedrijf/Bedrijf-Profiel');
     } else {
-      alert('Onbekend gebruikerstype. Contacteer de administrator.');
+      // This should never happen with our email-based logic
+      console.error('Onbekend gebruikerstype:', userType);
+      throw new Error('Authentication failed: Unknown user type');
     }
   } catch (error) {
     console.error('Login error:', error);
 
-    // Handle different types of errors
+    // Clear any stored authentication data on error
+    window.sessionStorage.removeItem('authToken');
+    window.sessionStorage.removeItem('studentData');
+    window.sessionStorage.removeItem('companyData');
+    window.sessionStorage.removeItem('userType');
+
+    // User-friendly error messages
     if (error.message.includes('401')) {
-      alert('Ongeldige inloggegevens. Controleer je email en wachtwoord.');
+      alert('Ongeldig e-mailadres of wachtwoord.');
     } else if (error.message.includes('403')) {
-      alert(
-        'Account niet geactiveerd of geblokkeerd. Contacteer de administrator.'
-      );
+      alert('Je account is niet geactiveerd of geblokkeerd.');
     } else if (error.message.includes('404')) {
-      alert('Login service niet beschikbaar. Probeer later opnieuw.');
+      alert('De dienst is momenteel niet beschikbaar.');
     } else if (error.message.includes('500')) {
-      alert('Server error. Probeer later opnieuw.');
+      alert('Er is een serverfout opgetreden. Probeer het later opnieuw.');
+    } else if (error.message.includes('Authentication failed')) {
+      alert('Authenticatie mislukt. Controleer je inloggegevens.');
     } else {
       alert(
-        'Er is een fout opgetreden tijdens het inloggen. Controleer je internetverbinding en probeer opnieuw.'
+        'Er is een netwerkfout opgetreden. Controleer je internetverbinding.'
       );
     }
   }
