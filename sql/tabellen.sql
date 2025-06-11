@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS bedrijf_functie (
 -- Deze tabel slaat de berichten op die studenten of bedrijven  kunnen sturen via het contactformulier zodat een admin deze kan bekijken
 CREATE TABLE IF NOT EXISTS contact (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    gebruiker_id INTEGER NOT NULL,
+    email TEXT NOT NULL,
     onderwerp TEXT NOT NULL,   
     bericht TEXT NOT NULL,
     FOREIGN KEY (gebruiker_id) REFERENCES gebruiker(id) ON DELETE CASCADE ON UPDATE CASCADE
