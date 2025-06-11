@@ -40,4 +40,4 @@ jobs:
       - name: Deploy via rsync
         working-directory: ./career-launch
         run: |
-          rsync -avz --delete -e "ssh" ./dist/ dev-deploy-ehb-match@ehb-match.me:/var/www/dev.ehb-match.me
+          rsync -avz --delete -e "ssh -v" ./dist/ dev-deploy-ehb-match@ehb-match.me:/var/www/dev.ehb-match.me
