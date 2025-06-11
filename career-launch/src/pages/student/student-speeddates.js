@@ -1,6 +1,6 @@
 // src/views/student-speeddates.js
-import logoIcon from '../Icons/favicon-32x32.png';
-import { renderLogin } from './login.js';
+import logoIcon from '../../Icons/favicon-32x32.png';
+import { renderLogin } from '../auth/login.js';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
@@ -170,17 +170,16 @@ export function renderSpeeddates(rootElement, studentData = {}) {
   document.getElementById('nav-logout').addEventListener('click', () => {
     renderLogin(rootElement);
   });
-
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/privacy');
     });
   });
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/contact');
     });

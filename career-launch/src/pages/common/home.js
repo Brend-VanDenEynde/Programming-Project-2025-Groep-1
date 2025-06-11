@@ -1,5 +1,5 @@
-import Router from '../router.js';
-import ehbLogo from '../Images/EhB-logo-transparant.png';
+import Router from '../../router.js';
+import ehbLogo from '../../Images/EhB-logo-transparant.png';
 
 export function renderHome(rootElement) {
   rootElement.innerHTML = `

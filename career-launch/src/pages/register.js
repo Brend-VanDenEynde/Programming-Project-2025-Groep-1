@@ -1,7 +1,7 @@
-import { renderStudentRegister } from './student-register.js';
-import { renderBedrijfRegister } from './bedrijf-register.js';
+import { renderStudentRegister } from './student/student-register.js';
+import { renderBedrijfRegister } from './company/bedrijf-register.js';
 import Router from '../router.js';
-import { renderLogin } from './login.js';
+import { renderLogin } from './auth/login.js';
 
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `
@@ -135,7 +135,8 @@ function handleRegister(event) {
     return;
   }
   if (formData.get('password').length < 8) {
-    errorMessageLabel.textContent = 'Wachtwoord moet minimaal 8 karakters bevatten!';
+    errorMessageLabel.textContent =
+      'Wachtwoord moet minimaal 8 karakters bevatten!';
     errorMessageLabel.style.display = 'block';
     return;
   }
@@ -145,10 +146,10 @@ function handleRegister(event) {
 
   // Data naar server sturen (voorbeeld)
   if (formData.get('rol') === 'student') {
-      renderStudentRegister(document.getElementById('app'), data);
+    renderStudentRegister(document.getElementById('app'), data);
   } else if (formData.get('rol') === 'bedrijf') {
-      renderBedrijfRegister(document.getElementById('app'), data);
+    renderBedrijfRegister(document.getElementById('app'), data);
   } else {
-      renderLogin(document.getElementById('app'));
+    renderLogin(document.getElementById('app'));
   }
 }

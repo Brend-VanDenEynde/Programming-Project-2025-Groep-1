@@ -1,5 +1,5 @@
-import { renderStudentRegister } from '../student-register.js';
-import { renderBedrijfRegister } from '../bedrijf-register.js';
+import { renderStudentRegister } from '../student/student-register.js';
+import { renderBedrijfRegister } from '../company/bedrijf-register.js';
 import Router from '../../router.js';
 import { renderLogin } from './login.js';
 import {
@@ -7,7 +7,7 @@ import {
   sendRegistrationToAPI,
   validateRegistrationData,
   mockRegistrationAPI,
-} from './registration-api.js';
+} from '../../utils/registration-api.js';
 
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `

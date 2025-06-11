@@ -3,7 +3,7 @@
  * Demonstrates how to use the new API utilities for skills-related endpoints
  */
 
-import { apiGet, apiPost, apiPut, apiDelete } from '../utils/api.js';
+import { apiGet, apiPost, apiPut, apiDelete } from './api.js';
 
 /**
  * Fetch all available skills from the API

@@ -1,14 +1,35 @@
 // main.js file
 import Router from './router.js';
+
+// CSS imports
 import './css/style.css';
 import './css/admin-style.css';
 
-// importeer de pagina's
-import { renderHome } from './pages/home.js';
-import { renderRegister } from './pages/register.js';
-import { renderLogin } from './pages/login.js';
-import { renderStudentProfiel } from './pages/student-profiel.js';
-import { renderSearchCriteriaStudent } from './pages/search-criteria-student.js';
+// Auth pages
+import { renderLogin } from './pages/auth/login.js';
+import { renderRegister } from './pages/auth/register.js';
+
+// Common pages
+import { renderHome } from './pages/common/home.js';
+import { renderContact } from './pages/common/contact.js';
+import { renderPrivacy } from './pages/common/privacy.js';
+
+// Student pages
+import { renderStudentProfiel } from './pages/student/student-profiel.js';
+import { renderSearchCriteriaStudent } from './pages/student/search-criteria-student.js';
+import { renderStudentRegister } from './pages/student/student-register.js';
+import { renderStudentOpleiding } from './pages/student/student-opleiding.js';
+import { renderStudentSkills } from './pages/student/student-skills.js';
+import { renderQRPopup } from './pages/student/student-qr-popup.js';
+import { renderSpeeddates } from './pages/student/student-speeddates.js';
+import { renderSpeeddatesRequests } from './pages/student/student-speeddates-verzoeken.js';
+
+// Company pages
+import { renderBedrijfProfiel } from './pages/company/bedrijf-profiel.js';
+import { renderSearchCriteriaBedrijf } from './pages/company/search-criteria-bedrijf.js';
+import { renderBedrijfRegister } from './pages/company/bedrijf-register.js';
+
+// Admin pages
 import { renderAdmin } from './pages/admin/admin-login.js';
 import { renderAdminDashboard } from './pages/admin/admin-dashboard.js';
 import { renderAdminSelectDashboard } from './pages/admin/admin-select-dashboard.js';
@@ -18,17 +39,6 @@ import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven
 import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js';
 import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
 import { renderAdminProcessingCompanyDetail } from './pages/admin/admin-processing-company-detail.js';
-import { renderPrivacy } from './pages/privacy.js';
-import { renderContact } from './pages/contact.js';
-import { renderBedrijfProfiel } from './pages/bedrijf-profiel.js';
-import { renderSearchCriteriaBedrijf } from './pages/search-criteria-bedrijf.js';
-import { renderStudentRegister } from './pages/student-register.js';
-import { renderStudentOpleiding } from './pages/student-opleiding.js';
-import { renderStudentSkills } from './pages/student-skills.js';
-import { renderBedrijfRegister } from './pages/bedrijf-register.js';
-import { renderQRPopup } from './pages/student-qr-popup.js';
-import { renderSpeeddates } from './pages/student-speeddates.js';
-import { renderSpeeddatesRequests } from './pages/student-speeddates-verzoeken.js';
 
 // functie om de 404 pagina te renderen
 function renderNotFound(rootElement) {

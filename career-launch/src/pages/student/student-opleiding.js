@@ -1,6 +1,6 @@
 import { renderStudentSkills } from './student-skills.js';
-import './student-register.css';
-import Router from '../router.js';
+import '../student-register.css';
+import Router from '../../router.js';
 
 export function renderStudentOpleiding(rootElement) {
   rootElement.innerHTML = `
@@ -77,7 +77,7 @@ function handleJaarRegister(event) {
     jaar: formData.get('jaar'), // geselecteerde radio
     opleiding: formData.get('opleiding'), // geselecteerde optie uit select
   };
-  
+
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
 

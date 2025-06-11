@@ -1,8 +1,8 @@
 // src/views/student-profile.js
-import defaultAvatar from '../Images/default.jpg';
-import { renderLogin } from './login.js';
+import defaultAvatar from '../../Images/default.jpg';
+import { renderLogin } from '../auth/login.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
-import Router from '../router.js';
+import Router from '../../router.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderQRPopup } from './student-qr-popup.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
@@ -257,10 +257,9 @@ if (burger && dropdown) {
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
     Router.navigate('/privacy');
-  });
-  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
+  });  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/contact');
     });

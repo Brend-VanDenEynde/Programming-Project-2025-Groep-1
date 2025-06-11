@@ -1,4 +1,4 @@
-import Router from '../router.js';
+import Router from '../../router.js';
 
 // Hoofdfunctie voor het renderen van de contactpagina
 export function renderContact(rootElement) {

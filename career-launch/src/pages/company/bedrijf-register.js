@@ -1,6 +1,6 @@
 // import { renderBedrijfOpleiding } from './student-opleiding.js';
-import './student-register.css';
-import Router from '../router.js';
+import '../student-register.css';
+import Router from '../../router.js';
 
 export function renderBedrijfRegister(rootElement) {
   rootElement.innerHTML = `
@@ -62,8 +62,6 @@ function handleNaamRegister(event) {
     achternaam: formData.get('achternaam'),
     linkedinLink: formData.get('linkedin'),
   };
-
-  
 
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);

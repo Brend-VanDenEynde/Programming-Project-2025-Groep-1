@@ -2,9 +2,9 @@ import { renderStudentProfiel } from './student-profiel.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { renderQRPopup } from './student-qr-popup.js';
-import { renderLogin } from './login.js';
+import { renderLogin } from '../auth/login.js';
 import { showSettingsPopup } from './student-settings.js';
-import Router from '../router.js';
+import Router from '../../router.js';
 
 export function renderSearchCriteriaStudent(
   rootElement,

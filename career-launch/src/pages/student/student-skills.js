@@ -1,8 +1,8 @@
-import './student-register.css';
-import Router from '../router.js';
+import '../student-register.css';
+import Router from '../../router.js';
 
 export function renderStudentSkills(rootElement) {
-    rootElement.innerHTML = `
+  rootElement.innerHTML = `
     <div style="min-height: 100vh; display: flex; flex-direction: column;">
     <main class="form-container skills-container">
       <button class="back-button" id="back-button">← Terug</button>
@@ -67,15 +67,13 @@ function handleSkillsRegister(event) {
   const job = formData.get('job');
   const skill = formData.get('skill');
 
-  
-
   const data = {
     job: formData.get('job'), // geselecteerde radio
     skill: formData.get('skill'),
   };
-  
+
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
 
-    // Navigeren naar de volgende pagina
+  // Navigeren naar de volgende pagina
 }

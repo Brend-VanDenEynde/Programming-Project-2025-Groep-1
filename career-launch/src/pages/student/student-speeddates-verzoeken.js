@@ -179,17 +179,16 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
       renderLogin(rootElement);
     });
   }
-
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/privacy');
     });
   });
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    import('../router.js').then((module) => {
+    import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/contact');
     });

@@ -1,4 +1,4 @@
-import Router from '../router.js';
+import Router from '../../router.js';
 
 export function renderPrivacy(rootElement) {
   rootElement.innerHTML = `
