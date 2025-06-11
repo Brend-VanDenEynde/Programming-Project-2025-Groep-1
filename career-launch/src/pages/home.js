@@ -33,6 +33,12 @@ export function renderHome(rootElement) {
   btnLog.addEventListener('click', () => {
     Router.navigate('/login');
   });
+  // Navigatie knoppen
+  const btnLogin = document.getElementById('btn-login');
+  const btnRegister = document.getElementById('btn-register');
+  if (btnLogin) btnLogin.addEventListener('click', () => window.appRouter.navigate('/login'));
+  if (btnRegister) btnRegister.addEventListener('click', () => window.appRouter.navigate('/registreer'));
+
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();

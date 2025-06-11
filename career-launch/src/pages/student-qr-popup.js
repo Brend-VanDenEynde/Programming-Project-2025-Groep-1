@@ -19,7 +19,7 @@ export function renderQRPopup(rootElement, studentData = {}) {
           <span>EhB Career Launch</span>
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
-        <ul id="burger-dropdown" class="student-profile-dropdown" style="display: none;">
+        <ul id="burger-dropdown" class="student-profile-dropdown">
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
@@ -52,6 +52,7 @@ export function renderQRPopup(rootElement, studentData = {}) {
     </div>
   `;
 
+  // Sidebar navigation
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       const route = e.currentTarget.getAttribute('data-route');
@@ -71,61 +72,41 @@ export function renderQRPopup(rootElement, studentData = {}) {
       }
     });
   });
+
+  // Burger menu logic (class-based toggling)
   const burger = document.getElementById('burger-menu');
   const dropdown = document.getElementById('burger-dropdown');
-
   if (burger && dropdown) {
-    // Toggle hamburger-menu bij klik
+    dropdown.classList.remove('show');
     burger.addEventListener('click', (event) => {
       event.stopPropagation();
-      dropdown.style.display =
-        dropdown.style.display === 'block' ? 'none' : 'block';
+      dropdown.classList.toggle('show');
     });
-
-    // Sluit het menu bij klik buiten het menu
     document.addEventListener('click', function (event) {
-      if (dropdown.style.display === 'block') {
+      if (dropdown.classList.contains('show')) {
         if (!dropdown.contains(event.target) && event.target !== burger) {
-          dropdown.style.display = 'none';
+          dropdown.classList.remove('show');
         }
       }
     });
-
-    // Sluit het menu bij klikken op een menu-item
     document.getElementById('nav-settings').addEventListener('click', () => {
-      dropdown.style.display = 'none';
+      dropdown.classList.remove('show');
       showSettingsPopup();
     });
-    document
-      .getElementById('nav-logout')
-      .addEventListener('click', async () => {
-        dropdown.style.display = 'none';
-        try {
-          const result = await performLogout();
-          console.log('Logout result:', result);
-          renderLogin(rootElement);
-        } catch (error) {
-          console.error('Logout error:', error);
-          renderLogin(rootElement);
-        }
-      });
+    document.getElementById('nav-logout').addEventListener('click', async () => {
+      dropdown.classList.remove('show');
+      try {
+        const result = await performLogout();
+        console.log('Logout result:', result);
+        renderLogin(rootElement);
+      } catch (error) {
+        console.error('Logout error:', error);
+        renderLogin(rootElement);
+      }
+    });
   }
 
-  document.getElementById('nav-settings').addEventListener('click', () => {
-    // Navigeren naar Instellingen (nog te implementeren)
-  });
-  document.getElementById('nav-logout').addEventListener('click', async () => {
-    try {
-      const result = await performLogout();
-      console.log('Logout result:', result);
-      renderLogin(rootElement);
-    } catch (error) {
-      console.error('Logout error:', error);
-      renderLogin(rootElement);
-    }
-  });
-
-  // Footer links
+  // Footer links (router navigation)
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
     import('../router.js').then((module) => {

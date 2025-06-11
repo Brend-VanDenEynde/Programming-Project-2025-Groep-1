@@ -1,4 +1,5 @@
 // src/views/student-speeddates-verzoeken.js
+import logoIcon from '../../Icons/favicon-32x32.png';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddates } from './student-speeddates.js';
@@ -92,7 +93,7 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     <div class="student-profile-container">
       <header class="student-profile-header">
         <div class="logo-section">
-          <img src="src/Icons/favicon-32x32.png" alt="Logo EhB Career Launch" width="32" height="32" />
+          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
@@ -129,70 +130,61 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
 
   renderTable();
 
-document.querySelectorAll('.sidebar-link').forEach((btn) => {
-  btn.addEventListener('click', (e) => {
-    const route = e.currentTarget.getAttribute('data-route');
-    switch (route) {
-      case 'profile':
-        window.appRouter.navigate('/Student/Student-Profiel');
-        break;
-      case 'search':
-        window.appRouter.navigate('/Student/Zoek-Criteria');
-        break;
-      case 'speeddates':
-        window.appRouter.navigate('/Student/Student-Speeddates');
-        break;
-      case 'requests':
-        window.appRouter.navigate('/Student/Student-Speeddates-Verzoeken');
-        break;
-      case 'qr':
-        window.appRouter.navigate('/Student/Student-QR-Popup');
-        break;
-    }
+  document.querySelectorAll('.sidebar-link').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const route = e.currentTarget.getAttribute('data-route');
+      switch (route) {
+        case 'profile':
+          window.appRouter.navigate('/Student/Student-Profiel');
+          break;
+        case 'search':
+          window.appRouter.navigate('/Student/Zoek-Criteria');
+          break;
+        case 'speeddates':
+          window.appRouter.navigate('/Student/Student-Speeddates');
+          break;
+        case 'requests':
+          window.appRouter.navigate('/Student/Student-Speeddates-Verzoeken');
+          break;
+        case 'qr':
+          window.appRouter.navigate('/Student/Student-QR-Popup');
+          break;
+      }
+    });
   });
-});
 
   const burger = document.getElementById('burger-menu');
   const dropdown = document.getElementById('burger-dropdown');
-const burger = document.getElementById('burger-menu');
-const dropdown = document.getElementById('burger-dropdown');
-
   if (burger && dropdown) {
-    // Toggle hamburger-menu bij klik
+    dropdown.classList.remove('open');
     burger.addEventListener('click', (event) => {
       event.stopPropagation();
-      dropdown.style.display =
-        dropdown.style.display === 'block' ? 'none' : 'block';
+      if (!dropdown.classList.contains('open')) {
+        dropdown.classList.add('open');
+      } else {
+        dropdown.classList.remove('open');
+      }
     });
-if (burger && dropdown) {
-  // Toggle menu bij klik op burger
-  burger.addEventListener('click', (event) => {
-    event.stopPropagation();
-    dropdown.classList.toggle('open');
-  });
-
-  // Sluit menu bij klik buiten menu of burger
-  document.addEventListener('click', function(event) {
-    if (
-      dropdown.classList.contains('open') &&
-      !dropdown.contains(event.target) &&
-      event.target !== burger
-    ) {
+    document.addEventListener('click', function(event) {
+      if (
+        dropdown.classList.contains('open') &&
+        !dropdown.contains(event.target) &&
+        event.target !== burger
+      ) {
+        dropdown.classList.remove('open');
+      }
+    });
+    document.getElementById('nav-settings').addEventListener('click', () => {
       dropdown.classList.remove('open');
-    }
-  });
-
-  // Navigeer via de router!
-  document.getElementById('nav-settings').addEventListener('click', () => {
-    dropdown.classList.remove('open');
-    showSettingsPopup(() => renderSpeeddatesRequests(rootElement));
-  });
-  document.getElementById('nav-logout').addEventListener('click', () => {
-    dropdown.classList.remove('open');
-    window.appRouter.navigate('/login');
-  });
-}
-
+      showSettingsPopup(() => renderSpeeddatesRequests(rootElement, studentData));
+    });
+    document.getElementById('nav-logout').addEventListener('click', () => {
+      dropdown.classList.remove('open');
+      localStorage.setItem('darkmode', 'false');
+      document.body.classList.remove('darkmode');
+      renderLogin(rootElement);
+    });
+  }
 
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();

@@ -3,9 +3,9 @@ import Router from '../router.js';
 export function renderPrivacy(rootElement) {
   rootElement.innerHTML = `
     <div class="privacy-container">
+      <button class="back-button" id="back-button">← Terug</button>
       <div class="content-card">
         <div class="header">
-          <button class="back-button" id="back-button" data-route="/">← Terug naar Home</button>
           <h1>Privacy Policy</h1>
         </div>
           <div class="content">
@@ -90,10 +90,13 @@ export function renderPrivacy(rootElement) {
       </footer>
     </div>
   `;
-  const backButton = document.getElementById('back-button');
-  backButton.addEventListener('click', () => {
-    Router.navigate('/');
-  });
+  const backBtn = document.getElementById('back-button');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      // Gebruik alleen history.back() zodat je altijd teruggaat naar de vorige pagina
+      window.history.back();
+    });
+  }
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();

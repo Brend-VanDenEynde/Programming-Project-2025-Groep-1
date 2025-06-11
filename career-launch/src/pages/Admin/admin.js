@@ -70,25 +70,11 @@ export function renderAdmin(rootElement) {
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-<<<<<<<< HEAD:career-launch/src/pages/Admin/admin.js
-    import('../../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/privacy');
-    });
-========
     Router.navigate('/privacy');
->>>>>>>> dev:career-launch/src/pages/admin/admin-login.js
   });
 
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-<<<<<<<< HEAD:career-launch/src/pages/Admin/admin.js
-    import('../../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/contact');
-    });
-========
     Router.navigate('/contact');
->>>>>>>> dev:career-launch/src/pages/admin/admin-login.js
   });
 }

@@ -1,3 +1,4 @@
+import logoIcon from '../../Icons/favicon-32x32.png';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
@@ -72,7 +73,7 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
     <div class="student-profile-container">
       <header class="student-profile-header">
         <div class="logo-section">
-          <img src="src/Icons/favicon-32x32.png" alt="Logo EhB Career Launch" width="32" height="32" />
+          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
@@ -150,167 +151,62 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
   // ---- INTERACTIE ----
 
   // Sidebar nav
-document.querySelectorAll('.sidebar-link').forEach((btn) => {
-  btn.addEventListener('click', (e) => {
-    const route = e.currentTarget.getAttribute('data-route');
-    switch (route) {
-      case 'profile':
-        window.appRouter.navigate('/Student/Student-Profiel');
-        break;
-      case 'search':
-        window.appRouter.navigate('/Student/Zoek-Criteria');
-        break;
-      case 'speeddates':
-        window.appRouter.navigate('/Student/Student-Speeddates');
-        break;
-      case 'requests':
-        window.appRouter.navigate('/Student/Student-Speeddates-Verzoeken');
-        break;
-      case 'qr':
-        window.appRouter.navigate('/Student/Student-QR-Popup');
-        break;
-    }
-  });
-});
-
-
-  // Burger menu
-const burger = document.getElementById('burger-menu');
-const dropdown = document.getElementById('burger-dropdown');
-
-if (burger && dropdown) {
-  // Toggle menu bij klik op burger
-  burger.addEventListener('click', (event) => {
-    event.stopPropagation();
-    dropdown.classList.toggle('open');
+  document.querySelectorAll('.sidebar-link').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const route = e.currentTarget.getAttribute('data-route');
+      switch (route) {
+        case 'profile':
+          window.appRouter.navigate('/Student/Student-Profiel');
+          break;
+        case 'search':
+          window.appRouter.navigate('/Student/Zoek-Criteria');
+          break;
+        case 'speeddates':
+          window.appRouter.navigate('/Student/Student-Speeddates');
+          break;
+        case 'requests':
+          window.appRouter.navigate('/Student/Student-Speeddates-Verzoeken');
+          break;
+        case 'qr':
+          window.appRouter.navigate('/Student/Student-QR-Popup');
+          break;
+      }
+    });
   });
 
-  // Sluit menu bij klik buiten menu of burger
-  document.addEventListener('click', function(event) {
-    if (
-      dropdown.classList.contains('open') &&
-      !dropdown.contains(event.target) &&
-      event.target !== burger
-    ) {
+  const burger = document.getElementById('burger-menu');
+  const dropdown = document.getElementById('burger-dropdown');
+  if (burger && dropdown) {
+    dropdown.classList.remove('open');
+    burger.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (!dropdown.classList.contains('open')) {
+        dropdown.classList.add('open');
+      } else {
+        dropdown.classList.remove('open');
+      }
+    });
+    document.addEventListener('click', function(event) {
+      if (
+        dropdown.classList.contains('open') &&
+        !dropdown.contains(event.target) &&
+        event.target !== burger
+      ) {
+        dropdown.classList.remove('open');
+      }
+    });
+    document.getElementById('nav-settings').addEventListener('click', () => {
       dropdown.classList.remove('open');
-    }
-  });
-
-  // Navigeer via de router!
-  document.getElementById('nav-settings').addEventListener('click', () => {
-    dropdown.classList.remove('open');
-    showSettingsPopup(() => renderSearchCriteriaStudent(rootElement));
-  });
-  document.getElementById('nav-logout').addEventListener('click', () => {
-    dropdown.classList.remove('open');
-    localStorage.setItem('darkmode', 'false');
-    document.body.classList.remove('darkmode');
-    window.appRouter.navigate('/login');
-  });
-}
-
-  // Form
-  const form = document.getElementById('criteriaForm');
-  const btnEdit = document.getElementById('btn-edit');
-  const btnSave = document.getElementById('btn-save');
-  const btnReset = document.getElementById('btn-reset');
-
-  Array.from(form.elements).forEach(el => {
-    if (
-      el.tagName !== "BUTTON"
-      && el.type !== "button"
-      && el.type !== "submit"
-      && el.type !== "reset"
-    ) {
-      el.disabled = readonlyMode;
-    }
-  });
-
-  // RESET: wis alles (ook custom velden) en ga naar editmode
-  if (btnReset) {
-    btnReset.addEventListener('click', (e) => {
-      e.preventDefault();
-      studentData.criteria = {
-        zoekType: '',
-        skills: [],
-        skillAndere: '',
-        talen: [],
-        taalAndere: '',
-        customSkills: [],
-        customTalen: [],
-      };
-      renderSearchCriteriaStudent(rootElement, studentData, false);
+      showSettingsPopup(() => renderSearchCriteriaStudent(rootElement, studentData));
+    });
+    document.getElementById('nav-logout').addEventListener('click', () => {
+      dropdown.classList.remove('open');
+      localStorage.setItem('darkmode', 'false');
+      document.body.classList.remove('darkmode');
+      renderLogin(rootElement);
     });
   }
 
-  // EDIT: ga naar edit mode
-  if (btnEdit) {
-    btnEdit.addEventListener('click', () => {
-      renderSearchCriteriaStudent(rootElement, studentData, false);
-    });
-  }
-
-  // SAVE: alles bewaren en readonly mode
-  if (btnSave) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const data = new FormData(form);
-      studentData.criteria.zoekType = data.get('jobType') || '';
-      studentData.criteria.skills = [...form.querySelectorAll('input[name="skills"]:checked')].map(cb => cb.value);
-      studentData.criteria.talen = [...form.querySelectorAll('input[name="talen"]:checked')].map(cb => cb.value);
-      renderSearchCriteriaStudent(rootElement, studentData, true);
-    });
-  }
-
-  // ANDERE SKILL TOEVOEGEN
-  if (!readonlyMode) {
-    const inputSkill = document.getElementById('skill-andere-text');
-    const addSkillBtn = document.getElementById('add-skill-btn');
-    function addCustomSkill(val) {
-      const checkedSkills = [...document.querySelectorAll('input[name="skills"]:checked')].map(cb => cb.value);
-      studentData.criteria.skills = checkedSkills;
-      const textValue = val.trim();
-      if (textValue && !studentData.criteria.customSkills.includes(textValue)) {
-        studentData.criteria.customSkills.push(textValue);
-        studentData.criteria.skills.push(textValue);
-        renderSearchCriteriaStudent(rootElement, studentData, false);
-      }
-    }
-    addSkillBtn.addEventListener('click', () => {
-      addCustomSkill(inputSkill.value);
-    });
-    inputSkill.addEventListener('keydown', (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        addCustomSkill(inputSkill.value);
-      }
-    });
-
-    // ANDERE TAAL TOEVOEGEN
-    const inputTaal = document.getElementById('taal-andere-text');
-    const addTaalBtn = document.getElementById('add-taal-btn');
-    function addCustomTaal(val) {
-      const checkedTalen = [...document.querySelectorAll('input[name="talen"]:checked')].map(cb => cb.value);
-      studentData.criteria.talen = checkedTalen;
-      const textValue = val.trim();
-      if (textValue && !studentData.criteria.customTalen.includes(textValue)) {
-        studentData.criteria.customTalen.push(textValue);
-        studentData.criteria.talen.push(textValue);
-        renderSearchCriteriaStudent(rootElement, studentData, false);
-      }
-    }
-    addTaalBtn.addEventListener('click', () => {
-      addCustomTaal(inputTaal.value);
-    });
-    inputTaal.addEventListener('keydown', (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        addCustomTaal(inputTaal.value);
-      }
-    });
-  }
-
-  // Footer links
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
     import('../../router.js').then((module) => {
@@ -325,4 +221,86 @@ if (burger && dropdown) {
       Router.navigate('/contact');
     });
   });
+
+  // Bewaar originele data voor reset
+  const originalCriteria = JSON.parse(JSON.stringify(studentData.criteria));
+
+  // Plaats deze code NA rootElement.innerHTML = ...
+  const form = document.getElementById('criteriaForm');
+  if (form) {
+    // EDIT knop
+    const editBtn = document.getElementById('btn-edit');
+    if (editBtn) {
+      editBtn.addEventListener('click', () => {
+        renderSearchCriteriaStudent(rootElement, studentData, false);
+      });
+    }
+
+    // SAVE knop
+    const saveBtn = document.getElementById('btn-save');
+    if (saveBtn) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        // Verzamel nieuwe data uit het formulier
+        const newCriteria = {
+          zoekType: form.jobType ? form.jobType.value : '',
+          skills: Array.from(form.querySelectorAll('input[name="skills"]:checked')).map(i => i.value),
+          talen: Array.from(form.querySelectorAll('input[name="talen"]:checked')).map(i => i.value),
+          customSkills: [...studentData.criteria.customSkills],
+          customTalen: [...studentData.criteria.customTalen],
+        };
+        studentData.criteria = newCriteria;
+        window.sessionStorage.setItem('studentData', JSON.stringify(studentData));
+        renderSearchCriteriaStudent(rootElement, studentData, true);
+      });
+    }
+
+    // RESET knop
+    const resetBtn = document.getElementById('btn-reset');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        studentData.criteria = JSON.parse(JSON.stringify(originalCriteria));
+        renderSearchCriteriaStudent(rootElement, studentData, false);
+      });
+    }
+
+    // Toevoegen custom skill
+    const addSkillBtn = document.getElementById('add-skill-btn');
+    if (addSkillBtn) {
+      addSkillBtn.addEventListener('click', () => {
+        const input = document.getElementById('skill-andere-text');
+        const value = input.value.trim();
+        if (value && !studentData.criteria.customSkills.includes(value)) {
+          // Verzamel huidige geselecteerde skills vóór toevoegen
+          const checkedSkills = Array.from(document.querySelectorAll('input[name="skills"]:checked')).map(i => i.value);
+          // Voeg de nieuwe custom skill toe aan customSkills en checkedSkills
+          const newCustomSkills = [...studentData.criteria.customSkills, value];
+          const newSkills = [...checkedSkills, value];
+          studentData.criteria.customSkills = newCustomSkills;
+          studentData.criteria.skills = newSkills;
+          input.value = '';
+          renderSearchCriteriaStudent(rootElement, studentData, false);
+        }
+      });
+    }
+
+    // Toevoegen custom taal
+    const addTaalBtn = document.getElementById('add-taal-btn');
+    if (addTaalBtn) {
+      addTaalBtn.addEventListener('click', () => {
+        const input = document.getElementById('taal-andere-text');
+        const value = input.value.trim();
+        if (value && !studentData.criteria.customTalen.includes(value)) {
+          // Verzamel huidige geselecteerde talen vóór toevoegen
+          const checkedTalen = Array.from(document.querySelectorAll('input[name="talen"]:checked')).map(i => i.value);
+          const newCustomTalen = [...studentData.criteria.customTalen, value];
+          const newTalen = [...checkedTalen, value];
+          studentData.criteria.customTalen = newCustomTalen;
+          studentData.criteria.talen = newTalen;
+          input.value = '';
+          renderSearchCriteriaStudent(rootElement, studentData, false);
+        }
+      });
+    }
+  }
 }

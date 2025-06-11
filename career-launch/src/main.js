@@ -8,13 +8,19 @@ import { renderLogin } from './pages/login.js';
 import { renderStudentProfiel } from './pages/Student/student-profiel.js';
 import { renderSearchCriteriaStudent } from './pages/Student/search-criteria-student.js';
 import { renderAdmin } from './pages/Admin/admin.js';
-import { renderAdminDashboard } from './pages/Admin/admin-dashboard.js';
+import { renderAdminSelectDashboard } from './pages/admin/admin-select-dashboard.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
 import { renderQRPopup } from './pages/Student/student-qr-popup.js';
 import { renderSpeeddates } from './pages/Student/student-speeddates.js';
 import { renderSpeeddatesRequests } from './pages/Student/student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './pages/Student/student-settings.js';
+import { renderAdminIngeschrevenStudenten } from './pages/Admin/admin-ingeschreven-studenten.js';
+import { renderAdminIngeschrevenBedrijven } from './pages/Admin/admin-ingeschreven-bedrijven.js';
+import { renderAdminBedrijvenInBehandeling } from './pages/Admin/admin-bedrijven-in-behandeling.js';
+import { renderAdminStudentDetail } from './pages/Admin/admin-student-detail.js';
+import { renderAdminCompanyDetail } from './pages/Admin/admin-company-detail.js';
+import { renderAdminProcessingCompanyDetail } from './pages/Admin/admin-dashboard.js';
 
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
@@ -33,10 +39,10 @@ const routes = {
   '/login': renderLogin,
   '/Student/Student-Profiel': renderStudentProfiel,
   '/Student/Zoek-Criteria': renderSearchCriteriaStudent,
-  '/admin': redirectToAdminLogin,
+  '/admin': renderAdmin,
   '/admin-login': renderAdmin,
   '/admin-select-dashboard': renderAdminSelectDashboard,
-  '/admin-dashboard': renderAdminDashboard,
+  '/admin-dashboard': renderAdminSelectDashboard,
   '/admin-dashboard/ingeschreven-studenten': renderAdminIngeschrevenStudenten,
   '/admin-dashboard/ingeschreven-bedrijven': renderAdminIngeschrevenBedrijven,
   '/admin-dashboard/bedrijven-in-behandeling':

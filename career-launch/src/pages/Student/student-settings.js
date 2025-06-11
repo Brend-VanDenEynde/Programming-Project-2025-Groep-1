@@ -1,25 +1,4 @@
-import { renderLogin } from './login.js';
-
-// Fallback voor t() en setLanguage() als deze niet bestaan
-if (typeof window.t !== 'function') {
-  window.t = (key) => {
-    const dict = {
-      back: 'Terug',
-      instellingen: 'Instellingen',
-      darkmode: 'Donkere modus',
-      language: 'Taal',
-      delete: 'Verwijder account',
-      logout: 'Log uit',
-      deleteConfirm: 'Weet je zeker dat je je account wilt verwijderen?',
-      yes: 'Ja',
-      no: 'Nee',
-    };
-    return dict[key] || key;
-  };
-}
-if (typeof window.setLanguage !== 'function') {
-  window.setLanguage = (lang) => { localStorage.setItem('lang', lang); };
-}
+// Verwijder ongeldige import en alle t()/setLanguage() functies
 
 // Main renderfunctie:
 export function showSettingsPopup(onClose) {

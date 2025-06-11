@@ -1,11 +1,11 @@
 // src/views/student-profile.js
 import { renderLogin } from '../login.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
-import Router from '../router.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderQRPopup } from './student-qr-popup.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './student-settings.js';
+import logoIcon from '../../Icons/favicon-32x32.png';
 
 const defaultProfile = {
   firstName: 'Voornaam',
@@ -15,8 +15,7 @@ const defaultProfile = {
   year: '1',
   profilePictureUrl: 'src/Images/default.jpg',
   linkedIn: '',
-  birthDate: '',
-  description: '',
+  birthDate: ''
 };
 
 export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode = true) {
@@ -28,15 +27,14 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
     year = defaultProfile.year,
     profilePictureUrl = defaultProfile.profilePictureUrl,
     linkedIn = defaultProfile.linkedIn,
-    birthDate = defaultProfile.birthDate,
-    description = defaultProfile.description,
+    birthDate = defaultProfile.birthDate
   } = studentData;
 
   rootElement.innerHTML = `
     <div class="student-profile-container">
       <header class="student-profile-header">
         <div class="logo-section">
-          <img src="src/Icons/favicon-32x32.png" alt="Logo EhB Career Launch" width="32" height="32"/>
+          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
@@ -124,135 +122,58 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
     </div>
   `;
 
- document.querySelectorAll('.sidebar-link').forEach((btn) => {
-  btn.addEventListener('click', (e) => {
-    const route = e.currentTarget.getAttribute('data-route');
-    switch (route) {
-      case 'profile':
-        window.appRouter.navigate('/Student/Student-Profiel');
-        break;
-      case 'search':
-        window.appRouter.navigate('/Student/Zoek-Criteria');
-        break;
-      case 'speeddates':
-        window.appRouter.navigate('/Student/Student-Speeddates');
-        break;
-      case 'requests':
-        window.appRouter.navigate('/Student/Student-Speeddates-Verzoeken');
-        break;
-      case 'qr':
-        window.appRouter.navigate('/Student/Student-QR-Popup');
-        break;
-    }
-  });
-});
-
-
-  // Burger menu
-const burger = document.getElementById('burger-menu');
-const dropdown = document.getElementById('burger-dropdown');
-
-if (burger && dropdown) {
-  // Toggle menu bij klik op burger
-  burger.addEventListener('click', (event) => {
-    event.stopPropagation();
-    dropdown.classList.toggle('open');
-  });
-
-  // Sluit menu bij klik buiten menu of burger
-  document.addEventListener('click', function(event) {
-    if (
-      dropdown.classList.contains('open') &&
-      !dropdown.contains(event.target) &&
-      event.target !== burger
-    ) {
-      dropdown.classList.remove('open');
-    }
-  });
-
-  // Navigeer via de router!
-  document.getElementById('nav-settings').addEventListener('click', () => {
-    dropdown.classList.remove('open');
-    showSettingsPopup(() => renderStudentProfiel(rootElement));
-  });
-  document.getElementById('nav-logout').addEventListener('click', () => {
-    dropdown.classList.remove('open');
-    window.appRouter.navigate('/login');
-  });
-}
-
-
-  // ===== Edit functionaliteit =====
-  const form = document.getElementById('profileForm');
-  const btnEdit = document.getElementById('btn-edit-profile');
-  const btnSave = document.getElementById('btn-save-profile');
-  const btnReset = document.getElementById('btn-reset-profile');
-  const photoInput = document.getElementById('photoInput');
-  const avatarPreview = document.getElementById('avatar-preview');
-
-  Array.from(form.elements).forEach(el => {
-    if (
-      el.tagName !== "BUTTON"
-      && el.type !== "button"
-      && el.type !== "submit"
-      && el.type !== "reset"
-    ) {
-      el.disabled = readonlyMode;
-    }
-  });
-  if (photoInput) photoInput.style.display = readonlyMode ? 'none' : 'block';
-
-  if (btnEdit) {
-    btnEdit.addEventListener('click', () => {
-      renderStudentProfiel(rootElement, studentData, false);
-    });
-  }
-
-  if (btnReset) {
-    btnReset.addEventListener('click', () => {
-      renderStudentProfiel(rootElement, { ...defaultProfile }, false);
-    });
-  }
-
-  if (btnSave) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const updatedData = {
-        ...studentData,
-        firstName: document.getElementById('firstNameInput').value.trim(),
-        lastName: document.getElementById('lastNameInput').value.trim(),
-        email: document.getElementById('emailInput').value.trim(),
-        studyProgram: document.getElementById('studyProgramInput').value.trim(),
-        year: document.getElementById('yearInput').value,
-        birthDate: document.getElementById('birthDateInput').value,
-        description: document.getElementById('descriptionInput').value.trim(),
-        linkedIn: document.getElementById('linkedinInput').value.trim(),
-        profilePictureUrl: studentData.profilePictureUrl,
-      };
-      renderStudentProfiel(rootElement, updatedData, true);
-    });
-  }
-
-  if (photoInput) {
-    photoInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const maxSize = 2 * 1024 * 1024;
-        if (file.size > maxSize) {
-          alert('De foto mag maximaal 2 MB zijn.');
-          e.target.value = '';
-          return;
-        }
-        const objectUrl = URL.createObjectURL(file);
-        avatarPreview.src = objectUrl;
-        studentData.profilePictureUrl = objectUrl;
+  document.querySelectorAll('.sidebar-link').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const route = e.currentTarget.getAttribute('data-route');
+      switch (route) {
+        case 'profile':
+          window.appRouter.navigate('/Student/Student-Profiel');
+          break;
+        case 'search':
+          window.appRouter.navigate('/Student/Zoek-Criteria');
+          break;
+        case 'speeddates':
+          window.appRouter.navigate('/Student/Student-Speeddates');
+          break;
+        case 'requests':
+          window.appRouter.navigate('/Student/Student-Speeddates-Verzoeken');
+          break;
+        case 'qr':
+          window.appRouter.navigate('/Student/Student-QR-Popup');
+          break;
       }
     });
-  }
+  });
 
-  const logoutBtn = document.getElementById('logout-btn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
+  const burger = document.getElementById('burger-menu');
+  const dropdown = document.getElementById('burger-dropdown');
+  if (burger && dropdown) {
+    dropdown.classList.remove('open');
+    burger.addEventListener('click', (event) => {
+      event.stopPropagation();
+      // Eerst sluiten bij elke klik, daarna openen als hij nog niet open is
+      if (!dropdown.classList.contains('open')) {
+        dropdown.classList.add('open');
+      } else {
+        dropdown.classList.remove('open');
+      }
+    });
+    // Gebruik bubbling (standaard, geen capture:true) zodat toggle altijd werkt
+    document.addEventListener('click', function(event) {
+      if (
+        dropdown.classList.contains('open') &&
+        !dropdown.contains(event.target) &&
+        event.target !== burger
+      ) {
+        dropdown.classList.remove('open');
+      }
+    });
+    document.getElementById('nav-settings').addEventListener('click', () => {
+      dropdown.classList.remove('open');
+      showSettingsPopup(() => renderStudentProfiel(rootElement, studentData));
+    });
+    document.getElementById('nav-logout').addEventListener('click', () => {
+      dropdown.classList.remove('open');
       localStorage.setItem('darkmode', 'false');
       document.body.classList.remove('darkmode');
       renderLogin(rootElement);
@@ -273,4 +194,58 @@ if (burger && dropdown) {
       Router.navigate('/contact');
     });
   });
+
+  // Voeg deze variabele toe om originele data te bewaren voor reset
+  const originalData = { ...studentData };
+
+  // Event handlers voor profiel bewerken
+  const form = document.getElementById('profileForm');
+  if (form) {
+    // EDIT knop
+    const editBtn = document.getElementById('btn-edit-profile');
+    if (editBtn) {
+      editBtn.addEventListener('click', () => {
+        renderStudentProfiel(rootElement, studentData, false);
+      });
+    }
+
+    // SAVE knop
+    const saveBtn = document.getElementById('btn-save-profile');
+    if (saveBtn) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        // Verzamel nieuwe data uit het formulier
+        const updatedData = {
+          ...studentData,
+          firstName: document.getElementById('firstNameInput').value,
+          lastName: document.getElementById('lastNameInput').value,
+          email: document.getElementById('emailInput').value,
+          studyProgram: document.getElementById('studyProgramInput').value,
+          year: document.getElementById('yearInput').value,
+          birthDate: document.getElementById('birthDateInput').value,
+          linkedIn: document.getElementById('linkedinInput').value,
+        };
+        // Optioneel: profielfoto uploaden
+        const photoInput = document.getElementById('photoInput');
+        if (photoInput && photoInput.files && photoInput.files[0]) {
+          // In een echte app zou je hier uploaden naar de server
+          // Voor nu: gebruik een tijdelijke URL
+          updatedData.profilePictureUrl = URL.createObjectURL(photoInput.files[0]);
+        }
+        // Sla op in sessionStorage
+        window.sessionStorage.setItem('studentData', JSON.stringify(updatedData));
+        // Herlaad profiel in readonly mode
+        renderStudentProfiel(rootElement, updatedData, true);
+      });
+    }
+
+    // RESET knop
+    const resetBtn = document.getElementById('btn-reset-profile');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        // Zet formulier terug naar originele data
+        renderStudentProfiel(rootElement, originalData, false);
+      });
+    }
+  }
 }
