@@ -66,6 +66,7 @@ function handleNaamRegister(event) {
   const currentData = {
     voornaam: formData.get('voornaam'),
     achternaam: formData.get('achternaam'),
+    date_of_birth: formData.get('geboortedatum'),
     linkedin: formData.get('linkedin'),
     profielFoto: formData.get('profielFoto')
       ? formData.get('profielFoto').name

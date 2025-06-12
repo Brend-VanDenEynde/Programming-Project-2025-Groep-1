@@ -15,15 +15,12 @@ export function renderStudentOpleiding(rootElement) {
           <label><input type="radio" name="jaar" value="1"> 1ste jaar</label>
           <label><input type="radio" name="jaar" value="2"> 2de jaar</label>
           <label><input type="radio" name="jaar" value="3"> 3de jaar</label>
-        </div>
-
-      <select class="opleiding-select" name="opleiding">
+        </div>      <select class="opleiding-select" name="opleiding">
 
       </select>
 
-      <input type="date" id="birthdate" name="birthdate" required placeholder="Geboortedatum" class="input-full" />
-
       <label id="error-label" class="error-label" style="color: red; display: none;"></label>
+      <label id="footer-error-label" class="error-label" style="color: red; display: none;"></label>
 
       <button class="save-button">Account Aanmaken</button>
       </form>
@@ -46,16 +43,17 @@ export function renderStudentOpleiding(rootElement) {
   const privacyLink = document.getElementById('privacy-link');
   privacyLink.addEventListener('click', (e) => {
     e.preventDefault();
-    const errorLabel = document.getElementById('error-label');
-    errorLabel.textContent = 'Privacy Policy pagina nog niet geïmplementeerd';
-    errorLabel.style.display = 'block';
+    const footerErrorLabel = document.getElementById('footer-error-label');
+    footerErrorLabel.textContent =
+      'Privacy Policy pagina nog niet geïmplementeerd';
+    footerErrorLabel.style.display = 'block';
   });
   const contactLink = document.getElementById('contact-link');
   contactLink.addEventListener('click', (e) => {
     e.preventDefault();
-    const errorLabel = document.getElementById('error-label');
-    errorLabel.textContent = 'Contact pagina nog niet geïmplementeerd';
-    errorLabel.style.display = 'block';
+    const footerErrorLabel = document.getElementById('footer-error-label');
+    footerErrorLabel.textContent = 'Contact pagina nog niet geïmplementeerd';
+    footerErrorLabel.style.display = 'block';
   });
 
   // Fetch opleidingen from API and populate dropdown
@@ -97,10 +95,8 @@ async function handleJaarRegister(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
-
   const jaar = formData.get('jaar');
   const opleiding = formData.get('opleiding');
-  const birthdate = formData.get('birthdate');
 
   const errorLabel = document.getElementById('error-label');
   errorLabel.style.display = 'none';
@@ -115,53 +111,41 @@ async function handleJaarRegister(event) {
     errorLabel.style.display = 'block';
     return;
   }
-  if (!birthdate) {
-    errorLabel.textContent = 'Vul je geboortedatum in!';
-    errorLabel.style.display = 'block';
-    return;
-  }
-  const today = new Date();
-  const birthdateDate = new Date(birthdate);
-  if (birthdateDate > today) {
-    errorLabel.textContent = 'Geboortedatum kan niet in de toekomst liggen!';
-    errorLabel.style.display = 'block';
-    return;
-  }
-
   const previousData = JSON.parse(localStorage.getItem('userData')) || {};
 
   const data = {
     email: previousData.email || '',
     password: previousData.password || '',
-    voornaam: previousData.voornaam || 'Jan',
-    achternaam: previousData.achternaam || 'Jansen',
-    linkedin: previousData.linkedin || 'linkedinlink',
-    profielFoto: previousData.profielFoto || 'default.jpg',
+    voornaam: previousData.voornaam || '',
+    achternaam: previousData.achternaam || '',
+    linkedin: previousData.linkedin || '',
+    profielFoto: previousData.profielFoto,
     studiejaar: parseInt(jaar, 10),
     opleiding_id: parseInt(opleiding, 10),
-    date_of_birth: birthdate,
+    date_of_birth: previousData.date_of_birth || '',
   };
-
   try {
-    const response = await fetch('https://api.ehb-match.me/auth/register/student', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
+    const response = await fetch(
+      'https://api.ehb-match.me/auth/register/student',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
     if (!response.ok) {
       throw new Error('Fout bij het aanmaken van account.');
     }
 
     const result = await response.json();
-    console.log('Account succesvol aangemaakt:', result);
 
     Router.navigate('/login');
   } catch (error) {
     console.error('Fout bij het aanmaken van account:', error);
-    errorLabel.textContent = 'Er is een fout opgetreden bij het aanmaken van je account.';
+    errorLabel.textContent =
+      'Er is een fout opgetreden bij het aanmaken van je account.';
     errorLabel.style.display = 'block';
   }
 }
