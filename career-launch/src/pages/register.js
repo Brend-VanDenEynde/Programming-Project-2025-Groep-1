@@ -1,12 +1,7 @@
 import { renderStudentRegister } from './student-register.js';
 import { renderBedrijfRegister } from './bedrijf-register.js';
 import Router from '../router.js';
-import { renderLogin } from './login.js';import {
-  createUserRegistrationJSON,
-  sendRegistrationToAPI,
-  validateRegistrationData,
-  mockRegistrationAPI,
-} from '../utils/registration-api.js';
+import { renderLogin } from './login.js';
 
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `
@@ -60,6 +55,8 @@ export function renderRegister(rootElement) {
             </label>
           </div>
           
+          <label id="error-message" class="error-label" style="color: red; display: none;"></label>
+
           <button type="submit" class="register-btn">Registreer</button>
         </form>
         
@@ -153,36 +150,35 @@ export function renderRegister(rootElement) {
 function handleRegister(event) {
   event.preventDefault();
 
+  const errorMessageLabel = document.getElementById('error-message');
+  errorMessageLabel.style.display = 'none'; // Reset error message visibility
+
   const formData = new FormData(event.target);
   const data = {
-    firstName: formData.get('firstName'),
-    lastName: formData.get('lastName'),
     email: formData.get('email'),
     password: formData.get('password'),
-    confirmPassword: formData.get('confirmPassword'),
-    rol: formData.get('rol'),
   };
 
   // Validatie
-  if (data.password !== data.confirmPassword) {
-    alert('Wachtwoorden komen niet overeen!');
+  if (formData.get('password') !== formData.get('confirmPassword')) {
+    errorMessageLabel.textContent = 'Wachtwoorden komen niet overeen!';
+    errorMessageLabel.style.display = 'block';
     return;
   }
-  if (data.password.length < 8) {
-    alert('Wachtwoord moet minimaal 8 karakters bevatten!');
+  if (formData.get('password').length < 8) {
+    errorMessageLabel.textContent = 'Wachtwoord moet minimaal 8 karakters bevatten!';
+    errorMessageLabel.style.display = 'block';
     return;
   }
-  if (!data.rol) {
-    alert('Selecteer “Student” of “Bedrijf”!');
-    return;
-  }
-  // Data naar server sturen (voorbeeld)
-  console.log('Registratie data:', data);
 
-  if (data.rol === 'student') {
-      renderStudentRegister(document.getElementById('app'));
-  } else if (data.rol === 'bedrijf') {
-      renderBedrijfRegister(document.getElementById('app'));
+  // Store data securely in localStorage
+  localStorage.setItem('userData', JSON.stringify(data));
+
+  // Data naar server sturen (voorbeeld)
+  if (formData.get('rol') === 'student') {
+      renderStudentRegister(document.getElementById('app'), data);
+  } else if (formData.get('rol') === 'bedrijf') {
+      renderBedrijfRegister(document.getElementById('app'), data);
   } else {
       renderLogin(document.getElementById('app'));
   }

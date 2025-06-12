@@ -5,9 +5,9 @@ localStorage.setItem('darkmode', 'false');
 document.body.classList.remove('darkmode');
 
 export function renderLogin(rootElement) {
-  // Direct skippen naar student-profiel (voor testen)
-  Router.navigate('/Student/Student-Profiel');
-  return;
+  // Verwijder de automatische skip naar student-profiel
+  // Router.navigate('/Student/Student-Profiel');
+  // return;
 
   rootElement.innerHTML = `
     <div class="login-container">

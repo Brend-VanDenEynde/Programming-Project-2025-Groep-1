@@ -11,16 +11,23 @@ export function renderStudentRegister(rootElement) {
 
       <div class="upload-section">
         <div class="upload-icon">⬆</div>
-        <label>Foto</label>
+        <label for="profielFoto">Foto</label>
+        <input type="file" id="profielFoto" name="profielFoto" accept="image/*" />
       </div>
 
       <form class="naamForm" id="naamForm">
         <div class="name-row">
-          <input type="voornaam" id="voornaam" name="voornaam" required placeholder="Voornaam" class="input-half" />
-          <input type="achternaam" id="achternaam" name="achternaam" required placeholder="Achternaam" class="input-half" />
+          <input type="text" id="voornaam" name="voornaam" required placeholder="Voornaam" class="input-half" />
+          <input type="text" id="achternaam" name="achternaam" required placeholder="Achternaam" class="input-half" />
         </div>
-        <input type="linkedin" id="linkedin" name"linkedin" placeholder="LinkedIn-link" class="input-full" />
-
+        <div class="form-spacing">
+          <input type="date" id="geboortedatum" name="geboortedatum" required placeholder="Geboortedatum" class="input-full" />
+        </div>
+        <div class="form-spacing">
+          <input type="text" id="linkedin" name="linkedin" placeholder="LinkedIn-link" class="input-full" />
+        </div>
+        <input type="linkedin" id="linkedin" name="linkedin" placeholder="LinkedIn-link" class="input-full" />
+        <label id="error-label" class="error-label" style="color: red; display: none;"></label>
         <button type="submit" class="next-button">Volgende →</button>
       </form>
 
@@ -60,17 +67,28 @@ function handleNaamRegister(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
-  const data = {
+  const currentData = {
     voornaam: formData.get('voornaam'),
     achternaam: formData.get('achternaam'),
-    linkedinLink: formData.get('linkedin'),
+    linkedin: formData.get('linkedin'),
+    profielFoto: formData.get('profielFoto') ? formData.get('profielFoto').name : null, // Get uploaded file name
   };
 
-  
+  const errorLabel = document.getElementById('error-label');
+  errorLabel.style.display = 'none';
 
-  // Data naar server sturen (voorbeeld)
-  console.log('Registratie data:', data);
-  alert(`Welkom ${data.voornaam}! Je account is aangemaakt.`);
+  if (!currentData.voornaam || !currentData.achternaam) {
+    errorLabel.textContent = 'Voornaam en achternaam zijn verplicht.';
+    errorLabel.style.display = 'block';
+    return;
+  }
+
+  const previousData = JSON.parse(localStorage.getItem('userData')) || {};
+
+  const mergedData = { ...previousData, ...currentData };
+
+  // Store merged data securely in localStorage
+  localStorage.setItem('userData', JSON.stringify(mergedData));
 
   renderStudentOpleiding(document.getElementById('app'));
 }
