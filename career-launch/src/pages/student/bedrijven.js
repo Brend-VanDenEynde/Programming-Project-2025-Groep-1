@@ -6,74 +6,10 @@ import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { renderQRPopup } from './student-qr-popup.js';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
+import { fetchCompanies } from '../../utils/data-api.js';
 
-// Belgische bedrijven met locatie, werkdomein en bedrijfslogo's (PNG/JPG/SVG direct van bedrijven of Wikipedia)
-const bedrijven = [
-  {
-    naam: 'Proximus',
-    linkedin: 'https://www.linkedin.com/company/proximus',
-    bio: 'Proximus is een toonaangevende Belgische telecomoperator en ICT-provider.',
-    foto: 'https://www.proximus.com/dam/jcr:8e2e5c1e-7f8c-4e2f-8e5e-6b7e7b7e7b7e/proximus-logo.png', // PNG logo
-    locatie: 'Brussel, België',
-    werkdomein: 'Telecom, ICT',
-  },
-  {
-    naam: 'Colruyt Group',
-    linkedin: 'https://www.linkedin.com/company/colruyt-group',
-    bio: 'Colruyt Group is een Belgische retailgroep actief in voeding, energie en meer.',
-    foto: 'https://www.colruytgroup.com/sites/default/files/styles/og_image/public/2021-03/colruytgroup-logo.png', // PNG logo
-    locatie: 'Halle, België',
-    werkdomein: 'Retail, Energie',
-  },
-  {
-    naam: 'Barco',
-    linkedin: 'https://www.linkedin.com/company/barco',
-    bio: 'Barco is een Belgisch technologiebedrijf gespecialiseerd in visualisatie en displayoplossingen.',
-    foto: 'https://www.barco.com/content/dam/barco/global/logos/barco-logo.png', // PNG logo
-    locatie: 'Kortrijk, België',
-    werkdomein: 'Technologie, Visualisatie',
-  },
-  {
-    naam: 'UCB',
-    linkedin: 'https://www.linkedin.com/company/ucb-pharma',
-    bio: 'UCB is een Belgisch biofarmaceutisch bedrijf met focus op neurowetenschappen en immunologie.',
-    foto: 'https://www.ucb.com/sites/default/files/2021-03/ucb-logo.png', // PNG logo
-    locatie: 'Brussel, België',
-    werkdomein: 'Farmaceutica, Biotechnologie',
-  },
-  {
-    naam: 'Solvay',
-    linkedin: 'https://www.linkedin.com/company/solvay',
-    bio: 'Solvay is een Belgisch chemiebedrijf actief in geavanceerde materialen en chemie.',
-    foto: 'https://www.solvay.com/sites/g/files/srpend221/files/styles/og_image/public/2021-03/solvay-logo.png', // PNG logo
-    locatie: 'Brussel, België',
-    werkdomein: 'Chemie, Materialen',
-  },
-  {
-    naam: 'Belfius',
-    linkedin: 'https://www.linkedin.com/company/belfius',
-    bio: 'Belfius is een Belgische bank en verzekeraar met focus op digitale innovatie.',
-    foto: 'https://www.belfius.com/images/default-source/default-album/belfius-logo.png', // PNG logo
-    locatie: 'Brussel, België',
-    werkdomein: 'Bank, Verzekeringen',
-  },
-  {
-    naam: 'Telenet',
-    linkedin: 'https://www.linkedin.com/company/telenet',
-    bio: 'Telenet is een Belgische aanbieder van kabeltelevisie, internet en telefonie.',
-    foto: 'https://www.telenet.be/content/dam/www-telenet-be/logos/telenet-logo.png', // PNG logo
-    locatie: 'Mechelen, België',
-    werkdomein: 'Telecom, Media',
-  },
-  {
-    naam: 'Delhaize',
-    linkedin: 'https://www.linkedin.com/company/delhaize',
-    bio: 'Delhaize is een Belgische supermarktketen, onderdeel van Ahold Delhaize.',
-    foto: 'https://www.delhaize.be/etc/designs/delhaize/clientlibs/img/logo.png', // PNG logo
-    locatie: 'Brussel, België',
-    werkdomein: 'Retail, Voeding',
-  },
-];
+// Globale variabele voor bedrijven data
+let bedrijven = [];
 
 // Popup voor bedrijf detail
 function showBedrijfPopup(bedrijf) {
@@ -191,19 +127,74 @@ function getUniekeDomeinen() {
 }
 
 // Hoofdfunctie: lijst van bedrijven
-export function renderBedrijven(rootElement, studentData = {}) {
+export async function renderBedrijven(rootElement, studentData = {}) {
   let huidigeZoek = '';
   let huidigeLocatie = '';
   let huidigeDomein = '';
 
+  // Check if user is authenticated
+  const authToken = window.sessionStorage.getItem('authToken');
+  if (!authToken) {
+    console.warn('No auth token found, redirecting to login');
+    renderLogin(rootElement);
+    return;
+  }
+
+  // Load companies from API
+  try {
+    console.log('Loading companies from API...');
+    const companies = await fetchCompanies();
+    console.log('Raw API response:', companies);
+
+    // Check if response is an array
+    if (!Array.isArray(companies)) {
+      console.error('API response is not an array:', companies);
+      bedrijven = [];
+    } else {
+      // Map API response to expected format
+      bedrijven = companies.map((company) => ({
+        naam: company.naam,
+        linkedin: company.linkedin || '',
+        bio: company.bio || '',
+        foto: company.foto || '/images/BedrijfDefault.jpg', // Use default image if no foto
+        locatie: company.plaats || '',
+        werkdomein: company.werkdomein || '',
+        contact_email: company.contact_email,
+        gebruiker_id: company.gebruiker_id,
+      }));
+    }
+
+    console.log('Mapped companies:', bedrijven);
+  } catch (error) {
+    console.error('Failed to load companies:', error);
+    console.error('Error details:', error.message);
+
+    // If authentication failed, redirect to login
+    if (error.message.includes('Authentication failed')) {
+      renderLogin(rootElement);
+      return;
+    }
+
+    // Keep empty array if loading fails
+    bedrijven = [];
+  }
   function renderList() {
+    const bedrijvenListElement = document.getElementById('bedrijven-list');
+
+    if (!bedrijvenListElement) return;
+
+    if (bedrijven.length === 0) {
+      bedrijvenListElement.innerHTML = `<div style="text-align:center;width:100%;color:#888;">Laden van bedrijven...</div>`;
+      return;
+    }
+
     const gefilterd = filterBedrijven({
       zoek: huidigeZoek,
       locatie: huidigeLocatie,
       werkdomein: huidigeDomein,
     });
 
-    document.getElementById('bedrijven-list').innerHTML = gefilterd.length
+    bedrijvenListElement.innerHTML = gefilterd.length
       ? gefilterd
           .map(
             (bedrijf, idx) => `
@@ -212,7 +203,7 @@ export function renderBedrijven(rootElement, studentData = {}) {
         )}">
           <img src="${bedrijf.foto}" alt="Logo ${
               bedrijf.naam
-            }" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;">
+            }" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.src='/images/BedrijfDefault.jpg'">
           <h3 style="margin-bottom:0.5rem;text-align:center;">${
             bedrijf.naam
           }</h3>
@@ -236,7 +227,7 @@ export function renderBedrijven(rootElement, studentData = {}) {
       });
     });
   }
-
+  // Initial render with loading state
   rootElement.innerHTML = `
     <div class="student-profile-container">
       <header class="student-profile-header">
@@ -268,19 +259,13 @@ export function renderBedrijven(rootElement, studentData = {}) {
               <input id="bedrijf-zoek" type="text" placeholder="Zoek bedrijf, locatie of domein..." style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;min-width:180px;">
               <select id="bedrijf-filter-locatie" style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;">
                 <option value="">Alle locaties</option>
-                ${getUniekeLocaties()
-                  .map((loc) => `<option value="${loc}">${loc}</option>`)
-                  .join('')}
               </select>
               <select id="bedrijf-filter-domein" style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;">
                 <option value="">Alle domeinen</option>
-                ${getUniekeDomeinen()
-                  .map((dom) => `<option value="${dom}">${dom}</option>`)
-                  .join('')}
               </select>
             </div>
             <div id="bedrijven-list" class="bedrijven-list" style="display:flex;flex-wrap:wrap;gap:2rem;justify-content:center;">
-              <!-- Cards komen hier dynamisch -->
+              <div style="text-align:center;width:100%;color:#888;">Laden van bedrijven...</div>
             </div>
           </div>
         </div>
@@ -291,6 +276,34 @@ export function renderBedrijven(rootElement, studentData = {}) {
       </footer>
     </div>
   `;
+
+  // Update filters after data is loaded
+  function updateFilters() {
+    const locatieSelect = document.getElementById('bedrijf-filter-locatie');
+    const domeinSelect = document.getElementById('bedrijf-filter-domein');
+
+    if (locatieSelect && domeinSelect) {
+      // Update location filter
+      const uniekeLocaties = getUniekeLocaties();
+      locatieSelect.innerHTML =
+        '<option value="">Alle locaties</option>' +
+        uniekeLocaties
+          .map((loc) => `<option value="${loc}">${loc}</option>`)
+          .join('');
+
+      // Update domain filter
+      const uniekeDomeinen = getUniekeDomeinen();
+      domeinSelect.innerHTML =
+        '<option value="">Alle domeinen</option>' +
+        uniekeDomeinen
+          .map((dom) => `<option value="${dom}">${dom}</option>`)
+          .join('');
+    }
+  }
+
+  // Update filters and render list after data is loaded
+  updateFilters();
+  renderList();
   // Sidebar nav - gebruik de router voor echte URL navigatie
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
     btn.addEventListener('click', (e) => {
@@ -321,26 +334,35 @@ export function renderBedrijven(rootElement, studentData = {}) {
       });
     });
   });
+  // Filter & zoek events - setup after data is loaded
+  const setupEventListeners = () => {
+    const zoekElement = document.getElementById('bedrijf-zoek');
+    const locatieElement = document.getElementById('bedrijf-filter-locatie');
+    const domeinElement = document.getElementById('bedrijf-filter-domein');
 
-  // Filter & zoek events
-  document.getElementById('bedrijf-zoek').addEventListener('input', (e) => {
-    huidigeZoek = e.target.value;
-    renderList();
-  });
-  document
-    .getElementById('bedrijf-filter-locatie')
-    .addEventListener('change', (e) => {
-      huidigeLocatie = e.target.value;
-      renderList();
-    });
-  document
-    .getElementById('bedrijf-filter-domein')
-    .addEventListener('change', (e) => {
-      huidigeDomein = e.target.value;
-      renderList();
-    });
+    if (zoekElement) {
+      zoekElement.addEventListener('input', (e) => {
+        huidigeZoek = e.target.value;
+        renderList();
+      });
+    }
 
-  renderList();
+    if (locatieElement) {
+      locatieElement.addEventListener('change', (e) => {
+        huidigeLocatie = e.target.value;
+        renderList();
+      });
+    }
+
+    if (domeinElement) {
+      domeinElement.addEventListener('change', (e) => {
+        huidigeDomein = e.target.value;
+        renderList();
+      });
+    }
+  };
+
+  setupEventListeners();
 
   // Burger menu
   const burger = document.getElementById('burger-menu');

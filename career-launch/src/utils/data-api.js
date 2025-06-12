@@ -11,7 +11,7 @@ import { apiGet, apiPost, apiPut, apiDelete } from '../utils/api.js';
  */
 export async function fetchSkills() {
   try {
-    const skills = await apiGet('http://localhost:3001/skills/');
+    const skills = await apiGet('https://api.ehb-match.me/skills');
     return skills;
   } catch (error) {
     console.error('Error fetching skills:', error);
@@ -25,7 +25,7 @@ export async function fetchSkills() {
  */
 export async function fetchStudents() {
   try {
-    const students = await apiGet('http://localhost:3001/studenten/');
+    const students = await apiGet('https://api.ehb-match.me/studenten');
     return students;
   } catch (error) {
     console.error('Error fetching students:', error);
@@ -41,7 +41,7 @@ export async function fetchStudents() {
 export async function fetchStudentById(studentId) {
   try {
     const student = await apiGet(
-      `http://localhost:3001/studenten/${studentId}`
+      `https://api.ehb-match.me/studenten/${studentId}`
     );
     return student;
   } catch (error) {
@@ -56,7 +56,7 @@ export async function fetchStudentById(studentId) {
  */
 export async function fetchCompanies() {
   try {
-    const companies = await apiGet('http://localhost:3001/bedrijven/');
+    const companies = await apiGet('https://api.ehb-match.me/bedrijven');
     return companies;
   } catch (error) {
     console.error('Error fetching companies:', error);
@@ -73,7 +73,7 @@ export async function fetchCompanies() {
 export async function updateStudentProfile(studentId, profileData) {
   try {
     const updatedStudent = await apiPut(
-      `http://localhost:3001/studenten/${studentId}`,
+      `https://api.ehb-match.me/studenten/${studentId}`,
       profileData
     );
     return updatedStudent;
@@ -92,7 +92,7 @@ export async function updateStudentProfile(studentId, profileData) {
 export async function saveSearchCriteria(studentId, criteria) {
   try {
     const response = await apiPost(
-      `http://localhost:3001/studenten/${studentId}/criteria`,
+      `https://api.ehb-match.me/studenten/${studentId}/criteria`,
       criteria
     );
     return response;

@@ -93,7 +93,24 @@ export async function apiGet(url, options = {}) {
   });
 
   if (!response.ok) {
+    const errorText = await response.text();
+    console.error(
+      `API GET error for ${url}:`,
+      response.status,
+      response.statusText,
+      errorText
+    );
     throw new Error(`API GET error: ${response.status} ${response.statusText}`);
+  }
+
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    const responseText = await response.text();
+    console.error(
+      `Expected JSON but got ${contentType} for ${url}:`,
+      responseText
+    );
+    throw new Error(`Expected JSON response but got ${contentType}`);
   }
 
   return await response.json();
