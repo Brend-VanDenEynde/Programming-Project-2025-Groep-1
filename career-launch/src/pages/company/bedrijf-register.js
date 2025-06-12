@@ -16,7 +16,7 @@ export function renderBedrijfRegister(rootElement) {
 
       <form class="naamForm" id="naamForm">
         <div class="name-row">
-          <input type="bedrijfnaam" id="bedrijfnaam" name="bedrijfnaam" required placeholder="Bedrijfnaam" class="input-half" />
+          <input type="text" id="bedrijfnaam" name="bedrijfnaam" required placeholder="Bedrijfnaam" class="input-half" />
         </div>
         <input type="linkedin" id="linkedin" name"linkedin" placeholder="LinkedIn-link" class="input-full" />
 

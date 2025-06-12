@@ -17,10 +17,10 @@ export function renderStudentRegister(rootElement) {
 
       <form class="naamForm" id="naamForm">
         <div class="name-row">
-          <input type="voornaam" id="voornaam" name="voornaam" required placeholder="Voornaam" class="input-half" />
+          <input type="text" id="voornaam" name="voornaam" required placeholder="Voornaam" class="input-half" />
           <input type="achternaam" id="achternaam" name="achternaam" required placeholder="Achternaam" class="input-half" />
         </div>
-        <input type="linkedin" id="linkedin" name="linkedin" placeholder="LinkedIn-link" class="input-full" />
+        <input type="url" id="linkedin" name="linkedin" placeholder="LinkedIn-link" class="input-full" />
         <label id="error-label" class="error-label" style="color: red; display: none;"></label>
         <button type="submit" class="next-button">Volgende →</button>
       </form>

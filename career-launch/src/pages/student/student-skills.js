@@ -11,7 +11,7 @@ export function renderStudentSkills(rootElement) {
       <div class="Job-Search">
       <h3>Ik zoek een</h3>
         <div class="radio-group">
-          <label><input type="radio" name="job" value="fulltime"> Fultime</label>
+          <label><input type="radio" name="job" value="fulltime"> Fulltime</label>
           <label><input type="radio" name="job" value="parttime"> Parttime</label>
           <label><input type="radio" name="job" value="stage"> Stage</label>
         </div>
