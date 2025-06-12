@@ -191,64 +191,47 @@ async function handleLogin(event, rootElement) {
       throw new Error('Invalid login response');
     }
 
-    // TEMPORARY: Since backend doesn't provide userType yet, we'll use email domain logic
-    // TODO: Remove this when backend adds userType to response
-    let userType = response.userType;
-
-    if (!userType) {
-      // Determine user type based on email domain (temporary solution)
-      if (email.includes('@student.ehb.be') || email.includes('@ehb.be')) {
-        userType = 'student';
-      } else {
-        userType = 'company';
-      }
-      console.warn(
-        'userType not provided by API, using email-based detection:',
-        userType
-      );
-    }
-
-    // Handle successful login based on user type
-    if (userType === 'student') {
-      // Mapping API response to student profile fields
+    // Gebruik numerieke type-codes: 0=user, 1=admin, 2=student, 3=bedrijf
+    const type = response.user?.type;
+    if (type === 2) { // student
       const studentData = {
-        id: response.user?.id || null,
-        firstName: response.user?.firstName || response.user?.voornaam || 'Voornaam',
-        lastName: response.user?.lastName || response.user?.achternaam || 'Achternaam',
-        email: response.user?.email || email,
-        studyProgram: response.user?.studyProgram || response.user?.opleiding_naam || '', // if available
-        year: response.user?.year || response.user?.studiejaar || '',
-        profilePictureUrl:
-          response.user?.profilePictureUrl ||
-          response.user?.profiel_foto ||
-          '/src/Images/default.jpg',
-        linkedIn: response.user?.linkedIn || response.user?.linkedin || '',
-        birthDate: response.user?.birthDate || response.user?.date_of_birth || '',
+        type,
+        gebruiker_id: response.user?.gebruiker_id || response.user?.id || null,
+        voornaam: response.user?.voornaam || response.user?.firstName || '',
+        achternaam: response.user?.achternaam || response.user?.lastName || '',
+        linkedin: response.user?.linkedin || '',
+        profiel_foto: response.user?.profiel_foto || response.user?.profilePictureUrl || '/src/Images/default.jpg',
+        studiejaar: response.user?.studiejaar || response.user?.year || '',
         opleiding_id: response.user?.opleiding_id || null,
       };
-
       window.sessionStorage.setItem('studentData', JSON.stringify(studentData));
       window.sessionStorage.setItem('userType', 'student');
       Router.navigate('/Student/Student-Profiel');
-    } else if (userType === 'company') {
-      // Handle company login with API data
+    } else if (type === 3) { // bedrijf
       const companyData = {
-        id: response.user?.id || null,
-        companyName: response.user?.companyName || 'Bedrijf',
-        email: response.user?.email || email,
-        description: response.user?.description || '',
-        linkedIn: response.user?.linkedIn || '',
-        profilePictureUrl:
-          response.user?.profilePictureUrl || '/src/Images/default-company.jpg',
+        type,
+        gebruiker_id: response.user?.gebruiker_id || response.user?.id || null,
+        naam: response.user?.naam || response.user?.companyName || '',
+        plaats: response.user?.plaats || response.user?.location || '',
+        contact_email: response.user?.contact_email || response.user?.email || '',
+        linkedin: response.user?.linkedin || '',
+        profiel_foto: response.user?.profiel_foto || response.user?.profilePictureUrl || '/src/Images/default-company.jpg',
       };
-
-      // Store company data
       window.sessionStorage.setItem('companyData', JSON.stringify(companyData));
-      window.sessionStorage.setItem('userType', 'company'); // Navigate to company profile
+      window.sessionStorage.setItem('userType', 'company');
       Router.navigate('/Bedrijf/Bedrijf-Profiel');
+    } else if (type === 1) { // admin
+      const adminData = {
+        type,
+        gebruiker_id: response.user?.gebruiker_id || response.user?.id || null,
+        email: response.user?.email || '',
+      };
+      window.sessionStorage.setItem('adminData', JSON.stringify(adminData));
+      window.sessionStorage.setItem('userType', 'admin');
+      Router.navigate('/admin-dashboard');
     } else {
-      // This should never happen with our email-based logic
-      console.error('Onbekend gebruikerstype:', userType);
+      // Onbekend of niet ondersteund type
+      alert('Onbekend of niet ondersteund gebruikerstype. Neem contact op met support.');
       throw new Error('Authentication failed: Unknown user type');
     }
   } catch (error) {
