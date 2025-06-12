@@ -124,7 +124,6 @@ export function renderRegister(rootElement) {
   document.body.classList.remove('darkmode');
 
   // Password toggle functionaliteit
-
   function setupPasswordToggle(inputId, toggleButtonId, iconId) {
     const input = document.getElementById(inputId);
     const toggleButton = document.getElementById(toggleButtonId);
@@ -140,6 +139,8 @@ export function renderRegister(rootElement) {
         icon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
       });
     }
+  }
+  
   const passwordInput = document.getElementById('passwordInput');
   const togglePassword = document.getElementById('togglePassword');
   const togglePasswordIcon = document.getElementById('togglePasswordIcon');

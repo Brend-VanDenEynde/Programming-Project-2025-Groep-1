@@ -92,14 +92,8 @@ export function renderLogin(rootElement) {
   const togglePasswordIcon = document.getElementById('togglePasswordIcon');
   if (passwordInput && togglePassword && togglePasswordIcon) {
     togglePassword.addEventListener('click', () => {
-      const isVisible = passwordInput.type === 'text';
-      passwordInput.type = isVisible ? 'password' : 'text';
+      const isVisible = passwordInput.type === 'text';      passwordInput.type = isVisible ? 'password' : 'text';
       togglePasswordIcon.src = isVisible
-        ? 'src/Icons/icons8-closed-eye-HIDDEN.png'
-        : 'src/Icons/icons8-closed-eye-CLEAR.png';
-      togglePasswordIcon.alt = isVisible
-        ? 'Toon wachtwoord'
-        : 'Verberg wachtwoord';
         ? 'src/Icons/hide.png'
         : 'src/Icons/eye.png';
       togglePasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
