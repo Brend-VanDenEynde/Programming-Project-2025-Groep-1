@@ -3,10 +3,10 @@
  * om de refresh token functionaliteit te gebruiken
  */
 
-import defaultAvatar from '../Images/default.jpg';
-import logoIcon from '../Icons/favicon-32x32.png';
-import { renderLogin } from './login.js';
-import { renderSearchCriteriaStudent } from './search-criteria-student.js';
+import defaultAvatar from '../images/default.png';
+import logoIcon from '../icons/favicon-32x32.png';
+import { renderLogin } from '../pages/login.js';
+import { renderSearchCriteriaStudent } from '../pages/student/search-criteria-student.js';
 import { performLogout } from '../utils/auth-api.js';
 import { fetchStudentById, updateStudentProfile } from '../utils/data-api.js';
 

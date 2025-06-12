@@ -1,4 +1,4 @@
-// import { renderBedrijfOpleiding } from './student-opleiding.js';
+// import { renderStudentOpleiding } from '../register-student/student-opleiding.js';
 import '../../css/student-register.css';
 import Router from '../../router.js';
 

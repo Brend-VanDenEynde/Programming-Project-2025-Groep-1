@@ -1,5 +1,5 @@
-import '../css/student-register.css';
-import Router from '../router.js';
+import '../../css/student-register.css';
+import Router from '../../router.js';
 
 // Skills ophalen uit de API
 async function fetchSkills() {

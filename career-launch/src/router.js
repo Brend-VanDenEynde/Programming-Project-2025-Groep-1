@@ -14,7 +14,7 @@ import { renderQRPopup } from './pages/student/student-qr-popup.js';
 import { renderSpeeddates } from './pages/student/student-speeddates.js';
 import { renderSpeeddatesRequests } from './pages/student/student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './pages/student/student-settings.js';
-import { renderBedrijfProfiel } from './pages/Bedrijf/bedrijf-profiel.js';
+import { renderBedrijfProfiel } from './pages/bedrijf/bedrijf-profiel.js';
 import { renderBedrijfRegister } from './pages/register-bedrijf/bedrijf-register.js';
 import { renderBedrijven } from './pages/student/bedrijven.js';
 
