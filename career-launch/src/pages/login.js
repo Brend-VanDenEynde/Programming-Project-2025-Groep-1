@@ -195,36 +195,36 @@ async function handleLogin(event, rootElement) {
     const type = response.user?.type;
     if (type === 2) { // student
       const studentData = {
-        type,
-        gebruiker_id: response.user?.gebruiker_id || response.user?.id || null,
-        voornaam: response.user?.voornaam || response.user?.firstName || '',
-        achternaam: response.user?.achternaam || response.user?.lastName || '',
-        linkedin: response.user?.linkedin || '',
-        profiel_foto: response.user?.profiel_foto || response.user?.profilePictureUrl || '/src/Images/default.jpg',
-        studiejaar: response.user?.studiejaar || response.user?.year || '',
-        opleiding_id: response.user?.opleiding_id || null,
+        type: response.user?.type ?? null,
+        gebruiker_id: response.user?.gebruiker_id ?? null,
+        voornaam: response.user?.voornaam ?? null,
+        achternaam: response.user?.achternaam ?? null,
+        linkedin: response.user?.linkedin ?? null,
+        profiel_foto: response.user?.profiel_foto ?? null,
+        studiejaar: response.user?.studiejaar ?? null,
+        opleiding_id: response.user?.opleiding_id ?? null,
       };
       window.sessionStorage.setItem('studentData', JSON.stringify(studentData));
       window.sessionStorage.setItem('userType', 'student');
       Router.navigate('/Student/Student-Profiel');
     } else if (type === 3) { // bedrijf
       const companyData = {
-        type,
-        gebruiker_id: response.user?.gebruiker_id || response.user?.id || null,
-        naam: response.user?.naam || response.user?.companyName || '',
-        plaats: response.user?.plaats || response.user?.location || '',
-        contact_email: response.user?.contact_email || response.user?.email || '',
-        linkedin: response.user?.linkedin || '',
-        profiel_foto: response.user?.profiel_foto || response.user?.profilePictureUrl || '/src/Images/default-company.jpg',
+        type: response.user?.type ?? null,
+        gebruiker_id: response.user?.gebruiker_id ?? null,
+        naam: response.user?.naam ?? null,
+        plaats: response.user?.plaats ?? null,
+        contact_email: response.user?.contact_email ?? null,
+        linkedin: response.user?.linkedin ?? null,
+        profiel_foto: response.user?.profiel_foto ?? null,
       };
       window.sessionStorage.setItem('companyData', JSON.stringify(companyData));
       window.sessionStorage.setItem('userType', 'company');
       Router.navigate('/Bedrijf/Bedrijf-Profiel');
     } else if (type === 1) { // admin
       const adminData = {
-        type,
-        gebruiker_id: response.user?.gebruiker_id || response.user?.id || null,
-        email: response.user?.email || '',
+        type: response.user?.type ?? null,
+        gebruiker_id: response.user?.gebruiker_id ?? null,
+        email: response.user?.email ?? null,
       };
       window.sessionStorage.setItem('adminData', JSON.stringify(adminData));
       window.sessionStorage.setItem('userType', 'admin');
