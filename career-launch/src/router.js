@@ -4,18 +4,18 @@
 import { renderHome } from './pages/home.js';
 import { renderRegister } from './pages/register.js';
 import { renderLogin } from './pages/login.js';
-import { renderStudentProfiel } from './pages/Student/student-profiel.js';
-import { renderSearchCriteriaStudent } from './pages/Student/search-criteria-student.js';
+import { renderStudentProfiel } from './pages/student/student-profiel.js';
+import { renderSearchCriteriaStudent } from './pages/student/search-criteria-student.js';
 import { renderAdmin } from './pages/Admin/admin.js';
 import { renderAdminSelectDashboard } from './pages/Admin/admin-select-dashboard.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
-import { renderQRPopup } from './pages/Student/student-qr-popup.js';
-import { renderSpeeddates } from './pages/Student/student-speeddates.js';
-import { renderSpeeddatesRequests } from './pages/Student/student-speeddates-verzoeken.js';
-import { showSettingsPopup } from './pages/Student/student-settings.js';
-import { renderBedrijfProfiel } from './pages/Bedrijf/bedrijf-profiel.js';
-import { renderBedrijfRegister } from './pages/Register-Bedrijf/bedrijf-register.js';
+import { renderQRPopup } from './pages/student/student-qr-popup.js';
+import { renderSpeeddates } from './pages/student/student-speeddates.js';
+import { renderSpeeddatesRequests } from './pages/student/student-speeddates-verzoeken.js';
+import { showSettingsPopup } from './pages/student/student-settings.js';
+import { renderBedrijfProfiel } from './pages/bedrijf/bedrijf-profiel.js';
+import { renderBedrijfRegister } from './pages/register-bedrijf/bedrijf-register.js';
 
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
@@ -102,7 +102,8 @@ class Router {
       '/Student/Zoek-Criteria': 'Zoek Criteria - Career Launch 2025',
       '/Student/Student-QR-Popup': 'Jouw QR-code - Career Launch 2025',
       '/Student/Student-Speeddates': 'Jouw Speeddates - Career Launch 2025',
-      '/Student/Student-Speeddates-Verzoeken': 'Speeddate Verzoeken - Career Launch 2025',
+      '/Student/Student-Speeddates-Verzoeken':
+        'Speeddate Verzoeken - Career Launch 2025',
       '/Student/Student-Settings': 'Instellingen - Career Launch 2025',
       '/admin': 'Admin Login - Career Launch 2025',
       '/admin-dashboard': 'Admin Dashboard - Career Launch 2025',
@@ -126,7 +127,10 @@ const router = new Router(routes);
 window.appRouter = router;
 
 // Automatisch redirecten naar https op productie (niet localhost)
-if (window.location.protocol === 'http:' && !window.location.hostname.includes('localhost')) {
+if (
+  window.location.protocol === 'http:' &&
+  !window.location.hostname.includes('localhost')
+) {
   window.location.href = window.location.href.replace('http:', 'https:');
 }
 

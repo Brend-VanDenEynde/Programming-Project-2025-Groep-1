@@ -1,2 +1,2 @@
-import { renderBedrijfRegister } from './Register-Bedrijf/bedrijf-register.js';
+import { renderBedrijfRegister } from './register-bedrijf/bedrijf-register.js';
 export { renderBedrijfRegister };

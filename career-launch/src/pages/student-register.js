@@ -1,2 +1,2 @@
-import { renderStudentRegister } from './Register-Student/student-register.js';
+import { renderStudentRegister } from './register-student/student-register.js';
 export { renderStudentRegister };
