@@ -20,7 +20,7 @@ import { renderAdminIngeschrevenBedrijven } from './pages/admin/admin-ingeschrev
 import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven-in-behandeling.js';
 import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js';
 import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
-import { renderAdminProcessingCompanyDetail } from './pages/admin/admin-dashboard.js';
+import { renderAdminProcessingCompanyDetail } from './pages/Admin/admin-dashboard.js';
 
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
