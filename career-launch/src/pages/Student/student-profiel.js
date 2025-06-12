@@ -1,21 +1,34 @@
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
 import logoIcon from '../../Icons/favicon-32x32.png';
+import { getOpleidingNaamById, opleidingen } from './student-opleidingen.js';
 
-// defaultProfile gebruikt nu ook enkel NL velden!
 const defaultProfile = {
   voornaam: 'Voornaam',
   achternaam: 'Achternaam',
   email: 'student@voorbeeld.com',
   studiejaar: '1',
-  profiel_foto: 'src/Images/default.jpg',
+  profiel_foto: 'src/Images/default.png',
   linkedin: '',
-  geboortedatum: '',
+  date_of_birth: '',
   opleiding_id: null,
 };
 
+function isoToDateString(isoString) {
+  if (!isoString) return '';
+  return isoString.split('T')[0];
+}
+
 export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode = true) {
-  // Direct alle velden uit je backend of fallback naar default:
+  // Laad uit sessionStorage als leeg
+  if (!studentData || Object.keys(studentData).length === 0) {
+    try {
+      const stored = window.sessionStorage.getItem('studentData');
+      if (stored) studentData = JSON.parse(stored);
+    } catch (e) {}
+  }
+
+  // Gebruik ENKEL de huidige API velden
   const {
     voornaam = defaultProfile.voornaam,
     achternaam = defaultProfile.achternaam,
@@ -23,9 +36,25 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
     studiejaar = defaultProfile.studiejaar,
     profiel_foto = defaultProfile.profiel_foto,
     linkedin = defaultProfile.linkedin,
-    geboortedatum = defaultProfile.geboortedatum,
+    date_of_birth = defaultProfile.date_of_birth,
     opleiding_id = defaultProfile.opleiding_id,
   } = studentData;
+
+  // Map opleiding name to id if id is missing
+  let resolvedOpleidingId = opleiding_id;
+  if ((!resolvedOpleidingId || resolvedOpleidingId === null || typeof resolvedOpleidingId === 'undefined') && studentData.opleiding) {
+    const found = opleidingen.find(o => o.naam === studentData.opleiding);
+    if (found) resolvedOpleidingId = found.id;
+  }
+
+  const geboortedatum = isoToDateString(
+    studentData.geboortedatum ||
+    studentData.birthdate ||
+    studentData.date_of_birth ||
+    defaultProfile.date_of_birth
+  );
+
+  const opleidingNaam = getOpleidingNaamById(resolvedOpleidingId);
 
   rootElement.innerHTML = `
     <div class="student-profile-container">
@@ -78,7 +107,15 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
               </div>
               <div class="student-profile-form-group">
                 <label for="studyProgramInput">Studieprogramma</label>
-                <input type="text" id="studyProgramInput" value="${opleiding_id !== null ? opleiding_id : ''}" disabled>
+                <input type="text" id="studyProgramInput" value="${opleidingNaam}" disabled ${!readonlyMode ? 'style="display:none;"' : ''}>
+                ${
+                  !readonlyMode
+                    ? `<select id="opleidingSelect" required>
+                        <option value="">Selecteer opleiding</option>
+                        ${opleidingen.map(o => `<option value="${o.id}" ${o.id == resolvedOpleidingId ? 'selected' : ''}>${o.naam}</option>`).join('')}
+                      </select>`
+                    : ''
+                }
               </div>
               <div class="student-profile-form-group">
                 <label for="yearInput">Opleidingsjaar</label>
@@ -232,6 +269,11 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
     if (saveBtn) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
+        let newOpleidingId = resolvedOpleidingId;
+        if (!readonlyMode) {
+          const select = document.getElementById('opleidingSelect');
+          if (select) newOpleidingId = select.value;
+        }
         const updatedData = {
           ...studentData,
           voornaam: document.getElementById('firstNameInput').value,
@@ -240,7 +282,7 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
           studiejaar: document.getElementById('yearInput').value,
           geboortedatum: document.getElementById('birthDateInput').value,
           linkedin: document.getElementById('linkedinInput').value,
-          opleiding_id: opleiding_id,
+          opleiding_id: newOpleidingId,
         };
         const photoInput = document.getElementById('photoInput');
         if (photoInput && photoInput.files && photoInput.files[0]) {

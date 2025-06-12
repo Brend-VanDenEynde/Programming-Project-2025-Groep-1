@@ -7,6 +7,14 @@ import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
 import { performLogout } from '../utils/auth-api.js';
 
 export function renderBedrijfProfiel(rootElement, bedrijfData = {}) {
+  // Haal altijd de meest recente bedrijfData uit sessionStorage als deze leeg is
+  if (!bedrijfData || Object.keys(bedrijfData).length === 0) {
+    try {
+      const stored = window.sessionStorage.getItem('companyData');
+      if (stored) bedrijfData = JSON.parse(stored);
+    } catch (e) {}
+  }
+
   const {
     name = 'Microsoft',
     email = 'bedrijf@voorbeeld.com',

@@ -6,7 +6,7 @@ import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './student-settings.js';
 
-const defaultAvatar = '/src/Images/default.jpg';
+const defaultAvatar = 'src/Images/default.png';
 
 // src/views/student-qr-popup.js
 
