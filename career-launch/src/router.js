@@ -6,7 +6,7 @@ import { renderRegister } from './pages/register.js';
 import { renderLogin } from './pages/login.js';
 import { renderStudentProfiel } from './pages/student/student-profiel.js';
 import { renderSearchCriteriaStudent } from './pages/student/search-criteria-student.js';
-import { renderAdmin } from './pages/admin/admin.js';
+import { renderAdmin } from './pages/admin/admin-login.js';
 import { renderAdminSelectDashboard } from './pages/admin/admin-select-dashboard.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
