@@ -33,7 +33,7 @@ export function renderLogin(rootElement) {
             <div style="position:relative;display:flex;align-items:center;">
               <input type="password" id="passwordInput" name="password" required style="flex:1;">
               <button type="button" id="togglePassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">
-                <img id="togglePasswordIcon" src="src/Icons/icons8-closed-eye-HIDDEN.png" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
+                <img id="togglePasswordIcon" src="src/Icons/hide.png" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
               </button>
             </div>
           </div>
@@ -100,6 +100,10 @@ export function renderLogin(rootElement) {
       togglePasswordIcon.alt = isVisible
         ? 'Toon wachtwoord'
         : 'Verberg wachtwoord';
+        ? 'src/Icons/hide.png'
+        : 'src/Icons/eye.png';
+      togglePasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
+
     });
   }
 
@@ -193,27 +197,11 @@ async function handleLogin(event, rootElement) {
       throw new Error('Invalid login response');
     }
 
-    // TEMPORARY: Since backend doesn't provide userType yet, we'll use email domain logic
-    // TODO: Remove this when backend adds userType to response
-    let userType = response.userType;
-
-    if (!userType) {
-      // Determine user type based on email domain (temporary solution)
-      if (email.includes('@student.ehb.be') || email.includes('@ehb.be')) {
-        userType = 'student';
-      } else {
-        userType = 'company';
-      }
-      console.warn(
-        'userType not provided by API, using email-based detection:',
-        userType
-      );
-    }
-
-    // Handle successful login based on user type
-    if (userType === 'student') {
-      // Mapping API response to student profile fields
+    // Gebruik numerieke type-codes: 0=user, 1=admin, 2=student, 3=bedrijf
+    const type = response.user?.type;
+    if (type === 2) { // student
       const studentData = {
+
         id: response.user?.id || null,
         firstName:
           response.user?.firstName || response.user?.voornaam || 'Voornaam',
@@ -234,14 +222,23 @@ async function handleLogin(event, rootElement) {
         birthDate:
           response.user?.birthDate || response.user?.date_of_birth || '',
         opleiding_id: response.user?.opleiding_id || null,
-      };
 
+        type: response.user?.type ?? null,
+        gebruiker_id: response.user?.gebruiker_id ?? null,
+        voornaam: response.user?.voornaam ?? null,
+        achternaam: response.user?.achternaam ?? null,
+        linkedin: response.user?.linkedin ?? null,
+        profiel_foto: response.user?.profiel_foto ?? null,
+        studiejaar: response.user?.studiejaar ?? null,
+        opleiding_id: response.user?.opleiding_id ?? null,
+
+      };
       window.sessionStorage.setItem('studentData', JSON.stringify(studentData));
       window.sessionStorage.setItem('userType', 'student');
       Router.navigate('/Student/Student-Profiel');
-    } else if (userType === 'company') {
-      // Handle company login with API data
+    } else if (type === 3) { // bedrijf
       const companyData = {
+
         id: response.user?.id || null,
         companyName: response.user?.companyName || 'Bedrijf',
         email: response.user?.email || email,
@@ -249,15 +246,30 @@ async function handleLogin(event, rootElement) {
         linkedIn: response.user?.linkedIn || 'https://www.linkedin.com/',
         profilePictureUrl:
           response.user?.profilePictureUrl || '/src/Images/default-company.jpg',
-      };
+        type: response.user?.type ?? null,
+        gebruiker_id: response.user?.gebruiker_id ?? null,
+        naam: response.user?.naam ?? null,
+        plaats: response.user?.plaats ?? null,
+        contact_email: response.user?.contact_email ?? null,
+        linkedin: response.user?.linkedin ?? null,
+        profiel_foto: response.user?.profiel_foto ?? null,
 
-      // Store company data
+      };
       window.sessionStorage.setItem('companyData', JSON.stringify(companyData));
-      window.sessionStorage.setItem('userType', 'company'); // Navigate to company profile
+      window.sessionStorage.setItem('userType', 'company');
       Router.navigate('/Bedrijf/Bedrijf-Profiel');
+    } else if (type === 1) { // admin
+      const adminData = {
+        type: response.user?.type ?? null,
+        gebruiker_id: response.user?.gebruiker_id ?? null,
+        email: response.user?.email ?? null,
+      };
+      window.sessionStorage.setItem('adminData', JSON.stringify(adminData));
+      window.sessionStorage.setItem('userType', 'admin');
+      Router.navigate('/admin-dashboard');
     } else {
-      // This should never happen with our email-based logic
-      console.error('Onbekend gebruikerstype:', userType);
+      // Onbekend of niet ondersteund type
+      alert('Onbekend of niet ondersteund gebruikerstype. Neem contact op met support.');
       throw new Error('Authentication failed: Unknown user type');
     }
   } catch (error) {
