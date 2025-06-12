@@ -210,21 +210,25 @@ async function handleLogin(event, rootElement) {
 
     // Handle successful login based on user type
     if (userType === 'student') {
-      // Handle student login with API data
+      // Mapping API response to student profile fields
       const studentData = {
         id: response.user?.id || null,
-        firstName: response.user?.firstName || 'Student',
-        lastName: response.user?.lastName || 'User',
+        firstName: response.user?.firstName || response.user?.voornaam || 'Voornaam',
+        lastName: response.user?.lastName || response.user?.achternaam || 'Achternaam',
         email: response.user?.email || email,
-        studyProgram: response.user?.studyProgram || 'Webontwikkeling',
-        year: response.user?.year || '2e Bachelor',
+        studyProgram: response.user?.studyProgram || response.user?.opleiding_naam || '', // if available
+        year: response.user?.year || response.user?.studiejaar || '',
         profilePictureUrl:
-          response.user?.profilePictureUrl || '/src/Images/default.jpg',
+          response.user?.profilePictureUrl ||
+          response.user?.profiel_foto ||
+          '/src/Images/default.jpg',
+        linkedIn: response.user?.linkedIn || response.user?.linkedin || '',
+        birthDate: response.user?.birthDate || response.user?.date_of_birth || '',
+        opleiding_id: response.user?.opleiding_id || null,
       };
 
-      // Store student data
       window.sessionStorage.setItem('studentData', JSON.stringify(studentData));
-      window.sessionStorage.setItem('userType', 'student'); // Navigate to student profile
+      window.sessionStorage.setItem('userType', 'student');
       Router.navigate('/Student/Student-Profiel');
     } else if (userType === 'company') {
       // Handle company login with API data

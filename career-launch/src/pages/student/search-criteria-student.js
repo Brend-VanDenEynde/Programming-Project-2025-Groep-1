@@ -89,6 +89,7 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
             <li><button data-route="search" class="sidebar-link active">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
+            <li><button data-route="bedrijven" class="sidebar-link">Bedrijven</button></li>
             <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
           </ul>
         </nav>
@@ -156,19 +157,22 @@ export function renderSearchCriteriaStudent(rootElement, studentData = {}, reado
       const route = e.currentTarget.getAttribute('data-route');
       switch (route) {
         case 'profile':
-          window.appRouter.navigate('/Student/Student-Profiel');
+          renderStudentProfiel(rootElement, studentData);
           break;
         case 'search':
-          window.appRouter.navigate('/Student/Zoek-Criteria');
+          renderSearchCriteriaStudent(rootElement, studentData);
           break;
         case 'speeddates':
-          window.appRouter.navigate('/Student/Student-Speeddates');
+          renderSpeeddates(rootElement, studentData);
           break;
         case 'requests':
-          window.appRouter.navigate('/Student/Student-Speeddates-Verzoeken');
+          renderSpeeddatesRequests(rootElement, studentData);
+          break;
+        case 'bedrijven':
+          import('./bedrijven.js').then(m => m.renderBedrijven(rootElement, studentData));
           break;
         case 'qr':
-          window.appRouter.navigate('/Student/Student-QR-Popup');
+          renderQRPopup(rootElement, studentData);
           break;
       }
     });

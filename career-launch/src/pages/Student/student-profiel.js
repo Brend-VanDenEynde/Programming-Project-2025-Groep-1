@@ -1,33 +1,30 @@
-// src/views/student-profile.js
 import { renderLogin } from '../login.js';
-import { renderSearchCriteriaStudent } from './search-criteria-student.js';
-import { renderSpeeddates } from './student-speeddates.js';
-import { renderQRPopup } from './student-qr-popup.js';
-import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './student-settings.js';
 import logoIcon from '../../Icons/favicon-32x32.png';
 
+// defaultProfile gebruikt nu ook enkel NL velden!
 const defaultProfile = {
-  firstName: 'Voornaam',
-  lastName: 'Achternaam',
+  voornaam: 'Voornaam',
+  achternaam: 'Achternaam',
   email: 'student@voorbeeld.com',
-  studyProgram: 'Opleiding',
-  year: '1',
-  profilePictureUrl: 'src/Images/default.jpg',
-  linkedIn: '',
-  birthDate: ''
+  studiejaar: '1',
+  profiel_foto: 'src/Images/default.jpg',
+  linkedin: '',
+  geboortedatum: '',
+  opleiding_id: null,
 };
 
 export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode = true) {
+  // Direct alle velden uit je backend of fallback naar default:
   const {
-    firstName = defaultProfile.firstName,
-    lastName = defaultProfile.lastName,
+    voornaam = defaultProfile.voornaam,
+    achternaam = defaultProfile.achternaam,
     email = defaultProfile.email,
-    studyProgram = defaultProfile.studyProgram,
-    year = defaultProfile.year,
-    profilePictureUrl = defaultProfile.profilePictureUrl,
-    linkedIn = defaultProfile.linkedIn,
-    birthDate = defaultProfile.birthDate
+    studiejaar = defaultProfile.studiejaar,
+    profiel_foto = defaultProfile.profiel_foto,
+    linkedin = defaultProfile.linkedin,
+    geboortedatum = defaultProfile.geboortedatum,
+    opleiding_id = defaultProfile.opleiding_id,
   } = studentData;
 
   rootElement.innerHTML = `
@@ -50,6 +47,7 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
+            <li><button data-route="bedrijven" class="sidebar-link">Bedrijven</button></li>
             <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
           </ul>
         </nav>
@@ -59,8 +57,8 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
             <form id="profileForm" class="student-profile-form" autocomplete="off" enctype="multipart/form-data">
               <div class="student-profile-avatar-section">
                 <img 
-                  src="${profilePictureUrl}" 
-                  alt="Profielfoto ${firstName} ${lastName}" 
+                  src="${profiel_foto}" 
+                  alt="Profielfoto ${voornaam} ${achternaam}" 
                   id="avatar-preview"
                   class="student-profile-avatar"
                 />
@@ -68,11 +66,11 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
               </div>
               <div class="student-profile-form-group">
                 <label for="firstNameInput">Voornaam</label>
-                <input type="text" id="firstNameInput" value="${firstName}" required ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="firstNameInput" value="${voornaam}" required ${readonlyMode ? 'disabled' : ''}>
               </div>
               <div class="student-profile-form-group">
                 <label for="lastNameInput">Achternaam</label>
-                <input type="text" id="lastNameInput" value="${lastName}" required ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="lastNameInput" value="${achternaam}" required ${readonlyMode ? 'disabled' : ''}>
               </div>
               <div class="student-profile-form-group">
                 <label for="emailInput">E-mailadres</label>
@@ -80,23 +78,23 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
               </div>
               <div class="student-profile-form-group">
                 <label for="studyProgramInput">Studieprogramma</label>
-                <input type="text" id="studyProgramInput" value="${studyProgram}" ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="studyProgramInput" value="${opleiding_id !== null ? opleiding_id : ''}" disabled>
               </div>
               <div class="student-profile-form-group">
                 <label for="yearInput">Opleidingsjaar</label>
                 <select id="yearInput" ${readonlyMode ? 'disabled' : ''}>
-                  <option value="1" ${year == '1' ? 'selected' : ''}>1</option>
-                  <option value="2" ${year == '2' ? 'selected' : ''}>2</option>
-                  <option value="3" ${year == '3' ? 'selected' : ''}>3</option>
+                  <option value="1" ${studiejaar == '1' ? 'selected' : ''}>1</option>
+                  <option value="2" ${studiejaar == '2' ? 'selected' : ''}>2</option>
+                  <option value="3" ${studiejaar == '3' ? 'selected' : ''}>3</option>
                 </select>
               </div>
               <div class="student-profile-form-group">
                 <label for="birthDateInput">Geboortedatum</label>
-                <input type="date" id="birthDateInput" value="${birthDate}" ${readonlyMode ? 'disabled' : ''}>
+                <input type="date" id="birthDateInput" value="${geboortedatum}" ${readonlyMode ? 'disabled' : ''}>
               </div>
               <div class="student-profile-form-group">
                 <label for="linkedinInput">LinkedIn-link</label>
-                <input type="url" id="linkedinInput" value="${linkedIn}" ${readonlyMode ? 'disabled' : ''}>
+                <input type="url" id="linkedinInput" value="${linkedin}" ${readonlyMode ? 'disabled' : ''}>
               </div>
               <div class="student-profile-buttons">
                 ${
@@ -127,19 +125,22 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
       const route = e.currentTarget.getAttribute('data-route');
       switch (route) {
         case 'profile':
-          window.appRouter.navigate('/Student/Student-Profiel');
+          renderStudentProfiel(rootElement, studentData);
           break;
         case 'search':
-          window.appRouter.navigate('/Student/Zoek-Criteria');
+          import('./search-criteria-student.js').then(m => m.renderSearchCriteriaStudent(rootElement, studentData));
           break;
         case 'speeddates':
-          window.appRouter.navigate('/Student/Student-Speeddates');
+          import('./student-speeddates.js').then(m => m.renderSpeeddates(rootElement, studentData));
           break;
         case 'requests':
-          window.appRouter.navigate('/Student/Student-Speeddates-Verzoeken');
+          import('./student-speeddates-verzoeken.js').then(m => m.renderSpeeddatesRequests(rootElement, studentData));
+          break;
+        case 'bedrijven':
+          import('./bedrijven.js').then(m => m.renderBedrijven(rootElement, studentData));
           break;
         case 'qr':
-          window.appRouter.navigate('/Student/Student-QR-Popup');
+          import('./student-qr-popup.js').then(m => m.renderQRPopup(rootElement, studentData));
           break;
       }
     });
@@ -158,7 +159,6 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
         dropdown.classList.remove('open');
       }
     });
-    // Gebruik bubbling (standaard, geen capture:true) zodat toggle altijd werkt
     document.addEventListener('click', function(event) {
       if (
         dropdown.classList.contains('open') &&
@@ -174,10 +174,28 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
     });
     document.getElementById('nav-logout').addEventListener('click', () => {
       dropdown.classList.remove('open');
+      // Volledige logout: wis alle relevante storage
+      window.sessionStorage.removeItem('studentData');
+      window.sessionStorage.removeItem('authToken');
+      window.sessionStorage.removeItem('userType');
       localStorage.setItem('darkmode', 'false');
       document.body.classList.remove('darkmode');
       renderLogin(rootElement);
     });
+
+    // Ook de LOG OUT knop in het profiel-formulier zelf (voor desktop)
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        // Volledige logout: wis alle relevante storage
+        window.sessionStorage.removeItem('studentData');
+        window.sessionStorage.removeItem('authToken');
+        window.sessionStorage.removeItem('userType');
+        localStorage.setItem('darkmode', 'false');
+        document.body.classList.remove('darkmode');
+        renderLogin(rootElement);
+      });
+    }
   }
 
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
@@ -195,7 +213,7 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
     });
   });
 
-  // Voeg deze variabele toe om originele data te bewaren voor reset
+  // Originele data voor reset
   const originalData = { ...studentData };
 
   // Event handlers voor profiel bewerken
@@ -214,27 +232,21 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
     if (saveBtn) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        // Verzamel nieuwe data uit het formulier
         const updatedData = {
           ...studentData,
-          firstName: document.getElementById('firstNameInput').value,
-          lastName: document.getElementById('lastNameInput').value,
+          voornaam: document.getElementById('firstNameInput').value,
+          achternaam: document.getElementById('lastNameInput').value,
           email: document.getElementById('emailInput').value,
-          studyProgram: document.getElementById('studyProgramInput').value,
-          year: document.getElementById('yearInput').value,
-          birthDate: document.getElementById('birthDateInput').value,
-          linkedIn: document.getElementById('linkedinInput').value,
+          studiejaar: document.getElementById('yearInput').value,
+          geboortedatum: document.getElementById('birthDateInput').value,
+          linkedin: document.getElementById('linkedinInput').value,
+          opleiding_id: opleiding_id,
         };
-        // Optioneel: profielfoto uploaden
         const photoInput = document.getElementById('photoInput');
         if (photoInput && photoInput.files && photoInput.files[0]) {
-          // In een echte app zou je hier uploaden naar de server
-          // Voor nu: gebruik een tijdelijke URL
-          updatedData.profilePictureUrl = URL.createObjectURL(photoInput.files[0]);
+          updatedData.profiel_foto = URL.createObjectURL(photoInput.files[0]);
         }
-        // Sla op in sessionStorage
         window.sessionStorage.setItem('studentData', JSON.stringify(updatedData));
-        // Herlaad profiel in readonly mode
         renderStudentProfiel(rootElement, updatedData, true);
       });
     }
@@ -243,7 +255,6 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
     const resetBtn = document.getElementById('btn-reset-profile');
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
-        // Zet formulier terug naar originele data
         renderStudentProfiel(rootElement, originalData, false);
       });
     }

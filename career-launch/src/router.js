@@ -57,7 +57,15 @@ class Router {
       '/': 'Career Launch 2025 - Home',
       '/registreer': 'Registreren - Career Launch 2025',
       '/login': 'Inloggen - Career Launch 2025',
-      '/Student/Student-Profiel': 'Student Profiel - Career Launch 2025',
+      '/Student/Student-Profiel': (rootElement) => {
+    let studentData = {};
+    try {
+      studentData = JSON.parse(window.sessionStorage.getItem('studentData')) || {};
+    } catch (e) {
+      studentData = {};
+    }
+    renderStudentProfiel(rootElement, studentData, true);
+  },
       '/Student/Zoek-Criteria': 'Zoek Criteria - Career Launch 2025',
       '/Student/Student-QR-Popup': 'Jouw QR-code - Career Launch 2025',
       '/Student/Student-Speeddates': 'Jouw Speeddates - Career Launch 2025',
