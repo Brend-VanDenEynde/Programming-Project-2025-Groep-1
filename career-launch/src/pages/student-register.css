@@ -85,6 +85,57 @@ body {
 .upload-section label {
   display: block;
   font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.upload-label {
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.file-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.file-input {
+  display: none;
+}
+
+.browse-button {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.browse-button:hover {
+  background-color: #e0e0e0;
+}
+
+.file-status {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Input groups and labels */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.input-label {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
 }
 
 /* Form fields */
@@ -98,6 +149,10 @@ body {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
+}
+
+.name-row .input-group {
+  flex: 1;
 }
 
 .form-spacing {
@@ -116,6 +171,19 @@ body {
   padding: 0.75rem;
   border-radius: 8px;
   border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.input-half,
+.input-full {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-half:focus,
+.input-full:focus {
+  outline: none;
+  border-color: #004080;
+  box-shadow: 0 0 0 2px rgba(0, 64, 128, 0.1);
 }
 
 /* Volgende knop */

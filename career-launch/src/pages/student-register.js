@@ -7,23 +7,37 @@ export function renderStudentRegister(rootElement) {
   
   <div style="min-height: 100vh; display: flex; flex-direction: column;">
     <main class="form-container">
-      <button class="back-button" id="back-button">← Terug</button>
-
-      <div class="upload-section">
+      <button class="back-button" id="back-button">← Terug</button>      <div class="upload-section">
         <div class="upload-icon">⬆</div>
-        <label for="profielFoto">Foto</label>
-        <input type="file" id="profielFoto" name="profielFoto" accept="image/*" />
+        <label for="profielFoto" class="upload-label">Foto</label>
+        <div class="file-input-wrapper">
+          <input type="file" id="profielFoto" name="profielFoto" accept="image/*" class="file-input" />
+          <button type="button" class="browse-button">Browse...</button>
+          <span class="file-status">No file selected.</span>
+        </div>
       </div>
 
       <form class="naamForm" id="naamForm">
         <div class="name-row">
-          <input type="text" id="voornaam" name="voornaam" required placeholder="Voornaam" class="input-half" />
-          <input type="text" id="achternaam" name="achternaam" required placeholder="Achternaam" class="input-half" />
+          <div class="input-group">
+            <label for="voornaam" class="input-label">Voornaam</label>
+            <input type="text" id="voornaam" name="voornaam" required placeholder="Voornaam" class="input-half" />
+          </div>
+          <div class="input-group">
+            <label for="achternaam" class="input-label">Achternaam</label>
+            <input type="text" id="achternaam" name="achternaam" required placeholder="Achternaam" class="input-half" />
+          </div>
+        </div>        <div class="form-spacing">
+          <div class="input-group">
+            <label for="geboortedatum" class="input-label">Geboortedatum</label>
+            <input type="date" id="geboortedatum" name="geboortedatum" required placeholder="dd / mm / yyyy" class="input-full" />
+          </div>
         </div>
         <div class="form-spacing">
-          <input type="date" id="geboortedatum" name="geboortedatum" required placeholder="Geboortedatum" class="input-full" />
-        </div>        <div class="form-spacing">
-          <input type="text" id="linkedin" name="linkedin" placeholder="LinkedIn-link" class="input-full" />
+          <div class="input-group">
+            <label for="linkedin" class="input-label">LinkedIn-link</label>
+            <input type="url" id="linkedin" name="linkedin" placeholder="LinkedIn-link" class="input-full" />
+          </div>
         </div>
         <label id="error-label" class="error-label" style="color: red; display: none;"></label>
         <button type="submit" class="next-button">Volgende →</button>
@@ -37,9 +51,26 @@ export function renderStudentRegister(rootElement) {
     </footer>
   </div>
   `;
-
   const form = document.getElementById('naamForm');
   form.addEventListener('submit', handleNaamRegister);
+
+  // File input functionaliteit
+  const fileInput = document.getElementById('profielFoto');
+  const browseButton = document.querySelector('.browse-button');
+  const fileStatus = document.querySelector('.file-status');
+
+  browseButton.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      fileStatus.textContent = file.name;
+    } else {
+      fileStatus.textContent = 'No file selected.';
+    }
+  });
 
   document.getElementById('back-button').addEventListener('click', () => {
     Router.navigate('/registreer');
