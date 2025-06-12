@@ -92,12 +92,14 @@ export function renderLogin(rootElement) {
   const togglePasswordIcon = document.getElementById('togglePasswordIcon');
   if (passwordInput && togglePassword && togglePasswordIcon) {
     togglePassword.addEventListener('click', () => {
-      const isVisible = passwordInput.type === 'text';      passwordInput.type = isVisible ? 'password' : 'text';
+      const isVisible = passwordInput.type === 'text';
+      passwordInput.type = isVisible ? 'password' : 'text';
       togglePasswordIcon.src = isVisible
         ? 'src/Icons/hide.png'
         : 'src/Icons/eye.png';
-      togglePasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
-
+      togglePasswordIcon.alt = isVisible
+        ? 'Toon wachtwoord'
+        : 'Verberg wachtwoord';
     });
   }
 
@@ -193,9 +195,9 @@ async function handleLogin(event, rootElement) {
 
     // Gebruik numerieke type-codes: 0=user, 1=admin, 2=student, 3=bedrijf
     const type = response.user?.type;
-    if (type === 2) { // student
+    if (type === 2) {
+      // student
       const studentData = {
-
         id: response.user?.id || null,
         firstName:
           response.user?.firstName || response.user?.voornaam || 'Voornaam',
@@ -225,14 +227,13 @@ async function handleLogin(event, rootElement) {
         profiel_foto: response.user?.profiel_foto ?? null,
         studiejaar: response.user?.studiejaar ?? null,
         opleiding_id: response.user?.opleiding_id ?? null,
-
       };
       window.sessionStorage.setItem('studentData', JSON.stringify(studentData));
       window.sessionStorage.setItem('userType', 'student');
       Router.navigate('/Student/Student-Profiel');
-    } else if (type === 3) { // bedrijf
+    } else if (type === 3) {
+      // bedrijf
       const companyData = {
-
         id: response.user?.id || null,
         companyName: response.user?.companyName || 'Bedrijf',
         email: response.user?.email || email,
@@ -247,12 +248,12 @@ async function handleLogin(event, rootElement) {
         contact_email: response.user?.contact_email ?? null,
         linkedin: response.user?.linkedin ?? null,
         profiel_foto: response.user?.profiel_foto ?? null,
-
       };
       window.sessionStorage.setItem('companyData', JSON.stringify(companyData));
       window.sessionStorage.setItem('userType', 'company');
       Router.navigate('/Bedrijf/Bedrijf-Profiel');
-    } else if (type === 1) { // admin
+    } else if (type === 1) {
+      // admin
       const adminData = {
         type: response.user?.type ?? null,
         gebruiker_id: response.user?.gebruiker_id ?? null,
@@ -263,7 +264,9 @@ async function handleLogin(event, rootElement) {
       Router.navigate('/admin-dashboard');
     } else {
       // Onbekend of niet ondersteund type
-      alert('Onbekend of niet ondersteund gebruikerstype. Neem contact op met support.');
+      alert(
+        'Onbekend of niet ondersteund gebruikerstype. Neem contact op met support.'
+      );
       throw new Error('Authentication failed: Unknown user type');
     }
   } catch (error) {

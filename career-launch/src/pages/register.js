@@ -140,7 +140,7 @@ export function renderRegister(rootElement) {
       });
     }
   }
-  
+
   const passwordInput = document.getElementById('passwordInput');
   const togglePassword = document.getElementById('togglePassword');
   const togglePasswordIcon = document.getElementById('togglePasswordIcon');
@@ -149,24 +149,35 @@ export function renderRegister(rootElement) {
       const isVisible = passwordInput.type === 'text';
       passwordInput.type = isVisible ? 'password' : 'text';
       togglePasswordIcon.src = isVisible
-         ? 'src/Icons/hide.png'
+        ? 'src/Icons/hide.png'
         : 'src/Icons/eye.png';
-      togglePasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
+      togglePasswordIcon.alt = isVisible
+        ? 'Toon wachtwoord'
+        : 'Verberg wachtwoord';
     });
   }
   const confirmPasswordInput = document.getElementById('confirmPasswordInput');
-  const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
-  const toggleConfirmPasswordIcon = document.getElementById('toggleConfirmPasswordIcon');
-  if (confirmPasswordInput && toggleConfirmPassword && toggleConfirmPasswordIcon) {
+  const toggleConfirmPassword = document.getElementById(
+    'toggleConfirmPassword'
+  );
+  const toggleConfirmPasswordIcon = document.getElementById(
+    'toggleConfirmPasswordIcon'
+  );
+  if (
+    confirmPasswordInput &&
+    toggleConfirmPassword &&
+    toggleConfirmPasswordIcon
+  ) {
     toggleConfirmPassword.addEventListener('click', () => {
       const isVisible = confirmPasswordInput.type === 'text';
       confirmPasswordInput.type = isVisible ? 'password' : 'text';
       toggleConfirmPasswordIcon.src = isVisible
         ? 'src/Icons/icons8-closed-eye-HIDDEN.png'
         : 'src/Icons/icons8-closed-eye-CLEAR.png';
-      toggleConfirmPasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
+      toggleConfirmPasswordIcon.alt = isVisible
+        ? 'Toon wachtwoord'
+        : 'Verberg wachtwoord';
     });
-
   }
 
   setupPasswordToggle('passwordInput', 'togglePassword', 'togglePasswordIcon');
