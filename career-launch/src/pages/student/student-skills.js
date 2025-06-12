@@ -1,4 +1,4 @@
-import './student-register.css';
+import '../css/student-register.css';
 import Router from '../router.js';
 
 // Skills ophalen uit de API

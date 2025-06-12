@@ -1,7 +1,7 @@
 import { renderStudentSkills } from './student-skills.js';
-import './student-register.css';
-import Router from '../router.js';
-import { apiGet, apiPost } from '../utils/api.js';
+import '../../css/student-register.css';
+import Router from '../../router.js';
+import { apiGet, apiPost } from '../../utils/api.js';
 
 export function renderStudentOpleiding(rootElement) {
   rootElement.innerHTML = `
@@ -175,3 +175,5 @@ async function handleJaarRegister(event) {
     errorLabel.style.display = 'block';
   }
 }
+
+// No changes needed for image imports in this file. All asset and API usage is correct.

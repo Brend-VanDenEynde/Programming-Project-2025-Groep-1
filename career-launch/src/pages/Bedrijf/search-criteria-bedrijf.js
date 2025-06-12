@@ -1,9 +1,9 @@
 // src/views/search-criteria-bedrijf.js
 
-import logoIcon from '../Icons/favicon-32x32.png';
-import { renderLogin } from './login.js';
+import logoIcon from '../../Icons/favicon-32x32.png';
+import { renderLogin } from '../login.js';
 import { renderBedrijfProfiel } from './bedrijf-profiel.js';
-import { performLogout } from '../utils/auth-api.js';
+import { performLogout } from '../../utils/auth-api.js';
 
 export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
   if (!bedrijfData.criteria) {

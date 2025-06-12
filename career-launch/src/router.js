@@ -1,4 +1,5 @@
-
+import { renderStudentProfiel } from './pages/Student/student-profiel.js';
+import { renderBedrijfRegister } from './pages/Register-Bedrijf/bedrijf-register.js';
 
 class Router {
   constructor(routes) {
@@ -91,5 +92,72 @@ class Router {
     window.dispatchEvent(new PopStateEvent('popstate'));
   }
 }
+
+const routes = {
+  '/': (rootElement) => {
+    rootElement.innerHTML = '<h1>Home</h1>';
+  },
+  '/registreer': (rootElement) => {
+    rootElement.innerHTML = '<h1>Registreren</h1>';
+  },
+  '/login': (rootElement) => {
+    rootElement.innerHTML = '<h1>Inloggen</h1>';
+  },
+  '/Student/Student-Profiel': (rootElement) => {
+    let studentData = {};
+    try {
+      studentData = JSON.parse(window.sessionStorage.getItem('studentData')) || {};
+    } catch (e) {
+      studentData = {};
+    }
+    renderStudentProfiel(rootElement, studentData, true);
+  },
+  '/Student/Zoek-Criteria': (rootElement) => {
+    rootElement.innerHTML = '<h1>Zoek Criteria</h1>';
+  },
+  '/Student/Student-QR-Popup': (rootElement) => {
+    rootElement.innerHTML = '<h1>Jouw QR-code</h1>';
+  },
+  '/Student/Student-Speeddates': (rootElement) => {
+    rootElement.innerHTML = '<h1>Jouw Speeddates</h1>';
+  },
+  '/Student/Student-Speeddates-Verzoeken': (rootElement) => {
+    rootElement.innerHTML = '<h1>Speeddate Verzoeken</h1>';
+  },
+  '/Student/Student-Settings': (rootElement) => {
+    rootElement.innerHTML = '<h1>Instellingen</h1>';
+  },
+  '/admin': (rootElement) => {
+    rootElement.innerHTML = '<h1>Admin Login</h1>';
+  },
+  '/admin/admin-dashboard': (rootElement) => {
+    rootElement.innerHTML = '<h1>Admin Dashboard</h1>';
+  },
+  '/contact': (rootElement) => {
+    rootElement.innerHTML = '<h1>Contacteer ons</h1>';
+  },
+  '/privacy': (rootElement) => {
+    rootElement.innerHTML = '<h1>Privacy Beleid</h1>';
+  },
+  '/404': (rootElement) => {
+    rootElement.innerHTML = '<h1>Pagina niet gevonden</h1>';
+  },
+  '/Bedrijf/Bedrijf-Profiel': (rootElement) => {
+    rootElement.innerHTML = '<h1>Bedrijf Profiel</h1>';
+  },
+  '/Bedrijf/Zoek-Criteria': (rootElement) => {
+    rootElement.innerHTML = '<h1>Zoek Criteria Bedrijf</h1>';
+  },
+  '/Student-Register': (rootElement) => {
+    rootElement.innerHTML = '<h1>Student Registreren</h1>';
+  },
+  '/Student-Opleiding': (rootElement) => {
+    rootElement.innerHTML = '<h1>Student Opleiding</h1>';
+  },
+  '/Student-Skills': (rootElement) => {
+    rootElement.innerHTML = '<h1>Student Skills</h1>';
+  },
+  '/Bedrijf-Register': renderBedrijfRegister,
+};
 
 export default Router;

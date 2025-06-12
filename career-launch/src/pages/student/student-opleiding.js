@@ -1,6 +1,6 @@
 import { renderStudentSkills } from './student-skills.js';
-import './student-register.css';
 import Router from '../router.js';
+import '../css/student-register.css';
 
 export function renderStudentOpleiding(rootElement) {
   rootElement.innerHTML = `

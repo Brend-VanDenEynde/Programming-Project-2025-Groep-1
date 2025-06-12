@@ -1,7 +1,7 @@
-import './student-register.css';
-import Router from '../router.js';
+import '../../css/student-register.css';
+import Router from '../../router.js';
 
-export function renderStudentSkills(rootElement) {
+export async function renderStudentSkills(rootElement) {
   rootElement.innerHTML = `
     <div style="min-height: 100vh; display: flex; flex-direction: column;">
     <main class="form-container skills-container">
@@ -35,7 +35,6 @@ export function renderStudentSkills(rootElement) {
     <footer class="footer">
       <a href="#" id="privacy-link">Privacy Policy</a> | <a href="#" id="contact-link">Contacteer Ons</a>
     </footer>
-  </div>
   `;
 
   const form = document.getElementById('skillsForm');
@@ -73,7 +72,7 @@ function handleSkillsRegister(event) {
   const skill = formData.get('skill');
 
   const data = {
-    job: formData.get('job'), // geselecteerde radio
+    job: formData.get('job'),
     skill: formData.get('skill'),
   };
 
@@ -81,6 +80,6 @@ function handleSkillsRegister(event) {
   console.log('Registratie data:', data);
   alert(`Je account is nu in orde.`);
 
-  // Navigeren naar de volgende pagina
+  // Navigeren naar de juiste profielpagina
   Router.navigate('/Student/Student-Profiel');
 }

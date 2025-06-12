@@ -5,8 +5,7 @@ import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './student-settings.js';
-
-const defaultAvatar = 'src/Images/default.png';
+import defaultAvatar from '../../Images/default.png';
 
 // src/views/student-qr-popup.js
 
