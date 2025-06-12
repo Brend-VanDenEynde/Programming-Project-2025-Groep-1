@@ -1,36 +1,53 @@
-/*
- * EhB Career Launch - Modulaire CSS Import
- * 
- * Dit bestand importeert alle CSS modules voor een georganiseerde structuur.
- * Modules worden geladen in de juiste volgorde voor optimale cascade.
- */
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-/* 1. Base styles - reset, typography, utilities */
-@import './base.css';
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  line-height: 1.6;
+}
 
-/* 2. Layout components - containers, headers, footers */
-@import './layout.css';
+/* Home container */
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 50px); /* Reduce height to accommodate footer */
+  padding: 20px;
+  padding-bottom: 70px; /* Extra padding at the bottom to prevent content from being hidden behind the footer */
+  background-color: white;
+}
 
-/* 3. Basic forms - login, registration */
-@import './forms.css';
+/* Logo styling */
+.home-container img {
+  max-width: 300px;
+  height: auto;
+  margin-bottom: 20px;
+}
 
-/* 4. Advanced forms - search criteria, complex forms */
-@import './forms-advanced.css';
+/* Typography */
+.home-container h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+  text-align: center;
+}
 
-/* 5. Student profile - complete profile system */
-@import './student-profile.css';
-
-/* 6. Tables - data presentation */
-@import './tables.css';
-
-/* 7. Modals and popups */
-@import './modals.css';
-
-/* 8. Dark mode - theming */
-@import './dark-mode.css';
-
-/* 9. Responsive design - media queries (moet als laatste) */
-@import './responsive.css';
+.home-container h2 {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 40px;
+  text-align: center;
+  letter-spacing: 2px;
+}
 
 .home-container p {
   font-size: 1.2rem;
@@ -172,7 +189,7 @@
 
 .register-btn {
   width: 100%;
-  background-color: #00bcd4;
+  background-color: #00acc1;
   color: white;
   border: none;
   padding: 12px;
@@ -185,7 +202,7 @@
 }
 
 .register-btn:hover {
-  background-color: #00acc1;
+  background-color: #01bdd6;
 }
 
 .divider {
@@ -221,8 +238,7 @@
 }
 
 /* Login/Register footer altijd onderaan */
-.login-container,
-.register-container {
+.login-container, .register-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -307,7 +323,7 @@ body.darkmode .footer-links {
 
 .login-btn {
   width: 100%;
-  background-color: #00bcd4;
+  background-color: #00acc1;
   color: white;
   border: none;
   padding: 14px;
@@ -320,7 +336,7 @@ body.darkmode .footer-links {
 }
 
 .login-btn:hover {
-  background-color: #00acc1;
+  background-color: #01bdd6;
 }
 
 .register-link {
@@ -340,9 +356,7 @@ body.darkmode .footer-links {
   font-weight: 500;
 }
 
-.register-link a:hover {
-  text-decoration: underline;
-}
+
 
 /* Privacy and Contact pages */
 .privacy-container,
@@ -578,7 +592,7 @@ body.darkmode .footer-links {
   border: 1px solid #e1e5e9;
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
   min-width: 160px;
   z-index: 1000;
 }
@@ -636,7 +650,7 @@ body.darkmode .footer-links {
 .student-profile-sidebar button.active,
 .student-profile-sidebar button:hover {
   background: #e1e5e9;
-  border-left: 4px solid #00bcd4;
+  border-left: 4px solid grey;
 }
 
 .student-profile-content {
@@ -645,7 +659,10 @@ body.darkmode .footer-links {
   justify-content: center;
   padding: 2rem;
 }
-
+body.darkmode .student-profile-content {
+  background: black;
+  color: #e0f7fa;
+}
 .student-profile-form-container {
   background: #fff;
   border-radius: 12px;
@@ -693,13 +710,13 @@ body.darkmode .footer-links {
   margin-bottom: 0.5rem;
   color: #333;
   font-size: 1.07rem;
-  letter-spacing: 0.01em;
+  letter-spacing: .01em;
 }
 
-.student-profile-form-group input[type='text'],
-.student-profile-form-group input[type='email'],
-.student-profile-form-group input[type='date'],
-.student-profile-form-group input[type='url'],
+.student-profile-form-group input[type="text"],
+.student-profile-form-group input[type="email"],
+.student-profile-form-group input[type="date"],
+.student-profile-form-group input[type="url"],
 .student-profile-form-group select,
 .student-profile-form-group textarea {
   width: 100%;
@@ -713,17 +730,18 @@ body.darkmode .footer-links {
   color: #333;
   margin-top: 2px;
   outline: none;
-  transition: border 0.17s;
+  transition: border .17s;
   resize: none;
+  margin-right: 10rem;
 }
 
-.student-profile-form-group input[type='text']:focus,
-.student-profile-form-group input[type='email']:focus,
-.student-profile-form-group input[type='date']:focus,
-.student-profile-form-group input[type='url']:focus,
+.student-profile-form-group input[type="text"]:focus,
+.student-profile-form-group input[type="email"]:focus,
+.student-profile-form-group input[type="date"]:focus,
+.student-profile-form-group input[type="url"]:focus,
 .student-profile-form-group select:focus,
 .student-profile-form-group textarea:focus {
-  border-color: #1de9b6;
+  border-color: grey;
   background: #f6fffa;
 }
 
@@ -743,11 +761,11 @@ body.darkmode .footer-links {
   font-size: 1.1rem;
   padding: 13px 0;
   cursor: pointer;
-  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  transition: background .18s, color .18s, box-shadow .18s;
 }
 
 .student-profile-btn-primary {
-  background: #00bcd4;
+  background: grey;
   color: #fff;
 }
 
@@ -758,14 +776,67 @@ body.darkmode .footer-links {
 }
 
 .student-profile-btn-secondary {
-  background: #e1e5e9;
-  color: #333;
+  background-color: #e1e5e9 !important;
+  color: #333 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 12px 28px !important;
+  font-size: 1.08rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
+  box-shadow: 0 2px 8px rgba(0,188,212,0.08) !important;
+  outline: none !important;
+  min-width: 120px !important;
+  display: inline-block !important;
 }
 
 .student-profile-btn-secondary:hover {
-  background: #cfd7ea;
-  color: #222;
-  box-shadow: 0 4px 14px 0 rgba(44, 44, 44, 0.08);
+  background-color: #00acc1 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(0,188,212,0.13) !important;
+  transform: translateY(-2px) !important;
+}
+
+.student-profile-btn:active,
+.student-profile-btn_primary:active {
+  background-color: #009ca6 !important;
+  color: #fff !important;
+  box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
+  transform: translateY(0) !important;
+}
+.student-profile-btn-secondary:active {
+  background-color: #009ca6 !important;
+  color: #fff !important;
+  box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
+  transform: translateY(0) !important;
+}
+
+/* DARKMODE: profielactieknoppen */
+body.darkmode .student-profile-btn,
+body.darkmode .student-profile-btn-primary,
+body.darkmode .student-profile-btn-secondary {
+  background-color: #232323 !important;
+  color: #00e6ef !important;
+  border-radius: 8px !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0,230,239,0.10) !important;
+}
+body.darkmode .student-profile-btn:hover,
+body.darkmode .student-profile-btn-primary:hover,
+body.darkmode .student-profile-btn-secondary:hover {
+  background-color: #181c1f !important;
+  color: #00e6ef !important;
+  box-shadow: 0 4px 16px rgba(0,230,239,0.13) !important;
+  transform: translateY(-2px) !important;
+}
+body.darkmode .student-profile-btn:active,
+body.darkmode .student-profile-btn-primary:active,
+body.darkmode .student-profile-btn-secondary:active {
+  background-color: grey !important;
+  color: #fff !important;
+  box-shadow: 0 2px 4px rgba(0,230,239,0.10) !important;
+  transform: translateY(0) !important;
 }
 
 /* --- Zoekcriteria Form --- */
@@ -821,19 +892,19 @@ body.darkmode .footer-links {
   user-select: none;
 }
 
-.checkbox-option input[type='checkbox'],
-.checkbox-option input[type='radio'] {
-  accent-color: #00bcd4;
+.checkbox-option input[type="checkbox"],
+.checkbox-option input[type="radio"] {
+  accent-color: grey;
   width: 20px;
   height: 20px;
   margin: 0 6px 0 0;
   border-radius: 6px;
 }
 
-.checkbox-option input[type='checkbox']:checked + span,
-.checkbox-option input[type='checkbox']:checked {
-  color: #00bcd4 !important;
-  border-color: #00bcd4;
+.checkbox-option input[type="checkbox"]:checked + span,
+.checkbox-option input[type="checkbox"]:checked {
+  color: grey !important;
+  border-color: grey;
 }
 
 .add-custom-wrapper {
@@ -851,22 +922,22 @@ body.darkmode .footer-links {
   border: 2px solid #e1e5e9;
   outline: none;
   background: #fff;
-  transition: border 0.16s;
+  transition: border .16s;
 }
 
 .form-input:focus {
-  border-color: #00bcd4;
+  border-color: grey;
   background: #f6fffa;
 }
 
 .add-btn {
-  background: #00bcd4;
+  background: lightgrey;
   color: #fff;
   border: none;
   font-weight: 700;
   padding: 10px 20px;
   cursor: pointer;
-  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  transition: background .18s, color .18s, box-shadow .18s;
   min-width: 92px;
   box-shadow: 0 2px 6px 0 rgba(44, 44, 44, 0.05);
 }
@@ -878,7 +949,7 @@ body.darkmode .footer-links {
   box-shadow: 0 3px 16px 0 rgba(0, 188, 212, 0.13);
 }
 
-/* --- Settings Popup (Login/Register stijl) --- */
+/* --- SETTINGS POPUP (LOGIN/REGISTER STIJL) --- */
 .settings-modal-root {
   position: fixed;
   inset: 0;
@@ -893,7 +964,7 @@ body.darkmode .footer-links {
 .settings-popup-card {
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.10);
   padding: 2.2rem 1.5rem 1.7rem 1.5rem;
   min-width: 320px;
   max-width: 420px;
@@ -934,65 +1005,748 @@ body.darkmode .footer-links {
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
   margin-bottom: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
 }
 
 .settings-action-btn:hover {
-  background: #00bcd4;
+  background: grey;
   color: #fff;
 }
 
 .settings-action-btn.logout {
-  background: #e1e5e9;
+  background: linear-gradient(90deg, #e4eafd 0%, #cfd7ea 100%);
   color: #222;
-}
-
-.settings-action-btn.logout:hover {
-  background: #cfd7ea;
-  color: #181c1f;
-}
-
-.settings-action-btn.delete {
-  background: #fa626a;
-  color: #fff;
-}
-
-.settings-action-btn.delete:hover {
-  background: #fd7855;
-  color: #fff;
-}
-
-/* Footer altijd onderaan student-profiel-achtige pagina's en geen onderlijning op links */
-.student-profile-footer {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100vw;
-  background: #f5f6f7;
-  color: #7a7a7a;
-  border-top: 1px solid #e1e5e9;
-  text-align: center;
-  font-size: 0.95rem;
-  padding: 18px 0 14px 0;
+  border: none;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 1.09rem;
+  padding: 13px 0;
+  min-width: 140px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px 0 rgba(44,44,44,0.06);
+  letter-spacing: .04em;
+  transition: background .17s, color .17s, box-shadow .17s;
   margin: 0;
-  box-shadow: none;
-  font-weight: 400;
+}
+.settings-action-btn.logout:hover {
+  background: linear-gradient(90deg, #cfd7ea 0%, #e4eafd 100%);
+  color: #fff;
+  filter: brightness(1.07) drop-shadow(0 0 12px #3dd68625);
+}
+
+/* --- UNIFORME BUTTON-STIJL VOOR PROFIELACTIEKNOPPEN (login/register look) --- */
+.student-profile-btn,
+.student-profile-btn-primary {
+  background-color: grey !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 12px 28px !important;
+  font-size: 1.08rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
+  box-shadow: 0 2px 8px rgba(0,188,212,0.08) !important;
+  outline: none !important;
+  min-width: 120px !important;
+  display: inline-block !important;
+}
+.student-profile-btn-secondary {
+  background-color: #e1e5e9 !important;
+  color: #333 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 12px 28px !important;
+  font-size: 1.08rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
+  box-shadow: 0 2px 8px rgba(0,188,212,0.08) !important;
+  outline: none !important;
+  min-width: 120px !important;
+  display: inline-block !important;
+}
+.student-profile-btn:hover,
+.student-profile-btn-primary:hover {
+  background-color: #00acc1 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(0,188,212,0.13) !important;
+  transform: translateY(-2px) !important;
+}
+.student-profile-btn-secondary:hover {
+  background-color: #00acc1 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(0,188,212,0.13) !important;
+  transform: translateY(-2px) !important;
+}
+.student-profile-btn:active,
+.student-profile-btn_primary:active {
+  background-color: #009ca6 !important;
+  color: #fff !important;
+  box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
+  transform: translateY(0) !important;
+}
+.student-profile-btn-secondary:active {
+  background-color: #009ca6 !important;
+  color: #fff !important;
+  box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
+  transform: translateY(0) !important;
+}
+
+/* DARKMODE: profielactieknoppen */
+body.darkmode .student-profile-btn,
+body.darkmode .student-profile-btn-primary,
+body.darkmode .student-profile-btn-secondary {
+  background-color: #232323 !important;
+  color: #00e6ef !important;
+  border-radius: 8px !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0,230,239,0.10) !important;
+}
+body.darkmode .student-profile-btn:hover,
+body.darkmode .student-profile-btn-primary:hover,
+body.darkmode .student-profile-btn-secondary:hover {
+  background-color: #181c1f !important;
+  color: #00e6ef !important;
+  box-shadow: 0 4px 16px rgba(0,230,239,0.13) !important;
+  transform: translateY(-2px) !important;
+}
+body.darkmode .student-profile-btn:active,
+body.darkmode .student-profile-btn-primary:active,
+body.darkmode .student-profile-btn-secondary:active {
+  background-color: grey !important;
+  color: #fff !important;
+  box-shadow: 0 2px 4px rgba(0,230,239,0.10) !important;
+  transform: translateY(0) !important;
+}
+
+/* --- Zoekcriteria Form --- */
+.criteria-form {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.search-fieldset {
+  border: none;
+  margin-bottom: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 1.2rem 1rem 1rem 1rem;
+  box-shadow: 0 1px 8px 0 rgba(44, 44, 44, 0.04);
+}
+
+.search-fieldset legend {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #0077b5;
+  padding-bottom: 3px;
+  border-bottom: none;
+  display: block;
+  letter-spacing: 0.03em;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.checkbox-option {
+  font-weight: 600;
+  color: #333;
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px 22px 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 120px;
+  border: 2px solid #e1e5e9;
+  cursor: pointer;
+  font-size: 1.08rem;
+  box-shadow: 0 2px 8px 0 rgba(44, 44, 44, 0.04);
+  margin-bottom: 0;
+  transition: border 0.15s, background 0.15s, color 0.15s;
+  user-select: none;
+}
+
+.checkbox-option input[type="checkbox"],
+.checkbox-option input[type="radio"] {
+  accent-color: grey;
+  width: 20px;
+  height: 20px;
+  margin: 0 6px 0 0;
+  border-radius: 6px;
+}
+
+.checkbox-option input[type="checkbox"]:checked + span,
+.checkbox-option input[type="checkbox"]:checked {
+  color: grey !important;
+  border-color: grey;
+}
+
+.add-custom-wrapper {
+  display: flex;
+  gap: 10px;
+  margin: 9px 0 0 0;
+  align-items: center;
+}
+
+.form-input,
+.add-btn {
+  font-size: 1.08rem;
+  padding: 10px 13px;
+  border-radius: 8px;
+  border: 2px solid #e1e5e9;
+  outline: none;
+  background: #fff;
+  transition: border .16s;
+}
+
+.form-input:focus {
+  border-color: grey;
+  background: #f6fffa;
+}
+
+.add-btn {
+  background: grey;
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background .18s, color .18s, box-shadow .18s;
+  min-width: 92px;
+  box-shadow: 0 2px 6px 0 rgba(44, 44, 44, 0.05);
+}
+
+.add-btn:hover,
+.add-btn:active {
+  background: #00acc1;
+  color: #fff;
+  box-shadow: 0 3px 16px 0 rgba(0, 188, 212, 0.13);
+}
+
+/* --- SETTINGS POPUP (LOGIN/REGISTER STIJL) --- */
+.settings-modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(30, 34, 54, 0.38);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.22s;
+}
+
+.settings-popup-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+  padding: 2.2rem 1.5rem 1.7rem 1.5rem;
+  min-width: 320px;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+  align-items: center;
+}
+
+.settings-popup-close {
+  font-size: 2rem;
+  color: #0077b5;
+  top: 12px;
+  right: 12px;
+}
+
+.settings-title {
+  color: #0077b5;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 1.1rem;
+}
+
+.settings-row {
+  gap: 0.7rem;
+  width: 100%;
+}
+
+.settings-action-btn {
+  width: 100%;
+  background: #1de9b6;
+  color: #181c1f;
+  border: none;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.settings-action-btn:hover {
+  background: grey;
+  color: #fff;
+}
+
+.settings-action-btn.logout {
+  background: linear-gradient(90deg, #e4eafd 0%, #cfd7ea 100%);
+  color: #222;
+  border: none;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 1.09rem;
+  padding: 13px 0;
+  min-width: 140px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px 0 rgba(44,44,44,0.06);
+  letter-spacing: .04em;
+  transition: background .17s, color .17s, box-shadow .17s;
+  margin: 0;
+}
+.settings-action-btn.logout:hover {
+  background: linear-gradient(90deg, #cfd7ea 0%, #e4eafd 100%);
+  color: #fff;
+  filter: brightness(1.07) drop-shadow(0 0 12px #3dd68625);
+}
+
+
+body.darkmode {
+  font-family: 'Arial', sans-serif;
+  background-color: #000 !important;
+  color: #f8fafd !important;
+  line-height: 1.6;
+}
+body.darkmode .home-container {
+  background-color: #000 !important;
+}
+body.darkmode .btn {
+  background-color: #232323 !important;
+  color: #00e6ef !important;
+  border-radius: 8px;
+}
+body.darkmode .btn:hover {
+  background-color: #181c1f !important;
+  color: #00e6ef !important;
+}
+body.darkmode .register-container,
+body.darkmode .login-container {
+  background-color: #000 !important;
+}
+body.darkmode .register-card,
+body.darkmode .login-card {
+  background: #181c1f !important;
+  color: #e0f7fa !important;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px 0 rgba(0,230,239,0.10), 0 1.5px 0 0 #232323;
+}
+body.darkmode .register-header h1,
+body.darkmode .login-header h1 {
+  color: #00e6ef !important;
+}
+body.darkmode .register-header p,
+body.darkmode .login-header p {
+  color: #b0b6c6 !important;
+}
+body.darkmode .register-input,
+body.darkmode .login-input {
+  background: #181c1f !important;
+  color: #e0f7fa !important;
+  border: 2px solid #00e6ef !important;
+}
+body.darkmode .register-input:focus,
+body.darkmode .login-input:focus {
+  border-color: #00e6ef !important;
+  background: #181c1f !important;
+}
+body.darkmode .footer-links {
+  background: #181c1f !important;
+  border-top: 1px solid #232323 !important;
+  color: #b0b6c6 !important;
+}
+body.darkmode .student-profile-header,
+body.darkmode .student-profile-sidebar {
+  background: #000 !important;
+  color: #00e6ef !important;
+  border-color: #232323 !important;
+}
+body.darkmode .student-profile-header .logo-section span {
+  color: #00e6ef !important;
+}
+body.darkmode .student-profile-header .logo-section img {
+  content: var(--header-logo);
+  filter: none !important;
+}
+body.darkmode .student-profile-sidebar button {
+  color: #e0f7fa !important;
+  background: #000 !important;
+  border-left: 4px solid transparent !important;
+  font-weight: 500;
+}
+body.darkmode .student-profile-sidebar button.active,
+body.darkmode .student-profile-sidebar button:hover {
+  background: #181c1f !important;
+  color: #00e6ef !important;
+  border-left: 4px solid #00e6ef !important;
+  font-weight: 700;
+}
+body.darkmode .student-profile-content {
+  background: #000 !important;
+}
+body.darkmode .student-profile-form-container,
+body.darkmode .criteria-form,
+body.darkmode .content-card,
+body.darkmode .settings-popup-card {
+  background: #000 !important;
+  color: #e0f7fa !important;
+  border-radius: 14px;
+  border: 1.5px solid #232323;
+  box-shadow: 0 4px 24px 0 rgba(0,230,239,0.10), 0 1.5px 0 0 #232323;
+}
+body.darkmode .student-profile-form-group label,
+body.darkmode .checkbox-option span {
+  color: #e0f7fa !important;
+  font-weight: 600;
+}
+body.darkmode .form-input,
+body.darkmode input,
+body.darkmode select,
+body.darkmode textarea {
+  background: #181c1f !important;
+  color: #e0f7fa !important;
+  border: 2px solid #00e6ef !important;
+  border-radius: 8px;
+  font-size: 1.08rem;
+  margin-bottom: 8px;
+}
+body.darkmode .form-input:focus,
+body.darkmode input:focus,
+body.darkmode select:focus,
+body.darkmode textarea:focus {
+  border-color: lightgrey !important;
+  background: #181c1f !important;
+}
+body.darkmode .form-input::placeholder,
+body.darkmode input::placeholder,
+body.darkmode textarea::placeholder {
+  color: #7defff !important;
+  opacity: 1;
+}
+body.darkmode .checkbox-option {
+  background: #181c1f !important;
+  border: 2px solid #00e6ef !important;
+  color: #e0f7fa !important;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+body.darkmode .checkbox-option input[type="checkbox"],
+body.darkmode .checkbox-option input[type="radio"] {
+  accent-color: #00e6ef !important;
+}
+body.darkmode .speeddates-table {
+  background: #000 !important;
+  border-radius: 12px;
+  border: 1.5px solid #232323;
+  box-shadow: 0 2px 12px rgba(0,230,239,0.07);
+}
+body.darkmode .speeddates-table th {
+  background: #101214 !important;
+  color: #00e6ef !important;
+  border-bottom: 1.5px solid #232323 !important;
+  text-align: center;
+  vertical-align: middle;
+}
+body.darkmode .speeddates-table td {
+  background: #000 !important;
+  color: #e0f7fa !important;
+  border-bottom: 1px solid #232323 !important;
+  text-align: center;
+  vertical-align: middle;
+}
+body.darkmode .speeddates-table tr:nth-child(even) td {
+  background: #181c1f !important;
+}
+body.darkmode .speeddates-table tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* --- DARKMODE: UNIFORME TURQUOISE ACCENT, OVERZICHTELIJKE UI, ALLES BLIJFT WERKEN --- */
+body.darkmode {
+  --accent: lightgrey;
+  --accent-contrast: #181c1f;
+  --header-logo: url('/src/Images/EhB-logo-transparant-558-DarkMode.png');
+  background: #000 !important;
+  color: #f8fafd !important;
+}
+
+/* --- DARKMODE: CONTAINER STYLES --- */
+body.darkmode .student-profile-form-container,
+body.darkmode .criteria-form,
+body.darkmode .content-card,
+body.darkmode .settings-popup-card {
+  background: #000 !important;
+  color: #e0f7fa !important;
+  border-radius: 14px;
+  border: 1.5px solid #232323;
+  box-shadow: 0 4px 24px 0 rgba(0,230,239,0.10), 0 1.5px 0 0 #232323;
+}
+
+body.darkmode .student-profile-header,
+body.darkmode .student-profile-sidebar {
+  background: #000 !important;
+  color: var(--accent) !important;
+  border-color: #232323 !important;
+}
+body.darkmode .student-profile-header .logo-section span {
+  color: var(--accent) !important;
+}
+body.darkmode .student-profile-header .logo-section img {
+  content: var(--header-logo);
+  filter: none !important;
+}
+
+body.darkmode .student-profile-sidebar ul {
+  background: transparent !important;
+}
+body.darkmode .student-profile-sidebar button {
+  color: #e0f7fa !important;
+  background: #000 !important;
+  border-left: 4px solid transparent !important;
+  font-weight: 500;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+body.darkmode .student-profile-sidebar button.active,
+body.darkmode .student-profile-sidebar button:hover {
+  background: #181c1f !important;
+  color: var(--accent) !important;
+  border-left: 4px solid var(--accent) !important;
+  font-weight: 700;
+}
+
+
+/* Burger menu popup in darkmode */
+body.darkmode .student-profile-dropdown {
+  background: #000 !important;
+  border-color: #333 !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.22) !important;
+}
+body.darkmode .student-profile-dropdown li button {
+  color: #e0f7fa !important;
+}
+body.darkmode .student-profile-dropdown li button:hover {
+  background: #181c1f !important;
+  color: var(--accent) !important;
+}
+
+/* --- DARKMODE: TABLES --- */
+body.darkmode .speeddates-table {
+  background: #000 !important;
+  border-radius: 12px;
+  border: 1.5px solid #232323;
+  box-shadow: 0 2px 12px rgba(0,230,239,0.07);
+}
+body.darkmode .speeddates-table th {
+  background: #101214 !important;
+  color: #00e6ef !important;
+  border-bottom: 1.5px solid #232323 !important;
+  text-align: center;
+  vertical-align: middle;
+}
+body.darkmode .speeddates-table td {
+  background: #000 !important;
+  color: #e0f7fa !important;
+  border-bottom: 1px solid #232323 !important;
+  text-align: center;
+  vertical-align: middle;
+}
+body.darkmode .speeddates-table tr:nth-child(even) td {
+  background: #181c1f !important;
+}
+body.darkmode .speeddates-table tr:last-child td {
+  border-bottom: none !important;
+}
+
+
+/* --- MODERN TABLES: LIGHT & DARK MODE --- */
+.speeddates-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  overflow: hidden;
+  margin-bottom: 2rem;
+  font-size: 1.07rem;
+}
+.speeddates-table th {
+  background: #f5f6f7;
+  color: #0077b5;
+  font-weight: 700;
+  padding: 1.1rem 1rem;
+  border-bottom: 2px solid #e1e5e9;
+  text-align: center;
+  vertical-align: middle;
   letter-spacing: 0.01em;
-  z-index: 100;
+}
+.speeddates-table td {
+  background: #fff;
+  color: #222;
+  padding: 1rem 1rem;
+  border-bottom: 1px solid #e1e5e9;
+  vertical-align: middle;
+  text-align: center;
+}
+.speeddates-table tr:last-child td {
+  border-bottom: none;
+}
+.speeddates-table tr:nth-child(even) td {
+  background: #f8f9fa;
 }
 
-.student-profile-footer a {
-  color: #7a7a7a;
-  text-decoration: none;
-  transition: color 0.2s;
+/* QR code image smaller and square */
+.qr-code-img {
+  display: block;
+  margin: 0 auto 1.2rem auto;
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
 }
-.student-profile-footer a:hover {
-  color: #009ca6;
-  text-decoration: underline;
+body.darkmode .qr-code-img {
+  background: #181c1f !important;
 }
 
+/* QR code popup text color same as sidebar accent */
+.qr-code-label,
+.qr-code-description {
+  color: var(--accent) !important;
+  text-align: center;
+}
+
+/* Popups (settings, modals, etc) */
+body.darkmode .settings-popup-card,
+body.darkmode .modal-content,
+body.darkmode .content-card {
+  background: #000 !important;
+  color: #e0f7fa !important;
+  box-shadow: 0 4px 24px 0 rgba(0,230,239,0.13);
+}
+body.darkmode .settings-title,
+body.darkmode .modal-header h1,
+body.darkmode .modal-header h2 {
+  color: var(--accent) !important;
+}
+body.darkmode .settings-popup-close {
+  color: var(--accent) !important;
+}
+
+/* Forms: overzichtelijk, turquoise accenten */
+body.darkmode .criteria-form,
+body.darkmode .student-profile-form-container,
+body.darkmode .search-fieldset {
+  background: #000 !important;
+  color: #e0f7fa !important;
+  border-radius: 12px;
+  box-shadow: 0 1px 8px 0 rgba(0,230,239,0.08);
+}
+body.darkmode .search-fieldset legend {
+  color: var(--accent) !important;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+body.darkmode .student-profile-form-group label,
+body.darkmode .checkbox-option span {
+  color: #e0f7fa !important;
+  font-weight: 600;
+}
+body.darkmode .form-input,
+body.darkmode input,
+body.darkmode select,
+body.darkmode textarea {
+  background: #181c1f !important;
+  color: #e0f7fa !important;
+  border: 2px solid var(--accent) !important;
+  border-radius: 8px;
+  font-size: 1.08rem;
+  margin-bottom: 8px;
+}
+body.darkmode .form-input:focus,
+body.darkmode input:focus,
+body.darkmode select:focus,
+body.darkmode textarea:focus {
+  border-color: var(--accent) !important;
+  background: #181c1f !important;
+}
+body.darkmode .form-input::placeholder,
+body.darkmode input::placeholder,
+body.darkmode textarea::placeholder {
+  color: grey !important;
+  opacity: 1;
+}
+body.darkmode .checkbox-option {
+  background: #181c1f !important;
+  border: 2px solid var(--accent) !important;
+  color: #e0f7fa !important;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+body.darkmode .checkbox-option input[type="checkbox"],
+body.darkmode .checkbox-option input[type="radio"] {
+  accent-color: var(--accent) !important;
+}
+
+/* Tables in darkmode */
+body.darkmode .speeddates-table th,
+body.darkmode .speeddates-table td {
+  background: #000 !important;
+  color: #e0f7fa !important;
+  border-color: #232323 !important;
+  text-align: center;
+  vertical-align: middle;
+}
+body.darkmode .speeddates-table .status-badge,
+body.darkmode .speeddates-table .accept-btn,
+body.darkmode .speeddates-table .deny-btn {
+  min-width: 110px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 38px;
+  margin: 0 2px;
+}
+@media (max-width: 600px) {
+  body.darkmode .speeddates-table .status-badge,
+  body.darkmode .speeddates-table .accept-btn,
+  body.darkmode .speeddates-table .deny-btn {
+    min-width: 70px;
+    height: 32px;
+    font-size: 0.95em;
+  }
+}
+
+/* QR-code en labels in darkmode */
+body.darkmode .qr-code-img {
+  background: #181c1f !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.22) !important;
+}
+body.darkmode .qr-code-label,
+body.darkmode .qr-code-description {
+  color: var(--accent) !important;
+}
+
+/* Footer in darkmode */
 body.darkmode .student-profile-footer {
-  background: #232323 !important;
+  background: #000 !important;
   color: #b0b6c6 !important;
   border-top: 1px solid #333 !important;
 }
@@ -1001,739 +1755,366 @@ body.darkmode .student-profile-footer a {
   text-decoration: none !important;
 }
 body.darkmode .student-profile-footer a:hover {
-  color: #00e6ef !important;
-  text-decoration: underline !important;
+  color: var(--accent) !important;
 }
 
-@media (max-width: 600px) {
-  .settings-popup-card {
-    padding: 1rem 2vw;
-    min-width: 0;
-    max-width: 98vw;
-  }
-  .login-card,
-  .register-card {
-    margin-bottom: 32px;
-  }
-  .student-profile-footer {
-    font-size: 0.88rem;
-    padding: 13px 0 10px 0;
-  }
-}
-
-@media (max-width: 900px) {
-  .student-profile-form-container,
-  .speeddates-table-container,
-  .criteria-form {
-    max-width: 98vw;
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  .speeddates-table-container {
-    max-width: 98vw;
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  .speeddates-table th,
-  .speeddates-table td {
-    padding: 13px 4px;
-    font-size: 0.98rem;
-  }
-  .status-badge {
-    min-width: 80px;
-    padding: 7px 0;
-  }
-}
-
-/* --- Speeddates & Speeddates-verzoeken Table Styles --- */
-.speeddates-table-container {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  padding: 2.5rem 1.5rem 2.5rem 1.5rem;
-  margin: 2.5rem auto 0 auto;
-  max-width: 900px;
-  width: 100%;
-}
-.speeddates-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 1.08rem;
-  background: none;
-}
-.speeddates-table thead tr {
-  background: #f8f9fa;
-  font-size: 1.12rem;
-}
-.speeddates-table th,
-.speeddates-table td {
-  padding: 20px 18px;
-  border-bottom: 1.5px solid #e1e5e9;
-  vertical-align: middle;
-  font-weight: 500;
-  text-align: center;
-}
-.speeddates-table th {
-  color: #0077b5;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  background: #f8f9fa;
-  border-bottom: 2px solid #e1e5e9;
-}
-.speeddates-table tbody tr:last-child td {
-  border-bottom: none;
-}
-.status-badge {
-  display: inline-block;
-  min-width: 120px;
-  text-align: center;
-  font-size: 1.05rem;
-  border-radius: 22px;
-  font-weight: 700;
-  padding: 10px 32px;
-  border: none;
-}
-.badge-bevestigd {
-  background: #e1f9ec;
-  color: #2aa97b !important;
-}
-.badge-waiting {
-  background: #fff8e3;
-  color: #fdac1b !important;
-}
-.badge-anders {
-  background: #e4eafd;
-  color: #2863df !important;
-}
-
-/* Speeddates-verzoeken specifieke cellen */
-.status-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  flex-wrap: wrap;
-  min-height: 56px;
-  width: 100%;
-}
-.accept-btn,
-.deny-btn {
+/* --- BADGES & SPEEDDATE ACTIE BUTTONS: UNIFORM & COMPACT --- */
+/* Basisstijl voor alle status-badges en actieknoppen in speeddates-tabel */
+.speeddates-table .status-badge,
+.speeddates-table .accept-btn,
+.speeddates-table .deny-btn {
   min-width: 110px;
-  max-width: 135px;
-  width: 100%;
-  padding: 9px 0;
-  border: none;
-  border-radius: 22px;
-  font-weight: 700;
-  font-size: 1rem;
-  cursor: pointer;
-  margin: 0 2px;
-  box-shadow: 0 2px 6px 0 rgba(44, 44, 44, 0.05);
-  transition: background 0.17s, color 0.17s, box-shadow 0.17s;
-  display: inline-block;
-  flex: 1 1 110px;
-}
-.accept-btn {
-  background: #00bcd4;
-  color: #fff;
-}
-.accept-btn:hover {
-  background: #00acc1;
-  color: #fff;
-  box-shadow: 0 3px 16px 0 rgba(0, 188, 212, 0.13);
-}
-.deny-btn {
-  background: #fa626a;
-  color: #fff;
-}
-.deny-btn:hover {
-  background: #fd7855;
-  color: #fff;
-}
-
-.qr-code-img {
-  width: 120px;
-  height: 120px;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-  display: block;
-  margin: 0 auto 1.2rem auto;
-}
-
-.qr-code-section {
-  display: flex;
-  flex-direction: column;
+  min-height: 38px;
+  border-radius: 16px !important;
+  font-weight: 600;
+  font-size: 1em;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 2.5rem;
-  margin-bottom: 2.5rem;
+  box-sizing: border-box;
+  padding: 0 18px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border 0.18s, transform 0.18s;
+}
+.speeddates-table .status-badge {
+  cursor: default;
 }
 
-.qr-code-label {
-  font-size: 1.13rem;
-  font-weight: 600;
-  color: #0077b5;
-  margin-bottom: 0.7rem;
-  text-align: center;
+/* Light mode: badge kleuren */
+.speeddates-table .status-badge.badge-accepted {
+  background: #e6f9ed !important;
+  color: #1db954 !important;
+  border: 1.5px solid #1db954 !important;
+}
+.speeddates-table .accept-btn {
+  background: #e6f9ed !important;
+  color: #1db954 !important;
+  border: 1.5px solid #1db954 !important;
+}
+.speeddates-table .accept-btn:hover,
+.speeddates-table .accept-btn:focus {
+  background: #1db954 !important;
+  color: #fff !important;
+  border-color: #1db954 !important;
+  transform: translateY(-2px);
+}
+.speeddates-table .accept-btn:active {
+  background: #0077b5 !important;
+  color: #fff !important;
+  border-color: #0077b5 !important;
+  transform: translateY(0);
 }
 
-.qr-code-description {
-  font-size: 1rem;
-  color: #444;
-  margin-top: 0.7rem;
-  margin-bottom: 0.2rem;
-  text-align: center;
-  max-width: 320px;
-}
-
-/* Dark mode adjustments */
-body.darkmode {
-  background: #111 !important;
-  color: #f5f5f5 !important;
-}
-
-body.darkmode .student-profile-container,
-body.darkmode .student-profile-form-container,
-body.darkmode .criteria-form,
-body.darkmode .speeddates-table-container,
-body.darkmode .settings-popup-card,
-body.darkmode .register-card,
-body.darkmode .login-card,
-body.darkmode .admin-card,
-body.darkmode .content-card {
-  background: #181c1f !important;
-  color: #f5f5f5 !important;
-  box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.22);
-}
-
-body.darkmode .student-profile-header,
-body.darkmode .student-profile-sidebar {
-  background: #181c1f !important;
-  color: #f5f5f5 !important;
-  border-color: #181c1f !important;
-}
-
-body.darkmode .student-profile-footer {
-  background: none !important;
-  color: #b0b6c6 !important;
-  border-top: 1px solid #232323 !important;
-}
-
-body.darkmode .student-profile-footer a {
-  color: #b0b6c6 !important;
-}
-
-body.darkmode .student-profile-footer a:hover {
-  color: #1de9b6 !important;
-}
-
-body.darkmode .settings-popup-close {
-  color: #1de9b6 !important;
-}
-
-body.darkmode .settings-title {
-  color: #1de9b6 !important;
-}
-
-body.darkmode .settings-action-btn {
-  background: #232323 !important;
-  color: #f5f5f5 !important;
-  border: 1.5px solid #1de9b6 !important;
-}
-
-body.darkmode .settings-action-btn.logout {
-  background: #181c1f !important;
-  color: #f5f5f5 !important;
-  border: 1.5px solid #b0b6c6 !important;
-}
-
-body.darkmode .settings-action-btn.delete {
-  background: #232323 !important;
+.speeddates-table .status-badge.badge-denied {
+  background: #ffeaea !important;
   color: #fa626a !important;
   border: 1.5px solid #fa626a !important;
 }
-
-body.darkmode .settings-action-btn:hover {
-  background: #1de9b6 !important;
-  color: #181c1f !important;
+.speeddates-table .deny-btn {
+  background: #ffeaea !important;
+  color: #fa626a !important;
+  border: 1.5px solid #fa626a !important;
 }
-
-body.darkmode .settings-action-btn.logout:hover {
-  background: #232323 !important;
-  color: #1de9b6 !important;
-}
-
-body.darkmode .settings-action-btn.delete:hover {
+.speeddates-table .deny-btn:hover,
+.speeddates-table .deny-btn:focus {
   background: #fa626a !important;
   color: #fff !important;
+  border-color: #fa626a !important;
+  transform: translateY(-2px);
+}
+.speeddates-table .deny-btn:active {
+  background: #b00020 !important;
+  color: #fff !important;
+  border-color: #b00020 !important;
+  transform: translateY(0);
 }
 
-body.darkmode input,
-body.darkmode select,
-body.darkmode textarea {
-  background: #232323 !important;
-  color: #f5f5f5 !important;
-  border-color: #333 !important;
-}
-
-body.darkmode .speeddates-table th,
-body.darkmode .speeddates-table td {
-  background: #181c1f !important;
-  color: #f5f5f5 !important;
-  border-color: #232323 !important;
-}
-
-body.darkmode .status-badge {
-  background: #232323 !important;
-  color: #1de9b6 !important;
-  border: 1.5px solid #1de9b6 !important;
-}
-
-body.darkmode .badge-bevestigd {
-  background: #232323 !important;
-  color: #1de9b6 !important;
-}
-
-body.darkmode .badge-waiting {
-  background: #232323 !important;
+.speeddates-table .status-badge.badge-waiting {
+  background: #fffbe6 !important;
   color: #ffd740 !important;
+  border: 1.5px solid #ffd740 !important;
+}
+.speeddates-table .status-badge.badge-other {
+  background: #f5f5f5 !important;
+  color: #b0b6c6 !important;
+  border: 1.5px solid #b0b6c6 !important;
 }
 
-body.darkmode .badge-anders {
-  background: #232323 !important;
-  color: #e0f7fa !important;
+/* DARKMODE: badge kleuren en actieknoppen */
+body.darkmode .speeddates-table .status-badge.badge-accepted {
+  background: #1a3d1a !important;
+  color: #00ff7f !important;
+  border: 1.5px solid #00ff7f !important;
+}
+body.darkmode .speeddates-table .accept-btn {
+  background: #1a3d1a !important;
+  color: #00ff7f !important;
+  border: 1.5px solid #00ff7f !important;
+}
+body.darkmode .speeddates-table .accept-btn:hover,
+body.darkmode .speeddates-table .accept-btn:focus {
+  background: #00ff7f !important;
+  color: #181c1f !important;
+  border-color: #00ff7f !important;
+  transform: translateY(-2px);
+}
+body.darkmode .speeddates-table .accept-btn:active {
+  background: #181c1f !important;
+  color: #00ff7f !important;
+  border-color: #00ff7f !important;
+  transform: translateY(0);
 }
 
-body.darkmode .qr-code-img {
-  background: #232323 !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22) !important;
+body.darkmode .speeddates-table .status-badge.badge-denied {
+  background: #3d1a1a !important;
+  color: #ff4d4f !important;
+  border: 1.5px solid #ff4d4f !important;
+}
+body.darkmode .speeddates-table .deny-btn {
+  background: #3d1a1a !important;
+  color: #ff4d4f !important;
+  border: 1.5px solid #ff4d4f !important;
+}
+body.darkmode .speeddates-table .deny-btn:hover,
+body.darkmode .speeddates-table .deny-btn:focus {
+  background: #ff4d4f !important;
+  color: #181c1f !important;
+  border-color: #ff4d4f !important;
+  transform: translateY(-2px);
+}
+body.darkmode .speeddates-table .deny-btn:active {
+  background: #181c1f !important;
+  color: #ff4d4f !important;
+  border-color: #ff4d4f !important;
+  transform: translateY(0);
 }
 
-body.darkmode .qr-code-label,
-body.darkmode .qr-code-description {
-  color: #e0f7fa !important;
+body.darkmode .speeddates-table .status-badge.badge-waiting {
+  background: #3d3a1a !important;
+  color: #ffd740 !important;
+  border: 1.5px solid #ffd740 !important;
+}
+body.darkmode .speeddates-table .status-badge.badge-other {
+  background: #181c1f !important;
+  color: #b0b6c6 !important;
+  border: 1.5px solid #b0b6c6 !important;
 }
 
-/* Modern Contact Page Styles */
-.modern-contact-container {
-  min-height: 100vh;
-  background: #f8f9fa;
-  padding: 2rem 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* Responsive */
+@media (max-width: 600px) {
+  .speeddates-table .status-badge,
+  .speeddates-table .accept-btn,
+  .speeddates-table .deny-btn {
+    min-width: 80px;
+    min-height: 32px;
+    font-size: 0.95em;
+    padding: 0 10px;
+  }
 }
 
-.modern-contact-header {
-  text-align: center;
-  margin-bottom: 2.5rem;
-  max-width: 600px;
+
+body.darkmode .student-profile-header .logo-section span {
+  font-weight: 700;
+  color: #e0f7fa  !important;
 }
 
-.modern-back-button {
-  position: absolute;
-  top: 2rem;
-  left: 2rem;
-  background: white;
-  border: 1px solid #e1e5e9;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  color: #666;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+/* --- UNIFORME BUTTON-STIJL VOOR PROFIELACTIEKNOPPEN (login/register look) --- */
+.student-profile-btn,
+.student-profile-btn-primary {
+  background-color: grey !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 12px 28px !important;
+  font-size: 1.08rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
+  box-shadow: 0 2px 8px rgba(0,188,212,0.08) !important;
+  outline: none !important;
+  min-width: 120px !important;
+  display: inline-block !important;
+}
+.student-profile-btn-secondary {
+  background-color: #e1e5e9 !important;
+  color: #333 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 12px 28px !important;
+  font-size: 1.08rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
+  box-shadow: 0 2px 8px rgba(0,188,212,0.08) !important;
+  outline: none !important;
+  min-width: 120px !important;
+  display: inline-block !important;
+}
+.student-profile-btn:hover,
+.student-profile-btn-primary:hover {
+  background-color: #00acc1 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(0,188,212,0.13) !important;
+  transform: translateY(-2px) !important;
+}
+.student-profile-btn-secondary:hover {
+  background-color: #00acc1 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(0,188,212,0.13) !important;
+  transform: translateY(-2px) !important;
+}
+.student-profile-btn:active,
+.student-profile-btn_primary:active {
+  background-color: #009ca6 !important;
+  color: #fff !important;
+  box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
+  transform: translateY(0) !important;
+}
+.student-profile-btn-secondary:active {
+  background-color: #009ca6 !important;
+  color: #fff !important;
+  box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
+  transform: translateY(0) !important;
 }
 
-.modern-back-button:hover {
-  background: #f8f9fa;
-  border-color: #ccc;
+/* DARKMODE: profielactieknoppen */
+body.darkmode .student-profile-btn,
+body.darkmode .student-profile-btn-primary,
+body.darkmode .student-profile-btn-secondary {
+  background-color: #2a2929 !important;
+  color: lightgray !important;
+  border-radius: 8px !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0,230,239,0.10) !important;
+}
+body.darkmode .student-profile-btn:hover,
+body.darkmode .student-profile-btn-primary:hover,
+body.darkmode .student-profile-btn-secondary:hover {
+  background-color: #181c1f !important;
+  color: lightgray !important;
+  box-shadow: 0 4px 16px rgba(0,230,239,0.13) !important;
+  transform: translateY(-2px) !important;
+}
+body.darkmode .student-profile-btn:active,
+body.darkmode .student-profile-btn-primary:active,
+body.darkmode .student-profile-btn-secondary:active {
+  background-color: grey !important;}
+
+  /* --- UNIFORME BUTTON STIJL VOOR LOGOUT EN DELETE IN SETTINGS --- */
+.settings-action-btn.logout {
+  background: grey !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 1.08rem !important;
+  padding: 12px 28px !important;
+  min-width: 120px !important;
+  display: inline-block !important;
+  box-shadow: 0 2px 8px rgba(0,188,212,0.08) !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
+}
+.settings-action-btn.logout:hover,
+.settings-action-btn.logout:focus {
+  background: #00acc1 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(0,188,212,0.13) !important;
+  transform: translateY(-2px) !important;
+}
+.settings-action-btn.logout:active {
+  background: #009ca6 !important;
+  color: #fff !important;
+  box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
+  transform: translateY(0) !important;
 }
 
-.back-arrow {
-  font-size: 1rem;
-  font-weight: bold;
+/* DELETE BUTTON: zelfde stijl, maar rood */
+.settings-action-btn.delete {
+  background: #fa626a !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 1.08rem !important;
+  padding: 12px 28px !important;
+  min-width: 120px !important;
+  display: inline-block !important;
+  box-shadow: 0 2px 8px rgba(250, 98, 106, 0.10) !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
+}
+.settings-action-btn.delete:hover,
+.settings-action-btn.delete:focus {
+  background: #c82333 !important; /* dieprood */
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(250, 98, 106, 0.18) !important;
+  transform: translateY(-2px) !important;
+}
+.settings-action-btn.delete:active {
+  background: #b00020 !important;
+  color: #fff !important;
+  box-shadow: 0 2px 4px rgba(250, 98, 106, 0.14) !important;
+  transform: translateY(0) !important;
 }
 
-.modern-contact-title {
-  font-size: 2.5rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.5rem;
+body.darkmode #burger-menu:hover{
+  background-color: lightgray !important;
 }
 
-.modern-contact-subtitle {
-  font-size: 1rem;
-  color: #666;
-  margin-bottom: 0;
-  font-weight: 400;
+.student-profile-dropdown {
+  display: none;
 }
-
-.modern-contact-content {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  padding: 2rem;
-  max-width: 600px;
-  width: 100%;
-  border: 1px solid #e1e5e9;
-}
-
-.contact-form-section {
-  margin-bottom: 1.5rem;
-}
-
-.contact-form-section h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-.modern-contact-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.form-group {
-  position: relative;
-}
-
-.form-group label {
+.student-profile-dropdown.open {
   display: block;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 0.3rem;
 }
 
-.form-group input,
-.form-group textarea {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #e1e5e9;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  background: white;
-  color: #333;
-  transition: border-color 0.2s ease;
-  font-family: inherit;
-  resize: vertical;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: #00bcd4;
-}
-
-.form-group input.error,
-.form-group textarea.error {
-  border-color: #dc3545;
-}
-
-.form-group input.valid,
-.form-group textarea.valid {
-  border-color: #28a745;
-}
-
-.error-message {
-  color: #dc3545;
-  font-size: 0.8rem;
-  margin-top: 0.25rem;
-  display: none;
-}
-
-.character-count {
-  font-size: 0.8rem;
-  color: #666;
-  text-align: right;
-  margin-top: 0.25rem;
-}
-
-.modern-submit-button {
-  background: #00bcd4;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.modern-submit-button:hover:not(:disabled) {
-  background: #00acc1;
-}
-
-.modern-submit-button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-.button-icon {
-  font-size: 1.2rem;
-}
-
-.form-status {
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-top: 1rem;
-  font-weight: 500;
-  display: none;
-}
-
-.form-status.error {
-  background: #fff5f5;
-  color: #dc3545;
-  border: 1px solid #dc3545;
-}
-
-.form-status.success {
-  background: #f0fff4;
-  color: #28a745;
-  border: 1px solid #28a745;
-}
-
-/* Success Modal Styles */
-.success-modal {
+.student-profile-footer {
   position: fixed;
-  top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 8px;
-  padding: 0;
-  max-width: 450px;
-  width: 90%;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-.modal-header {
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  background: #fff;
+  border-top: 1px solid #e1e5e9;
   text-align: center;
-  padding: 1.5rem 1.5rem 1rem;
-  border-bottom: 1px solid #eee;
+  padding: 12px 0 10px 0;
+  z-index: 100;
+  text-decoration: none;
 }
 
-.success-icon {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
+
+
+/* Algemene link-stijlen */
+a {
+  color: #0077b5;
+  transition: color 0.18s;
+}
+a:hover {
+  color: #28bb8a;
+}
+body.darkmode a {
+  color: #00e6ef;
+  transition: color 0.18s;
+}
+body.darkmode a:hover {
+  color: #3dd686;
 }
 
-.modal-header h3 {
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #28a745;
-  margin: 0;
+
+/* Links in .student-profile-footer zijn standaard niet onderlijnd, maar wel bij hover. Dit geldt voor zowel light als darkmode. */
+.student-profile-footer a {
+  color: #232846;
+  text-decoration: none;
+  transition: color 0.18s;
 }
-
-.modal-body {
-  padding: 1rem 1.5rem;
-  text-align: center;
+.student-profile-footer a:hover {
+  color: #28bb8a;
+  text-decoration: underline;
 }
-
-.modal-body p {
-  color: #666;
-  line-height: 1.5;
-  margin-bottom: 0.75rem;
+body.darkmode .student-profile-footer a {
+  color: #00e6ef;
+  text-decoration: none;
 }
-
-.modal-reference {
-  background: #f8f9fa;
-  padding: 0.75rem;
-  border-radius: 4px;
-  border-left: 3px solid #00bcd4;
-  margin-top: 0.75rem;
-}
-
-.modal-footer {
-  padding: 1rem 1.5rem 1.5rem;
-  text-align: center;
-}
-
-.modal-close-button {
-  background: #00bcd4;
-  color: white;
-  border: none;
-  padding: 0.6rem 1.5rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.modal-close-button:hover {
-  background: #00acc1;
-}
-
-/* Loading Overlay Styles */
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1001;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top: 3px solid #00bcd4;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.loading-overlay p {
-  color: white;
-  font-size: 1rem;
-  font-weight: 400;
-}
-
-/* Dark mode adjustments for contact page */
-body.darkmode .modern-contact-container {
-  background: #1a1a1a;
-}
-
-body.darkmode .modern-contact-content {
-  background: #2d2d2d;
-  color: #f5f5f5;
-  border-color: #444;
-}
-
-body.darkmode .contact-form-section h2,
-body.darkmode .modern-contact-title {
-  color: #f5f5f5;
-}
-
-body.darkmode .form-group label {
-  color: #e0e0e0;
-}
-
-body.darkmode .form-group input,
-body.darkmode .form-group textarea {
-  background: #333;
-  border-color: #555;
-  color: #f5f5f5;
-}
-
-body.darkmode .form-group input:focus,
-body.darkmode .form-group textarea:focus {
-  border-color: #00bcd4;
-}
-
-body.darkmode .modern-back-button {
-  background: #2d2d2d;
-  border-color: #555;
-  color: #f5f5f5;
-}
-
-body.darkmode .modern-back-button:hover {
-  background: #333;
-}
-
-body.darkmode .modal-content {
-  background: #2d2d2d;
-  color: #f5f5f5;
-}
-
-body.darkmode .modal-header {
-  border-bottom-color: #555;
-}
-
-body.darkmode .modal-reference {
-  background: #333;
-  color: #f5f5f5;
-}
-
-/* Responsive Design for Contact Page */
-@media (max-width: 768px) {
-  .modern-contact-container {
-    padding: 1rem 0.5rem;
-  }
-
-  .modern-back-button {
-    position: relative;
-    top: auto;
-    left: auto;
-    margin-bottom: 1.5rem;
-  }
-
-  .modern-contact-title {
-    font-size: 2rem;
-  }
-
-  .modern-contact-content {
-    padding: 1.5rem;
-    margin: 0 0.5rem;
-  }
-
-  .modal-content {
-    width: 95%;
-    margin: 0 0.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .modern-contact-title {
-    font-size: 1.8rem;
-  }
-
-  .modern-contact-subtitle {
-    font-size: 0.9rem;
-  }
-
-  .modern-contact-content {
-    padding: 1rem;
-  }
-
-  .contact-form-section h2 {
-    font-size: 1.3rem;
-  }
-
-  .modern-submit-button {
-    padding: 0.7rem 1.2rem;
-    font-size: 0.9rem;
-  }
+body.darkmode .student-profile-footer a:hover {
+  color: #3dd686;
+  text-decoration: underline;
 }

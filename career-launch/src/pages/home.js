@@ -2,6 +2,10 @@ import Router from '../router.js';
 import ehbLogo from '../Images/EhB-logo-transparant.png';
 
 export function renderHome(rootElement) {
+  // Zet altijd light mode bij laden van home
+  localStorage.setItem('darkmode', 'false');
+  document.body.classList.remove('darkmode');
+
   rootElement.innerHTML = `
     <div class="home-container">
       <img 
@@ -29,6 +33,12 @@ export function renderHome(rootElement) {
   btnLog.addEventListener('click', () => {
     Router.navigate('/login');
   });
+  // Navigatie knoppen
+  const btnLogin = document.getElementById('btn-login');
+  const btnRegister = document.getElementById('btn-register');
+  if (btnLogin) btnLogin.addEventListener('click', () => window.appRouter.navigate('/login'));
+  if (btnRegister) btnRegister.addEventListener('click', () => window.appRouter.navigate('/registreer'));
+
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();

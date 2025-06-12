@@ -1,6 +1,14 @@
 import Router from '../router.js';
 
+// Zet altijd light mode bij laden van login
+localStorage.setItem('darkmode', 'false');
+document.body.classList.remove('darkmode');
+
 export function renderLogin(rootElement) {
+  // Direct skippen naar student-profiel (voor testen)
+  Router.navigate('/Student/Student-Profiel');
+  return;
+
   rootElement.innerHTML = `
     <div class="login-container">
       <div class="login-card">
@@ -20,15 +28,15 @@ export function renderLogin(rootElement) {
             class="login-input"
           >
           
-          <input 
-            type="password" 
-            id="password" 
-            name="password" 
-            required 
-            placeholder="Wachtwoord"
-            minlength="8"
-            class="login-input"
-          >
+          <div class="form-group">
+            <label for="passwordInput">Wachtwoord</label>
+            <div style="position:relative;display:flex;align-items:center;">
+              <input type="password" id="passwordInput" name="password" required style="flex:1;">
+              <button type="button" id="togglePassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">
+                <img id="togglePasswordIcon" src="src/Icons/icons8-closed-eye-HIDDEN.png" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
+              </button>
+            </div>
+          </div>
           
           <button type="submit" class="login-btn">Login</button>
         </form>
@@ -77,6 +85,22 @@ export function renderLogin(rootElement) {
   linkedinButton.addEventListener('click', () => {
     // LinkedIn integratie nog niet geïmplementeerd
   });
+
+  // Password toggle functionaliteit
+  const passwordInput = document.getElementById('passwordInput');
+  const togglePassword = document.getElementById('togglePassword');
+  const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+  if (passwordInput && togglePassword && togglePasswordIcon) {
+    togglePassword.addEventListener('click', () => {
+      const isVisible = passwordInput.type === 'text';
+      passwordInput.type = isVisible ? 'password' : 'text';
+      togglePasswordIcon.src = isVisible
+        ? 'src/Icons/icons8-closed-eye-HIDDEN.png'
+        : 'src/Icons/icons8-closed-eye-CLEAR.png';
+      togglePasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
+    });
+  }
+
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
@@ -186,21 +210,25 @@ async function handleLogin(event, rootElement) {
 
     // Handle successful login based on user type
     if (userType === 'student') {
-      // Handle student login with API data
+      // Mapping API response to student profile fields
       const studentData = {
         id: response.user?.id || null,
-        firstName: response.user?.firstName || 'Student',
-        lastName: response.user?.lastName || 'User',
+        firstName: response.user?.firstName || response.user?.voornaam || 'Voornaam',
+        lastName: response.user?.lastName || response.user?.achternaam || 'Achternaam',
         email: response.user?.email || email,
-        studyProgram: response.user?.studyProgram || 'Webontwikkeling',
-        year: response.user?.year || '2e Bachelor',
+        studyProgram: response.user?.studyProgram || response.user?.opleiding_naam || '', // if available
+        year: response.user?.year || response.user?.studiejaar || '',
         profilePictureUrl:
-          response.user?.profilePictureUrl || '/src/Images/default.jpg',
+          response.user?.profilePictureUrl ||
+          response.user?.profiel_foto ||
+          '/src/Images/default.jpg',
+        linkedIn: response.user?.linkedIn || response.user?.linkedin || '',
+        birthDate: response.user?.birthDate || response.user?.date_of_birth || '',
+        opleiding_id: response.user?.opleiding_id || null,
       };
 
-      // Store student data
       window.sessionStorage.setItem('studentData', JSON.stringify(studentData));
-      window.sessionStorage.setItem('userType', 'student'); // Navigate to student profile
+      window.sessionStorage.setItem('userType', 'student');
       Router.navigate('/Student/Student-Profiel');
     } else if (userType === 'company') {
       // Handle company login with API data
