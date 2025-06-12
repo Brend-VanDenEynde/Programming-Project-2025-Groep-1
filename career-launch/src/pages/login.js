@@ -97,7 +97,9 @@ export function renderLogin(rootElement) {
       togglePasswordIcon.src = isVisible
         ? 'src/Icons/icons8-closed-eye-HIDDEN.png'
         : 'src/Icons/icons8-closed-eye-CLEAR.png';
-      togglePasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
+      togglePasswordIcon.alt = isVisible
+        ? 'Toon wachtwoord'
+        : 'Verberg wachtwoord';
     });
   }
 
@@ -186,7 +188,7 @@ async function handleLogin(event, rootElement) {
     }
 
     // Debug: Log the response to see what we're getting
-    console.log('Login response structure:', response); // SECURITY: Only proceed if we have a valid response with message "Login successful"
+    // console.log('Login response structure:', response); // Disabled to prevent sensitive information leakage in production
     if (!response.message || response.message !== 'Login successful') {
       throw new Error('Invalid login response');
     }
@@ -213,17 +215,24 @@ async function handleLogin(event, rootElement) {
       // Mapping API response to student profile fields
       const studentData = {
         id: response.user?.id || null,
-        firstName: response.user?.firstName || response.user?.voornaam || 'Voornaam',
-        lastName: response.user?.lastName || response.user?.achternaam || 'Achternaam',
+        firstName:
+          response.user?.firstName || response.user?.voornaam || 'Voornaam',
+        lastName:
+          response.user?.lastName || response.user?.achternaam || 'Achternaam',
         email: response.user?.email || email,
-        studyProgram: response.user?.studyProgram || response.user?.opleiding_naam || '', // if available
+        studyProgram:
+          response.user?.studyProgram || response.user?.opleiding_naam || '', // if available
         year: response.user?.year || response.user?.studiejaar || '',
         profilePictureUrl:
           response.user?.profilePictureUrl ||
           response.user?.profiel_foto ||
           '/src/Images/default.jpg',
-        linkedIn: response.user?.linkedIn || response.user?.linkedin || '',
-        birthDate: response.user?.birthDate || response.user?.date_of_birth || '',
+        linkedIn:
+          response.user?.linkedIn ||
+          response.user?.linkedin ||
+          'https://www.linkedin.com/',
+        birthDate:
+          response.user?.birthDate || response.user?.date_of_birth || '',
         opleiding_id: response.user?.opleiding_id || null,
       };
 
@@ -237,7 +246,7 @@ async function handleLogin(event, rootElement) {
         companyName: response.user?.companyName || 'Bedrijf',
         email: response.user?.email || email,
         description: response.user?.description || '',
-        linkedIn: response.user?.linkedIn || '',
+        linkedIn: response.user?.linkedIn || 'https://www.linkedin.com/',
         profilePictureUrl:
           response.user?.profilePictureUrl || '/src/Images/default-company.jpg',
       };

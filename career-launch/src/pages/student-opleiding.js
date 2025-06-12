@@ -117,13 +117,15 @@ async function handleJaarRegister(event) {
     return;
   }
   const previousData = JSON.parse(localStorage.getItem('userData')) || {};
-
   const data = {
     email: previousData.email || '',
     password: previousData.password || '',
     voornaam: previousData.voornaam || '',
     achternaam: previousData.achternaam || '',
-    linkedin: previousData.linkedin || '',
+    linkedin:
+      previousData.linkedin && previousData.linkedin.trim() !== ''
+        ? previousData.linkedin
+        : 'https://www.linkedin.com/',
     profielFoto: previousData.profielFoto,
     studiejaar: parseInt(jaar, 10),
     opleiding_id: parseInt(opleiding, 10),

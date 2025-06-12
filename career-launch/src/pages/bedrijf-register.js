@@ -64,14 +64,16 @@ function handleBedrijfRegister(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
+  const linkedinInput = formData.get('linkedin');
   const data = {
     bedrijfnaam: formData.get('bedrijfnaam'),
     contactpersoon: formData.get('contactpersoon'),
     telefoon: formData.get('telefoon'),
-    linkedinLink: formData.get('linkedin'),
+    linkedinLink:
+      linkedinInput && linkedinInput.trim() !== ''
+        ? linkedinInput
+        : 'https://www.linkedin.com/',
   };
-
-  
 
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
@@ -79,4 +81,3 @@ function handleBedrijfRegister(event) {
 
   Router.navigate('/Bedrijf/Bedrijf-Profiel');
 }
-// firstName

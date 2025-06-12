@@ -63,11 +63,15 @@ function handleNaamRegister(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
+  const linkedinInput = formData.get('linkedin');
   const currentData = {
     voornaam: formData.get('voornaam'),
     achternaam: formData.get('achternaam'),
     date_of_birth: formData.get('geboortedatum'),
-    linkedin: formData.get('linkedin'),
+    linkedin:
+      linkedinInput && linkedinInput.trim() !== ''
+        ? linkedinInput
+        : 'https://www.linkedin.com/',
     profielFoto: formData.get('profielFoto')
       ? formData.get('profielFoto').name
       : null, // Get uploaded file name
