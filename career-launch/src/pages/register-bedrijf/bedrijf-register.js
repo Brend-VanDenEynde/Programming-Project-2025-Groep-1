@@ -79,5 +79,5 @@ function handleBedrijfRegister(event) {
   console.log('Registratie data:', data);
   alert(`Je account is nu in orde.`);
 
-  Router.navigate('/Bedrijf/Bedrijf-Profiel');
+  Router.navigate('/bedrijf/bedrijf-profiel');
 }

@@ -19,9 +19,12 @@ export async function renderStudentSkills(rootElement) {
   }
 
   // Maak dynamisch HTML voor je skills (checkboxes)
-  const skillInputs = skills.map(s =>
-    `<label><input type="checkbox" name="skills" value="${s.id}"> ${s.skill}</label>`
-  ).join('');
+  const skillInputs = skills
+    .map(
+      (s) =>
+        `<label><input type="checkbox" name="skills" value="${s.id}"> ${s.skill}</label>`
+    )
+    .join('');
 
   rootElement.innerHTML = `
     <div style="min-height: 100vh; display: flex; flex-direction: column;">
@@ -54,9 +57,11 @@ export async function renderStudentSkills(rootElement) {
     </div>
   `;
 
-  document.getElementById('skillsForm').addEventListener('submit', handleSkillsRegister);
+  document
+    .getElementById('skillsForm')
+    .addEventListener('submit', handleSkillsRegister);
   document.getElementById('back-button').addEventListener('click', () => {
-    Router.navigate('/Student-Opleiding');
+    Router.navigate('/student-opleiding');
   });
   // Footer links
   const privacyLink = document.getElementById('privacy-link');
@@ -78,7 +83,7 @@ function handleSkillsRegister(event) {
   // Haal alle aangevinkte skills op als array:
   const selectedSkills = Array.from(
     document.querySelectorAll('input[name="skills"]:checked')
-  ).map(cb => Number(cb.value));
+  ).map((cb) => Number(cb.value));
   const data = {
     job,
     skills: selectedSkills, // <-- array met ids!

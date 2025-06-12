@@ -116,30 +116,34 @@ export function renderSpeeddates(rootElement, studentData = {}) {
       </footer>
     </div>
   `;
-
+  // Sidebar nav - gebruik de router voor echte URL navigatie
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       const route = e.currentTarget.getAttribute('data-route');
-      switch (route) {
-        case 'profile':
-          renderStudentProfiel(rootElement, studentData);
-          break;
-        case 'search':
-          renderSearchCriteriaStudent(rootElement, studentData);
-          break;
-        case 'speeddates':
-          renderSpeeddates(rootElement, studentData);
-          break;
-        case 'requests':
-          renderSpeeddatesRequests(rootElement, studentData);
-          break;
-        case 'bedrijven':
-          import('./bedrijven.js').then(m => m.renderBedrijven(rootElement, studentData));
-          break;
-        case 'qr':
-          renderQRPopup(rootElement, studentData);
-          break;
-      }
+      // Gebruik de router om naar de juiste URL te navigeren
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        switch (route) {
+          case 'profile':
+            Router.navigate('/student/student-profiel');
+            break;
+          case 'search':
+            Router.navigate('/student/zoek-criteria');
+            break;
+          case 'speeddates':
+            Router.navigate('/student/student-speeddates');
+            break;
+          case 'requests':
+            Router.navigate('/student/student-speeddates-verzoeken');
+            break;
+          case 'bedrijven':
+            Router.navigate('/student/bedrijven');
+            break;
+          case 'qr':
+            Router.navigate('/student/student-qr-popup');
+            break;
+        }
+      });
     });
   });
 
@@ -155,7 +159,7 @@ export function renderSpeeddates(rootElement, studentData = {}) {
         dropdown.classList.remove('open');
       }
     });
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
       if (
         dropdown.classList.contains('open') &&
         !dropdown.contains(event.target) &&

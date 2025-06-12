@@ -15,7 +15,7 @@ const bedrijven = [
     bio: 'Proximus is een toonaangevende Belgische telecomoperator en ICT-provider.',
     foto: 'https://www.proximus.com/dam/jcr:8e2e5c1e-7f8c-4e2f-8e5e-6b7e7b7e7b7e/proximus-logo.png', // PNG logo
     locatie: 'Brussel, België',
-    werkdomein: 'Telecom, ICT'
+    werkdomein: 'Telecom, ICT',
   },
   {
     naam: 'Colruyt Group',
@@ -23,7 +23,7 @@ const bedrijven = [
     bio: 'Colruyt Group is een Belgische retailgroep actief in voeding, energie en meer.',
     foto: 'https://www.colruytgroup.com/sites/default/files/styles/og_image/public/2021-03/colruytgroup-logo.png', // PNG logo
     locatie: 'Halle, België',
-    werkdomein: 'Retail, Energie'
+    werkdomein: 'Retail, Energie',
   },
   {
     naam: 'Barco',
@@ -31,7 +31,7 @@ const bedrijven = [
     bio: 'Barco is een Belgisch technologiebedrijf gespecialiseerd in visualisatie en displayoplossingen.',
     foto: 'https://www.barco.com/content/dam/barco/global/logos/barco-logo.png', // PNG logo
     locatie: 'Kortrijk, België',
-    werkdomein: 'Technologie, Visualisatie'
+    werkdomein: 'Technologie, Visualisatie',
   },
   {
     naam: 'UCB',
@@ -39,7 +39,7 @@ const bedrijven = [
     bio: 'UCB is een Belgisch biofarmaceutisch bedrijf met focus op neurowetenschappen en immunologie.',
     foto: 'https://www.ucb.com/sites/default/files/2021-03/ucb-logo.png', // PNG logo
     locatie: 'Brussel, België',
-    werkdomein: 'Farmaceutica, Biotechnologie'
+    werkdomein: 'Farmaceutica, Biotechnologie',
   },
   {
     naam: 'Solvay',
@@ -47,7 +47,7 @@ const bedrijven = [
     bio: 'Solvay is een Belgisch chemiebedrijf actief in geavanceerde materialen en chemie.',
     foto: 'https://www.solvay.com/sites/g/files/srpend221/files/styles/og_image/public/2021-03/solvay-logo.png', // PNG logo
     locatie: 'Brussel, België',
-    werkdomein: 'Chemie, Materialen'
+    werkdomein: 'Chemie, Materialen',
   },
   {
     naam: 'Belfius',
@@ -55,7 +55,7 @@ const bedrijven = [
     bio: 'Belfius is een Belgische bank en verzekeraar met focus op digitale innovatie.',
     foto: 'https://www.belfius.com/images/default-source/default-album/belfius-logo.png', // PNG logo
     locatie: 'Brussel, België',
-    werkdomein: 'Bank, Verzekeringen'
+    werkdomein: 'Bank, Verzekeringen',
   },
   {
     naam: 'Telenet',
@@ -63,7 +63,7 @@ const bedrijven = [
     bio: 'Telenet is een Belgische aanbieder van kabeltelevisie, internet en telefonie.',
     foto: 'https://www.telenet.be/content/dam/www-telenet-be/logos/telenet-logo.png', // PNG logo
     locatie: 'Mechelen, België',
-    werkdomein: 'Telecom, Media'
+    werkdomein: 'Telecom, Media',
   },
   {
     naam: 'Delhaize',
@@ -71,8 +71,8 @@ const bedrijven = [
     bio: 'Delhaize is een Belgische supermarktketen, onderdeel van Ahold Delhaize.',
     foto: 'https://www.delhaize.be/etc/designs/delhaize/clientlibs/img/logo.png', // PNG logo
     locatie: 'Brussel, België',
-    werkdomein: 'Retail, Voeding'
-  }
+    werkdomein: 'Retail, Voeding',
+  },
 ];
 
 // Popup voor bedrijf detail
@@ -101,23 +101,33 @@ function showBedrijfPopup(bedrijf) {
     '11:00 - 12:00',
     '13:00 - 14:00',
     '14:00 - 15:00',
-    '15:00 - 16:00'
+    '15:00 - 16:00',
   ];
 
   popup.innerHTML = `
     <div id="bedrijf-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:400px;width:95vw;position:relative;display:flex;flex-direction:column;align-items:center;">
       <button id="bedrijf-popup-close" style="position:absolute;top:10px;right:14px;font-size:1.7rem;background:none;border:none;cursor:pointer;color:#888;">&times;</button>
-      <img src="${bedrijf.foto}" alt="Logo ${bedrijf.naam}" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;">
+      <img src="${bedrijf.foto}" alt="Logo ${
+    bedrijf.naam
+  }" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;">
       <h2 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h2>
-      <div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${bedrijf.locatie}</div>
-      <div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${bedrijf.werkdomein}</div>
-      <a href="${bedrijf.linkedin}" target="_blank" style="color:#0077b5;margin-bottom:1rem;">LinkedIn</a>
+      <div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${
+        bedrijf.locatie
+      }</div>
+      <div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${
+        bedrijf.werkdomein
+      }</div>
+      <a href="${
+        bedrijf.linkedin
+      }" target="_blank" style="color:#0077b5;margin-bottom:1rem;">LinkedIn</a>
       <p style="text-align:center;margin-bottom:1.2rem;">${bedrijf.bio}</p>
       <div style="margin-bottom:1rem;width:100%;">
         <label for="speeddates-tijdslot" style="font-weight:500;">Kies een tijdslot:</label>
         <select id="speeddates-tijdslot" style="width:100%;margin-top:0.5rem;padding:0.5rem;border-radius:6px;border:1.5px solid #e1e5e9;">
           <option value="">-- Selecteer een tijdslot --</option>
-          ${tijdslots.map(slot => `<option value="${slot}">${slot}</option>`).join('')}
+          ${tijdslots
+            .map((slot) => `<option value="${slot}">${slot}</option>`)
+            .join('')}
         </select>
       </div>
       <button id="speeddates-aanvraag-btn" style="background:#00bcd4;color:#fff;border:none;padding:0.7rem 1.5rem;border-radius:8px;font-size:1rem;cursor:pointer;" disabled>Confirmeer aanvraag</button>
@@ -155,23 +165,29 @@ function showBedrijfPopup(bedrijf) {
 
 // Filter en zoek functionaliteit (alleen op naam zoeken)
 function filterBedrijven({ zoek = '', locatie = '', werkdomein = '' }) {
-  return bedrijven.filter(b => {
+  return bedrijven.filter((b) => {
     const matchZoek = zoek
       ? b.naam.toLowerCase().includes(zoek.toLowerCase())
       : true;
     const matchLocatie = locatie ? b.locatie === locatie : true;
-    const matchDomein = werkdomein ? b.werkdomein.toLowerCase().includes(werkdomein.toLowerCase()) : true;
+    const matchDomein = werkdomein
+      ? b.werkdomein.toLowerCase().includes(werkdomein.toLowerCase())
+      : true;
     return matchZoek && matchLocatie && matchDomein;
   });
 }
 
 // Unieke locaties en domeinen voor filters
 function getUniekeLocaties() {
-  return [...new Set(bedrijven.map(b => b.locatie))];
+  return [...new Set(bedrijven.map((b) => b.locatie))];
 }
 function getUniekeDomeinen() {
   // Splits domeinen op komma's en maak uniek
-  return [...new Set(bedrijven.flatMap(b => b.werkdomein.split(',').map(d => d.trim())))];
+  return [
+    ...new Set(
+      bedrijven.flatMap((b) => b.werkdomein.split(',').map((d) => d.trim()))
+    ),
+  ];
 }
 
 // Hoofdfunctie: lijst van bedrijven
@@ -184,18 +200,32 @@ export function renderBedrijven(rootElement, studentData = {}) {
     const gefilterd = filterBedrijven({
       zoek: huidigeZoek,
       locatie: huidigeLocatie,
-      werkdomein: huidigeDomein
+      werkdomein: huidigeDomein,
     });
 
     document.getElementById('bedrijven-list').innerHTML = gefilterd.length
-      ? gefilterd.map((bedrijf, idx) => `
-        <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;" data-bedrijf-idx="${bedrijven.indexOf(bedrijf)}">
-          <img src="${bedrijf.foto}" alt="Logo ${bedrijf.naam}" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;">
-          <h3 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h3>
-          <div style="font-size:0.97rem;color:#666;margin-bottom:0.3rem;">${bedrijf.locatie}</div>
-          <div style="font-size:0.97rem;color:#888;margin-bottom:0.3rem;">${bedrijf.werkdomein}</div>
+      ? gefilterd
+          .map(
+            (bedrijf, idx) => `
+        <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;" data-bedrijf-idx="${bedrijven.indexOf(
+          bedrijf
+        )}">
+          <img src="${bedrijf.foto}" alt="Logo ${
+              bedrijf.naam
+            }" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;">
+          <h3 style="margin-bottom:0.5rem;text-align:center;">${
+            bedrijf.naam
+          }</h3>
+          <div style="font-size:0.97rem;color:#666;margin-bottom:0.3rem;">${
+            bedrijf.locatie
+          }</div>
+          <div style="font-size:0.97rem;color:#888;margin-bottom:0.3rem;">${
+            bedrijf.werkdomein
+          }</div>
         </div>
-      `).join('')
+      `
+          )
+          .join('')
       : `<div style="text-align:center;width:100%;color:#888;">Geen bedrijven gevonden.</div>`;
 
     // Popup event
@@ -238,11 +268,15 @@ export function renderBedrijven(rootElement, studentData = {}) {
               <input id="bedrijf-zoek" type="text" placeholder="Zoek bedrijf, locatie of domein..." style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;min-width:180px;">
               <select id="bedrijf-filter-locatie" style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;">
                 <option value="">Alle locaties</option>
-                ${getUniekeLocaties().map(loc => `<option value="${loc}">${loc}</option>`).join('')}
+                ${getUniekeLocaties()
+                  .map((loc) => `<option value="${loc}">${loc}</option>`)
+                  .join('')}
               </select>
               <select id="bedrijf-filter-domein" style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;">
                 <option value="">Alle domeinen</option>
-                ${getUniekeDomeinen().map(dom => `<option value="${dom}">${dom}</option>`).join('')}
+                ${getUniekeDomeinen()
+                  .map((dom) => `<option value="${dom}">${dom}</option>`)
+                  .join('')}
               </select>
             </div>
             <div id="bedrijven-list" class="bedrijven-list" style="display:flex;flex-wrap:wrap;gap:2rem;justify-content:center;">
@@ -257,31 +291,34 @@ export function renderBedrijven(rootElement, studentData = {}) {
       </footer>
     </div>
   `;
-
-  // Sidebar nav (nu met bedrijven)
+  // Sidebar nav - gebruik de router voor echte URL navigatie
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       const route = e.currentTarget.getAttribute('data-route');
-      switch (route) {
-        case 'profile':
-          renderStudentProfiel(rootElement, studentData);
-          break;
-        case 'search':
-          renderSearchCriteriaStudent(rootElement, studentData);
-          break;
-        case 'speeddates':
-          renderSpeeddates(rootElement, studentData);
-          break;
-        case 'requests':
-          renderSpeeddatesRequests(rootElement, studentData);
-          break;
-        case 'bedrijven':
-          renderBedrijven(rootElement, studentData);
-          break;
-        case 'qr':
-          renderQRPopup(rootElement, studentData);
-          break;
-      }
+      // Gebruik de router om naar de juiste URL te navigeren
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        switch (route) {
+          case 'profile':
+            Router.navigate('/student/student-profiel');
+            break;
+          case 'search':
+            Router.navigate('/student/zoek-criteria');
+            break;
+          case 'speeddates':
+            Router.navigate('/student/student-speeddates');
+            break;
+          case 'requests':
+            Router.navigate('/student/student-speeddates-verzoeken');
+            break;
+          case 'bedrijven':
+            Router.navigate('/student/bedrijven');
+            break;
+          case 'qr':
+            Router.navigate('/student/student-qr-popup');
+            break;
+        }
+      });
     });
   });
 
@@ -290,14 +327,18 @@ export function renderBedrijven(rootElement, studentData = {}) {
     huidigeZoek = e.target.value;
     renderList();
   });
-  document.getElementById('bedrijf-filter-locatie').addEventListener('change', (e) => {
-    huidigeLocatie = e.target.value;
-    renderList();
-  });
-  document.getElementById('bedrijf-filter-domein').addEventListener('change', (e) => {
-    huidigeDomein = e.target.value;
-    renderList();
-  });
+  document
+    .getElementById('bedrijf-filter-locatie')
+    .addEventListener('change', (e) => {
+      huidigeLocatie = e.target.value;
+      renderList();
+    });
+  document
+    .getElementById('bedrijf-filter-domein')
+    .addEventListener('change', (e) => {
+      huidigeDomein = e.target.value;
+      renderList();
+    });
 
   renderList();
 
@@ -314,7 +355,7 @@ export function renderBedrijven(rootElement, studentData = {}) {
         dropdown.classList.remove('open');
       }
     });
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
       if (
         dropdown.classList.contains('open') &&
         !dropdown.contains(event.target) &&

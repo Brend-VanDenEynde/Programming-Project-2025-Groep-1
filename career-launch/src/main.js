@@ -7,22 +7,23 @@ import { renderRegister } from './pages/register.js';
 import { renderLogin } from './pages/login.js';
 import { renderStudentProfiel } from './pages/student/student-profiel.js';
 import { renderSearchCriteriaStudent } from './pages/student/search-criteria-student.js';
-import { renderAdmin } from './pages/Admin/admin.js';
-import { renderAdminSelectDashboard } from './pages/Admin/admin-select-dashboard.js';
+import { renderAdmin } from './pages/admin/admin.js';
+import { renderAdminSelectDashboard } from './pages/admin/admin-select-dashboard.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
 import { renderQRPopup } from './pages/student/student-qr-popup.js';
 import { renderSpeeddates } from './pages/student/student-speeddates.js';
 import { renderSpeeddatesRequests } from './pages/student/student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './pages/student/student-settings.js';
-import { renderAdminIngeschrevenStudenten } from './pages/Admin/admin-ingeschreven-studenten.js';
-import { renderAdminIngeschrevenBedrijven } from './pages/Admin/admin-ingeschreven-bedrijven.js';
-import { renderAdminBedrijvenInBehandeling } from './pages/Admin/admin-bedrijven-in-behandeling.js';
-import { renderAdminStudentDetail } from './pages/Admin/admin-student-detail.js';
-import { renderAdminCompanyDetail } from './pages/Admin/admin-company-detail.js';
-import { renderAdminProcessingCompanyDetail } from './pages/Admin/admin-dashboard.js';
+import { renderAdminIngeschrevenStudenten } from './pages/admin/admin-ingeschreven-studenten.js';
+import { renderAdminIngeschrevenBedrijven } from './pages/admin/admin-ingeschreven-bedrijven.js';
+import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven-in-behandeling.js';
+import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js';
+import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
+import { renderAdminProcessingCompanyDetail } from './pages/admin/admin-dashboard.js';
 import { renderBedrijfProfiel } from './pages/bedrijf/bedrijf-profiel.js';
 import { renderBedrijfRegister } from './pages/register-bedrijf/bedrijf-register.js';
+import { renderBedrijven } from './pages/student/bedrijven.js';
 
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
@@ -39,8 +40,8 @@ const routes = {
   '/404': renderNotFound,
   '/registreer': renderRegister,
   '/login': renderLogin,
-  '/Student/Student-Profiel': renderStudentProfiel,
-  '/Student/Zoek-Criteria': renderSearchCriteriaStudent,
+  '/student/student-profiel': renderStudentProfiel,
+  '/student/zoek-criteria': renderSearchCriteriaStudent,
   '/admin': renderAdmin,
   '/admin-login': renderAdmin,
   '/admin-select-dashboard': renderAdminSelectDashboard,
@@ -55,11 +56,12 @@ const routes = {
     renderAdminProcessingCompanyDetail,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
-  '/Student/Student-QR-Popup': renderQRPopup,
-  '/Student/Student-Speeddates': renderSpeeddates,
-  '/Student/Student-Speeddates-Verzoeken': renderSpeeddatesRequests,
-  '/Student/Student-Settings': showSettingsPopup,
-  '/Bedrijf/Bedrijf-Profiel': renderBedrijfProfiel,
+  '/student/student-qr-popup': renderQRPopup,
+  '/student/student-speeddates': renderSpeeddates,
+  '/student/student-speeddates-verzoeken': renderSpeeddatesRequests,
+  '/student/student-settings': showSettingsPopup,
+  '/student/bedrijven': renderBedrijven,
+  '/bedrijf/bedrijf-profiel': renderBedrijfProfiel,
   '/registreer-bedrijf': renderBedrijfRegister,
 };
 

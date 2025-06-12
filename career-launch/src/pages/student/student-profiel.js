@@ -20,7 +20,11 @@ function isoToDateString(isoString) {
   return isoString.split('T')[0];
 }
 
-export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode = true) {
+export function renderStudentProfiel(
+  rootElement,
+  studentData = {},
+  readonlyMode = true
+) {
   // Laad uit sessionStorage als leeg
   if (!studentData || Object.keys(studentData).length === 0) {
     try {
@@ -43,16 +47,21 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
 
   // Map opleiding name to id if id is missing
   let resolvedOpleidingId = opleiding_id;
-  if ((!resolvedOpleidingId || resolvedOpleidingId === null || typeof resolvedOpleidingId === 'undefined') && studentData.opleiding) {
-    const found = opleidingen.find(o => o.naam === studentData.opleiding);
+  if (
+    (!resolvedOpleidingId ||
+      resolvedOpleidingId === null ||
+      typeof resolvedOpleidingId === 'undefined') &&
+    studentData.opleiding
+  ) {
+    const found = opleidingen.find((o) => o.naam === studentData.opleiding);
     if (found) resolvedOpleidingId = found.id;
   }
 
   const geboortedatum = isoToDateString(
     studentData.geboortedatum ||
-    studentData.birthdate ||
-    studentData.date_of_birth ||
-    defaultProfile.date_of_birth
+      studentData.birthdate ||
+      studentData.date_of_birth ||
+      defaultProfile.date_of_birth
   );
 
   const opleidingNaam = getOpleidingNaamById(resolvedOpleidingId);
@@ -92,28 +101,45 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
                   id="avatar-preview"
                   class="student-profile-avatar"
                 />
-                <input type="file" accept="image/*" id="photoInput" style="display:${readonlyMode ? 'none' : 'block'};margin-top:10px;">
+                <input type="file" accept="image/*" id="photoInput" style="display:${
+                  readonlyMode ? 'none' : 'block'
+                };margin-top:10px;">
               </div>
               <div class="student-profile-form-group">
                 <label for="firstNameInput">Voornaam</label>
-                <input type="text" id="firstNameInput" value="${voornaam}" required ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="firstNameInput" value="${voornaam}" required ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="student-profile-form-group">
                 <label for="lastNameInput">Achternaam</label>
-                <input type="text" id="lastNameInput" value="${achternaam}" required ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="lastNameInput" value="${achternaam}" required ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="student-profile-form-group">
                 <label for="emailInput">E-mailadres</label>
-                <input type="email" id="emailInput" value="${email}" required ${readonlyMode ? 'disabled' : ''}>
+                <input type="email" id="emailInput" value="${email}" required ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="student-profile-form-group">
                 <label for="studyProgramInput">Studieprogramma</label>
-                <input type="text" id="studyProgramInput" value="${opleidingNaam}" disabled ${!readonlyMode ? 'style="display:none;"' : ''}>
+                <input type="text" id="studyProgramInput" value="${opleidingNaam}" disabled ${
+    !readonlyMode ? 'style="display:none;"' : ''
+  }>
                 ${
                   !readonlyMode
                     ? `<select id="opleidingSelect" required>
                         <option value="">Selecteer opleiding</option>
-                        ${opleidingen.map(o => `<option value="${o.id}" ${o.id == resolvedOpleidingId ? 'selected' : ''}>${o.naam}</option>`).join('')}
+                        ${opleidingen
+                          .map(
+                            (o) =>
+                              `<option value="${o.id}" ${
+                                o.id == resolvedOpleidingId ? 'selected' : ''
+                              }>${o.naam}</option>`
+                          )
+                          .join('')}
                       </select>`
                     : ''
                 }
@@ -121,18 +147,28 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
               <div class="student-profile-form-group">
                 <label for="yearInput">Opleidingsjaar</label>
                 <select id="yearInput" ${readonlyMode ? 'disabled' : ''}>
-                  <option value="1" ${studiejaar == '1' ? 'selected' : ''}>1</option>
-                  <option value="2" ${studiejaar == '2' ? 'selected' : ''}>2</option>
-                  <option value="3" ${studiejaar == '3' ? 'selected' : ''}>3</option>
+                  <option value="1" ${
+                    studiejaar == '1' ? 'selected' : ''
+                  }>1</option>
+                  <option value="2" ${
+                    studiejaar == '2' ? 'selected' : ''
+                  }>2</option>
+                  <option value="3" ${
+                    studiejaar == '3' ? 'selected' : ''
+                  }>3</option>
                 </select>
               </div>
               <div class="student-profile-form-group">
                 <label for="birthDateInput">Geboortedatum</label>
-                <input type="date" id="birthDateInput" value="${geboortedatum}" ${readonlyMode ? 'disabled' : ''}>
+                <input type="date" id="birthDateInput" value="${geboortedatum}" ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="student-profile-form-group">
                 <label for="linkedinInput">LinkedIn-link</label>
-                <input type="url" id="linkedinInput" value="${linkedin}" ${readonlyMode ? 'disabled' : ''}>
+                <input type="url" id="linkedinInput" value="${linkedin}" ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="student-profile-buttons">
                 ${
@@ -157,30 +193,34 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
       </footer>
     </div>
   `;
-
+  // Sidebar nav - gebruik de router voor echte URL navigatie
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       const route = e.currentTarget.getAttribute('data-route');
-      switch (route) {
-        case 'profile':
-          renderStudentProfiel(rootElement, studentData);
-          break;
-        case 'search':
-          import('./search-criteria-student.js').then(m => m.renderSearchCriteriaStudent(rootElement, studentData));
-          break;
-        case 'speeddates':
-          import('./student-speeddates.js').then(m => m.renderSpeeddates(rootElement, studentData));
-          break;
-        case 'requests':
-          import('./student-speeddates-verzoeken.js').then(m => m.renderSpeeddatesRequests(rootElement, studentData));
-          break;
-        case 'bedrijven':
-          import('./bedrijven.js').then(m => m.renderBedrijven(rootElement, studentData));
-          break;
-        case 'qr':
-          import('./student-qr-popup.js').then(m => m.renderQRPopup(rootElement, studentData));
-          break;
-      }
+      // Gebruik de router om naar de juiste URL te navigeren
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        switch (route) {
+          case 'profile':
+            Router.navigate('/student/student-profiel');
+            break;
+          case 'search':
+            Router.navigate('/student/zoek-criteria');
+            break;
+          case 'speeddates':
+            Router.navigate('/student/student-speeddates');
+            break;
+          case 'requests':
+            Router.navigate('/student/student-speeddates-verzoeken');
+            break;
+          case 'bedrijven':
+            Router.navigate('/student/bedrijven');
+            break;
+          case 'qr':
+            Router.navigate('/student/student-qr-popup');
+            break;
+        }
+      });
     });
   });
 
@@ -197,7 +237,7 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
         dropdown.classList.remove('open');
       }
     });
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
       if (
         dropdown.classList.contains('open') &&
         !dropdown.contains(event.target) &&
@@ -289,7 +329,10 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
         if (photoInput && photoInput.files && photoInput.files[0]) {
           updatedData.profiel_foto = URL.createObjectURL(photoInput.files[0]);
         }
-        window.sessionStorage.setItem('studentData', JSON.stringify(updatedData));
+        window.sessionStorage.setItem(
+          'studentData',
+          JSON.stringify(updatedData)
+        );
         renderStudentProfiel(rootElement, updatedData, true);
       });
     }

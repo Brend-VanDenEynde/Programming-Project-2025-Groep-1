@@ -56,12 +56,26 @@ export function renderLogin(rootElement) {
   `;
 
   // Event listeners
-  document.getElementById('loginForm').addEventListener('submit', (e) => handleLogin(e, rootElement));
-  document.getElementById('register-link').addEventListener('click', () => Router.navigate('/registreer'));
-  document.getElementById('back-button').addEventListener('click', () => Router.navigate('/'));
-  document.getElementById('linkedin-btn').addEventListener('click', () => { /* LinkedIn login nog niet geïmplementeerd */ });
-  document.getElementById('privacy-policy').addEventListener('click', (e) => { e.preventDefault(); Router.navigate('/privacy'); });
-  document.getElementById('contacteer-ons').addEventListener('click', (e) => { e.preventDefault(); Router.navigate('/contact'); });
+  document
+    .getElementById('loginForm')
+    .addEventListener('submit', (e) => handleLogin(e, rootElement));
+  document
+    .getElementById('register-link')
+    .addEventListener('click', () => Router.navigate('/registreer'));
+  document
+    .getElementById('back-button')
+    .addEventListener('click', () => Router.navigate('/'));
+  document.getElementById('linkedin-btn').addEventListener('click', () => {
+    /* LinkedIn login nog niet geïmplementeerd */
+  });
+  document.getElementById('privacy-policy').addEventListener('click', (e) => {
+    e.preventDefault();
+    Router.navigate('/privacy');
+  });
+  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
+    e.preventDefault();
+    Router.navigate('/contact');
+  });
 
   // Password toggle
   const passwordInput = document.getElementById('passwordInput');
@@ -71,8 +85,12 @@ export function renderLogin(rootElement) {
     togglePassword.addEventListener('click', () => {
       const isVisible = passwordInput.type === 'text';
       passwordInput.type = isVisible ? 'password' : 'text';
-      togglePasswordIcon.src = isVisible ? 'src/Icons/hide.png' : 'src/Icons/eye.png';
-      togglePasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
+      togglePasswordIcon.src = isVisible
+        ? 'src/Icons/hide.png'
+        : 'src/Icons/eye.png';
+      togglePasswordIcon.alt = isVisible
+        ? 'Toon wachtwoord'
+        : 'Verberg wachtwoord';
     });
   }
 }
@@ -114,9 +132,9 @@ async function fetchUserInfo(token) {
   const response = await fetch(infoUrl, {
     method: 'GET',
     headers: {
-      'Authorization': 'Bearer ' + token,
-      'Accept': 'application/json'
-    }
+      Authorization: 'Bearer ' + token,
+      Accept: 'application/json',
+    },
   });
   const user = await response.json();
   // Debug: log alles wat backend terugstuurt
@@ -161,7 +179,9 @@ async function handleLogin(event, rootElement) {
     console.log('opleiding_id in user:', user ? user.opleiding_id : undefined);
 
     if (!user || !user.type) {
-      alert('Geen gebruikersinformatie ontvangen. Neem contact op met support.');
+      alert(
+        'Geen gebruikersinformatie ontvangen. Neem contact op met support.'
+      );
       throw new Error('Authentication failed: No user info');
     }
 
@@ -169,14 +189,19 @@ async function handleLogin(event, rootElement) {
       window.sessionStorage.setItem('studentData', JSON.stringify(user));
       window.sessionStorage.setItem('userType', 'student');
       // Debug: check presence of opleiding_id in sessionStorage
-      const storedStudent = JSON.parse(window.sessionStorage.getItem('studentData'));
+      const storedStudent = JSON.parse(
+        window.sessionStorage.getItem('studentData')
+      );
       console.log('STORED studentData:', storedStudent);
-      console.log('opleiding_id in stored studentData:', storedStudent ? storedStudent.opleiding_id : undefined);
-      Router.navigate('/Student/Student-Profiel');
+      console.log(
+        'opleiding_id in stored studentData:',
+        storedStudent ? storedStudent.opleiding_id : undefined
+      );
+      Router.navigate('/student/student-profiel');
     } else if (user.type === 3) {
       window.sessionStorage.setItem('companyData', JSON.stringify(user));
       window.sessionStorage.setItem('userType', 'company');
-      Router.navigate('/Bedrijf/Bedrijf-Profiel');
+      Router.navigate('/bedrijf/bedrijf-profiel');
     } else if (user.type === 1) {
       window.sessionStorage.setItem('adminData', JSON.stringify(user));
       window.sessionStorage.setItem('userType', 'admin');

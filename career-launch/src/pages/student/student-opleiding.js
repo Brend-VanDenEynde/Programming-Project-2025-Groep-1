@@ -37,9 +37,8 @@ export function renderStudentOpleiding(rootElement) {
 
   const form = document.getElementById('jaarForm');
   form.addEventListener('submit', handleJaarRegister);
-
   document.getElementById('back-button').addEventListener('click', () => {
-    Router.navigate('/Student-Register');
+    Router.navigate('/registreer');
   });
 
   // Footer links
@@ -77,7 +76,7 @@ function handleJaarRegister(event) {
     jaar: formData.get('jaar'), // geselecteerde radio
     opleiding: formData.get('opleiding'), // geselecteerde optie uit select
   };
-  
+
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
 
