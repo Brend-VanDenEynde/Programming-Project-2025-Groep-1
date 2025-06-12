@@ -33,8 +33,6 @@ export function renderStudentRegister(rootElement) {
   </div>
   `;
 
-  
-
   const form = document.getElementById('naamForm');
   form.addEventListener('submit', handleNaamRegister);
 
@@ -60,13 +58,15 @@ function handleNaamRegister(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
+  const linkedinInput = formData.get('linkedin');
   const data = {
     voornaam: formData.get('voornaam'),
     achternaam: formData.get('achternaam'),
-    linkedinLink: formData.get('linkedin'),
+    linkedinLink:
+      linkedinInput && linkedinInput.trim() !== ''
+        ? linkedinInput
+        : 'https://www.linkedin.com/',
   };
-
-  
 
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);

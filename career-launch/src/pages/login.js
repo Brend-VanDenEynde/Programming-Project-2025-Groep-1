@@ -95,9 +95,15 @@ export function renderLogin(rootElement) {
       const isVisible = passwordInput.type === 'text';
       passwordInput.type = isVisible ? 'password' : 'text';
       togglePasswordIcon.src = isVisible
+        ? 'src/Icons/icons8-closed-eye-HIDDEN.png'
+        : 'src/Icons/icons8-closed-eye-CLEAR.png';
+      togglePasswordIcon.alt = isVisible
+        ? 'Toon wachtwoord'
+        : 'Verberg wachtwoord';
         ? 'src/Icons/hide.png'
         : 'src/Icons/eye.png';
       togglePasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
+
     });
   }
 
@@ -186,7 +192,7 @@ async function handleLogin(event, rootElement) {
     }
 
     // Debug: Log the response to see what we're getting
-    console.log('Login response structure:', response); // SECURITY: Only proceed if we have a valid response with message "Login successful"
+    // console.log('Login response structure:', response); // Disabled to prevent sensitive information leakage in production
     if (!response.message || response.message !== 'Login successful') {
       throw new Error('Invalid login response');
     }
@@ -195,6 +201,28 @@ async function handleLogin(event, rootElement) {
     const type = response.user?.type;
     if (type === 2) { // student
       const studentData = {
+
+        id: response.user?.id || null,
+        firstName:
+          response.user?.firstName || response.user?.voornaam || 'Voornaam',
+        lastName:
+          response.user?.lastName || response.user?.achternaam || 'Achternaam',
+        email: response.user?.email || email,
+        studyProgram:
+          response.user?.studyProgram || response.user?.opleiding_naam || '', // if available
+        year: response.user?.year || response.user?.studiejaar || '',
+        profilePictureUrl:
+          response.user?.profilePictureUrl ||
+          response.user?.profiel_foto ||
+          '/src/Images/default.jpg',
+        linkedIn:
+          response.user?.linkedIn ||
+          response.user?.linkedin ||
+          'https://www.linkedin.com/',
+        birthDate:
+          response.user?.birthDate || response.user?.date_of_birth || '',
+        opleiding_id: response.user?.opleiding_id || null,
+
         type: response.user?.type ?? null,
         gebruiker_id: response.user?.gebruiker_id ?? null,
         voornaam: response.user?.voornaam ?? null,
@@ -203,12 +231,21 @@ async function handleLogin(event, rootElement) {
         profiel_foto: response.user?.profiel_foto ?? null,
         studiejaar: response.user?.studiejaar ?? null,
         opleiding_id: response.user?.opleiding_id ?? null,
+
       };
       window.sessionStorage.setItem('studentData', JSON.stringify(studentData));
       window.sessionStorage.setItem('userType', 'student');
       Router.navigate('/Student/Student-Profiel');
     } else if (type === 3) { // bedrijf
       const companyData = {
+
+        id: response.user?.id || null,
+        companyName: response.user?.companyName || 'Bedrijf',
+        email: response.user?.email || email,
+        description: response.user?.description || '',
+        linkedIn: response.user?.linkedIn || 'https://www.linkedin.com/',
+        profilePictureUrl:
+          response.user?.profilePictureUrl || '/src/Images/default-company.jpg',
         type: response.user?.type ?? null,
         gebruiker_id: response.user?.gebruiker_id ?? null,
         naam: response.user?.naam ?? null,
@@ -216,6 +253,7 @@ async function handleLogin(event, rootElement) {
         contact_email: response.user?.contact_email ?? null,
         linkedin: response.user?.linkedin ?? null,
         profiel_foto: response.user?.profiel_foto ?? null,
+
       };
       window.sessionStorage.setItem('companyData', JSON.stringify(companyData));
       window.sessionStorage.setItem('userType', 'company');
