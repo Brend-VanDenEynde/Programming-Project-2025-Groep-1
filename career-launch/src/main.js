@@ -15,11 +15,11 @@ import { renderQRPopup } from './pages/Student/student-qr-popup.js';
 import { renderSpeeddates } from './pages/Student/student-speeddates.js';
 import { renderSpeeddatesRequests } from './pages/Student/student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './pages/Student/student-settings.js';
-import { renderAdminIngeschrevenStudenten } from './pages/Admin/admin-ingeschreven-studenten.js';
-import { renderAdminIngeschrevenBedrijven } from './pages/Admin/admin-ingeschreven-bedrijven.js';
-import { renderAdminBedrijvenInBehandeling } from './pages/Admin/admin-bedrijven-in-behandeling.js';
-import { renderAdminStudentDetail } from './pages/Admin/admin-student-detail.js';
-import { renderAdminCompanyDetail } from './pages/Admin/admin-company-detail.js';
+import { renderAdminIngeschrevenStudenten } from './pages/admin/admin-ingeschreven-studenten.js';
+import { renderAdminIngeschrevenBedrijven } from './pages/admin/admin-ingeschreven-bedrijven.js';
+import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven-in-behandeling.js';
+import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js';
+import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
 import { renderAdminProcessingCompanyDetail } from './pages/Admin/admin-dashboard.js';
 
 function renderNotFound(rootElement) {
