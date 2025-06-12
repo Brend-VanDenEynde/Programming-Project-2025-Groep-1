@@ -1,6 +1,54 @@
+// src/router.js
+
+// Importeer al je paginacomponenten
+import { renderHome } from './pages/home.js';
+import { renderRegister } from './pages/register.js';
+import { renderLogin } from './pages/login.js';
 import { renderStudentProfiel } from './pages/Student/student-profiel.js';
+import { renderSearchCriteriaStudent } from './pages/Student/search-criteria-student.js';
+import { renderAdmin } from './pages/Admin/admin.js';
+import { renderAdminSelectDashboard } from './pages/Admin/admin-select-dashboard.js';
+import { renderPrivacy } from './pages/privacy.js';
+import { renderContact } from './pages/contact.js';
+import { renderQRPopup } from './pages/Student/student-qr-popup.js';
+import { renderSpeeddates } from './pages/Student/student-speeddates.js';
+import { renderSpeeddatesRequests } from './pages/Student/student-speeddates-verzoeken.js';
+import { showSettingsPopup } from './pages/Student/student-settings.js';
+import { renderBedrijfProfiel } from './pages/Bedrijf/bedrijf-profiel.js';
 import { renderBedrijfRegister } from './pages/Register-Bedrijf/bedrijf-register.js';
 
+function renderNotFound(rootElement) {
+  rootElement.innerHTML = `
+    <div class="not-found-container">
+      <h1>404 - Pagina niet gevonden</h1>
+      <p>De pagina die je zoekt bestaat niet.</p>
+      <a href="/" data-route="/">Terug naar home</a>
+    </div>
+  `;
+}
+
+// Zet je routes op
+const routes = {
+  '/': renderHome,
+  '/404': renderNotFound,
+  '/registreer': renderRegister,
+  '/login': renderLogin,
+  '/Student/Student-Profiel': renderStudentProfiel,
+  '/Student/Zoek-Criteria': renderSearchCriteriaStudent,
+  '/admin': renderAdmin,
+  '/admin-select-dashboard': renderAdminSelectDashboard,
+  '/admin-dashboard': renderAdminSelectDashboard,
+  '/privacy': renderPrivacy,
+  '/contact': renderContact,
+  '/Student/Student-QR-Popup': renderQRPopup,
+  '/Student/Student-Speeddates': renderSpeeddates,
+  '/Student/Student-Speeddates-Verzoeken': renderSpeeddatesRequests,
+  '/Student/Student-Settings': showSettingsPopup,
+  '/Bedrijf/Bedrijf-Profiel': renderBedrijfProfiel,
+  '/registreer-bedrijf': renderBedrijfRegister,
+};
+
+// Router class
 class Router {
   constructor(routes) {
     this.routes = routes;
@@ -21,7 +69,7 @@ class Router {
     });
   }
 
-  navigate(path, {replace = false} = {}) {
+  navigate(path, { replace = false } = {}) {
     if (replace) {
       window.history.replaceState(null, '', path);
     } else {
@@ -35,19 +83,11 @@ class Router {
     if (!path.startsWith('/')) path = '/' + path;
     path = path.replace(/\/+/g, '/');
 
-    // Protected route check
-    if (path === '/admin/admin-dashboard') {
-      const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
-      if (!isLoggedIn || isLoggedIn !== 'true') {
-        sessionStorage.setItem('redirectAfterLogin', path);
-        this.navigate('/admin', {replace: true});
-        return;
-      }
-    }
-
+    // Als route niet bestaat: 404
     const route = this.routes[path] || this.routes['/404'];
     if (route) {
       this.rootElement.innerHTML = '';
+      // Optioneel: je kan extra data meegeven als je wil
       route(this.rootElement);
       this.updateTitle(path);
     }
@@ -58,31 +98,19 @@ class Router {
       '/': 'Career Launch 2025 - Home',
       '/registreer': 'Registreren - Career Launch 2025',
       '/login': 'Inloggen - Career Launch 2025',
-      '/Student/Student-Profiel': (rootElement) => {
-    let studentData = {};
-    try {
-      studentData = JSON.parse(window.sessionStorage.getItem('studentData')) || {};
-    } catch (e) {
-      studentData = {};
-    }
-    renderStudentProfiel(rootElement, studentData, true);
-  },
+      '/Student/Student-Profiel': 'Student Profiel - Career Launch 2025',
       '/Student/Zoek-Criteria': 'Zoek Criteria - Career Launch 2025',
       '/Student/Student-QR-Popup': 'Jouw QR-code - Career Launch 2025',
       '/Student/Student-Speeddates': 'Jouw Speeddates - Career Launch 2025',
       '/Student/Student-Speeddates-Verzoeken': 'Speeddate Verzoeken - Career Launch 2025',
       '/Student/Student-Settings': 'Instellingen - Career Launch 2025',
       '/admin': 'Admin Login - Career Launch 2025',
-      '/admin/admin-dashboard': 'Admin Dashboard - Career Launch 2025',
+      '/admin-dashboard': 'Admin Dashboard - Career Launch 2025',
       '/contact': 'Contacteer ons - Career Launch 2025',
       '/privacy': 'Privacy Beleid - Career Launch 2025',
       '/404': 'Pagina niet gevonden - Career Launch 2025',
       '/Bedrijf/Bedrijf-Profiel': 'Bedrijf Profiel - Career Launch 2025',
-      '/Bedrijf/Zoek-Criteria': 'Zoek Criteria Bedrijf - Career Launch 2025',
-      '/Student-Register': 'Student Registreren - Career Launch 2025',
-      '/Student-Opleiding': 'Student Opleiding - Career Launch 2025',
-      '/Student-Skills': 'Student Skills - Career Launch 2025',
-      '/Bedrijf-Register': 'Bedrijf Registreren - Career Launch 2025',
+      '/registreer-bedrijf': 'Bedrijf Registreren - Career Launch 2025',
     };
     document.title = titles[path] || 'Career Launch 2025';
   }
@@ -93,71 +121,14 @@ class Router {
   }
 }
 
-const routes = {
-  '/': (rootElement) => {
-    rootElement.innerHTML = '<h1>Home</h1>';
-  },
-  '/registreer': (rootElement) => {
-    rootElement.innerHTML = '<h1>Registreren</h1>';
-  },
-  '/login': (rootElement) => {
-    rootElement.innerHTML = '<h1>Inloggen</h1>';
-  },
-  '/Student/Student-Profiel': (rootElement) => {
-    let studentData = {};
-    try {
-      studentData = JSON.parse(window.sessionStorage.getItem('studentData')) || {};
-    } catch (e) {
-      studentData = {};
-    }
-    renderStudentProfiel(rootElement, studentData, true);
-  },
-  '/Student/Zoek-Criteria': (rootElement) => {
-    rootElement.innerHTML = '<h1>Zoek Criteria</h1>';
-  },
-  '/Student/Student-QR-Popup': (rootElement) => {
-    rootElement.innerHTML = '<h1>Jouw QR-code</h1>';
-  },
-  '/Student/Student-Speeddates': (rootElement) => {
-    rootElement.innerHTML = '<h1>Jouw Speeddates</h1>';
-  },
-  '/Student/Student-Speeddates-Verzoeken': (rootElement) => {
-    rootElement.innerHTML = '<h1>Speeddate Verzoeken</h1>';
-  },
-  '/Student/Student-Settings': (rootElement) => {
-    rootElement.innerHTML = '<h1>Instellingen</h1>';
-  },
-  '/admin': (rootElement) => {
-    rootElement.innerHTML = '<h1>Admin Login</h1>';
-  },
-  '/admin/admin-dashboard': (rootElement) => {
-    rootElement.innerHTML = '<h1>Admin Dashboard</h1>';
-  },
-  '/contact': (rootElement) => {
-    rootElement.innerHTML = '<h1>Contacteer ons</h1>';
-  },
-  '/privacy': (rootElement) => {
-    rootElement.innerHTML = '<h1>Privacy Beleid</h1>';
-  },
-  '/404': (rootElement) => {
-    rootElement.innerHTML = '<h1>Pagina niet gevonden</h1>';
-  },
-  '/Bedrijf/Bedrijf-Profiel': (rootElement) => {
-    rootElement.innerHTML = '<h1>Bedrijf Profiel</h1>';
-  },
-  '/Bedrijf/Zoek-Criteria': (rootElement) => {
-    rootElement.innerHTML = '<h1>Zoek Criteria Bedrijf</h1>';
-  },
-  '/Student-Register': (rootElement) => {
-    rootElement.innerHTML = '<h1>Student Registreren</h1>';
-  },
-  '/Student-Opleiding': (rootElement) => {
-    rootElement.innerHTML = '<h1>Student Opleiding</h1>';
-  },
-  '/Student-Skills': (rootElement) => {
-    rootElement.innerHTML = '<h1>Student Skills</h1>';
-  },
-  '/Bedrijf-Register': renderBedrijfRegister,
-};
+// Maak de router direct aan
+const router = new Router(routes);
+window.appRouter = router;
 
+// Automatisch redirecten naar https op productie (niet localhost)
+if (window.location.protocol === 'http:' && !window.location.hostname.includes('localhost')) {
+  window.location.href = window.location.href.replace('http:', 'https:');
+}
+
+// *** HIERONDER default export ***
 export default Router;
