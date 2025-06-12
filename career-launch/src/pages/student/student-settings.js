@@ -1,4 +1,5 @@
 import { renderLogin } from '../auth/login.js';
+import { performLogout } from '../../utils/auth-api.js';
 
 // Fallback voor t() en setLanguage() als deze niet bestaan
 if (typeof window.t !== 'function') {
@@ -133,10 +134,15 @@ export function showSettingsPopup(onClose) {
         window.location.reload();
       }
     });
-
   // Logout
-  document.getElementById('btn-logout').addEventListener('click', () => {
-    localStorage.removeItem('user');
-    window.location.reload();
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    try {
+      const result = await performLogout();
+      console.log('Logout result:', result);
+      renderLogin(document.getElementById('app'));
+    } catch (error) {
+      console.error('Logout error:', error);
+      renderLogin(document.getElementById('app'));
+    }
   });
 }

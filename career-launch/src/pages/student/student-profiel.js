@@ -20,7 +20,11 @@ const defaultProfile = {
   description: '',
 };
 
-export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode = true) {
+export function renderStudentProfiel(
+  rootElement,
+  studentData = {},
+  readonlyMode = true
+) {
   const {
     firstName = defaultProfile.firstName,
     lastName = defaultProfile.lastName,
@@ -34,9 +38,7 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
   } = studentData;
 
   rootElement.innerHTML = `
-    <div class="student-profile-container">
-      <header class="student-profile-header">
-        <div class="logo-section">
+    <div class="student-profile-container">      <header class="student-profile-header">        <div class="logo-section">
           <img src="src/Icons/favicon-32x32.png" alt="Logo EhB Career Launch" width="32" height="32"/>
           <span>EhB Career Launch</span>
         </div>
@@ -67,23 +69,33 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
                   id="avatar-preview"
                   class="student-profile-avatar"
                 />
-                <input type="file" accept="image/*" id="photoInput" style="display:${readonlyMode ? 'none' : 'block'};margin-top:10px;">
+                <input type="file" accept="image/*" id="photoInput" style="display:${
+                  readonlyMode ? 'none' : 'block'
+                };margin-top:10px;">
               </div>
               <div class="student-profile-form-group">
                 <label for="firstNameInput">Voornaam</label>
-                <input type="text" id="firstNameInput" value="${firstName}" required ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="firstNameInput" value="${firstName}" required ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="student-profile-form-group">
                 <label for="lastNameInput">Achternaam</label>
-                <input type="text" id="lastNameInput" value="${lastName}" required ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="lastNameInput" value="${lastName}" required ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="student-profile-form-group">
                 <label for="emailInput">E-mailadres</label>
-                <input type="email" id="emailInput" value="${email}" required ${readonlyMode ? 'disabled' : ''}>
+                <input type="email" id="emailInput" value="${email}" required ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="student-profile-form-group">
                 <label for="studyProgramInput">Studieprogramma</label>
-                <input type="text" id="studyProgramInput" value="${studyProgram}" ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="studyProgramInput" value="${studyProgram}" ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="student-profile-form-group">
                 <label for="yearInput">Opleidingsjaar</label>
@@ -95,15 +107,21 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
               </div>
               <div class="student-profile-form-group">
                 <label for="birthDateInput">Geboortedatum</label>
-                <input type="date" id="birthDateInput" value="${birthDate}" ${readonlyMode ? 'disabled' : ''}>
+                <input type="date" id="birthDateInput" value="${birthDate}" ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="student-profile-form-group">
                 <label for="descriptionInput">Beschrijving</label>
-                <textarea id="descriptionInput" rows="3" ${readonlyMode ? 'disabled' : ''}>${description}</textarea>
+                <textarea id="descriptionInput" rows="3" ${
+                  readonlyMode ? 'disabled' : ''
+                }>${description}</textarea>
               </div>
               <div class="student-profile-form-group">
                 <label for="linkedinInput">LinkedIn-link</label>
-                <input type="url" id="linkedinInput" value="${linkedIn}" ${readonlyMode ? 'disabled' : ''}>
+                <input type="url" id="linkedinInput" value="${linkedIn}" ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="student-profile-buttons">
                 ${
@@ -133,46 +151,56 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
     btn.addEventListener('click', (e) => {
       const route = e.currentTarget.getAttribute('data-route');
       switch (route) {
-        case 'profile': renderStudentProfiel(rootElement, studentData, true); break;
-        case 'search': renderSearchCriteriaStudent(rootElement, studentData, true); break;
-        case 'speeddates': renderSpeeddates(rootElement, studentData); break;
-        case 'requests': renderSpeeddatesRequests(rootElement, studentData); break;
-        case 'qr': renderQRPopup(rootElement, studentData); break;
+        case 'profile':
+          renderStudentProfiel(rootElement, studentData, true);
+          break;
+        case 'search':
+          renderSearchCriteriaStudent(rootElement, studentData, true);
+          break;
+        case 'speeddates':
+          renderSpeeddates(rootElement, studentData);
+          break;
+        case 'requests':
+          renderSpeeddatesRequests(rootElement, studentData);
+          break;
+        case 'qr':
+          renderQRPopup(rootElement, studentData);
+          break;
       }
     });
   });
 
   // Burger menu
-const burger = document.getElementById('burger-menu');
-const dropdown = document.getElementById('burger-dropdown');
+  const burger = document.getElementById('burger-menu');
+  const dropdown = document.getElementById('burger-dropdown');
 
-if (burger && dropdown) {
-  // Toggle hamburger-menu bij klik
-  burger.addEventListener('click', (event) => {
-    event.stopPropagation();
-    dropdown.style.display =
-      dropdown.style.display === 'block' ? 'none' : 'block';
-  });
+  if (burger && dropdown) {
+    // Toggle hamburger-menu bij klik
+    burger.addEventListener('click', (event) => {
+      event.stopPropagation();
+      dropdown.style.display =
+        dropdown.style.display === 'block' ? 'none' : 'block';
+    });
 
-  // Sluit het menu bij klik buiten het menu
-  document.addEventListener('click', function(event) {
-    if (dropdown.style.display === 'block') {
-      if (!dropdown.contains(event.target) && event.target !== burger) {
-        dropdown.style.display = 'none';
+    // Sluit het menu bij klik buiten het menu
+    document.addEventListener('click', function (event) {
+      if (dropdown.style.display === 'block') {
+        if (!dropdown.contains(event.target) && event.target !== burger) {
+          dropdown.style.display = 'none';
+        }
       }
-    }
-  });
+    });
 
-  // Sluit het menu bij klikken op een menu-item
-  document.getElementById('nav-settings').addEventListener('click', () => {
-    dropdown.style.display = 'none';
-    showSettingsPopup();
-  });
-  document.getElementById('nav-logout').addEventListener('click', () => {
-    document.getElementById('burger-dropdown').style.display = 'none';
-    renderLogin(rootElement);
-  });
-}
+    // Sluit het menu bij klikken op een menu-item
+    document.getElementById('nav-settings').addEventListener('click', () => {
+      dropdown.style.display = 'none';
+      showSettingsPopup();
+    });
+    document.getElementById('nav-logout').addEventListener('click', () => {
+      document.getElementById('burger-dropdown').style.display = 'none';
+      renderLogin(rootElement);
+    });
+  }
 
   document.getElementById('nav-settings').addEventListener('click', () => {});
   document.getElementById('nav-logout').addEventListener('click', () => {
@@ -187,12 +215,12 @@ if (burger && dropdown) {
   const photoInput = document.getElementById('photoInput');
   const avatarPreview = document.getElementById('avatar-preview');
 
-  Array.from(form.elements).forEach(el => {
+  Array.from(form.elements).forEach((el) => {
     if (
-      el.tagName !== "BUTTON"
-      && el.type !== "button"
-      && el.type !== "submit"
-      && el.type !== "reset"
+      el.tagName !== 'BUTTON' &&
+      el.type !== 'button' &&
+      el.type !== 'submit' &&
+      el.type !== 'reset'
     ) {
       el.disabled = readonlyMode;
     }
@@ -257,7 +285,8 @@ if (burger && dropdown) {
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
     Router.navigate('/privacy');
-  });  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
+  });
+  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
     import('../../router.js').then((module) => {
       const Router = module.default;

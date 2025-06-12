@@ -1,5 +1,5 @@
 // import { renderBedrijfOpleiding } from './student-opleiding.js';
-import '../student-register.css';
+import '../../css/student-register.css';
 import Router from '../../router.js';
 
 export function renderBedrijfRegister(rootElement) {
