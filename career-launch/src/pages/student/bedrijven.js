@@ -7,6 +7,7 @@ import { renderQRPopup } from './student-qr-popup.js';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
 import { fetchCompanies } from '../../utils/data-api.js';
+import defaultBedrijfLogo from '../../images/BedrijfDefault.jpg';
 
 // Globale variabele voor bedrijven data
 let bedrijven = [];
@@ -39,13 +40,12 @@ function showBedrijfPopup(bedrijf) {
     '14:00 - 15:00',
     '15:00 - 16:00',
   ];
-
   popup.innerHTML = `
     <div id="bedrijf-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:400px;width:95vw;position:relative;display:flex;flex-direction:column;align-items:center;">
       <button id="bedrijf-popup-close" style="position:absolute;top:10px;right:14px;font-size:1.7rem;background:none;border:none;cursor:pointer;color:#888;">&times;</button>
       <img src="${bedrijf.foto}" alt="Logo ${
     bedrijf.naam
-  }" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;">
+  }" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
       <h2 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h2>
       <div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${
         bedrijf.locatie
@@ -156,7 +156,10 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         naam: company.naam,
         linkedin: company.linkedin || '',
         bio: company.bio || '',
-        foto: company.foto || '/images/BedrijfDefault.jpg', // Use default image if no foto
+        foto:
+          company.foto && company.foto.trim() !== ''
+            ? company.foto
+            : defaultBedrijfLogo, // Use default if no foto or empty
         locatie: company.plaats || '',
         werkdomein: company.werkdomein || '',
         contact_email: company.contact_email,
@@ -198,23 +201,21 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       ? gefilterd
           .map(
             (bedrijf, idx) => `
-        <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;" data-bedrijf-idx="${bedrijven.indexOf(
-          bedrijf
-        )}">
-          <img src="${bedrijf.foto}" alt="Logo ${
+    <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;" data-bedrijf-idx="${bedrijven.indexOf(
+      bedrijf
+    )}">
+      <img src="${bedrijf.foto}" alt="Logo ${
               bedrijf.naam
-            }" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.src='/images/BedrijfDefault.jpg'">
-          <h3 style="margin-bottom:0.5rem;text-align:center;">${
-            bedrijf.naam
-          }</h3>
-          <div style="font-size:0.97rem;color:#666;margin-bottom:0.3rem;">${
-            bedrijf.locatie
-          }</div>
-          <div style="font-size:0.97rem;color:#888;margin-bottom:0.3rem;">${
-            bedrijf.werkdomein
-          }</div>
-        </div>
-      `
+            }" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
+      <h3 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h3>
+      <div style="font-size:0.97rem;color:#666;margin-bottom:0.3rem;">${
+        bedrijf.locatie
+      }</div>
+      <div style="font-size:0.97rem;color:#888;margin-bottom:0.3rem;">${
+        bedrijf.werkdomein
+      }</div>
+    </div>
+  `
           )
           .join('')
       : `<div style="text-align:center;width:100%;color:#888;">Geen bedrijven gevonden.</div>`;
