@@ -22,11 +22,9 @@ export function renderStudentRegister(rootElement) {
         </div>
         <div class="form-spacing">
           <input type="date" id="geboortedatum" name="geboortedatum" required placeholder="Geboortedatum" class="input-full" />
-        </div>
-        <div class="form-spacing">
+        </div>        <div class="form-spacing">
           <input type="text" id="linkedin" name="linkedin" placeholder="LinkedIn-link" class="input-full" />
         </div>
-        <input type="linkedin" id="linkedin" name="linkedin" placeholder="LinkedIn-link" class="input-full" />
         <label id="error-label" class="error-label" style="color: red; display: none;"></label>
         <button type="submit" class="next-button">Volgende →</button>
       </form>
@@ -39,8 +37,6 @@ export function renderStudentRegister(rootElement) {
     </footer>
   </div>
   `;
-
-  
 
   const form = document.getElementById('naamForm');
   form.addEventListener('submit', handleNaamRegister);
@@ -71,7 +67,9 @@ function handleNaamRegister(event) {
     voornaam: formData.get('voornaam'),
     achternaam: formData.get('achternaam'),
     linkedin: formData.get('linkedin'),
-    profielFoto: formData.get('profielFoto') ? formData.get('profielFoto').name : null, // Get uploaded file name
+    profielFoto: formData.get('profielFoto')
+      ? formData.get('profielFoto').name
+      : null, // Get uploaded file name
   };
 
   const errorLabel = document.getElementById('error-label');
@@ -87,7 +85,7 @@ function handleNaamRegister(event) {
 
   const mergedData = { ...previousData, ...currentData };
 
-  // Store merged data securely in localStorage
+  // Store merged data in localStorage
   localStorage.setItem('userData', JSON.stringify(mergedData));
 
   renderStudentOpleiding(document.getElementById('app'));
