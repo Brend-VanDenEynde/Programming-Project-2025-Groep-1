@@ -3,7 +3,7 @@ import Router from '../../router.js';
 import defaultAvatar from '../../Images/default.png';
 import { performLogout } from '../../utils/auth-api.js';
 
-export function renderAdminStudentDetail(rootElement) {
+export async function renderAdminStudentDetail(rootElement) {
   // Check if user is logged in
   const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
   const adminUsername = sessionStorage.getItem('adminUsername');
@@ -15,7 +15,12 @@ export function renderAdminStudentDetail(rootElement) {
 
   // Get student ID from URL or use default for demo
   const urlParams = new URLSearchParams(window.location.search);
-  const studentId = urlParams.get('id') || 'demo';
+  const studentId = urlParams.get('id');
+
+  if (!studentId) {
+    console.error('Student ID is missing in the URL');
+    return;
+  }
 
   // Mock student data - in real app this would come from API
   const studentData = getStudentData(studentId);
@@ -139,6 +144,33 @@ export function renderAdminStudentDetail(rootElement) {
   // Event handlers
   setupEventHandlers();
   document.title = `Student Details: ${studentData.firstName} ${studentData.lastName} - Admin Dashboard`;
+
+  // Fetch student data from API
+  const accessToken = sessionStorage.getItem('accessToken');
+  try {
+    const response = await fetch(
+      `https://api.ehb-match.me/studenten/${studentId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    const studentData = await response.json();
+
+    // Update the page with student data
+    document.querySelector('.admin-section-header h1').textContent = `Student Details: ${studentData.voornaam} ${studentData.achternaam}`;
+    document.querySelector('.detail-logo-section img').src = studentData.profiel_foto || defaultAvatar;
+    document.querySelector('.detail-info .detail-field:nth-child(1) span').textContent = `${studentData.voornaam} ${studentData.achternaam}`;
+    document.querySelector('.detail-info .detail-field:nth-child(2) span').textContent = studentData.email || 'Niet beschikbaar';
+    document.querySelector('.detail-info .detail-field:nth-child(3) span').innerHTML = studentData.linkedin
+      ? `<a href="${studentData.linkedin}" target="_blank" class="linkedin-link">${studentData.linkedin}</a>`
+      : 'Niet ingesteld';
+  } catch (error) {
+    console.error('Error fetching student details:', error);
+  }
 }
 
 // Modal functionality for speeddates
