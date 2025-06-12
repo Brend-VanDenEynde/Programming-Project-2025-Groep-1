@@ -120,7 +120,6 @@ class ImportCasingChecker {
 
     return resolvedPath;
   }
-
   /**
    * Check if file exists with exact case sensitivity
    */
@@ -129,6 +128,14 @@ class ImportCasingChecker {
       // First check if file exists at all
       if (!fs.existsSync(filePath)) {
         return false;
+      }
+
+      // Special check for common case-sensitivity issues
+      if (filePath.includes('/Images/') || filePath.includes('\\Images\\')) {
+        return false; // Images should be images
+      }
+      if (filePath.includes('/Icons/') || filePath.includes('\\Icons\\')) {
+        return false; // Icons should be icons
       }
 
       // On case-sensitive systems, fs.existsSync is enough

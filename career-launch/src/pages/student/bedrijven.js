@@ -1,4 +1,4 @@
-import logoIcon from '../../Icons/favicon-32x32.png';
+import logoIcon from '../../icons/favicon-32x32.png';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddates } from './student-speeddates.js';

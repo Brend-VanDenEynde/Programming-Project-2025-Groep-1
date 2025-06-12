@@ -1,8 +1,8 @@
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
-import logoIcon from '../../Icons/favicon-32x32.png';
+import logoIcon from '../../icons/favicon-32x32.png';
 import { getOpleidingNaamById, opleidingen } from './student-opleidingen.js';
-import defaultAvatar from '../../Images/default.png';
+import defaultAvatar from '../../images/default.png';
 
 const defaultProfile = {
   voornaam: 'Voornaam',

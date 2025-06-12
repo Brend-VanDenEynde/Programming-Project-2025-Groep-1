@@ -1,6 +1,6 @@
 // Admin student detail pagina
 import Router from '../../router.js';
-import defaultAvatar from '../../Images/default.png';
+import defaultAvatar from '../../images/default.png';
 import { performLogout } from '../../utils/auth-api.js';
 
 export function renderAdminStudentDetail(rootElement) {

@@ -1,11 +1,11 @@
-import logoIcon from '../../Icons/favicon-32x32.png';
+import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './student-settings.js';
-import defaultAvatar from '../../Images/default.png';
+import defaultAvatar from '../../images/default.png';
 
 // src/views/student-qr-popup.js
 
@@ -74,7 +74,9 @@ export function renderQRPopup(rootElement, studentData = {}) {
           renderSpeeddatesRequests(rootElement, studentData);
           break;
         case 'bedrijven':
-          import('./bedrijven.js').then(m => m.renderBedrijven(rootElement, studentData));
+          import('./bedrijven.js').then((m) =>
+            m.renderBedrijven(rootElement, studentData)
+          );
           break;
         case 'qr':
           renderQRPopup(rootElement, studentData);
@@ -96,7 +98,7 @@ export function renderQRPopup(rootElement, studentData = {}) {
         dropdown.classList.remove('open');
       }
     });
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
       if (
         dropdown.classList.contains('open') &&
         !dropdown.contains(event.target) &&

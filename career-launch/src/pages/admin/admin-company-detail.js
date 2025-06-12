@@ -1,6 +1,6 @@
 // Admin company detail pagina
 import Router from '../../router.js';
-import defaultCompanyLogo from '../../Images/BedrijfDefault.jpg';
+import defaultCompanyLogo from '../../images/BedrijfDefault.jpg';
 
 export function renderAdminCompanyDetail(rootElement) {
   // Check if user is logged in
