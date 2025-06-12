@@ -33,7 +33,7 @@ export function renderLogin(rootElement) {
             <div style="position:relative;display:flex;align-items:center;">
               <input type="password" id="passwordInput" name="password" required style="flex:1;">
               <button type="button" id="togglePassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">
-                <img id="togglePasswordIcon" src="src/Icons/icons8-closed-eye-HIDDEN.png" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
+                <img id="togglePasswordIcon" src="src/Icons/hide.png" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
               </button>
             </div>
           </div>
@@ -95,8 +95,8 @@ export function renderLogin(rootElement) {
       const isVisible = passwordInput.type === 'text';
       passwordInput.type = isVisible ? 'password' : 'text';
       togglePasswordIcon.src = isVisible
-        ? 'src/Icons/icons8-closed-eye-HIDDEN.png'
-        : 'src/Icons/icons8-closed-eye-CLEAR.png';
+        ? 'src/Icons/hide.png'
+        : 'src/Icons/eye.png';
       togglePasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
     });
   }
