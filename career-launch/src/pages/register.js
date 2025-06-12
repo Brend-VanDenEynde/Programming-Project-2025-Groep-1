@@ -12,16 +12,18 @@ export function renderRegister(rootElement) {
           <h1>Registreren</h1>
           <p>Vermeld je school-email en een wachtwoord voor je account</p>
         </div>
-        
-        <form id="registerForm">
-          <input 
-            type="email" 
-            id="email" 
-            name="email" 
-            required 
-            placeholder="Email"
-            class="register-input full-width"
-          >
+          <form id="registerForm">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              required 
+              placeholder="Email"
+              class="register-input full-width"
+            >
+          </div>
             <div class="form-group">
             <label for="passwordInput">Wachtwoord</label>
             <div style="position:relative;display:flex;align-items:center;">
