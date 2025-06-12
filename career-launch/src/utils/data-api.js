@@ -14,7 +14,6 @@ export async function fetchSkills() {
     const skills = await apiGet('https://api.ehb-match.me/skills');
     return skills;
   } catch (error) {
-    console.error('Error fetching skills:', error);
     throw error;
   }
 }
@@ -28,7 +27,6 @@ export async function fetchStudents() {
     const students = await apiGet('https://api.ehb-match.me/studenten');
     return students;
   } catch (error) {
-    console.error('Error fetching students:', error);
     throw error;
   }
 }
@@ -45,7 +43,6 @@ export async function fetchStudentById(studentId) {
     );
     return student;
   } catch (error) {
-    console.error('Error fetching student:', error);
     throw error;
   }
 }
@@ -59,7 +56,6 @@ export async function fetchCompanies() {
     const companies = await apiGet('https://api.ehb-match.me/bedrijven');
     return companies;
   } catch (error) {
-    console.error('Error fetching companies:', error);
     throw error;
   }
 }
@@ -78,7 +74,6 @@ export async function updateStudentProfile(studentId, profileData) {
     );
     return updatedStudent;
   } catch (error) {
-    console.error('Error updating student profile:', error);
     throw error;
   }
 }
@@ -97,7 +92,6 @@ export async function saveSearchCriteria(studentId, criteria) {
     );
     return response;
   } catch (error) {
-    console.error('Error saving search criteria:', error);
     throw error;
   }
 }

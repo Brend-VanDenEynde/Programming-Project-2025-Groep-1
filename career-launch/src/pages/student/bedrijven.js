@@ -131,24 +131,17 @@ export async function renderBedrijven(rootElement, studentData = {}) {
   let huidigeZoek = '';
   let huidigeLocatie = '';
   let huidigeDomein = '';
-
   // Check if user is authenticated
   const authToken = window.sessionStorage.getItem('authToken');
   if (!authToken) {
-    console.warn('No auth token found, redirecting to login');
     renderLogin(rootElement);
     return;
   }
 
   // Load companies from API
   try {
-    console.log('Loading companies from API...');
-    const companies = await fetchCompanies();
-    console.log('Raw API response:', companies);
-
-    // Check if response is an array
+    const companies = await fetchCompanies(); // Check if response is an array
     if (!Array.isArray(companies)) {
-      console.error('API response is not an array:', companies);
       bedrijven = [];
     } else {
       // Map API response to expected format
@@ -166,12 +159,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         gebruiker_id: company.gebruiker_id,
       }));
     }
-
-    console.log('Mapped companies:', bedrijven);
   } catch (error) {
-    console.error('Failed to load companies:', error);
-    console.error('Error details:', error.message);
-
     // If authentication failed, redirect to login
     if (error.message.includes('Authentication failed')) {
       renderLogin(rootElement);
