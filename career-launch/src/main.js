@@ -18,8 +18,8 @@ import { showSettingsPopup } from './pages/Student/student-settings.js';
 import { renderAdminIngeschrevenStudenten } from './pages/admin/admin-ingeschreven-studenten.js';
 import { renderAdminIngeschrevenBedrijven } from './pages/admin/admin-ingeschreven-bedrijven.js';
 import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven-in-behandeling.js';
-import { renderAdminStudentDetail } from './pages/Admin/admin-student-detail.js';
-import { renderAdminCompanyDetail } from './pages/Admin/admin-company-detail.js';
+import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js';
+import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
 import { renderAdminProcessingCompanyDetail } from './pages/admin/admin-dashboard.js';
 
 function renderNotFound(rootElement) {
