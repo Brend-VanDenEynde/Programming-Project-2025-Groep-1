@@ -56,7 +56,7 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
                       v.status === 'Geaccepteerd'
                         ? `<span class="status-badge badge-accepted">Geaccepteerd</span>`
                         : v.status === 'Geweigerd'
-                        ? `<span class="status-badge badge-denied">Geweigerd</span>`
+                        ? `<span class="status-badge-denied badge-denied">Geweigerd</span>`
                         : `
                             <button class="accept-btn" data-idx="${idx}">Accepteer</button>
                             <button class="deny-btn" data-idx="${idx}">Weiger</button>

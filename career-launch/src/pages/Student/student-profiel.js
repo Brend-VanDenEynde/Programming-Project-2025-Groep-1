@@ -174,10 +174,28 @@ export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode
     });
     document.getElementById('nav-logout').addEventListener('click', () => {
       dropdown.classList.remove('open');
+      // Volledige logout: wis alle relevante storage
+      window.sessionStorage.removeItem('studentData');
+      window.sessionStorage.removeItem('authToken');
+      window.sessionStorage.removeItem('userType');
       localStorage.setItem('darkmode', 'false');
       document.body.classList.remove('darkmode');
       renderLogin(rootElement);
     });
+
+    // Ook de LOG OUT knop in het profiel-formulier zelf (voor desktop)
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        // Volledige logout: wis alle relevante storage
+        window.sessionStorage.removeItem('studentData');
+        window.sessionStorage.removeItem('authToken');
+        window.sessionStorage.removeItem('userType');
+        localStorage.setItem('darkmode', 'false');
+        document.body.classList.remove('darkmode');
+        renderLogin(rootElement);
+      });
+    }
   }
 
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
