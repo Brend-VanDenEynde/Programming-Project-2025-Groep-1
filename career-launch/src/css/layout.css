@@ -240,3 +240,46 @@
   border-color: #667eea;
   box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
 }
+
+/* Footer Styles */
+.footer-links {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  background: none;
+  z-index: 100;
+  padding: 18px 0 14px 0;
+  margin: 0;
+  border-top: 1px solid #e1e5e9;
+  background: #fff;
+}
+
+.student-profile-footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  background: #f5f6f7;
+  color: #7a7a7a;
+  border-top: 1px solid #e1e5e9;
+  text-align: center;
+  font-size: 0.95rem;
+  padding: 18px 0 14px 0;
+  margin: 0;
+  box-shadow: none;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  z-index: 100;
+}
+
+.student-profile-footer a {
+  color: #7a7a7a;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.student-profile-footer a:hover {
+  color: #009ca6;
+  text-decoration: underline;
+}
