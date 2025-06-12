@@ -42,7 +42,6 @@ const routes = {
   '/login': renderLogin,
   '/student/student-profiel': renderStudentProfiel,
   '/student/zoek-criteria': renderSearchCriteriaStudent,
-  '/admin': renderAdmin,
   '/admin-login': renderAdmin,
   '/admin-select-dashboard': renderAdminSelectDashboard,
   '/admin-dashboard': renderAdminSelectDashboard,
@@ -52,8 +51,7 @@ const routes = {
     renderAdminBedrijvenInBehandeling,
   '/admin-dashboard/student-detail': renderAdminStudentDetail,
   '/admin-dashboard/company-detail': renderAdminCompanyDetail,
-  '/admin-dashboard/processing-company-detail':
-    renderAdminProcessingCompanyDetail,
+  '/admin-dashboard/processing-company-detail': renderAdminProcessingCompanyDetail,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
   '/student/student-qr-popup': renderQRPopup,
@@ -67,6 +65,28 @@ const routes = {
 
 const router = new Router(routes);
 window.appRouter = router;
+
+// Footer event listeners éénmalig toevoegen na elke route change
+function setupFooterLinks() {
+  const privacyLink = document.getElementById('privacy-policy');
+  if (privacyLink) {
+    privacyLink.onclick = (e) => {
+      e.preventDefault();
+      window.appRouter.navigate('/privacy', { replace: true });
+    };
+  }
+  const contactLink = document.getElementById('contacteer-ons');
+  if (contactLink) {
+    contactLink.onclick = (e) => {
+      e.preventDefault();
+      window.appRouter.navigate('/contact', { replace: true });
+    };
+  }
+}
+
+// Hook in op elke route change
+window.addEventListener('popstate', setupFooterLinks);
+document.addEventListener('DOMContentLoaded', setupFooterLinks);
 
 if (
   window.location.protocol === 'http:' &&

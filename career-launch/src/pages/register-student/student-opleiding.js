@@ -53,15 +53,17 @@ export function renderStudentOpleiding(rootElement) {
 
   const form = document.getElementById('jaarForm');
   form.addEventListener('submit', handleJaarRegister);
-  document.getElementById('back-button').addEventListener('click', () => {
-    // Check if there's a previous page in history
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      // Fallback to register if no history
-      Router.navigate('/registreer');
-    }
-  });
+  const backBtn = document.getElementById('back-button');
+  if (backBtn) {
+    backBtn.onclick = null;
+    backBtn.addEventListener('click', () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        Router.navigate('/registreer');
+      }
+    });
+  }
 
   // Footer links
   const privacyLink = document.getElementById('privacy-link');
@@ -173,7 +175,21 @@ async function handleJaarRegister(event) {
     errorLabel.textContent =
       'Er is een fout opgetreden bij het aanmaken van je account.';
     errorLabel.style.display = 'block';
-  }
-}
+  }  }
 
-// No changes needed for image imports in this file. All asset and API usage is correct.
+  // Voorbeeld: als er een uitlogknop zou zijn
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// No changes needed for image imports in this file. All asset and API usage is correct.}  }    });      Router.navigate('/');      localStorage.clear();      window.sessionStorage.clear();      // Hier zou je eventueel een logoutUser() API call doen    logoutBtn.addEventListener('click', async () => {    logoutBtn.onclick = null;  if (logoutBtn) {  const logoutBtn = document.getElementById('logout-btn');// No changes needed for image imports in this file. All asset and API usage is correct.

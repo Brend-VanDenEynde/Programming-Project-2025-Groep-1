@@ -4,7 +4,7 @@ import defaultAvatar from '../../images/BedrijfDefault.jpg';
 import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
-import { performLogout } from '../../utils/auth-api.js';
+import { performLogout, logoutUser } from '../../utils/auth-api.js';
 
 export function renderBedrijfProfiel(rootElement, bedrijfData = {}) {
   // Haal altijd de meest recente bedrijfData uit sessionStorage als deze leeg is
@@ -149,29 +149,36 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}) {
         alert('Account verwijderen (nog te implementeren)');
       }
     });
-  document.getElementById('nav-logout').addEventListener('click', async () => {
-    try {
-      const result = await performLogout();
-      console.log('Logout result:', result);
-      renderLogin(rootElement);
-    } catch (error) {
-      console.error('Logout error:', error);
-      // Still navigate to login even if logout API fails
-      renderLogin(rootElement);
-    }
-  });
-  // UITLOGGEN (in profiel‐weergave)
-  document.getElementById('logout-btn').addEventListener('click', async () => {
-    try {
-      const result = await performLogout();
-      console.log('Logout result:', result);
-      renderLogin(rootElement);
-    } catch (error) {
-      console.error('Logout error:', error);
-      // Still navigate to login even if logout API fails
-      renderLogin(rootElement);
-    }
-  });
+  // Burger-menu logout
+  const navLogout = document.getElementById('nav-logout');
+  if (navLogout) {
+    navLogout.onclick = null;
+    navLogout.addEventListener('click', async () => {
+      const response = await logoutUser();
+      console.log('Logout API response:', response);
+      window.sessionStorage.clear();
+      localStorage.clear();
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/');
+      });
+    });
+  }
+  // Profiel-formulier logout
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.onclick = null;
+    logoutBtn.addEventListener('click', async () => {
+      const response = await logoutUser();
+      console.log('Logout API response:', response);
+      window.sessionStorage.clear();
+      localStorage.clear();
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/');
+      });
+    });
+  }
 
   // SCHAKEL WEERGAVE ↔ BEWERKEN
   const editBtn = document.getElementById('edit-profile-btn');

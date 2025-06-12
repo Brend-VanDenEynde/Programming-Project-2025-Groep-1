@@ -36,9 +36,17 @@ export function renderStudentRegister(rootElement) {
   const form = document.getElementById('naamForm');
   form.addEventListener('submit', handleNaamRegister);
 
-  document.getElementById('back-button').addEventListener('click', () => {
-    Router.navigate('/registreer');
-  });
+  const backBtn = document.getElementById('back-button');
+  if (backBtn) {
+    backBtn.onclick = null;
+    backBtn.addEventListener('click', () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        Router.navigate('/registreer');
+      }
+    });
+  }
 
   // Footer links
   const privacyLink = document.getElementById('privacy-link');

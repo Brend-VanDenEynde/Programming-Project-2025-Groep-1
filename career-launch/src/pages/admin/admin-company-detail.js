@@ -195,17 +195,24 @@ function getCompanyData(companyId) {
 function setupEventHandlers() {
   // Back button
   const backBtn = document.getElementById('back-btn');
-  backBtn.addEventListener('click', () => {
-    Router.navigate('/admin-dashboard/ingeschreven-bedrijven');
-  });
+  if (backBtn) {
+    backBtn.onclick = null;
+    backBtn.addEventListener('click', () => {
+      Router.navigate('/admin-dashboard/ingeschreven-bedrijven');
+    });
+  }
 
   // Logout button
   const logoutBtn = document.getElementById('logout-btn');
-  logoutBtn.addEventListener('click', () => {
-    sessionStorage.removeItem('adminLoggedIn');
-    sessionStorage.removeItem('adminUsername');
-    Router.navigate('/admin-login');
-  });
+  if (logoutBtn) {
+    logoutBtn.onclick = null;
+    logoutBtn.addEventListener('click', async () => {
+      await logoutUser();
+      window.sessionStorage.clear();
+      localStorage.clear();
+      Router.navigate('/');
+    });
+  }
 
   // Navigation buttons
   const navButtons = document.querySelectorAll('.nav-btn');

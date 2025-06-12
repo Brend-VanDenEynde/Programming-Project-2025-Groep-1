@@ -3,6 +3,7 @@ import { showSettingsPopup } from './student-settings.js';
 import logoIcon from '../../icons/favicon-32x32.png';
 import { getOpleidingNaamById, opleidingen } from './student-opleidingen.js';
 import defaultAvatar from '../../images/default.png';
+import { logoutUser } from '../../utils/auth-api.js';
 
 const defaultProfile = {
   voornaam: 'Voornaam',
@@ -250,28 +251,36 @@ export function renderStudentProfiel(
       dropdown.classList.remove('open');
       showSettingsPopup(() => renderStudentProfiel(rootElement, studentData));
     });
-    document.getElementById('nav-logout').addEventListener('click', () => {
+    document.getElementById('nav-logout').addEventListener('click', async () => {
       dropdown.classList.remove('open');
-      // Volledige logout: wis alle relevante storage
+      const response = await logoutUser();
+      console.log('Logout API response:', response);
       window.sessionStorage.removeItem('studentData');
       window.sessionStorage.removeItem('authToken');
       window.sessionStorage.removeItem('userType');
       localStorage.setItem('darkmode', 'false');
       document.body.classList.remove('darkmode');
-      renderLogin(rootElement);
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/');
+      });
     });
 
     // Ook de LOG OUT knop in het profiel-formulier zelf (voor desktop)
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
-      logoutBtn.addEventListener('click', () => {
-        // Volledige logout: wis alle relevante storage
+      logoutBtn.addEventListener('click', async () => {
+        const response = await logoutUser();
+        console.log('Logout API response:', response);
         window.sessionStorage.removeItem('studentData');
         window.sessionStorage.removeItem('authToken');
         window.sessionStorage.removeItem('userType');
         localStorage.setItem('darkmode', 'false');
         document.body.classList.remove('darkmode');
-        renderLogin(rootElement);
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/');
+        });
       });
     }
   }

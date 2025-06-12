@@ -1,7 +1,7 @@
 // Admin student detail pagina
 import Router from '../../router.js';
 import defaultAvatar from '../../images/default.png';
-import { performLogout } from '../../utils/auth-api.js';
+import { performLogout, logoutUser } from '../../utils/auth-api.js';
 
 export function renderAdminStudentDetail(rootElement) {
   // Check if user is logged in
@@ -377,22 +377,23 @@ function getStudentData(studentId) {
 function setupEventHandlers() {
   // Back button
   const backBtn = document.getElementById('back-btn');
-  backBtn.addEventListener('click', () => {
-    Router.navigate('/admin-dashboard/ingeschreven-studenten');
-  });
+  if (backBtn) {
+    backBtn.onclick = null;
+    backBtn.addEventListener('click', () => {
+      Router.navigate('/admin-dashboard/ingeschreven-studenten');
+    });
+  }
   // Logout button
   const logoutBtn = document.getElementById('logout-btn');
-  logoutBtn.addEventListener('click', async () => {
-    try {
-      const result = await performLogout();
-      console.log('Admin logout result:', result);
-      Router.navigate('/admin-login');
-    } catch (error) {
-      console.error('Admin logout error:', error);
-      // Still navigate to login even if logout API fails
-      Router.navigate('/admin-login');
-    }
-  });
+  if (logoutBtn) {
+    logoutBtn.onclick = null;
+    logoutBtn.addEventListener('click', async () => {
+      await logoutUser();
+      window.sessionStorage.clear();
+      localStorage.clear();
+      Router.navigate('/');
+    });
+  }
 
   // Navigation buttons
   const navButtons = document.querySelectorAll('.nav-btn');

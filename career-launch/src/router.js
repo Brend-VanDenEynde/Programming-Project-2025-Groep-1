@@ -8,6 +8,12 @@ import { renderStudentProfiel } from './pages/student/student-profiel.js';
 import { renderSearchCriteriaStudent } from './pages/student/search-criteria-student.js';
 import { renderAdmin } from './pages/admin/admin-login.js';
 import { renderAdminSelectDashboard } from './pages/admin/admin-select-dashboard.js';
+import { renderAdminIngeschrevenStudenten } from './pages/admin/admin-ingeschreven-studenten.js';
+import { renderAdminIngeschrevenBedrijven } from './pages/admin/admin-ingeschreven-bedrijven.js';
+import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven-in-behandeling.js';
+import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js';
+import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
+import { renderAdminProcessingCompanyDetail } from './pages/admin/admin-processing-company-detail.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
 import { renderQRPopup } from './pages/student/student-qr-popup.js';
@@ -41,9 +47,15 @@ const routes = {
   '/student/student-speeddates-verzoeken': renderSpeeddatesRequests,
   '/student/student-settings': showSettingsPopup,
   '/student/bedrijven': renderBedrijven,
-  '/admin': renderAdmin,
+  '/admin-login': renderAdmin,
   '/admin-select-dashboard': renderAdminSelectDashboard,
   '/admin-dashboard': renderAdminSelectDashboard,
+  '/admin-dashboard/ingeschreven-studenten': renderAdminIngeschrevenStudenten,
+  '/admin-dashboard/ingeschreven-bedrijven': renderAdminIngeschrevenBedrijven,
+  '/admin-dashboard/bedrijven-in-behandeling': renderAdminBedrijvenInBehandeling,
+  '/admin-dashboard/student-detail': renderAdminStudentDetail,
+  '/admin-dashboard/company-detail': renderAdminCompanyDetail,
+  '/admin-dashboard/processing-company-detail': renderAdminProcessingCompanyDetail,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
   '/bedrijf/bedrijf-profiel': renderBedrijfProfiel,

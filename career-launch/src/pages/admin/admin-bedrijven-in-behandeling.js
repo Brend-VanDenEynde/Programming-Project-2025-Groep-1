@@ -76,12 +76,15 @@ export function renderAdminBedrijvenInBehandeling(rootElement) {
 
   // Handle logout
   const logoutBtn = document.getElementById('logout-btn');
-  logoutBtn.addEventListener('click', () => {
-    // Clear session    sessionStorage.removeItem('adminLoggedIn');
-    sessionStorage.removeItem('adminUsername');
-    // Redirect to admin login
-    Router.navigate('/admin-login');
-  });
+  if (logoutBtn) {
+    logoutBtn.onclick = null;
+    logoutBtn.addEventListener('click', async () => {
+      await logoutUser();
+      window.sessionStorage.clear();
+      localStorage.clear();
+      Router.navigate('/');
+    });
+  }
 
   // Handle navigation between sections
   const navButtons = document.querySelectorAll('.nav-btn');
@@ -170,4 +173,13 @@ export function renderAdminBedrijvenInBehandeling(rootElement) {
     });
   });
   document.title = 'Bedrijven in Behandeling - Admin Dashboard';
+
+  // Back button
+  const backBtn = document.getElementById('back-btn');
+  if (backBtn) {
+    backBtn.onclick = null;
+    backBtn.addEventListener('click', () => {
+      Router.navigate('/admin-dashboard/bedrijven-in-behandeling');
+    });
+  }
 }

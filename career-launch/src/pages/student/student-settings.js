@@ -1,4 +1,4 @@
-// Verwijder ongeldige import en alle t()/setLanguage() functies
+import { logoutUser } from '../../utils/auth-api.js';
 
 // Main renderfunctie:
 export function showSettingsPopup(onClose) {
@@ -108,10 +108,12 @@ export function showSettingsPopup(onClose) {
   });
 
   // Logout
-  document.getElementById('btn-logout').addEventListener('click', () => {
-    localStorage.removeItem('user');
-    window.location.reload();
+  document.getElementById('btn-logout').onclick = null;
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    const response = await logoutUser();
+    console.log('Logout API response:', response);
+    window.sessionStorage.clear();
+    localStorage.clear();
+    window.location.href = '/';
   });
 }
-
-

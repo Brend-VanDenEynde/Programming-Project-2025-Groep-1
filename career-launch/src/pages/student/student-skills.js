@@ -60,9 +60,17 @@ export async function renderStudentSkills(rootElement) {
   document
     .getElementById('skillsForm')
     .addEventListener('submit', handleSkillsRegister);
-  document.getElementById('back-button').addEventListener('click', () => {
-    Router.navigate('/student-opleiding');
-  });
+  const backBtn = document.getElementById('back-button');
+  if (backBtn) {
+    backBtn.onclick = null;
+    backBtn.addEventListener('click', () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        Router.navigate('/student-opleiding');
+      }
+    });
+  }
   // Footer links
   const privacyLink = document.getElementById('privacy-link');
   privacyLink.addEventListener('click', (e) => {

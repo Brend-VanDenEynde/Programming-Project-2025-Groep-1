@@ -3,7 +3,7 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderBedrijfProfiel } from './bedrijf-profiel.js';
-import { performLogout } from '../../utils/auth-api.js';
+import { performLogout, logoutUser } from '../../utils/auth-api.js';
 
 export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
   if (!bedrijfData.criteria) {
@@ -166,16 +166,36 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
     });
   });
 
-  document.getElementById('nav-logout').addEventListener('click', async () => {
-    try {
-      const result = await performLogout();
-      console.log('Logout result:', result);
-      renderLogin(rootElement);
-    } catch (error) {
-      console.error('Logout error:', error);
-      renderLogin(rootElement);
-    }
-  });
+  // Burger-menu logout
+  const navLogout = document.getElementById('nav-logout');
+  if (navLogout) {
+    navLogout.onclick = null;
+    navLogout.addEventListener('click', async () => {
+      const response = await logoutUser();
+      console.log('Logout API response:', response);
+      window.sessionStorage.clear();
+      localStorage.clear();
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/');
+      });
+    });
+  }
+  // Profiel-formulier logout
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.onclick = null;
+    logoutBtn.addEventListener('click', async () => {
+      const response = await logoutUser();
+      console.log('Logout API response:', response);
+      window.sessionStorage.clear();
+      localStorage.clear();
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/');
+      });
+    });
+  }
 
   // BURGER-MENU
   const burger = document.getElementById('burger-menu');
@@ -200,14 +220,10 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
       }
     });
   document.getElementById('nav-logout').addEventListener('click', async () => {
-    try {
-      const result = await performLogout();
-      console.log('Logout result:', result);
-      renderLogin(rootElement);
-    } catch (error) {
-      console.error('Logout error:', error);
-      renderLogin(rootElement);
-    }
+    await logoutUser();
+    window.sessionStorage.clear();
+    localStorage.clear();
+    window.location.reload();
   });
 
   // RESET-KNOP
@@ -286,7 +302,7 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
 
   // SAVE-KNOP: bewaar radiokeuze, checkboxes, maar re-render niet
   document.getElementById('btn-save').addEventListener('click', () => {
-    // Radiokoze: enkel één waarde
+    // Radiikoze: enkel één waarde
     const selectedRadio = document.querySelector(
       'input[name="jobType"]:checked'
     );

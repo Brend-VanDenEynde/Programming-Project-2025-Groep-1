@@ -1,6 +1,6 @@
 // Admin ingeschreven studenten pagina
 import Router from '../../router.js';
-import { performLogout } from '../../utils/auth-api.js';
+import { logoutUser } from '../../utils/auth-api.js';
 
 export function renderAdminIngeschrevenStudenten(rootElement) {
   // Check if user is logged in
@@ -79,17 +79,15 @@ export function renderAdminIngeschrevenStudenten(rootElement) {
   `;
   // Handle logout
   const logoutBtn = document.getElementById('logout-btn');
-  logoutBtn.addEventListener('click', async () => {
-    try {
-      const result = await performLogout();
-      console.log('Admin logout result:', result);
-      Router.navigate('/admin-login');
-    } catch (error) {
-      console.error('Admin logout error:', error);
-      // Still navigate to login even if logout API fails
-      Router.navigate('/admin-login');
-    }
-  });
+  if (logoutBtn) {
+    logoutBtn.onclick = null;
+    logoutBtn.addEventListener('click', async () => {
+      await logoutUser();
+      window.sessionStorage.clear();
+      localStorage.clear();
+      Router.navigate('/');
+    });
+  }
 
   // Handle navigation between sections
   const navButtons = document.querySelectorAll('.nav-btn');

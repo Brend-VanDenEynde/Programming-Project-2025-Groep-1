@@ -107,10 +107,21 @@ export function renderContact(rootElement) {
 // Functie om alle event listeners en validatie te initialiseren
 function initializeContactPage() {
   // Terug knop functionaliteit
+  // Backbutton: eerst oude event listeners verwijderen
   const backButton = document.getElementById('back-button');
-  backButton.addEventListener('click', () => {
-    window.history.back();
-  });
+  if (backButton) {
+    const newHandler = () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else if (window.appRouter) {
+        window.appRouter.navigate('/', { replace: true });
+      } else {
+        window.location.replace('/');
+      }
+    };
+    backButton.onclick = null;
+    backButton.onclick = newHandler;
+  }
   // Formulier elementen ophalen
   const form = document.getElementById('modernContactForm');
   const emailField = document.getElementById('email');
@@ -324,16 +335,4 @@ function initializeContactPage() {
 
   // Initiële validatie
   validateForm();
-  // FOOTER LINKS
-  document.getElementById('privacy-policy').addEventListener('click', (e) => {
-    e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/privacy');
-    });
-  });
-  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
-    e.preventDefault();
-    window.history.back();
-  });
 }
