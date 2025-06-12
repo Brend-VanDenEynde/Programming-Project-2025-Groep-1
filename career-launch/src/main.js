@@ -21,7 +21,7 @@ import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven
 import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js';
 import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
 import { renderAdminProcessingCompanyDetail } from './pages/admin/admin-processing-company-detail.js';
-import { renderBedrijfProfiel } from './pages/bedrijf/bedrijf-profiel.js';
+import { renderBedrijfProfiel } from './pages/Bedrijf/bedrijf-profiel.js';
 import { renderBedrijfRegister } from './pages/register-bedrijf/bedrijf-register.js';
 import { renderBedrijven } from './pages/student/bedrijven.js';
 
