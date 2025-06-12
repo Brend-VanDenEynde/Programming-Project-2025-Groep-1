@@ -12,21 +12,22 @@ export function renderRegister(rootElement) {
           <h1>Registreren</h1>
           <p>Vermeld je school-email en een wachtwoord voor je account</p>
         </div>
-        
-        <form id="registerForm">
-          <input 
-            type="email" 
-            id="email" 
-            name="email" 
-            required 
-            placeholder="Email"
-            class="register-input full-width"
-          >
-          
+          <form id="registerForm">
           <div class="form-group">
+            <label for="email">Email</label>
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              required 
+              placeholder="Email"
+              class="register-input full-width"
+            >
+          </div>
+            <div class="form-group">
             <label for="passwordInput">Wachtwoord</label>
             <div style="position:relative;display:flex;align-items:center;">
-              <input type="password" id="passwordInput" name="password" required style="flex:1;">
+              <input type="password" id="passwordInput" name="password" required placeholder="Wachtwoord" style="flex:1;">
               <button type="button" id="togglePassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">
                 <img id="togglePasswordIcon" src="src/Icons/hide.png" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
               </button>
@@ -35,7 +36,7 @@ export function renderRegister(rootElement) {
           <div class="form-group">
             <label for="confirmPasswordInput">Bevestig wachtwoord</label>
             <div style="position:relative;display:flex;align-items:center;">
-              <input type="password" id="confirmPasswordInput" name="confirmPassword" required style="flex:1;">
+              <input type="password" id="confirmPasswordInput" name="confirmPassword" required placeholder="Bevestig wachtwoord" style="flex:1;">
               <button type="button" id="toggleConfirmPassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">
                 <img id="toggleConfirmPasswordIcon" src="src/Icons/hide.png" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
               </button>
@@ -55,7 +56,7 @@ export function renderRegister(rootElement) {
             </label>
           </div>
           
-          <label id="error-message" class="error-label" style="color: red; display: none;"></label>
+          <label id="error-message" class="error-label" style="color: red; display: none;" aria-live="polite"></label>
 
           <button type="submit" class="register-btn">Registreer</button>
         </form>
@@ -86,9 +87,14 @@ export function renderRegister(rootElement) {
 
   const form = document.getElementById('registerForm');
   form.addEventListener('submit', handleRegister);
-
   document.getElementById('back-button').addEventListener('click', () => {
-    Router.navigate('/');
+    // Check if there's a previous page in history
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      // Fallback to home if no history
+      Router.navigate('/');
+    }
   });
 
   const loginLink = document.getElementById('login-link');
@@ -118,6 +124,23 @@ export function renderRegister(rootElement) {
   document.body.classList.remove('darkmode');
 
   // Password toggle functionaliteit
+  function setupPasswordToggle(inputId, toggleButtonId, iconId) {
+    const input = document.getElementById(inputId);
+    const toggleButton = document.getElementById(toggleButtonId);
+    const icon = document.getElementById(iconId);
+
+    if (input && toggleButton && icon) {
+      toggleButton.addEventListener('click', () => {
+        const isVisible = input.type === 'text';
+        input.type = isVisible ? 'password' : 'text';
+        icon.src = isVisible
+          ? 'src/Icons/icons8-closed-eye-HIDDEN.png'
+          : 'src/Icons/icons8-closed-eye-CLEAR.png';
+        icon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
+      });
+    }
+  }
+
   const passwordInput = document.getElementById('passwordInput');
   const togglePassword = document.getElementById('togglePassword');
   const togglePasswordIcon = document.getElementById('togglePasswordIcon');
@@ -126,24 +149,43 @@ export function renderRegister(rootElement) {
       const isVisible = passwordInput.type === 'text';
       passwordInput.type = isVisible ? 'password' : 'text';
       togglePasswordIcon.src = isVisible
-         ? 'src/Icons/hide.png'
+        ? 'src/Icons/hide.png'
         : 'src/Icons/eye.png';
-      togglePasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
+      togglePasswordIcon.alt = isVisible
+        ? 'Toon wachtwoord'
+        : 'Verberg wachtwoord';
     });
   }
   const confirmPasswordInput = document.getElementById('confirmPasswordInput');
-  const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
-  const toggleConfirmPasswordIcon = document.getElementById('toggleConfirmPasswordIcon');
-  if (confirmPasswordInput && toggleConfirmPassword && toggleConfirmPasswordIcon) {
+  const toggleConfirmPassword = document.getElementById(
+    'toggleConfirmPassword'
+  );
+  const toggleConfirmPasswordIcon = document.getElementById(
+    'toggleConfirmPasswordIcon'
+  );
+  if (
+    confirmPasswordInput &&
+    toggleConfirmPassword &&
+    toggleConfirmPasswordIcon
+  ) {
     toggleConfirmPassword.addEventListener('click', () => {
       const isVisible = confirmPasswordInput.type === 'text';
       confirmPasswordInput.type = isVisible ? 'password' : 'text';
       toggleConfirmPasswordIcon.src = isVisible
         ? 'src/Icons/icons8-closed-eye-HIDDEN.png'
         : 'src/Icons/icons8-closed-eye-CLEAR.png';
-      toggleConfirmPasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
+      toggleConfirmPasswordIcon.alt = isVisible
+        ? 'Toon wachtwoord'
+        : 'Verberg wachtwoord';
     });
   }
+
+  setupPasswordToggle('passwordInput', 'togglePassword', 'togglePasswordIcon');
+  setupPasswordToggle(
+    'confirmPasswordInput',
+    'toggleConfirmPassword',
+    'toggleConfirmPasswordIcon'
+  );
 }
 
 // Nieuwe handleRegister functie met JSON-structurering en API-call
@@ -166,7 +208,8 @@ function handleRegister(event) {
     return;
   }
   if (formData.get('password').length < 8) {
-    errorMessageLabel.textContent = 'Wachtwoord moet minimaal 8 karakters bevatten!';
+    errorMessageLabel.textContent =
+      'Wachtwoord moet minimaal 8 karakters bevatten!';
     errorMessageLabel.style.display = 'block';
     return;
   }
@@ -176,10 +219,10 @@ function handleRegister(event) {
 
   // Data naar server sturen (voorbeeld)
   if (formData.get('rol') === 'student') {
-      renderStudentRegister(document.getElementById('app'), data);
+    renderStudentRegister(document.getElementById('app'), data);
   } else if (formData.get('rol') === 'bedrijf') {
-      renderBedrijfRegister(document.getElementById('app'), data);
+    renderBedrijfRegister(document.getElementById('app'), data);
   } else {
-      renderLogin(document.getElementById('app'));
+    renderLogin(document.getElementById('app'));
   }
 }
