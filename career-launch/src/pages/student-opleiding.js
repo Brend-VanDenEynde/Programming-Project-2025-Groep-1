@@ -5,31 +5,50 @@ import { apiGet, apiPost } from '../utils/api.js';
 
 export function renderStudentOpleiding(rootElement) {
   rootElement.innerHTML = `
-    <div style="min-height: 100vh; display: flex; flex-direction: column;">
-    <main class="form-container opleiding-container">
-      <button class="back-button" id="back-button">← Terug</button>
+    <div style="min-height: 100vh; display: flex; flex-direction: column; background-color: #f7f9fb;">
+      <button class="back-button-outside" id="back-button">← Terug</button>
+      
+      <main class="form-container opleiding-container">
+        <div class="opleiding-content">
+          <h2 class="opleiding-title">Vertel ons meer over jezelf</h2>
+          
+          <form class="jaarForm" id="jaarForm">
+            <div class="form-section">
+              <h3 class="section-title">Ik ben een</h3>
+              <div class="radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="jaar" value="1">
+                  <span class="radio-text">1ste jaar</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="jaar" value="2">
+                  <span class="radio-text">2de jaar</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="jaar" value="3">
+                  <span class="radio-text">3de jaar</span>
+                </label>
+              </div>
+            </div>
 
-      <form class="jaarForm" id="jaarForm">
-      <h3>Ik ben een</h3>
-        <div class="radio-group">
-          <label><input type="radio" name="jaar" value="1"> 1ste jaar</label>
-          <label><input type="radio" name="jaar" value="2"> 2de jaar</label>
-          <label><input type="radio" name="jaar" value="3"> 3de jaar</label>
-        </div>      <select class="opleiding-select" name="opleiding">
+            <div class="form-section">
+              <label class="select-label">Selecteer je opleiding</label>
+              <select class="opleiding-select" name="opleiding">
+              </select>
+            </div>
 
-      </select>
+            <label id="error-label" class="error-label" style="color: #e74c3c; display: none; margin-top: 1rem; text-align: center;"></label>
+            
+            <button type="submit" class="create-account-button">Account Aanmaken</button>
+          </form>
+        </div>
+      </main>
 
-      <label id="error-label" class="error-label" style="color: red; display: none;"></label>
-      <label id="footer-error-label" class="error-label" style="color: red; display: none;"></label>
-
-      <button class="save-button">Account Aanmaken</button>
-      </form>
-    </main>
-
-    <footer class="footer">
-      <a href="#" id="privacy-link">Privacy Policy</a> | <a href="#" id="contact-link">Contacteer Ons</a>
-    </footer>
-  </div>
+      <footer class="footer">
+        <a href="#" id="privacy-link">Privacy Policy</a> | <a href="#" id="contact-link">Contacteer Ons</a>
+        <label id="footer-error-label" class="error-label" style="color: #e74c3c; display: none; margin-top: 0.5rem;"></label>
+      </footer>
+    </div>
   `;
 
   const form = document.getElementById('jaarForm');
