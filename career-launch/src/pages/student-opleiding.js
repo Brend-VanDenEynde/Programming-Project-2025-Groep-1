@@ -34,9 +34,14 @@ export function renderStudentOpleiding(rootElement) {
 
   const form = document.getElementById('jaarForm');
   form.addEventListener('submit', handleJaarRegister);
-
   document.getElementById('back-button').addEventListener('click', () => {
-    Router.navigate('/Student-Register');
+    // Check if there's a previous page in history
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      // Fallback to register if no history
+      Router.navigate('/registreer');
+    }
   });
 
   // Footer links

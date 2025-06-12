@@ -87,9 +87,14 @@ export function renderRegister(rootElement) {
 
   const form = document.getElementById('registerForm');
   form.addEventListener('submit', handleRegister);
-
   document.getElementById('back-button').addEventListener('click', () => {
-    Router.navigate('/');
+    // Check if there's a previous page in history
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      // Fallback to home if no history
+      Router.navigate('/');
+    }
   });
 
   const loginLink = document.getElementById('login-link');
