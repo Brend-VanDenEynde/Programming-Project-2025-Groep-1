@@ -6,9 +6,9 @@ import defaultAvatar from '../../images/default.png';
 import { logoutUser } from '../../utils/auth-api.js';
 
 const defaultProfile = {
-  voornaam: 'Voornaam',
-  achternaam: 'Achternaam',
-  email: 'student@voorbeeld.com',
+  voornaam: '',
+  achternaam: '',
+  email: '',
   studiejaar: '1',
   profiel_foto: defaultAvatar,
   linkedin: '',
@@ -108,25 +108,25 @@ export function renderStudentProfiel(
               </div>
               <div class="student-profile-form-group">
                 <label for="firstNameInput">Voornaam</label>
-                <input type="text" id="firstNameInput" value="${voornaam}" required ${
+                <input type="text" id="firstNameInput" value="${voornaam}" placeholder="voornaam" required ${
     readonlyMode ? 'disabled' : ''
   }>
               </div>
               <div class="student-profile-form-group">
                 <label for="lastNameInput">Achternaam</label>
-                <input type="text" id="lastNameInput" value="${achternaam}" required ${
+                <input type="text" id="lastNameInput" value="${achternaam}" placeholder="achternaam" required ${
     readonlyMode ? 'disabled' : ''
   }>
               </div>
               <div class="student-profile-form-group">
                 <label for="emailInput">E-mailadres</label>
-                <input type="email" id="emailInput" value="${email}" required ${
+                <input type="email" id="emailInput" value="${email}" placeholder="e-mailadres" required ${
     readonlyMode ? 'disabled' : ''
   }>
               </div>
               <div class="student-profile-form-group">
                 <label for="studyProgramInput">Studieprogramma</label>
-                <input type="text" id="studyProgramInput" value="${opleidingNaam}" disabled ${
+                <input type="text" id="studyProgramInput" value="${opleidingNaam}" placeholder="opleiding" disabled ${
     !readonlyMode ? 'style="display:none;"' : ''
   }>
                 ${
@@ -161,13 +161,14 @@ export function renderStudentProfiel(
               </div>
               <div class="student-profile-form-group">
                 <label for="birthDateInput">Geboortedatum</label>
-                <input type="date" id="birthDateInput" value="${geboortedatum}" ${
+                <input type="date" id="birthDateInput" value="${geboortedatum}" placeholder="geboortedatum" ${
     readonlyMode ? 'disabled' : ''
   }>
+                <div id="birthDateError" style="color: red; font-size: 0.9em; min-height: 1.2em;"></div>
               </div>
               <div class="student-profile-form-group">
                 <label for="linkedinInput">LinkedIn-link</label>
-                <input type="url" id="linkedinInput" value="${linkedin}" ${
+                <input type="url" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/in/jouwprofiel" ${
     readonlyMode ? 'disabled' : ''
   }>
               </div>
@@ -347,10 +348,19 @@ export function renderStudentProfiel(
         }
         // Debug: log de gebruikte ID's en token
         console.log('studentData:', studentData, 'studentID:', studentID, 'userID:', userID, 'token:', token);
-        // Check geboortedatum niet in de toekomst
-        const today = new Date().toISOString().split('T')[0];
-        if (updatedStudentData.date_of_birth > today) {
-          alert('Geboortedatum mag niet in de toekomst liggen.');
+        // Check geboortedatum niet in de toekomst en minstens 17 jaar oud
+        const today = new Date();
+        const minBirthDate = new Date(today.getFullYear() - 17, today.getMonth(), today.getDate());
+        const inputBirthDate = new Date(updatedStudentData.date_of_birth);
+        // Inline validatie geboortedatum
+        const birthDateError = document.getElementById('birthDateError');
+        birthDateError.textContent = '';
+        if (updatedStudentData.date_of_birth > today.toISOString().split('T')[0]) {
+          birthDateError.textContent = 'Geboortedatum mag niet in de toekomst liggen.';
+          return;
+        }
+        if (inputBirthDate > minBirthDate) {
+          birthDateError.textContent = 'Je moet minstens 17 jaar oud zijn.';
           return;
         }
         try {
@@ -411,7 +421,16 @@ export function renderStudentProfiel(
     const resetBtn = document.getElementById('btn-reset-profile');
     if (resetBtn) {
       resetBtn.addEventListener('click', () => {
-        renderStudentProfiel(rootElement, originalData, false);
+        // Maak een nieuw object met default waarden, behalve email en geboortedatum
+        const today = new Date().toISOString().split('T')[0];
+        const resetData = {
+          ...defaultProfile,
+          email: '',
+          date_of_birth: today,
+          gebruiker_id: originalData.gebruiker_id,
+          opleiding_id: '', // forceer selectie
+        };
+        renderStudentProfiel(rootElement, resetData, false);
       });
     }
   }
