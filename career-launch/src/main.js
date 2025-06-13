@@ -21,6 +21,7 @@ import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven
 import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js';
 import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
 import { renderAdminProcessingCompanyDetail } from './pages/Admin/admin-dashboard.js';
+import { renderBedrijfProfiel } from './pages/bedrijf/bedrijf-profiel.js';
 
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
@@ -57,6 +58,7 @@ const routes = {
   '/Student/Student-Speeddates': renderSpeeddates,
   '/Student/Student-Speeddates-Verzoeken': renderSpeeddatesRequests,
   '/Student/Student-Settings': showSettingsPopup,
+  '/Bedrijf/Bedrijf-Profiel': renderBedrijfProfiel,
 };
 
 const router = new Router(routes);
