@@ -95,3 +95,17 @@ export async function saveSearchCriteria(studentId, criteria) {
     throw error;
   }
 }
+
+/**
+ * Delete a user account (admin only)
+ * @param {number} userId - The user ID to delete
+ * @returns {Promise<Object>} Response from server
+ */
+export async function deleteUser(userId) {
+  try {
+    const response = await apiDelete(`https://api.ehb-match.me/user/${userId}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
