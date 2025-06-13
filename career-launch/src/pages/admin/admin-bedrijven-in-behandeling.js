@@ -77,12 +77,15 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
   // Fetch unapproved companies from API
   const accessToken = sessionStorage.getItem('accessToken');
   try {
-    const response = await fetch('https://api.ehb-match.me/bedrijven/nietgoedgekeurd', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
+    const response = await fetch(
+      'https://api.ehb-match.me/bedrijven/nietgoedgekeurd',
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
 
     const companies = await response.json();
 
@@ -91,12 +94,16 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
 
     // Ensure data-company-id is correctly set when rendering companies
     if (companies.length === 0) {
-      companyListContainer.innerHTML = '<p>Geen bedrijven gevonden die zich hebben ingeschreven.</p>';
+      companyListContainer.innerHTML =
+        '<p>Geen bedrijven gevonden die zich hebben ingeschreven.</p>';
     } else {
       companies.forEach((company) => {
         const companyItem = document.createElement('div');
         companyItem.className = 'processing-item clickable-processing';
-        companyItem.setAttribute('data-company-id', company.gebruiker_id || 'unknown'); // Gebruik gebruiker_id als ID
+        companyItem.setAttribute(
+          'data-company-id',
+          company.gebruiker_id || 'unknown'
+        ); // Gebruik gebruiker_id als ID
 
         companyItem.innerHTML = `
           <span class="processing-company-name">${company.naam}</span>
@@ -151,7 +158,9 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
   const rejectButtons = document.querySelectorAll('.reject-btn');
 
   // Update click event listener for processing items to use the correct route
-  const clickableProcessingItems = document.querySelectorAll('.clickable-processing');
+  const clickableProcessingItems = document.querySelectorAll(
+    '.clickable-processing'
+  );
   clickableProcessingItems.forEach((item) => {
     item.addEventListener('click', (e) => {
       // Prevent navigation if clicking on action buttons
@@ -170,7 +179,9 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
         );
       } else {
         alert('Fout: Bedrijfs-ID ontbreekt. Neem contact op met de beheerder.');
-        console.error('Company ID is missing or undefined for the clicked item.');
+        console.error(
+          'Company ID is missing or undefined for the clicked item.'
+        );
       }
     });
   });
@@ -179,25 +190,91 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
   document.querySelectorAll('.clickable-company').forEach((companyItem) => {
     companyItem.addEventListener('click', () => {
       const companyId = companyItem.dataset.companyId;
-      Router.navigate(`/admin-dashboard/processing-company-detail?id=${companyId}`);
+      Router.navigate(
+        `/admin-dashboard/processing-company-detail?id=${companyId}`
+      );
     });
   });
-
   approveButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const companyName = btn.dataset.company;
-      if (confirm(`Weet je zeker dat je ${companyName} wilt goedkeuren?`)) {
-        // Remove the item from the list
-        btn.closest('.processing-item').remove();
-        alert(
-          `${companyName} is goedgekeurd en toegevoegd aan ingeschreven bedrijven.`
-        );
+      const companyItem = btn.closest('.processing-item');
+      const companyId = companyItem.getAttribute('data-company-id');
 
-        // Check if list is empty
-        const processingList = document.querySelector('.processing-list');
-        if (processingList.children.length === 0) {
-          processingList.innerHTML =
-            '<div class="empty-state"><p>Geen bedrijven in behandeling</p></div>';
+      if (!companyId || companyId === 'unknown') {
+        alert('Fout: Bedrijfs-ID ontbreekt. Kan het bedrijf niet goedkeuren.');
+        return;
+      }
+
+      if (confirm(`Weet je zeker dat je ${companyName} wilt goedkeuren?`)) {
+        try {
+          // Disable the button to prevent double-clicks
+          btn.disabled = true;
+          btn.textContent = '...';
+
+          // Call the API to approve the company
+          const accessToken = sessionStorage.getItem('accessToken');
+          const response = await fetch(
+            `https://api.ehb-match.me/bedrijven/keur/${companyId}`,
+            {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+
+          if (response.ok) {
+            const result = await response.json();
+            console.log('Company approved successfully:', result);
+
+            // Remove the item from the list
+            companyItem.remove();
+            alert(
+              `${companyName} is goedgekeurd en toegevoegd aan ingeschreven bedrijven.`
+            );
+
+            // Check if list is empty
+            const processingList = document.querySelector('.processing-list');
+            if (processingList.children.length === 0) {
+              processingList.innerHTML =
+                '<div class="empty-state"><p>Geen bedrijven in behandeling</p></div>';
+            }
+          } else {
+            // Handle error responses
+            let errorMessage =
+              'Er is een fout opgetreden bij het goedkeuren van het bedrijf.';
+
+            try {
+              const errorData = await response.json();
+              if (errorData.message) {
+                errorMessage = errorData.message;
+              }
+            } catch (e) {
+              // If we can't parse the error, use default message
+            }
+
+            if (response.status === 403) {
+              errorMessage =
+                'Je hebt geen toestemming om bedrijven goed te keuren.';
+            } else if (response.status === 404) {
+              errorMessage = 'Het bedrijf werd niet gevonden.';
+            }
+
+            alert(errorMessage);
+
+            // Re-enable the button
+            btn.disabled = false;
+            btn.textContent = '✓';
+          }
+        } catch (error) {
+          console.error('Error approving company:', error);
+          alert('Er is een netwerkfout opgetreden. Probeer het later opnieuw.');
+
+          // Re-enable the button
+          btn.disabled = false;
+          btn.textContent = '✓';
         }
       }
     });
