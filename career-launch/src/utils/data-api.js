@@ -109,3 +109,32 @@ export async function deleteUser(userId) {
     throw error;
   }
 }
+
+/**
+ * Register a new company
+ * @param {Object} companyData - The company registration data
+ * @returns {Promise<Object>} Registration response from server
+ */
+export async function registerCompany(companyData) {
+  try {
+    const response = await fetch(
+      'https://api.ehb-match.me/auth/register/bedrijf',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(companyData),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Company registration failed');
+    }
+
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+}
