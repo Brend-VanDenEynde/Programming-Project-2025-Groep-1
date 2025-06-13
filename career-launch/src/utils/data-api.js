@@ -61,6 +61,19 @@ export async function fetchCompanies() {
 }
 
 /**
+ * Fetch only approved companies from the API
+ * @returns {Promise<Array>} Array of approved companies
+ */
+export async function fetchApprovedCompanies() {
+  try {
+    const companies = await apiGet('https://api.ehb-match.me/bedrijven/goedgekeurd');
+    return companies;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
  * Update student profile data
  * @param {string} studentId - The student ID
  * @param {Object} profileData - The updated profile data
