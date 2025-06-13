@@ -164,7 +164,7 @@ export async function apiPut(url, data = null, options = {}) {
  * Makes a DELETE request with automatic token refresh
  * @param {string} url - The API endpoint URL
  * @param {Object} options - Additional fetch options
- * @returns {Promise<Object>} The JSON response data
+ * @returns {Promise<Object>} The JSON response data or empty object for 204
  */
 export async function apiDelete(url, options = {}) {
   const response = await authenticatedFetch(url, {
@@ -178,7 +178,18 @@ export async function apiDelete(url, options = {}) {
     );
   }
 
-  return await response.json();
+  // Handle 204 No Content response (successful deletion)
+  if (response.status === 204) {
+    return { success: true, message: 'Resource deleted successfully' };
+  }
+
+  // For other successful responses, try to parse JSON
+  const contentType = response.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    return await response.json();
+  }
+  // If no JSON content, return success object
+  return { success: true, message: 'Operation completed successfully' };
 }
 
 /**

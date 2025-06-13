@@ -1,6 +1,8 @@
 // Admin company detail pagina
 import Router from '../../router.js';
 import defaultCompanyLogo from '../../images/BedrijfDefault.jpg';
+import { logoutUser } from '../../utils/auth-api.js';
+import { deleteUser } from '../../utils/data-api.js';
 
 export function renderAdminCompanyDetail(rootElement) {
   // Check if user is logged in
@@ -134,6 +136,7 @@ function getCompanyData(companyId) {
   // Mock data - in real app this would fetch from API
   const companyDatabase = {
     carrefour: {
+      userId: 201,
       name: 'Carrefour',
       email: 'contact@carrefour.be',
       location: 'Brussel',
@@ -143,6 +146,7 @@ function getCompanyData(companyId) {
       lastLogin: '2024-12-08',
     },
     delhaize: {
+      userId: 202,
       name: 'Delhaize',
       email: 'hr@delhaize.be',
       location: 'Antwerpen',
@@ -152,6 +156,7 @@ function getCompanyData(companyId) {
       lastLogin: '2024-12-07',
     },
     colruyt: {
+      userId: 203,
       name: 'Colruyt',
       email: 'jobs@colruyt.com',
       location: 'Gent',
@@ -161,6 +166,7 @@ function getCompanyData(companyId) {
       lastLogin: '2024-12-06',
     },
     proximus: {
+      userId: 204,
       name: 'Proximus',
       email: 'careers@proximus.be',
       location: 'Brussel',
@@ -170,15 +176,16 @@ function getCompanyData(companyId) {
       lastLogin: '2024-12-09',
     },
     kbc: {
+      userId: 205,
       name: 'KBC Bank',
       email: 'talent@kbc.be',
       location: 'Leuven',
       logoUrl: null,
       registrationDate: '2024-10-15',
       status: 'Actief',
-      lastLogin: '2024-12-08',
-    },
+      lastLogin: '2024-12-08',    },
     demo: {
+      userId: 999,
       name: 'Demo Bedrijf',
       email: 'demo@bedrijf.be',
       location: 'Demo Stad',
@@ -249,11 +256,40 @@ function setupEventHandlers() {
   speedDatesBtn.addEventListener('click', () => {
     openSpeedDatesModal();
   });
-
   const deleteBtn = document.getElementById('delete-company-btn');
-  deleteBtn.addEventListener('click', () => {
+  deleteBtn.addEventListener('click', async () => {
     if (confirm('Weet je zeker dat je dit bedrijf wilt verwijderen?')) {
-      alert('Bedrijf verwijdering zou hier geïmplementeerd worden.');
+      try {
+        // Get current company ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const companyId = urlParams.get('id') || 'demo';
+        
+        // Get company data to access user ID (in real app this would be the actual user ID)
+        const companyData = getCompanyData(companyId);
+        
+        // In a real implementation, you would use the actual user ID from the company data
+        // For demo purposes, we'll use a mock ID
+        const userId = companyData.userId || 2; // This should be the actual user ID from your database
+        
+        // Call the delete API
+        await deleteUser(userId);
+        
+        alert('Bedrijf succesvol verwijderd.');
+        
+        // Navigate back to companies overview
+        Router.navigate('/admin-dashboard/ingeschreven-bedrijven');
+      } catch (error) {
+        console.error('Error deleting company:', error);
+        
+        // Handle different error types
+        if (error.message.includes('403')) {
+          alert('Je hebt geen toestemming om dit bedrijf te verwijderen.');
+        } else if (error.message.includes('404')) {
+          alert('Bedrijf niet gevonden.');
+        } else {
+          alert('Er is een fout opgetreden bij het verwijderen van het bedrijf. Probeer het opnieuw.');
+        }
+      }
     }
   });
 
