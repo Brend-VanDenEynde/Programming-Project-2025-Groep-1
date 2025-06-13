@@ -51,7 +51,8 @@ const routes = {
     renderAdminBedrijvenInBehandeling,
   '/admin-dashboard/student-detail': renderAdminStudentDetail,
   '/admin-dashboard/company-detail': renderAdminCompanyDetail,
-  '/admin-dashboard/processing-company-detail': renderAdminProcessingCompanyDetail,
+  '/admin-dashboard/processing-company-detail':
+    renderAdminProcessingCompanyDetail,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
   '/student/student-qr-popup': renderQRPopup,
