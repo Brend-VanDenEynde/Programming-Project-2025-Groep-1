@@ -1,7 +1,7 @@
 // Verwijder ongeldige import en alle t()/setLanguage() functies
 
 // Main renderfunctie:
-export function showSettingsPopup(onClose) {
+export function showBedrijfSettingsPopup(onClose) {
   // Voeg popup-styles toe
   if (!document.getElementById('settings-popup-style')) {
     const style = document.createElement('style');

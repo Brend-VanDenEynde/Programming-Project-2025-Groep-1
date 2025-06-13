@@ -1,5 +1,5 @@
 import { renderLogin } from '../login.js';
-import { showSettingsPopup } from './bedrijf-settings.js';
+import { showBedrijfSettingsPopup } from './bedrijf-settings.js';
 import logoIcon from '../../Icons/favicon-32x32.png';
 
 // defaultProfile gebruikt nu ook enkel NL velden!
@@ -47,7 +47,7 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="bedrijven" class="sidebar-link">Bedrijven</button></li>
+            <li><button data-route="Studenten" class="sidebar-link">Studenten</button></li>
             <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
           </ul>
         </nav>
@@ -131,10 +131,10 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
           import('./search-criteria-bedrijf.js').then(m => m.renderSearchCriteriaBedrijf(rootElement, bedrijfData));
           break;
         case 'speeddates':
-          import('./bedrijf-speeddates.js').then(m => m.renderSpeeddates(rootElement, bedrijfData));
+          import('./bedrijf-speeddates.js').then(m => m.renderBedrijfSpeeddates(rootElement, bedrijfData));
           break;
         case 'requests':
-          import('./bedrijf-speeddates-verzoeken.js').then(m => m.renderSpeeddatesRequests(rootElement, bedrijfData));
+          import('./bedrijf-speeddates-verzoeken.js').then(m => m.renderBedrijfSpeeddatesRequests(rootElement, bedrijfData));
           break;
         case 'studenten':
           import('./studenten.js').then(m => m.renderStudenten(rootElement, bedrijfData));
@@ -170,7 +170,7 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
     });
     document.getElementById('nav-settings').addEventListener('click', () => {
       dropdown.classList.remove('open');
-      showSettingsPopup(() => renderBedrijfProfiel(rootElement, bedrijfData));
+      showBedrijfSettingsPopup(() => renderBedrijfProfiel(rootElement, bedrijfData));
     });
     document.getElementById('nav-logout').addEventListener('click', () => {
       dropdown.classList.remove('open');

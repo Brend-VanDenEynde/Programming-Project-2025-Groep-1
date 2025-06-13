@@ -82,6 +82,10 @@ class Router {
       '/Student-Opleiding': 'Student Opleiding - Career Launch 2025',
       '/Student-Skills': 'Student Skills - Career Launch 2025',
       '/Bedrijf-Register': 'Bedrijf Registreren - Career Launch 2025',
+      '/Bedrijf/Bedrijf-QR-Popup': 'Bedrijf QR-code - Career Launch 2025',
+      '/Bedrijf/Bedrijf-Speeddates': 'Bedrijf Speeddates - Career Launch 2025',
+      '/Bedrijf/Bedrijf-Speeddates-Verzoeken': 'Bedrijf Speeddates Verzoeken - Career Launch 2025',
+      '/Bedrijf/Bedrijf-Settings': 'Bedrijf Instellingen - Career Launch 2025',
     };
     document.title = titles[path] || 'Career Launch 2025';
   }

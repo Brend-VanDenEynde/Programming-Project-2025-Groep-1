@@ -3,11 +3,11 @@ import logoIcon from '../../Icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderBedrijfProfiel } from './bedrijf-profiel.js';
 import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
-import { renderSpeeddatesRequests } from './bedrijf-speeddates-verzoeken.js';
-import { renderQRPopup } from './bedrijf-qr-popup.js';
-import { showSettingsPopup } from './bedrijf-settings.js';
+import { renderBedrijfSpeeddatesRequests } from './bedrijf-speeddates-verzoeken.js';
+import { renderBedrijfQRPopup } from './bedrijf-qr-popup.js';
+import { showBedrijfSettingsPopup } from './bedrijf-settings.js';
 
-export function renderSpeeddates(rootElement, bedrijfData = {}) {
+export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
   const speeddates = [
     {
       bedrijf: 'Web & Co',
@@ -64,7 +64,7 @@ export function renderSpeeddates(rootElement, bedrijfData = {}) {
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link active">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="bedrijven" class="sidebar-link">Bedrijven</button></li>
+            <li><button data-route="studenten" class="sidebar-link">Student</button></li>
             <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
           </ul>
         </nav>
@@ -128,13 +128,13 @@ export function renderSpeeddates(rootElement, bedrijfData = {}) {
           renderSearchCriteriaBedrijf(rootElement, bedrijfData);
           break;
         case 'speeddates':
-          renderSpeeddates(rootElement, bedrijfData);
+          renderBedrijfSpeeddates(rootElement, bedrijfData);
           break;
         case 'requests':
-          renderSpeeddatesRequests(rootElement, bedrijfData);
+          renderBedrijfSpeeddatesRequests(rootElement, bedrijfData);
           break;
-        case 'bedrijven':
-          import('./bedrijven.js').then(m => m.renderBedrijven(rootElement, bedrijfData));
+        case 'studenten':
+          import('./studenten.js').then(m => m.renderStudenten(rootElement, bedrijfData));
           break;
         case 'qr':
           renderQRPopup(rootElement, bedrijfData);
@@ -166,7 +166,7 @@ export function renderSpeeddates(rootElement, bedrijfData = {}) {
     });
     document.getElementById('nav-settings').addEventListener('click', () => {
       dropdown.classList.remove('open');
-      showSettingsPopup(() => renderSpeeddates(rootElement, bedrijfData));
+      showBedrijfSettingsPopup(() => renderBedrijfSpeeddates(rootElement, bedrijfData));
     });
     document.getElementById('nav-logout').addEventListener('click', () => {
       dropdown.classList.remove('open');

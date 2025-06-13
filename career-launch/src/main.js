@@ -22,6 +22,11 @@ import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js'
 import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
 import { renderAdminProcessingCompanyDetail } from './pages/Admin/admin-dashboard.js';
 import { renderBedrijfProfiel } from './pages/bedrijf/bedrijf-profiel.js';
+import { renderSearchCriteriaBedrijf } from './pages/bedrijf/search-criteria-bedrijf.js';
+import { renderBedrijfQRPopup } from './pages/bedrijf/bedrijf-qr-popup.js';
+import { renderBedrijfSpeeddates } from './pages/bedrijf/bedrijf-speeddates.js';
+import { renderBedrijfSpeeddatesRequests } from './pages/bedrijf/bedrijf-speeddates-verzoeken.js';
+import { showBedrijfSettingsPopup } from './pages/bedrijf/bedrijf-settings.js';
 
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
@@ -59,6 +64,11 @@ const routes = {
   '/Student/Student-Speeddates-Verzoeken': renderSpeeddatesRequests,
   '/Student/Student-Settings': showSettingsPopup,
   '/Bedrijf/Bedrijf-Profiel': renderBedrijfProfiel,
+  '/Bedrijf/Zoek-Criteria': renderSearchCriteriaBedrijf,
+  '/Bedrijf/Bedrijf-QR-Popup': renderBedrijfQRPopup,
+  '/Bedrijf/Bedrijf-Speeddates': renderBedrijfSpeeddates,
+  '/Bedrijf/Bedrijf-Speeddates-Verzoeken': renderBedrijfSpeeddatesRequests,
+  '/Bedrijf/Bedrijf-Settings': showBedrijfSettingsPopup,
 };
 
 const router = new Router(routes);

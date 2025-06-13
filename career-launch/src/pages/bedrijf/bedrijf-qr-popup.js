@@ -2,15 +2,15 @@ import logoIcon from '../../Icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderBedrijfProfiel } from './bedrijf-profiel.js';
 import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
-import { renderSpeeddates } from './bedrijf-speeddates.js';
-import { renderSpeeddatesRequests } from './bedrijf-speeddates-verzoeken.js';
-import { showSettingsPopup } from './bedrijf-settings.js';
+import { renderBedrijfSpeeddates } from './bedrijf-speeddates.js';
+import { renderBedrijfSpeeddatesRequests } from './bedrijf-speeddates-verzoeken.js';
+import { showBedrijfSettingsPopup } from './bedrijf-settings.js';
 
 const defaultAvatar = '/src/Images/default.jpg';
 
 // src/views/bedrijf-qr-popup.js
 
-export function renderQRPopup(rootElement, bedrijfData = {}) {
+export function renderBedrijfQRPopup(rootElement, bedrijfData = {}) {
   rootElement.innerHTML = `
     <div class="bedrijf-profile-container">
       <header class="bedrijf-profile-header">
@@ -31,7 +31,7 @@ export function renderQRPopup(rootElement, bedrijfData = {}) {
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="bedrijven" class="sidebar-link">Bedrijven</button></li>
+            <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
             <li><button data-route="qr" class="sidebar-link active">QR-code</button></li>
           </ul>
         </nav>
@@ -39,7 +39,7 @@ export function renderQRPopup(rootElement, bedrijfData = {}) {
           <div class="bedrijf-profile-form-container">
             <h1 class="bedrijf-profile-title">Jouw QR-code</h1>
             <div class="qr-code-section">
-              <div class="qr-code-label">Laat deze QR-code scannen door bedrijven of tijdens events</div>
+              <div class="qr-code-label">Laat deze QR-code scannen door studenten of tijdens events</div>
               <img src="${defaultAvatar}" alt="QR code" class="qr-code-img" id="qr-code-img">
             </div>
           </div>
@@ -74,11 +74,11 @@ export function renderQRPopup(rootElement, bedrijfData = {}) {
         case 'requests':
           renderSpeeddatesRequests(rootElement, bedrijfData);
           break;
-        case 'bedrijven':
-          import('./bedrijven.js').then(m => m.renderBedrijven(rootElement, bedrijfData));
+        case 'studenten':
+          import('./studenten.js').then(m => m.renderStudenten(rootElement, bedrijfData));
           break;
         case 'qr':
-          renderQRPopup(rootElement, bedrijfData);
+          renderBedrijfQRPopup(rootElement, bedrijfData);
           break;
       }
     });
@@ -103,12 +103,12 @@ export function renderQRPopup(rootElement, bedrijfData = {}) {
         !dropdown.contains(event.target) &&
         event.target !== burger
       ) {
-        dropdown.classList.remove('open');
+        dropdown.classList.remove('open'); 
       }
     });
     document.getElementById('nav-settings').addEventListener('click', () => {
       dropdown.classList.remove('open');
-      showSettingsPopup(() => renderQRPopup(rootElement, bedrijfData));
+      showBedrijfSettingsPopup(() => renderBedrijfQRPopup(rootElement, bedrijfData));
     });
     document.getElementById('nav-logout').addEventListener('click', () => {
       dropdown.classList.remove('open');
