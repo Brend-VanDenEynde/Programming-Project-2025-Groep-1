@@ -2,7 +2,8 @@
 import Router from '../../router.js';
 import { performLogout } from '../../utils/auth-api.js';
 
-export function renderAdminProcessingCompanyDetail(rootElement) {
+// Make the render function async to support await
+export async function renderAdminProcessingCompanyDetail(rootElement) {
   // Check if user is logged in
   const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
   const adminUsername = sessionStorage.getItem('adminUsername');
@@ -15,34 +16,6 @@ export function renderAdminProcessingCompanyDetail(rootElement) {
   // Get company ID from URL params
   const urlParams = new URLSearchParams(window.location.search);
   const companyId = urlParams.get('id');
-  // Mock company data - in real app this would come from database
-  const companyData = {
-    carrefour: {
-      name: 'Carrefour',
-      email: 'hr@carrefour.be',
-      location: 'Brussel, België',
-      linkedin: 'https://www.linkedin.com/company/carrefour',
-    },
-    mediamarkt: {
-      name: 'MediaMarkt',
-      email: 'recruitment@mediamarkt.be',
-      location: 'Vilvoorde, België',
-      linkedin: 'https://www.linkedin.com/company/mediamarkt',
-    },
-    'bol.com': {
-      name: 'Bol.com',
-      email: 'jobs@bol.com',
-      location: 'Utrecht, Nederland',
-      linkedin: 'https://www.linkedin.com/company/bol-com',
-    },
-  };
-
-  const company = companyData[companyId] || {
-    name: 'Onbekend Bedrijf',
-    email: 'onbekend@email.com',
-    location: 'Onbekende locatie',
-    linkedin: '#',
-  };
 
   rootElement.innerHTML = `
     <div class="admin-dashboard-clean">
@@ -71,7 +44,7 @@ export function renderAdminProcessingCompanyDetail(rootElement) {
           <main class="admin-content-clean">
           <div class="admin-section-header">
             <button id="back-btn" class="back-btn">← Terug naar overzicht</button>
-            <h1 id="section-title">Bedrijf in Behandeling - ${company.name}</h1>
+            <h1 id="section-title">Bedrijf in Behandeling</h1>
           </div><div class="admin-content-area" id="content-area">
             <div class="detail-container">
               <div class="detail-main-layout">
@@ -89,18 +62,18 @@ export function renderAdminProcessingCompanyDetail(rootElement) {
                   <div class="detail-info">
                     <div class="detail-field">
                       <label>Naam:</label>
-                      <span>${company.name}</span>
+                      <span></span>
                     </div>
                     
                     <div class="detail-field">
                       <label>Locatie:</label>
-                      <span>${company.location}</span>
+                      <span></span>
                     </div>
                     
                     <div class="detail-field">
                       <label>LinkedIn:</label>
                       <span>
-                        <a href="${company.linkedin}" target="_blank" class="linkedin-link">${company.linkedin}</a>
+                        <a href="#" target="_blank" class="linkedin-link"></a>
                       </span>
                     </div>
                   </div>
@@ -126,6 +99,52 @@ export function renderAdminProcessingCompanyDetail(rootElement) {
       </footer>
     </div>
   `;
+  // Fetch company data from API
+  const accessToken = sessionStorage.getItem('accessToken');
+  try {
+    const response = await fetch(`https://api.ehb-match.me/bedrijven/${companyId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch company data');
+    }
+
+    const company = await response.json();
+
+    // Update the page with company data
+    document.querySelector('#section-title').textContent = `Bedrijf in Behandeling - ${company.naam}`;
+    document.querySelector('.detail-logo-section img').src = company.profiel_foto || 'src/Images/BedrijfDefault.jpg';
+    document.querySelector('.detail-info').innerHTML = `
+      <div class="detail-field">
+        <label>Naam:</label>
+        <span>${company.naam}</span>
+      </div>
+      <div class="detail-field">
+        <label>Locatie:</label>
+        <span>${company.plaats || 'Niet beschikbaar'}</span>
+      </div>
+      <div class="detail-field">
+        <label>LinkedIn:</label>
+        <span>${company.linkedin ? `<a href="https://www.linkedin.com/in/${company.linkedin}" target="_blank">${company.linkedin}</a>` : 'Niet ingesteld'}</span>
+      </div>
+    `;
+
+    // Update contact button
+    const contactBtn = document.getElementById('contact-btn');
+    contactBtn.addEventListener('click', () => {
+      const mailtoLink = `mailto:${company.contact_email}`;
+      window.location.href = mailtoLink;
+    });
+  } catch (error) {
+    console.error('Error fetching company details:', error);
+    document.querySelector('#section-title').textContent = 'Er is een probleem. Probeer opnieuw.';
+    document.querySelector('.detail-info').innerHTML = '<p>Er is een probleem met het ophalen van de bedrijfsgegevens. Probeer het later opnieuw.</p>';
+  }
+
   // Handle logout
   const logoutBtn = document.getElementById('logout-btn');
   logoutBtn.addEventListener('click', async () => {
@@ -173,15 +192,8 @@ export function renderAdminProcessingCompanyDetail(rootElement) {
   });
 
   // Handle action buttons
-  const contactBtn = document.getElementById('contact-btn');
   const acceptBtn = document.getElementById('accept-btn');
   const rejectBtn = document.getElementById('reject-btn');
-  contactBtn.addEventListener('click', () => {
-    // Create mailto link and open it
-    const mailtoLink = `mailto:${company.email}`;
-    window.location.href = mailtoLink;
-  });
-
   acceptBtn.addEventListener('click', () => {
     if (confirm(`Weet je zeker dat je ${company.name} wilt accepteren?`)) {
       alert(

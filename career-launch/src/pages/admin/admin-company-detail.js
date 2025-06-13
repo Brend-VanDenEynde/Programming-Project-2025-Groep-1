@@ -2,7 +2,7 @@
 import Router from '../../router.js';
 import defaultCompanyLogo from '../../Images/BedrijfDefault.jpg';
 
-export function renderAdminCompanyDetail(rootElement) {
+export async function renderAdminCompanyDetail(rootElement) {
   // Check if user is logged in
   const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
   const adminUsername = sessionStorage.getItem('adminUsername');
@@ -124,6 +124,54 @@ export function renderAdminCompanyDetail(rootElement) {
     </div>
   `;
 
+  // Fetch company data from API
+  const accessToken = sessionStorage.getItem('accessToken');
+  try {
+    const response = await fetch(`https://api.ehb-match.me/bedrijven/${companyId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch company data');
+    }
+
+    const companyData = await response.json();
+
+    // Update the page with company data
+    document.querySelector('#section-title').textContent = `Bedrijf Details: ${companyData.naam}`;
+    document.querySelector('.detail-logo-section img').src = companyData.profiel_foto || defaultCompanyLogo;
+    document.querySelector('.detail-info').innerHTML = `
+      <div class="detail-field">
+        <label>Naam:</label>
+        <span>${companyData.naam}</span>
+      </div>
+      <div class="detail-field">
+        <label>Locatie:</label>
+        <span>${companyData.plaats || 'Niet beschikbaar'}</span>
+      </div>
+      <div class="detail-field">
+        <label>Contact-Email:</label>
+        <span>${companyData.contact_email || 'Niet beschikbaar'}</span>
+      </div>
+      <div class="detail-field">
+        <label>LinkedIn:</label>
+        <span>${companyData.linkedin ? `<a href="https://www.linkedin.com/in/${companyData.linkedin}" target="_blank">${companyData.linkedin}</a>` : 'Niet ingesteld'}</span>
+      </div>
+      <div class="detail-field">
+        <label>Sector ID:</label>
+        <span>${companyData.sector_id || 'Niet beschikbaar'}</span>
+      </div>
+    `;
+  } catch (error) {
+    console.error('Error fetching company details:', error);
+    document.querySelector('#section-title').textContent = 'Er is een probleem. Probeer opnieuw.';
+    document.querySelector('.detail-logo-section img').src = defaultCompanyLogo;
+    document.querySelector('.detail-info').innerHTML = '<p>Er is een probleem met het ophalen van de bedrijfsgegevens. Probeer het later opnieuw.</p>';
+  }
+
   // Event handlers
   setupEventHandlers();
 
@@ -224,18 +272,35 @@ function setupEventHandlers() {
   });
 
   // Admin action buttons
+  // Update the contact button to use the correct email
   const contactBtn = document.getElementById('contact-company-btn');
-  contactBtn.addEventListener('click', () => {
-    // Get current company ID from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const companyId = urlParams.get('id') || 'demo';
+  contactBtn.addEventListener('click', async () => {
+    try {
+      // Fetch company data again to ensure email is available
+      const response = await fetch(`https://api.ehb-match.me/bedrijven/${companyId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
 
-    // Get company data to access email
-    const companyData = getCompanyData(companyId);
+      if (!response.ok) {
+        throw new Error('Failed to fetch company data');
+      }
 
-    // Create mailto link and open it
-    const mailtoLink = `mailto:${companyData.email}`;
-    window.location.href = mailtoLink;
+      const companyData = await response.json();
+
+      // Use the contact_email from the fetched data
+      const mailtoLink = `mailto:${companyData.contact_email || ''}`;
+      if (companyData.contact_email) {
+        window.location.href = mailtoLink;
+      } else {
+        alert('Het e-mailadres is niet beschikbaar.');
+      }
+    } catch (error) {
+      console.error('Error fetching company details for contact:', error);
+      alert('Er is een probleem opgetreden bij het ophalen van de contactgegevens. Probeer het later opnieuw.');
+    }
   });
 
   const speedDatesBtn = document.getElementById('view-speeddates-btn');

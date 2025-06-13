@@ -1,7 +1,7 @@
 // Admin bedrijven in behandeling pagina
 import Router from '../../router.js';
 
-export function renderAdminBedrijvenInBehandeling(rootElement) {
+export async function renderAdminBedrijvenInBehandeling(rootElement) {
   // Check if user is logged in
   const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
   const adminUsername = sessionStorage.getItem('adminUsername');
@@ -74,6 +74,45 @@ export function renderAdminBedrijvenInBehandeling(rootElement) {
     </div>
   `;
 
+  // Fetch unapproved companies from API
+  const accessToken = sessionStorage.getItem('accessToken');
+  try {
+    const response = await fetch('https://api.ehb-match.me/bedrijven/nietgoedgekeurd', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    const companies = await response.json();
+
+    const companyListContainer = document.querySelector('.processing-list');
+    companyListContainer.innerHTML = ''; // Clear existing content
+
+    // Ensure data-company-id is correctly set when rendering companies
+    if (companies.length === 0) {
+      companyListContainer.innerHTML = '<p>Geen bedrijven gevonden die zich hebben ingeschreven.</p>';
+    } else {
+      companies.forEach((company) => {
+        const companyItem = document.createElement('div');
+        companyItem.className = 'processing-item clickable-processing';
+        companyItem.setAttribute('data-company-id', company.gebruiker_id || 'unknown'); // Gebruik gebruiker_id als ID
+
+        companyItem.innerHTML = `
+          <span class="processing-company-name">${company.naam}</span>
+          <div class="processing-actions">
+            <button class="approve-btn" data-company="${company.naam}" title="Goedkeuren">✓</button>
+            <button class="reject-btn" data-company="${company.naam}" title="Afwijzen">✕</button>
+          </div>
+        `;
+
+        companyListContainer.appendChild(companyItem);
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching unapproved companies:', error);
+  }
+
   // Handle logout
   const logoutBtn = document.getElementById('logout-btn');
   logoutBtn.addEventListener('click', () => {
@@ -111,13 +150,11 @@ export function renderAdminBedrijvenInBehandeling(rootElement) {
   const approveButtons = document.querySelectorAll('.approve-btn');
   const rejectButtons = document.querySelectorAll('.reject-btn');
 
-  // Handle clicking on entire processing items to go to detail page
-  const clickableProcessingItems = document.querySelectorAll(
-    '.clickable-processing'
-  );
+  // Update click event listener for processing items to use the correct route
+  const clickableProcessingItems = document.querySelectorAll('.clickable-processing');
   clickableProcessingItems.forEach((item) => {
     item.addEventListener('click', (e) => {
-      // Don't navigate if clicking on action buttons
+      // Prevent navigation if clicking on action buttons
       if (
         e.target.classList.contains('approve-btn') ||
         e.target.classList.contains('reject-btn')
@@ -125,10 +162,24 @@ export function renderAdminBedrijvenInBehandeling(rootElement) {
         return;
       }
 
-      const companyId = item.dataset.companyId;
-      Router.navigate(
-        `/admin-dashboard/processing-company-detail?id=${companyId}`
-      );
+      // Retrieve the companyId from the dataset
+      const companyId = item.getAttribute('data-company-id');
+      if (companyId && companyId !== 'unknown') {
+        Router.navigate(
+          `/admin-dashboard/processing-company-detail?id=${companyId}`
+        );
+      } else {
+        alert('Fout: Bedrijfs-ID ontbreekt. Neem contact op met de beheerder.');
+        console.error('Company ID is missing or undefined for the clicked item.');
+      }
+    });
+  });
+
+  // Add click event listener to navigate to processing company detail page
+  document.querySelectorAll('.clickable-company').forEach((companyItem) => {
+    companyItem.addEventListener('click', () => {
+      const companyId = companyItem.dataset.companyId;
+      Router.navigate(`/admin-dashboard/processing-company-detail?id=${companyId}`);
     });
   });
 
