@@ -20,7 +20,6 @@ import { renderAdminIngeschrevenBedrijven } from './pages/admin/admin-ingeschrev
 import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven-in-behandeling.js';
 import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js';
 import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
-import { renderAdminProcessingCompanyDetail } from './pages/Admin/admin-dashboard.js';
 import { renderBedrijfProfiel } from './pages/bedrijf/bedrijf-profiel.js';
 import { renderBedrijfRegister } from './pages/register-bedrijf/bedrijf-register.js';
 import { renderBedrijven } from './pages/student/bedrijven.js';
@@ -56,7 +55,6 @@ const routes = {
     renderAdminBedrijvenInBehandeling,
   '/admin-dashboard/student-detail': renderAdminStudentDetail,
   '/admin-dashboard/company-detail': renderAdminCompanyDetail,
-  '/admin-dashboard/processing-company-detail': renderAdminProcessingCompanyDetail,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
   '/Student/Student-QR-Popup': renderQRPopup,
@@ -66,11 +64,11 @@ const routes = {
   '/student/bedrijven': renderBedrijven,
   '/bedrijf/bedrijf-profiel': renderBedrijfProfiel,
   '/registreer-bedrijf': renderBedrijfRegister,
-    '/Bedrijf/Zoek-Criteria': renderSearchCriteriaBedrijf,
-  '/Bedrijf/Bedrijf-QR-Popup': renderBedrijfQRPopup,
-  '/Bedrijf/Bedrijf-Speeddates': renderBedrijfSpeeddates,
-  '/Bedrijf/Bedrijf-Speeddates-Verzoeken': renderBedrijfSpeeddatesRequests,
-  '/Bedrijf/Bedrijf-Settings': showBedrijfSettingsPopup,
+  '/bedrijf/Zoek-Criteria': renderSearchCriteriaBedrijf,
+  '/bedrijf/bedrijf-QR-Popup': renderBedrijfQRPopup,
+  '/bedrijf/bedrijf-Speeddates': renderBedrijfSpeeddates,
+  '/bedrijf/bedrijf-Speeddates-Verzoeken': renderBedrijfSpeeddatesRequests,
+  '/bedrijf/bedrijf-Settings': showBedrijfSettingsPopup,
 };
 
 const router = new Router(routes);
