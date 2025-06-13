@@ -2,7 +2,7 @@
 import Router from '../../router.js';
 import { logoutUser } from '../../utils/auth-api.js';
 
-export function renderAdminIngeschrevenBedrijven(rootElement) {
+export async function renderAdminIngeschrevenBedrijven(rootElement) {
   // Check if user is logged in
   const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
   const adminUsername = sessionStorage.getItem('adminUsername');
@@ -42,22 +42,8 @@ export function renderAdminIngeschrevenBedrijven(rootElement) {
             <h1 id="section-title">Ingeschreven Bedrijven</h1>
           </div>
             <div class="admin-content-area" id="content-area">
-            <div class="companies-list">
-              <div class="company-item clickable-company" data-company-id="carrefour">
-                <span class="company-name">Carrefour</span>
-              </div>
-              <div class="company-item clickable-company" data-company-id="delhaize">
-                <span class="company-name">Delhaize</span>
-              </div>
-              <div class="company-item clickable-company" data-company-id="colruyt">
-                <span class="company-name">Colruyt</span>
-              </div>
-              <div class="company-item clickable-company" data-company-id="proximus">
-                <span class="company-name">Proximus</span>
-              </div>
-              <div class="company-item clickable-company" data-company-id="kbc">
-                <span class="company-name">KBC Bank</span>
-              </div>
+            <div class="companies-list company-list">
+              <!-- Dynamically populated company items will be inserted here -->
             </div>
           </div>
         </main>
@@ -107,6 +93,41 @@ export function renderAdminIngeschrevenBedrijven(rootElement) {
     e.preventDefault();
     Router.navigate('/contact');
   });
+
+  // Fetch approved companies from API
+  const accessToken = sessionStorage.getItem('accessToken');
+  try {
+    const response = await fetch('https://api.ehb-match.me/bedrijven/goedgekeurd', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    const companies = await response.json();
+
+    const companyListContainer = document.querySelector('.companies-list');
+    companyListContainer.innerHTML = ''; // Clear existing content
+
+    if (companies.length === 0) {
+      companyListContainer.innerHTML = '<p class="no-companies">Geen bedrijven zijn goedgekeurd om naar de Career Launch te komen.</p>';
+    } else {
+      companies.forEach((company) => {
+        const companyItem = document.createElement('div');
+        companyItem.className = 'company-item clickable-company';
+        companyItem.dataset.companyId = company.gebruiker_id;
+
+        companyItem.innerHTML = `
+          <img src="${company.profiel_foto || 'src/Images/default.png'}" alt="${company.naam}" class="company-logo" style="height: 40px; width: auto; margin-right: 10px;">
+          <span class="company-name">${company.naam}</span>
+        `;
+
+        companyListContainer.appendChild(companyItem);
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching approved companies:', error);
+  }
 
   // Add click handlers for company items
   const companyItems = document.querySelectorAll('.clickable-company');
