@@ -1,6 +1,6 @@
 import logoIcon from '../../icons/favicon-32x32.png';
-import { renderBedrijfStudentProfiel } from './bedrijf-profiel.js';
-import { renderBedrijfSearchCriteriaStudent } from './search-criteria-bedrijf.js';
+import { renderBedrijfProfiel } from './bedrijf-profiel.js';
+import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
 import { renderBedrijfSpeeddates } from './bedrijf-speeddates.js';
 import { renderBedrijfSpeeddatesRequests } from './bedrijf-speeddates-verzoeken.js';
 import { renderBedrijfQRPopup } from './bedrijf-qr-popup.js';

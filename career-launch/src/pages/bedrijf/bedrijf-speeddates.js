@@ -125,19 +125,19 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
           renderBedrijfProfiel(rootElement, bedrijfData);
           break;
         case 'search':
-          renderSearchCriteriaBedrijf(rootElement, bedrijfData);
+          import('./search-criteria-bedrijf.js').then(m => m.renderSearchCriteriaBedrijf(rootElement, bedrijfData));
           break;
         case 'speeddates':
-          renderBedrijfSpeeddates(rootElement, bedrijfData);
+          import('./bedrijf-speeddates.js').then(m => m.renderBedrijfSpeeddates(rootElement, bedrijfData));
           break;
         case 'requests':
-          renderBedrijfSpeeddatesRequests(rootElement, bedrijfData);
+          import('./bedrijf-speeddates-verzoeken.js').then(m => m.renderBedrijfSpeeddatesRequests(rootElement, bedrijfData));
           break;
         case 'studenten':
           import('./studenten.js').then(m => m.renderStudenten(rootElement, bedrijfData));
           break;
         case 'qr':
-          renderQRPopup(rootElement, bedrijfData);
+          import('./bedrijf-qr-popup.js').then(m => m.renderQRPopup(rootElement, bedrijfData));
           break;
       }
     });

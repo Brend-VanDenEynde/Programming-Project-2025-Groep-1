@@ -3,6 +3,7 @@ import { showBedrijfSettingsPopup } from './bedrijf-settings.js';
 import logoIcon from '../../Icons/favicon-32x32.png';
 import '../../css/bedrijf-profile.css';
 import defaultAvatar from '../../images/default.png';
+import { logoutUser } from '../../utils/auth-api.js';
 
 // defaultProfile gebruikt nu ook enkel NL velden!
 const defaultProfile = {
