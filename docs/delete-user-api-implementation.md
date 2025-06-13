@@ -9,21 +9,21 @@ This document outlines the implementation of the user account deletion functiona
 - **URL**: `https://api.ehb-match.me/user/{userID}`
 - **Method**: `DELETE`
 - **Description**: Delete a user and their associated student or company profile
-- **Access**: Admin only
+- **Access**: Account owner or admin
 
 ### Parameters
 
-| Parameter | Type    | Location | Description                    |
-|-----------|---------|----------|--------------------------------|
-| userID    | integer | path     | The ID of the user to delete   |
+| Parameter | Type    | Location | Description                  |
+| --------- | ------- | -------- | ---------------------------- |
+| userID    | integer | path     | The ID of the user to delete |
 
 ### Response Codes
 
-| Code | Description    | Details                                    |
-|------|----------------|--------------------------------------------|
-| 204  | No Content     | User successfully deleted                  |
-| 403  | Forbidden      | User doesn't have admin permissions       |
-| 404  | User not found | User with specified ID doesn't exist      |
+| Code | Description    | Details                                             |
+| ---- | -------------- | --------------------------------------------------- |
+| 204  | No Content     | User successfully deleted                           |
+| 403  | Forbidden      | User doesn't have permission to delete this account |
+| 404  | User not found | User with specified ID doesn't exist                |
 
 ## Implementation
 
@@ -95,6 +95,7 @@ The implementation includes comprehensive error handling:
 For demo purposes, added `userId` fields to all mock data:
 
 ### Student Data
+
 - `tiberius-kirk`: userId 101
 - `john-smith`: userId 102
 - `jean-luc-picard`: userId 103
@@ -105,6 +106,7 @@ For demo purposes, added `userId` fields to all mock data:
 - `demo`: userId 999
 
 ### Company Data
+
 - `carrefour`: userId 201
 - `delhaize`: userId 202
 - `colruyt`: userId 203

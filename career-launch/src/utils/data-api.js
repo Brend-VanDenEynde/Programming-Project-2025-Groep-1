@@ -97,7 +97,7 @@ export async function saveSearchCriteria(studentId, criteria) {
 }
 
 /**
- * Delete a user account (admin only)
+ * Delete a user account (accessible to account owner and admins)
  * @param {number} userId - The user ID to delete
  * @returns {Promise<Object>} Response from server
  */

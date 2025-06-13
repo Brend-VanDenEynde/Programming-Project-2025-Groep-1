@@ -1,4 +1,5 @@
 import { logoutUser } from '../../utils/auth-api.js';
+import { deleteUser } from '../../utils/data-api.js';
 
 // Main renderfunctie:
 export function showSettingsPopup(onClose) {
@@ -67,7 +68,9 @@ export function showSettingsPopup(onClose) {
         <label style="display:flex;align-items:center;gap:16px;">
           <span style="font-size:1.22em;">🌞</span>
           <span class="switch">
-            <input id="toggle-darkmode" type="checkbox" ${dark ? 'checked' : ''}/>
+            <input id="toggle-darkmode" type="checkbox" ${
+              dark ? 'checked' : ''
+            }/>
             <span class="slider"></span>
           </span>
           <span style="font-size:1.22em;">🌙</span>
@@ -94,18 +97,60 @@ export function showSettingsPopup(onClose) {
   };
 
   // Darkmode toggle
-  document.getElementById('toggle-darkmode').addEventListener('change', e => {
+  document.getElementById('toggle-darkmode').addEventListener('change', (e) => {
     localStorage.setItem('darkmode', e.target.checked);
     document.body.classList.toggle('darkmode', e.target.checked);
   });
-
   // Delete account
-  document.getElementById('btn-delete-account').addEventListener('click', () => {
-    if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
-      localStorage.clear();
-      window.location.reload();
-    }
-  });
+  document
+    .getElementById('btn-delete-account')
+    .addEventListener('click', async () => {
+      if (
+        confirm(
+          'Weet je zeker dat je je account wilt verwijderen? Deze actie kan niet ongedaan gemaakt worden.'
+        )
+      ) {
+        try {
+          // Get current user data to access user ID
+          const userData = JSON.parse(
+            window.sessionStorage.getItem('studentData')
+          );
+          const userId = userData?.userId || userData?.id;
+
+          if (!userId) {
+            alert(
+              'Kan gebruiker ID niet vinden. Probeer opnieuw in te loggen.'
+            );
+            return;
+          }
+
+          // Call delete API
+          await deleteUser(userId);
+
+          // Clear session data
+          window.sessionStorage.clear();
+          localStorage.clear();
+
+          alert('Je account is succesvol verwijderd.');
+
+          // Navigate to home page
+          window.location.href = '/';
+        } catch (error) {
+          console.error('Error deleting account:', error);
+
+          // Handle different error types
+          if (error.message.includes('403')) {
+            alert('Je hebt geen toestemming om dit account te verwijderen.');
+          } else if (error.message.includes('404')) {
+            alert('Account niet gevonden.');
+          } else {
+            alert(
+              'Er is een fout opgetreden bij het verwijderen van je account. Probeer het opnieuw.'
+            );
+          }
+        }
+      }
+    });
 
   // Logout
   document.getElementById('btn-logout').onclick = null;
