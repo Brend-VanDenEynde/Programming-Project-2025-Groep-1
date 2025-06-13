@@ -46,7 +46,9 @@ const routes = {
   '/student/student-speeddates': renderSpeeddates,
   '/student/student-speeddates-verzoeken': renderSpeeddatesRequests,
   '/student/student-settings': showSettingsPopup,
-  '/student/bedrijven': renderBedrijven,
+  '/student/bedrijven': (rootElement) => {
+  const studentData = JSON.parse(window.sessionStorage.getItem('studentData'));
+  renderBedrijven(rootElement, studentData);},
   '/admin-login': renderAdmin,
   '/admin-select-dashboard': renderAdminSelectDashboard,
   '/admin-dashboard': renderAdminSelectDashboard,
@@ -150,3 +152,5 @@ if (
 
 // *** HIERONDER default export ***
 export default Router;
+
+
