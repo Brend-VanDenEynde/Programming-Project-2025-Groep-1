@@ -89,7 +89,7 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}, reado
             <li><button data-route="search" class="sidebar-link active">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="bedrijven" class="sidebar-link">Bedrijven</button></li>
+            <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
             <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
           </ul>
         </nav>

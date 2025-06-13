@@ -2,17 +2,18 @@ import { renderLogin } from '../login.js';
 import { showBedrijfSettingsPopup } from './bedrijf-settings.js';
 import logoIcon from '../../Icons/favicon-32x32.png';
 import '../../css/bedrijf-profile.css';
+import defaultAvatar from '../../images/default.png';
 
 // defaultProfile gebruikt nu ook enkel NL velden!
 const defaultProfile = {
-  voornaam: 'Voornaam',
-  achternaam: 'Achternaam',
-  email: 'bedrijf@voorbeeld.com',
-  studiejaar: '1',
-  profiel_foto: 'src/Images/default.jpg',
-  linkedin: '',
-  geboortedatum: '',
-  opleiding_id: null,
+  voornaam: '',
+    achternaam: '',
+    email: '',
+    studiejaar: '1',
+    profiel_foto: defaultAvatar,
+    linkedin: '',
+    date_of_birth: '',
+    opleiding_id: null,
 };
 
 export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode = true) {

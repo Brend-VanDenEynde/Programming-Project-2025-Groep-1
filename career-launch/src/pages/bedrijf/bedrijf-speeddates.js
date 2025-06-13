@@ -64,7 +64,7 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link active">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="studenten" class="sidebar-link">Student</button></li>
+            <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
             <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
           </ul>
         </nav>
