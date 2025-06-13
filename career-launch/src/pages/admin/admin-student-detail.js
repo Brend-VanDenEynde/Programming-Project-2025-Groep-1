@@ -162,11 +162,20 @@ export async function renderAdminStudentDetail(rootElement) {
     const studentData = await response.json();
 
     // Update the page with student data
-    document.querySelector('.admin-section-header h1').textContent = `Student Details: ${studentData.voornaam} ${studentData.achternaam}`;
-    document.querySelector('.detail-logo-section img').src = studentData.profiel_foto || defaultAvatar;
-    document.querySelector('.detail-info .detail-field:nth-child(1) span').textContent = `${studentData.voornaam} ${studentData.achternaam}`;
-    document.querySelector('.detail-info .detail-field:nth-child(2) span').textContent = studentData.email || 'Niet beschikbaar';
-    document.querySelector('.detail-info .detail-field:nth-child(3) span').innerHTML = studentData.linkedin
+    document.querySelector(
+      '.admin-section-header h1'
+    ).textContent = `Student Details: ${studentData.voornaam} ${studentData.achternaam}`;
+    document.querySelector('.detail-logo-section img').src =
+      studentData.profiel_foto || defaultAvatar;
+    document.querySelector(
+      '.detail-info .detail-field:nth-child(1) span'
+    ).textContent = `${studentData.voornaam} ${studentData.achternaam}`;
+    document.querySelector(
+      '.detail-info .detail-field:nth-child(2) span'
+    ).textContent = studentData.email || 'Niet beschikbaar';
+    document.querySelector(
+      '.detail-info .detail-field:nth-child(3) span'
+    ).innerHTML = studentData.linkedin
       ? `<a href="${studentData.linkedin}" target="_blank" class="linkedin-link">${studentData.linkedin}</a>`
       : 'Niet ingesteld';
   } catch (error) {
@@ -333,7 +342,8 @@ function getStudentData(studentId) {
       registrationDate: '2024-08-20',
       status: 'Actief',
       lastLogin: '2024-12-09',
-    },    'daniel-vonkman': {
+    },
+    'daniel-vonkman': {
       userId: 104,
       firstName: 'Daniel',
       lastName: 'Vonkman',
@@ -383,7 +393,8 @@ function getStudentData(studentId) {
       firstName: 'Ed',
       lastName: 'Marvin',
       email: 'ed.marvin@student.ehb.be',
-      studyProgram: 'Engineering',      year: '4e jaar',
+      studyProgram: 'Engineering',
+      year: '4e jaar',
       birthDate: '1994-09-30',
       linkedIn: 'linkedin.com/in/ed-marvin',
       description:
@@ -473,32 +484,36 @@ function setupEventHandlers() {
       try {
         // Get current student ID from URL
         const urlParams = new URLSearchParams(window.location.search);
-        const studentId = urlParams.get('id') || 'demo';
-        
-        // Get student data to access user ID (in real app this would be the actual user ID)
-        const studentData = getStudentData(studentId);
-        
-        // In a real implementation, you would use the actual user ID from the student data
-        // For demo purposes, we'll use a mock ID
-        const userId = studentData.userId || 1; // This should be the actual user ID from your database
-        
+        const studentId = urlParams.get('id');
+
+        if (!studentId) {
+          alert('Student ID niet gevonden.');
+          return;
+        }
+
+        // Use the student ID as the user ID for the delete API call
+        // The studentId in the URL is actually the gebruiker_id from the API
+        const userId = studentId;
+
         // Call the delete API
         await deleteUser(userId);
-        
-        alert('Account succesvol verwijderd.');
-        
+
+        alert('Student succesvol verwijderd.');
+
         // Navigate back to students overview
         Router.navigate('/admin-dashboard/ingeschreven-studenten');
       } catch (error) {
         console.error('Error deleting user:', error);
-        
+
         // Handle different error types
         if (error.message.includes('403')) {
           alert('Je hebt geen toestemming om dit account te verwijderen.');
         } else if (error.message.includes('404')) {
           alert('Gebruiker niet gevonden.');
         } else {
-          alert('Er is een fout opgetreden bij het verwijderen van het account. Probeer het opnieuw.');
+          alert(
+            'Er is een fout opgetreden bij het verwijderen van het account. Probeer het opnieuw.'
+          );
         }
       }
     }
