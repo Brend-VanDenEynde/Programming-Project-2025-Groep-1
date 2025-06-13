@@ -2,6 +2,7 @@
 import Router from '../../router.js';
 import defaultAvatar from '../../images/default.png';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
+import { deleteUser } from '../../utils/data-api.js';
 
 export function renderAdminStudentDetail(rootElement) {
   // Check if user is logged in
@@ -255,6 +256,7 @@ function getStudentData(studentId) {
   // Mock data - in real app this would fetch from API
   const studentDatabase = {
     'tiberius-kirk': {
+      userId: 101,
       firstName: 'Tiberius',
       lastName: 'Kirk',
       email: 'Tiberius.Kirk@Enterprise.space',
@@ -270,6 +272,7 @@ function getStudentData(studentId) {
       lastLogin: '2024-12-08',
     },
     'john-smith': {
+      userId: 102,
       firstName: 'John',
       lastName: 'Smith',
       email: 'john.smith@student.ehb.be',
@@ -284,6 +287,7 @@ function getStudentData(studentId) {
       lastLogin: '2024-12-07',
     },
     'jean-luc-picard': {
+      userId: 103,
       firstName: 'Jean-Luc',
       lastName: 'Picard',
       email: 'jean.luc.picard@student.ehb.be',
@@ -297,8 +301,8 @@ function getStudentData(studentId) {
       registrationDate: '2024-08-20',
       status: 'Actief',
       lastLogin: '2024-12-09',
-    },
-    'daniel-vonkman': {
+    },    'daniel-vonkman': {
+      userId: 104,
       firstName: 'Daniel',
       lastName: 'Vonkman',
       email: 'daniel.vonkman@student.ehb.be',
@@ -313,6 +317,7 @@ function getStudentData(studentId) {
       lastLogin: '2024-12-06',
     },
     'len-jaxtyn': {
+      userId: 105,
       firstName: 'Len',
       lastName: 'Jaxtyn',
       email: 'len.jaxtyn@student.ehb.be',
@@ -327,6 +332,7 @@ function getStudentData(studentId) {
       lastLogin: '2024-12-08',
     },
     'kimberley-hester': {
+      userId: 106,
       firstName: 'Kimberley',
       lastName: 'Hester',
       email: 'kimberley.hester@student.ehb.be',
@@ -341,11 +347,11 @@ function getStudentData(studentId) {
       lastLogin: '2024-12-05',
     },
     'ed-marvin': {
+      userId: 107,
       firstName: 'Ed',
       lastName: 'Marvin',
       email: 'ed.marvin@student.ehb.be',
-      studyProgram: 'Engineering',
-      year: '4e jaar',
+      studyProgram: 'Engineering',      year: '4e jaar',
       birthDate: '1994-09-30',
       linkedIn: 'linkedin.com/in/ed-marvin',
       description:
@@ -356,6 +362,7 @@ function getStudentData(studentId) {
       lastLogin: '2024-12-07',
     },
     demo: {
+      userId: 999,
       firstName: 'Demo',
       lastName: 'Student',
       email: 'demo@student.ehb.be',
@@ -428,11 +435,40 @@ function setupEventHandlers() {
   speedDatesBtn.addEventListener('click', () => {
     openSpeedDatesModal();
   });
-
   const deleteBtn = document.getElementById('delete-account-btn');
-  deleteBtn.addEventListener('click', () => {
+  deleteBtn.addEventListener('click', async () => {
     if (confirm('Weet je zeker dat je dit account wilt verwijderen?')) {
-      alert('Account verwijdering zou hier geïmplementeerd worden.');
+      try {
+        // Get current student ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const studentId = urlParams.get('id') || 'demo';
+        
+        // Get student data to access user ID (in real app this would be the actual user ID)
+        const studentData = getStudentData(studentId);
+        
+        // In a real implementation, you would use the actual user ID from the student data
+        // For demo purposes, we'll use a mock ID
+        const userId = studentData.userId || 1; // This should be the actual user ID from your database
+        
+        // Call the delete API
+        await deleteUser(userId);
+        
+        alert('Account succesvol verwijderd.');
+        
+        // Navigate back to students overview
+        Router.navigate('/admin-dashboard/ingeschreven-studenten');
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        
+        // Handle different error types
+        if (error.message.includes('403')) {
+          alert('Je hebt geen toestemming om dit account te verwijderen.');
+        } else if (error.message.includes('404')) {
+          alert('Gebruiker niet gevonden.');
+        } else {
+          alert('Er is een fout opgetreden bij het verwijderen van het account. Probeer het opnieuw.');
+        }
+      }
     }
   });
 
