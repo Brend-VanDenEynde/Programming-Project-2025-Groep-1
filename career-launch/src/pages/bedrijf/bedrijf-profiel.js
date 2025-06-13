@@ -1,6 +1,7 @@
 import { renderLogin } from '../login.js';
 import { showBedrijfSettingsPopup } from './bedrijf-settings.js';
 import logoIcon from '../../Icons/favicon-32x32.png';
+import '../../css/bedrijf-profile.css';
 
 // defaultProfile gebruikt nu ook enkel NL velden!
 const defaultProfile = {
@@ -47,7 +48,7 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="Studenten" class="sidebar-link">Studenten</button></li>
+            <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
             <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
           </ul>
         </nav>
