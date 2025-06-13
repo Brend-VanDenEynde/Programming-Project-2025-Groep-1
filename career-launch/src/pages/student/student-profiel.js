@@ -38,7 +38,7 @@ export function renderStudentProfiel(
   const {
     voornaam = defaultProfile.voornaam,
     achternaam = defaultProfile.achternaam,
-    email = defaultProfile.email,
+    email = studentData.email || defaultProfile.email,
     studiejaar = defaultProfile.studiejaar,
     profiel_foto = defaultProfile.profiel_foto,
     linkedin = defaultProfile.linkedin,
@@ -317,32 +317,93 @@ export function renderStudentProfiel(
     // SAVE knop
     const saveBtn = document.getElementById('btn-save-profile');
     if (saveBtn) {
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         let newOpleidingId = resolvedOpleidingId;
         if (!readonlyMode) {
           const select = document.getElementById('opleidingSelect');
           if (select) newOpleidingId = select.value;
         }
-        const updatedData = {
-          ...studentData,
+        // Verzamel nieuwe waarden, alleen geldige velden en types
+        const nieuweEmail = document.getElementById('emailInput').value;
+        const oudeEmail = studentData.email;
+        const updatedStudentData = {
           voornaam: document.getElementById('firstNameInput').value,
           achternaam: document.getElementById('lastNameInput').value,
-          email: document.getElementById('emailInput').value,
-          studiejaar: document.getElementById('yearInput').value,
-          geboortedatum: document.getElementById('birthDateInput').value,
+          studiejaar: parseInt(document.getElementById('yearInput').value, 10),
+          date_of_birth: document.getElementById('birthDateInput').value,
           linkedin: document.getElementById('linkedinInput').value,
-          opleiding_id: newOpleidingId,
+          opleiding_id: parseInt(newOpleidingId, 10),
         };
-        const photoInput = document.getElementById('photoInput');
-        if (photoInput && photoInput.files && photoInput.files[0]) {
-          updatedData.profiel_foto = URL.createObjectURL(photoInput.files[0]);
+        // Debug: log de payload
+        console.log('Student update payload:', JSON.stringify(updatedStudentData));
+        const token = sessionStorage.getItem('authToken');
+        // Haal altijd de juiste ID’s uit sessionStorage
+        let studentID = studentData.gebruiker_id;
+        let userID = studentData.gebruiker_id;
+        if (!studentID || !userID) {
+          alert('Student ID (gebruiker_id) ontbreekt!');
+          return;
         }
-        window.sessionStorage.setItem(
-          'studentData',
-          JSON.stringify(updatedData)
-        );
-        renderStudentProfiel(rootElement, updatedData, true);
+        // Debug: log de gebruikte ID's en token
+        console.log('studentData:', studentData, 'studentID:', studentID, 'userID:', userID, 'token:', token);
+        // Check geboortedatum niet in de toekomst
+        const today = new Date().toISOString().split('T')[0];
+        if (updatedStudentData.date_of_birth > today) {
+          alert('Geboortedatum mag niet in de toekomst liggen.');
+          return;
+        }
+        try {
+          // 1. E-mail gewijzigd? Eerst /user/{userID}
+          if (nieuweEmail && nieuweEmail !== oudeEmail) {
+            console.debug('PUT /user/' + userID, { email: nieuweEmail });
+            const respUser = await fetch(`https://api.ehb-match.me/user/${userID}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token,
+              },
+              body: JSON.stringify({ email: nieuweEmail }),
+            });
+            if (!respUser.ok) {
+              const errText = await respUser.text();
+              console.error('Backend response (user):', errText);
+              throw new Error('E-mail bijwerken mislukt: ' + errText);
+            }
+            const userResult = await respUser.json();
+            // Update email in sessionStorage studentData
+            if (userResult.user && userResult.user.email) {
+              studentData.email = userResult.user.email;
+            }
+          }
+          // 2. Overige profielinfo via /studenten/{studentID}
+          console.debug('PUT /studenten/' + studentID, updatedStudentData);
+          const respStudent = await fetch(`https://api.ehb-match.me/studenten/${studentID}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token,
+            },
+            body: JSON.stringify(updatedStudentData),
+          });
+          if (!respStudent.ok) {
+            const errText = await respStudent.text();
+            console.error('Backend response (student):', errText);
+            throw new Error('Profiel bijwerken mislukt: ' + errText);
+          }
+          const result = await respStudent.json();
+          // Backend geeft { message, student } terug
+          if (result.student) {
+            // Combineer email met nieuwe studentdata voor sessionStorage
+            const nieuweStudentData = { ...result.student, email: studentData.email };
+            sessionStorage.setItem('studentData', JSON.stringify(nieuweStudentData));
+            renderStudentProfiel(rootElement, nieuweStudentData, true);
+          } else {
+            alert('Profiel opgeslagen, maar geen student-object in response!');
+          }
+        } catch (err) {
+          alert('Fout bij opslaan profiel: ' + err.message);
+        }
       });
     }
 
@@ -354,4 +415,30 @@ export function renderStudentProfiel(
       });
     }
   }
+}
+
+// Utility: Haal gecombineerde studentdata + email op en sla op in sessionStorage
+export async function fetchAndStoreStudentProfile() {
+  const token = sessionStorage.getItem('authToken');
+  if (!token) throw new Error('Geen authToken gevonden');
+  // 1. Haal user-info op (voor email en userID)
+  const respUser = await fetch('https://api.ehb-match.me/auth/info', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  });
+  if (!respUser.ok) throw new Error('Kan user-info niet ophalen');
+  const userResult = await respUser.json();
+  const user = userResult.user;
+  if (!user || !user.id) throw new Error('User info onvolledig');
+  // 2. Haal alle studenten op en zoek juiste student
+  const respStudents = await fetch('https://api.ehb-match.me/studenten', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  });
+  if (!respStudents.ok) throw new Error('Kan studentenlijst niet ophalen');
+  const studenten = await respStudents.json();
+  const student = studenten.find(s => s.gebruiker_id === user.id);
+  if (!student) throw new Error('Student niet gevonden voor deze gebruiker!');
+  // 3. Combineer info (voeg email toe aan studentdata)
+  const combined = { ...student, email: user.email, gebruiker_id: user.id };
+  sessionStorage.setItem('studentData', JSON.stringify(combined));
+  return combined;
 }
