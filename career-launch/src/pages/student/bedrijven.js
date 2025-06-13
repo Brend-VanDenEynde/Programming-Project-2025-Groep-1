@@ -6,7 +6,7 @@ import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { renderQRPopup } from './student-qr-popup.js';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
-import { fetchApprovedCompanies } from '../../utils/data-api.js';
+import { fetchCompanies } from '../../utils/data-api.js';
 import defaultBedrijfLogo from '../../images/BedrijfDefault.jpg';
 
 // Globale variabele voor bedrijven data
@@ -137,10 +137,10 @@ export async function renderBedrijven(rootElement, studentData = {}) {
     renderLogin(rootElement);
     return;
   }
+
   // Load companies from API
   try {
-    const companies = await fetchApprovedCompanies(); // Only fetch approved companies
-    // Check if response is an array
+    const companies = await fetchCompanies(); // Check if response is an array
     if (!Array.isArray(companies)) {
       bedrijven = [];
     } else {
