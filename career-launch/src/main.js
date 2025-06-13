@@ -17,10 +17,10 @@ import { renderSpeeddatesRequests } from './pages/Student/student-speeddates-ver
 import { showSettingsPopup } from './pages/Student/student-settings.js';
 import { renderAdminIngeschrevenStudenten } from './pages/Admin/admin-ingeschreven-studenten.js';
 import { renderAdminIngeschrevenBedrijven } from './pages/Admin/admin-ingeschreven-bedrijven.js';
-import { renderAdminBedrijvenInBehandeling } from './pages/Admin/admin-bedrijven-in-behandeling.js';
+import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven-in-behandeling.js';
 import { renderAdminStudentDetail } from './pages/Admin/admin-student-detail.js';
 import { renderAdminCompanyDetail } from './pages/Admin/admin-company-detail.js';
-import { renderAdminProcessingCompanyDetail } from './pages/Admin/admin-processing-company-detail.js';
+import { renderAdminProcessingCompanyDetail } from './pages/admin/admin-processing-company-detail.js';
 
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
@@ -62,6 +62,9 @@ const routes = {
 const router = new Router(routes);
 window.appRouter = router;
 
-if (window.location.protocol === 'http:' && !window.location.hostname.includes('localhost')) {
+if (
+  window.location.protocol === 'http:' &&
+  !window.location.hostname.includes('localhost')
+) {
   window.location.href = window.location.href.replace('http:', 'https:');
 }
