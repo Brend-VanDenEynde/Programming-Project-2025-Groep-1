@@ -90,21 +90,19 @@ export function renderPrivacy(rootElement) {
       </footer>
     </div>
   `;
+  // Backbutton: eerst oude event listeners verwijderen
   const backBtn = document.getElementById('back-button');
   if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      // Gebruik alleen history.back() zodat je altijd teruggaat naar de vorige pagina
-      window.history.back();
-    });
+    const newHandler = () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else if (window.appRouter) {
+        window.appRouter.navigate('/', { replace: true });
+      } else {
+        window.location.replace('/');
+      }
+    };
+    backBtn.onclick = null;
+    backBtn.onclick = newHandler;
   }
-  // FOOTER LINKS
-  document.getElementById('privacy-policy').addEventListener('click', (e) => {
-    e.preventDefault();
-    Router.navigate('/privacy');
-  });
-
-  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
-    e.preventDefault();
-    Router.navigate('/contact');
-  });
 }

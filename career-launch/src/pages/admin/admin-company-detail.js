@@ -1,8 +1,10 @@
 // Admin company detail pagina
 import Router from '../../router.js';
-import defaultCompanyLogo from '../../Images/BedrijfDefault.jpg';
+import defaultCompanyLogo from '../../images/BedrijfDefault.jpg';
+import { logoutUser } from '../../utils/auth-api.js';
+import { deleteUser } from '../../utils/data-api.js';
 
-export function renderAdminCompanyDetail(rootElement) {
+export async function renderAdminCompanyDetail(rootElement) {
   // Check if user is logged in
   const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
   const adminUsername = sessionStorage.getItem('adminUsername');
@@ -124,6 +126,54 @@ export function renderAdminCompanyDetail(rootElement) {
     </div>
   `;
 
+  // Fetch company data from API
+  const accessToken = sessionStorage.getItem('accessToken');
+  try {
+    const response = await fetch(`https://api.ehb-match.me/bedrijven/${companyId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch company data');
+    }
+
+    const companyData = await response.json();
+
+    // Update the page with company data
+    document.querySelector('#section-title').textContent = `Bedrijf Details: ${companyData.naam}`;
+    document.querySelector('.detail-logo-section img').src = companyData.profiel_foto || defaultCompanyLogo;
+    document.querySelector('.detail-info').innerHTML = `
+      <div class="detail-field">
+        <label>Naam:</label>
+        <span>${companyData.naam}</span>
+      </div>
+      <div class="detail-field">
+        <label>Locatie:</label>
+        <span>${companyData.plaats || 'Niet beschikbaar'}</span>
+      </div>
+      <div class="detail-field">
+        <label>Contact-Email:</label>
+        <span>${companyData.contact_email || 'Niet beschikbaar'}</span>
+      </div>
+      <div class="detail-field">
+        <label>LinkedIn:</label>
+        <span>${companyData.linkedin ? `<a href="https://www.linkedin.com/in/${companyData.linkedin}" target="_blank">${companyData.linkedin}</a>` : 'Niet ingesteld'}</span>
+      </div>
+      <div class="detail-field">
+        <label>Sector ID:</label>
+        <span>${companyData.sector_id || 'Niet beschikbaar'}</span>
+      </div>
+    `;
+  } catch (error) {
+    console.error('Error fetching company details:', error);
+    document.querySelector('#section-title').textContent = 'Er is een probleem. Probeer opnieuw.';
+    document.querySelector('.detail-logo-section img').src = defaultCompanyLogo;
+    document.querySelector('.detail-info').innerHTML = '<p>Er is een probleem met het ophalen van de bedrijfsgegevens. Probeer het later opnieuw.</p>';
+  }
+
   // Event handlers
   setupEventHandlers();
 
@@ -134,6 +184,7 @@ function getCompanyData(companyId) {
   // Mock data - in real app this would fetch from API
   const companyDatabase = {
     carrefour: {
+      userId: 201,
       name: 'Carrefour',
       email: 'contact@carrefour.be',
       location: 'Brussel',
@@ -143,6 +194,7 @@ function getCompanyData(companyId) {
       lastLogin: '2024-12-08',
     },
     delhaize: {
+      userId: 202,
       name: 'Delhaize',
       email: 'hr@delhaize.be',
       location: 'Antwerpen',
@@ -152,6 +204,7 @@ function getCompanyData(companyId) {
       lastLogin: '2024-12-07',
     },
     colruyt: {
+      userId: 203,
       name: 'Colruyt',
       email: 'jobs@colruyt.com',
       location: 'Gent',
@@ -161,6 +214,7 @@ function getCompanyData(companyId) {
       lastLogin: '2024-12-06',
     },
     proximus: {
+      userId: 204,
       name: 'Proximus',
       email: 'careers@proximus.be',
       location: 'Brussel',
@@ -170,15 +224,16 @@ function getCompanyData(companyId) {
       lastLogin: '2024-12-09',
     },
     kbc: {
+      userId: 205,
       name: 'KBC Bank',
       email: 'talent@kbc.be',
       location: 'Leuven',
       logoUrl: null,
       registrationDate: '2024-10-15',
       status: 'Actief',
-      lastLogin: '2024-12-08',
-    },
+      lastLogin: '2024-12-08',    },
     demo: {
+      userId: 999,
       name: 'Demo Bedrijf',
       email: 'demo@bedrijf.be',
       location: 'Demo Stad',
@@ -195,17 +250,24 @@ function getCompanyData(companyId) {
 function setupEventHandlers() {
   // Back button
   const backBtn = document.getElementById('back-btn');
-  backBtn.addEventListener('click', () => {
-    Router.navigate('/admin-dashboard/ingeschreven-bedrijven');
-  });
+  if (backBtn) {
+    backBtn.onclick = null;
+    backBtn.addEventListener('click', () => {
+      Router.navigate('/admin-dashboard/ingeschreven-bedrijven');
+    });
+  }
 
   // Logout button
   const logoutBtn = document.getElementById('logout-btn');
-  logoutBtn.addEventListener('click', () => {
-    sessionStorage.removeItem('adminLoggedIn');
-    sessionStorage.removeItem('adminUsername');
-    Router.navigate('/admin-login');
-  });
+  if (logoutBtn) {
+    logoutBtn.onclick = null;
+    logoutBtn.addEventListener('click', async () => {
+      await logoutUser();
+      window.sessionStorage.clear();
+      localStorage.clear();
+      Router.navigate('/');
+    });
+  }
 
   // Navigation buttons
   const navButtons = document.querySelectorAll('.nav-btn');
@@ -224,29 +286,75 @@ function setupEventHandlers() {
   });
 
   // Admin action buttons
+  // Update the contact button to use the correct email
   const contactBtn = document.getElementById('contact-company-btn');
-  contactBtn.addEventListener('click', () => {
-    // Get current company ID from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const companyId = urlParams.get('id') || 'demo';
+  contactBtn.addEventListener('click', async () => {
+    try {
+      // Fetch company data again to ensure email is available
+      const response = await fetch(`https://api.ehb-match.me/bedrijven/${companyId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
 
-    // Get company data to access email
-    const companyData = getCompanyData(companyId);
+      if (!response.ok) {
+        throw new Error('Failed to fetch company data');
+      }
 
-    // Create mailto link and open it
-    const mailtoLink = `mailto:${companyData.email}`;
-    window.location.href = mailtoLink;
+      const companyData = await response.json();
+
+      // Use the contact_email from the fetched data
+      const mailtoLink = `mailto:${companyData.contact_email || ''}`;
+      if (companyData.contact_email) {
+        window.location.href = mailtoLink;
+      } else {
+        alert('Het e-mailadres is niet beschikbaar.');
+      }
+    } catch (error) {
+      console.error('Error fetching company details for contact:', error);
+      alert('Er is een probleem opgetreden bij het ophalen van de contactgegevens. Probeer het later opnieuw.');
+    }
   });
 
   const speedDatesBtn = document.getElementById('view-speeddates-btn');
   speedDatesBtn.addEventListener('click', () => {
     openSpeedDatesModal();
   });
-
   const deleteBtn = document.getElementById('delete-company-btn');
-  deleteBtn.addEventListener('click', () => {
+  deleteBtn.addEventListener('click', async () => {
     if (confirm('Weet je zeker dat je dit bedrijf wilt verwijderen?')) {
-      alert('Bedrijf verwijdering zou hier geïmplementeerd worden.');
+      try {
+        // Get current company ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const companyId = urlParams.get('id') || 'demo';
+        
+        // Get company data to access user ID (in real app this would be the actual user ID)
+        const companyData = getCompanyData(companyId);
+        
+        // In a real implementation, you would use the actual user ID from the company data
+        // For demo purposes, we'll use a mock ID
+        const userId = companyData.userId || 2; // This should be the actual user ID from your database
+        
+        // Call the delete API
+        await deleteUser(userId);
+        
+        alert('Bedrijf succesvol verwijderd.');
+        
+        // Navigate back to companies overview
+        Router.navigate('/admin-dashboard/ingeschreven-bedrijven');
+      } catch (error) {
+        console.error('Error deleting company:', error);
+        
+        // Handle different error types
+        if (error.message.includes('403')) {
+          alert('Je hebt geen toestemming om dit bedrijf te verwijderen.');
+        } else if (error.message.includes('404')) {
+          alert('Bedrijf niet gevonden.');
+        } else {
+          alert('Er is een fout opgetreden bij het verwijderen van het bedrijf. Probeer het opnieuw.');
+        }
+      }
     }
   });
 

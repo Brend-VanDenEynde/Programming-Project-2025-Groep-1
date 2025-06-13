@@ -1,8 +1,8 @@
-import './student-register.css';
-import Router from '../router.js';
+import '../../css/student-register.css';
+import Router from '../../router.js';
 
-export function renderStudentSkills(rootElement) {
-    rootElement.innerHTML = `
+export async function renderStudentSkills(rootElement) {
+  rootElement.innerHTML = `
     <div style="min-height: 100vh; display: flex; flex-direction: column;">
     <main class="form-container skills-container">
       <button class="back-button" id="back-button">← Terug</button>
@@ -35,14 +35,18 @@ export function renderStudentSkills(rootElement) {
     <footer class="footer">
       <a href="#" id="privacy-link">Privacy Policy</a> | <a href="#" id="contact-link">Contacteer Ons</a>
     </footer>
-  </div>
   `;
 
   const form = document.getElementById('skillsForm');
   form.addEventListener('submit', handleSkillsRegister);
-
   document.getElementById('back-button').addEventListener('click', () => {
-    Router.navigate('/Student-Opleiding');
+    // Check if there's a previous page in history
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      // Fallback to register if no history
+      Router.navigate('/registreer');
+    }
   });
 
   // Footer links
@@ -67,17 +71,15 @@ function handleSkillsRegister(event) {
   const job = formData.get('job');
   const skill = formData.get('skill');
 
-  
-
   const data = {
-    job: formData.get('job'), // geselecteerde radio
+    job: formData.get('job'),
     skill: formData.get('skill'),
   };
-  
+
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
   alert(`Je account is nu in orde.`);
 
-  // Navigeren naar de volgende pagina
+  // Navigeren naar de juiste profielpagina
   Router.navigate('/Student/Student-Profiel');
 }

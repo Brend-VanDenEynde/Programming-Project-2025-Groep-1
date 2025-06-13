@@ -4,7 +4,7 @@
  */
 
 // Importeer de functies (in een echte implementatie zou je deze import gebruiken)
-// import { createUserRegistrationJSON, validateRegistrationData } from './utils/registration-api.js';
+// import { createUserRegistrationJSON, validateRegistrationData } from '../utils/registration-api.js';
 
 // Test data voor een student
 const testStudentData = {

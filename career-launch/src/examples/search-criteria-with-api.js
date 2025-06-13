@@ -3,9 +3,9 @@
  * om skills en andere data van de API te halen met automatische token refresh
  */
 
-import logoIcon from '../Icons/favicon-32x32.png';
-import { renderLogin } from './login.js';
-import { renderStudentProfiel } from './student-profiel.js';
+import logoIcon from '../icons/favicon-32x32.png';
+import { renderLogin } from '../pages/login.js';
+import { renderStudentProfiel } from '../pages/student/student-profiel.js';
 import { fetchSkills, saveSearchCriteria } from '../utils/data-api.js';
 
 export async function renderSearchCriteriaStudent(

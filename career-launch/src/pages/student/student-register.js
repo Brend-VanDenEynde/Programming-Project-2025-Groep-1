@@ -1,6 +1,6 @@
 import { renderStudentOpleiding } from './student-opleiding.js';
-import './student-register.css';
-import Router from '../router.js';
+import '../../css/student-register.css';
+import Router from '../../router.js';
 
 export function renderStudentRegister(rootElement) {
   rootElement.innerHTML = `
@@ -33,14 +33,20 @@ export function renderStudentRegister(rootElement) {
   </div>
   `;
 
-  
-
   const form = document.getElementById('naamForm');
   form.addEventListener('submit', handleNaamRegister);
 
-  document.getElementById('back-button').addEventListener('click', () => {
-    Router.navigate('/registreer');
-  });
+  const backBtn = document.getElementById('back-button');
+  if (backBtn) {
+    backBtn.onclick = null;
+    backBtn.addEventListener('click', () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        Router.navigate('/registreer');
+      }
+    });
+  }
 
   // Footer links
   const privacyLink = document.getElementById('privacy-link');
@@ -60,13 +66,15 @@ function handleNaamRegister(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
+  const linkedinInput = formData.get('linkedin');
   const data = {
     voornaam: formData.get('voornaam'),
     achternaam: formData.get('achternaam'),
-    linkedinLink: formData.get('linkedin'),
+    linkedinLink:
+      linkedinInput && linkedinInput.trim() !== ''
+        ? linkedinInput
+        : 'https://www.linkedin.com/',
   };
-
-  
 
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);

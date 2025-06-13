@@ -11,10 +11,9 @@ import { apiGet, apiPost, apiPut, apiDelete } from '../utils/api.js';
  */
 export async function fetchSkills() {
   try {
-    const skills = await apiGet('http://localhost:3001/skills/');
+    const skills = await apiGet('https://api.ehb-match.me/skills');
     return skills;
   } catch (error) {
-    console.error('Error fetching skills:', error);
     throw error;
   }
 }
@@ -25,10 +24,9 @@ export async function fetchSkills() {
  */
 export async function fetchStudents() {
   try {
-    const students = await apiGet('http://localhost:3001/studenten/');
+    const students = await apiGet('https://api.ehb-match.me/studenten');
     return students;
   } catch (error) {
-    console.error('Error fetching students:', error);
     throw error;
   }
 }
@@ -41,11 +39,10 @@ export async function fetchStudents() {
 export async function fetchStudentById(studentId) {
   try {
     const student = await apiGet(
-      `http://localhost:3001/studenten/${studentId}`
+      `https://api.ehb-match.me/studenten/${studentId}`
     );
     return student;
   } catch (error) {
-    console.error('Error fetching student:', error);
     throw error;
   }
 }
@@ -56,10 +53,9 @@ export async function fetchStudentById(studentId) {
  */
 export async function fetchCompanies() {
   try {
-    const companies = await apiGet('http://localhost:3001/bedrijven/');
+    const companies = await apiGet('https://api.ehb-match.me/bedrijven');
     return companies;
   } catch (error) {
-    console.error('Error fetching companies:', error);
     throw error;
   }
 }
@@ -73,12 +69,11 @@ export async function fetchCompanies() {
 export async function updateStudentProfile(studentId, profileData) {
   try {
     const updatedStudent = await apiPut(
-      `http://localhost:3001/studenten/${studentId}`,
+      `https://api.ehb-match.me/studenten/${studentId}`,
       profileData
     );
     return updatedStudent;
   } catch (error) {
-    console.error('Error updating student profile:', error);
     throw error;
   }
 }
@@ -92,12 +87,54 @@ export async function updateStudentProfile(studentId, profileData) {
 export async function saveSearchCriteria(studentId, criteria) {
   try {
     const response = await apiPost(
-      `http://localhost:3001/studenten/${studentId}/criteria`,
+      `https://api.ehb-match.me/studenten/${studentId}/criteria`,
       criteria
     );
     return response;
   } catch (error) {
-    console.error('Error saving search criteria:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete a user account (accessible to account owner and admins)
+ * @param {number} userId - The user ID to delete
+ * @returns {Promise<Object>} Response from server
+ */
+export async function deleteUser(userId) {
+  try {
+    const response = await apiDelete(`https://api.ehb-match.me/user/${userId}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Register a new company
+ * @param {Object} companyData - The company registration data
+ * @returns {Promise<Object>} Registration response from server
+ */
+export async function registerCompany(companyData) {
+  try {
+    const response = await fetch(
+      'https://api.ehb-match.me/auth/register/bedrijf',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(companyData),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Company registration failed');
+    }
+
+    return await response.json();
+  } catch (error) {
     throw error;
   }
 }

@@ -1,9 +1,10 @@
 // Admin student detail pagina
 import Router from '../../router.js';
-import defaultAvatar from '../../Images/default.jpg';
-import { performLogout } from '../../utils/auth-api.js';
+import defaultAvatar from '../../images/default.png';
+import { performLogout, logoutUser } from '../../utils/auth-api.js';
+import { deleteUser } from '../../utils/data-api.js';
 
-export function renderAdminStudentDetail(rootElement) {
+export async function renderAdminStudentDetail(rootElement) {
   // Check if user is logged in
   const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
   const adminUsername = sessionStorage.getItem('adminUsername');
@@ -15,7 +16,12 @@ export function renderAdminStudentDetail(rootElement) {
 
   // Get student ID from URL or use default for demo
   const urlParams = new URLSearchParams(window.location.search);
-  const studentId = urlParams.get('id') || 'demo';
+  const studentId = urlParams.get('id');
+
+  if (!studentId) {
+    console.error('Student ID is missing in the URL');
+    return;
+  }
 
   // Mock student data - in real app this would come from API
   const studentData = getStudentData(studentId);
@@ -139,6 +145,33 @@ export function renderAdminStudentDetail(rootElement) {
   // Event handlers
   setupEventHandlers();
   document.title = `Student Details: ${studentData.firstName} ${studentData.lastName} - Admin Dashboard`;
+
+  // Fetch student data from API
+  const accessToken = sessionStorage.getItem('accessToken');
+  try {
+    const response = await fetch(
+      `https://api.ehb-match.me/studenten/${studentId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    const studentData = await response.json();
+
+    // Update the page with student data
+    document.querySelector('.admin-section-header h1').textContent = `Student Details: ${studentData.voornaam} ${studentData.achternaam}`;
+    document.querySelector('.detail-logo-section img').src = studentData.profiel_foto || defaultAvatar;
+    document.querySelector('.detail-info .detail-field:nth-child(1) span').textContent = `${studentData.voornaam} ${studentData.achternaam}`;
+    document.querySelector('.detail-info .detail-field:nth-child(2) span').textContent = studentData.email || 'Niet beschikbaar';
+    document.querySelector('.detail-info .detail-field:nth-child(3) span').innerHTML = studentData.linkedin
+      ? `<a href="${studentData.linkedin}" target="_blank" class="linkedin-link">${studentData.linkedin}</a>`
+      : 'Niet ingesteld';
+  } catch (error) {
+    console.error('Error fetching student details:', error);
+  }
 }
 
 // Modal functionality for speeddates
@@ -255,6 +288,7 @@ function getStudentData(studentId) {
   // Mock data - in real app this would fetch from API
   const studentDatabase = {
     'tiberius-kirk': {
+      userId: 101,
       firstName: 'Tiberius',
       lastName: 'Kirk',
       email: 'Tiberius.Kirk@Enterprise.space',
@@ -270,6 +304,7 @@ function getStudentData(studentId) {
       lastLogin: '2024-12-08',
     },
     'john-smith': {
+      userId: 102,
       firstName: 'John',
       lastName: 'Smith',
       email: 'john.smith@student.ehb.be',
@@ -284,6 +319,7 @@ function getStudentData(studentId) {
       lastLogin: '2024-12-07',
     },
     'jean-luc-picard': {
+      userId: 103,
       firstName: 'Jean-Luc',
       lastName: 'Picard',
       email: 'jean.luc.picard@student.ehb.be',
@@ -297,8 +333,8 @@ function getStudentData(studentId) {
       registrationDate: '2024-08-20',
       status: 'Actief',
       lastLogin: '2024-12-09',
-    },
-    'daniel-vonkman': {
+    },    'daniel-vonkman': {
+      userId: 104,
       firstName: 'Daniel',
       lastName: 'Vonkman',
       email: 'daniel.vonkman@student.ehb.be',
@@ -313,6 +349,7 @@ function getStudentData(studentId) {
       lastLogin: '2024-12-06',
     },
     'len-jaxtyn': {
+      userId: 105,
       firstName: 'Len',
       lastName: 'Jaxtyn',
       email: 'len.jaxtyn@student.ehb.be',
@@ -327,6 +364,7 @@ function getStudentData(studentId) {
       lastLogin: '2024-12-08',
     },
     'kimberley-hester': {
+      userId: 106,
       firstName: 'Kimberley',
       lastName: 'Hester',
       email: 'kimberley.hester@student.ehb.be',
@@ -341,11 +379,11 @@ function getStudentData(studentId) {
       lastLogin: '2024-12-05',
     },
     'ed-marvin': {
+      userId: 107,
       firstName: 'Ed',
       lastName: 'Marvin',
       email: 'ed.marvin@student.ehb.be',
-      studyProgram: 'Engineering',
-      year: '4e jaar',
+      studyProgram: 'Engineering',      year: '4e jaar',
       birthDate: '1994-09-30',
       linkedIn: 'linkedin.com/in/ed-marvin',
       description:
@@ -356,6 +394,7 @@ function getStudentData(studentId) {
       lastLogin: '2024-12-07',
     },
     demo: {
+      userId: 999,
       firstName: 'Demo',
       lastName: 'Student',
       email: 'demo@student.ehb.be',
@@ -377,22 +416,23 @@ function getStudentData(studentId) {
 function setupEventHandlers() {
   // Back button
   const backBtn = document.getElementById('back-btn');
-  backBtn.addEventListener('click', () => {
-    Router.navigate('/admin-dashboard/ingeschreven-studenten');
-  });
+  if (backBtn) {
+    backBtn.onclick = null;
+    backBtn.addEventListener('click', () => {
+      Router.navigate('/admin-dashboard/ingeschreven-studenten');
+    });
+  }
   // Logout button
   const logoutBtn = document.getElementById('logout-btn');
-  logoutBtn.addEventListener('click', async () => {
-    try {
-      const result = await performLogout();
-      console.log('Admin logout result:', result);
-      Router.navigate('/admin-login');
-    } catch (error) {
-      console.error('Admin logout error:', error);
-      // Still navigate to login even if logout API fails
-      Router.navigate('/admin-login');
-    }
-  });
+  if (logoutBtn) {
+    logoutBtn.onclick = null;
+    logoutBtn.addEventListener('click', async () => {
+      await logoutUser();
+      window.sessionStorage.clear();
+      localStorage.clear();
+      Router.navigate('/');
+    });
+  }
 
   // Navigation buttons
   const navButtons = document.querySelectorAll('.nav-btn');
@@ -427,11 +467,40 @@ function setupEventHandlers() {
   speedDatesBtn.addEventListener('click', () => {
     openSpeedDatesModal();
   });
-
   const deleteBtn = document.getElementById('delete-account-btn');
-  deleteBtn.addEventListener('click', () => {
+  deleteBtn.addEventListener('click', async () => {
     if (confirm('Weet je zeker dat je dit account wilt verwijderen?')) {
-      alert('Account verwijdering zou hier geïmplementeerd worden.');
+      try {
+        // Get current student ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const studentId = urlParams.get('id') || 'demo';
+        
+        // Get student data to access user ID (in real app this would be the actual user ID)
+        const studentData = getStudentData(studentId);
+        
+        // In a real implementation, you would use the actual user ID from the student data
+        // For demo purposes, we'll use a mock ID
+        const userId = studentData.userId || 1; // This should be the actual user ID from your database
+        
+        // Call the delete API
+        await deleteUser(userId);
+        
+        alert('Account succesvol verwijderd.');
+        
+        // Navigate back to students overview
+        Router.navigate('/admin-dashboard/ingeschreven-studenten');
+      } catch (error) {
+        console.error('Error deleting user:', error);
+        
+        // Handle different error types
+        if (error.message.includes('403')) {
+          alert('Je hebt geen toestemming om dit account te verwijderen.');
+        } else if (error.message.includes('404')) {
+          alert('Gebruiker niet gevonden.');
+        } else {
+          alert('Er is een fout opgetreden bij het verwijderen van het account. Probeer het opnieuw.');
+        }
+      }
     }
   });
 

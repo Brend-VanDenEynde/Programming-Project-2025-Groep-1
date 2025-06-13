@@ -1,8 +1,8 @@
 // Admin ingeschreven studenten pagina
 import Router from '../../router.js';
-import { performLogout } from '../../utils/auth-api.js';
+import { logoutUser } from '../../utils/auth-api.js';
 
-export function renderAdminIngeschrevenStudenten(rootElement) {
+export async function renderAdminIngeschrevenStudenten(rootElement) {
   // Check if user is logged in
   const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
   const adminUsername = sessionStorage.getItem('adminUsername');
@@ -44,27 +44,7 @@ export function renderAdminIngeschrevenStudenten(rootElement) {
           
           <div class="admin-content-area" id="content-area">
             <div class="student-list">
-              <div class="student-item clickable-student" data-student-id="tiberius-kirk">
-                <span class="student-name">Tiberius Kirk</span>
-              </div>
-              <div class="student-item clickable-student" data-student-id="john-smith">
-                <span class="student-name">John Smith</span>
-              </div>
-              <div class="student-item clickable-student" data-student-id="jean-luc-picard">
-                <span class="student-name">Jean-Luc Picard</span>
-              </div>
-              <div class="student-item clickable-student" data-student-id="daniel-vonkman">
-                <span class="student-name">Daniel Vonkman</span>
-              </div>
-              <div class="student-item clickable-student" data-student-id="len-jaxtyn">
-                <span class="student-name">Len Jaxtyn</span>
-              </div>
-              <div class="student-item clickable-student" data-student-id="kimberley-hester">
-                <span class="student-name">Kimberley Hester</span>
-              </div>
-              <div class="student-item clickable-student" data-student-id="ed-marvin">
-                <span class="student-name">Ed Marvin</span>
-              </div>
+              <!-- Student items will be populated by JavaScript -->
             </div>
           </div>
         </main>
@@ -79,17 +59,15 @@ export function renderAdminIngeschrevenStudenten(rootElement) {
   `;
   // Handle logout
   const logoutBtn = document.getElementById('logout-btn');
-  logoutBtn.addEventListener('click', async () => {
-    try {
-      const result = await performLogout();
-      console.log('Admin logout result:', result);
-      Router.navigate('/admin-login');
-    } catch (error) {
-      console.error('Admin logout error:', error);
-      // Still navigate to login even if logout API fails
-      Router.navigate('/admin-login');
-    }
-  });
+  if (logoutBtn) {
+    logoutBtn.onclick = null;
+    logoutBtn.addEventListener('click', async () => {
+      await logoutUser();
+      window.sessionStorage.clear();
+      localStorage.clear();
+      Router.navigate('/');
+    });
+  }
 
   // Handle navigation between sections
   const navButtons = document.querySelectorAll('.nav-btn');
@@ -118,14 +96,39 @@ export function renderAdminIngeschrevenStudenten(rootElement) {
     Router.navigate('/contact');
   });
 
-  // Add click handlers for student items
-  const studentItems = document.querySelectorAll('.clickable-student');
-  studentItems.forEach((item) => {
-    item.addEventListener('click', () => {
-      const studentId = item.dataset.studentId;
-      Router.navigate(`/admin-dashboard/student-detail?id=${studentId}`);
+  // Fetch students data from API
+  const accessToken = sessionStorage.getItem('accessToken');
+  try {
+    const response = await fetch('https://api.ehb-match.me/studenten/', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
     });
-  });
+
+    const students = await response.json();
+
+    const studentListContainer = document.querySelector('.student-list');
+    studentListContainer.innerHTML = ''; // Clear existing content
+
+    students.forEach((student) => {
+      const studentItem = document.createElement('div');
+      studentItem.className = 'student-item clickable-student';
+      studentItem.dataset.studentId = student.gebruiker_id;
+
+      studentItem.innerHTML = `
+        <span class="student-name">${student.voornaam} ${student.achternaam}</span>
+      `;
+
+      studentItem.addEventListener('click', () => {
+        Router.navigate(`/admin-dashboard/student-detail?id=${student.gebruiker_id}`);
+      });
+
+      studentListContainer.appendChild(studentItem);
+    });
+  } catch (error) {
+    console.error('Error fetching students:', error);
+  }
 
   document.title = 'Ingeschreven Studenten - Admin Dashboard';
 }

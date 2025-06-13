@@ -1,5 +1,5 @@
 import Router from '../router.js';
-import ehbLogo from '../Images/EhB-logo-transparant.png';
+import ehbLogo from '../images/EhB-logo-transparant.png';
 
 export function renderHome(rootElement) {
   // Zet altijd light mode bij laden van home
@@ -36,8 +36,14 @@ export function renderHome(rootElement) {
   // Navigatie knoppen
   const btnLogin = document.getElementById('btn-login');
   const btnRegister = document.getElementById('btn-register');
-  if (btnLogin) btnLogin.addEventListener('click', () => window.appRouter.navigate('/login'));
-  if (btnRegister) btnRegister.addEventListener('click', () => window.appRouter.navigate('/registreer'));
+  if (btnLogin)
+    btnLogin.addEventListener('click', () =>
+      window.appRouter.navigate('/login')
+    );
+  if (btnRegister)
+    btnRegister.addEventListener('click', () =>
+      window.appRouter.navigate('/registreer')
+    );
 
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {

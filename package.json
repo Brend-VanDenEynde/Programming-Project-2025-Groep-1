@@ -1,0 +1,13 @@
+{
+  "name": "programming-project-2025-groep-1",
+  "version": "1.0.0",
+  "description": "Project for checking import case sensitivity",
+  "type": "commonjs",
+  "scripts": {
+    "check-imports": "node check-import-casing.js career-launch/src",
+    "check-imports-all": "node check-import-casing.js src"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
