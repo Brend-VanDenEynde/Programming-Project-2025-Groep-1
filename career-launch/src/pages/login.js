@@ -23,10 +23,9 @@ export function renderLogin(rootElement) {
             class="login-input"
           >          <div class="form-group">
             <label for="passwordInput">Wachtwoord</label>
-            <div style="position:relative;display:flex;align-items:center;">
-              <input type="password" id="passwordInput" name="password" required placeholder="Wachtwoord" style="flex:1;">
-              <button type="button" id="togglePassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">
-                <img id="togglePasswordIcon" src="/icons/hide.png" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
+            <div class="password-input-container">
+              <input type="password" id="passwordInput" name="password" required placeholder="Wachtwoord" class="login-input password-input-with-toggle">              <button type="button" id="togglePassword" class="password-toggle-btn">
+                <img id="togglePasswordIcon" src="/icons/hide.png" alt="Toon wachtwoord" class="password-toggle-icon" />
               </button>
             </div>
           </div>
@@ -75,7 +74,6 @@ export function renderLogin(rootElement) {
     e.preventDefault();
     Router.navigate('/contact');
   });
-
   // Password toggle
   const passwordInput = document.getElementById('passwordInput');
   const togglePassword = document.getElementById('togglePassword');
