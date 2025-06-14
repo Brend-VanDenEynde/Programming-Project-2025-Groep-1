@@ -85,10 +85,9 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}) {
         <div>
           <label for="nameInput">Bedrijfsnaam</label>
           <input type="text" id="nameInput" value="${name}" required>
-        </div>
-        <div>
+        </div>        <div>
           <label for="emailInput">E-mailadres</label>
-          <input type="email" id="emailInput" value="${email}" required>
+          <input type="email" id="emailInput" value="${email}" placeholder="Email" required>
         </div>
         <div>
           <label for="descriptionInput">Beschrijving</label>
