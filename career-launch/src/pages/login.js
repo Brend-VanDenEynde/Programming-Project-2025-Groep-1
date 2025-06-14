@@ -61,9 +61,9 @@ export function renderLogin(rootElement) {
   document
     .getElementById('register-link')
     .addEventListener('click', () => Router.navigate('/registreer'));
-  document
-    .getElementById('back-button')
-    .addEventListener('click', () => Router.navigate('/'));
+  document.getElementById('back-button').addEventListener('click', () => {
+    Router.goBack('/');
+  });
   document.getElementById('linkedin-btn').addEventListener('click', () => {
     /* LinkedIn login nog niet geïmplementeerd */
   });

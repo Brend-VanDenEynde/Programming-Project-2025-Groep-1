@@ -90,17 +90,10 @@ export function renderPrivacy(rootElement) {
       </footer>
     </div>
   `;
-  // Backbutton: eerst oude event listeners verwijderen
-  const backBtn = document.getElementById('back-button');
+  // Backbutton: eerst oude event listeners verwijderen  const backBtn = document.getElementById('back-button');
   if (backBtn) {
     const newHandler = () => {
-      if (window.history.length > 1) {
-        window.history.back();
-      } else if (window.appRouter) {
-        window.appRouter.navigate('/', { replace: true });
-      } else {
-        window.location.replace('/');
-      }
+      Router.goBack('/');
     };
     backBtn.onclick = null;
     backBtn.onclick = newHandler;

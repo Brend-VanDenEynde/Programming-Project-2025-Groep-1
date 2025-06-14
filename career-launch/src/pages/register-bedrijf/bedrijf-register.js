@@ -61,16 +61,11 @@ export function renderBedrijfRegister(rootElement) {
       fileStatus.textContent = 'No file selected.';
     }
   });
-
   const backBtn = document.getElementById('back-button');
   if (backBtn) {
     backBtn.onclick = null;
     backBtn.addEventListener('click', () => {
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        Router.navigate('/registreer-bedrijf');
-      }
+      Router.goBack('/registreer');
     });
   }
 

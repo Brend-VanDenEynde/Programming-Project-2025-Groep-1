@@ -22,28 +22,23 @@ export function renderHome(rootElement) {
       <footer class="student-profile-footer">
         <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
         <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
-      </footer>
-  `; // Event listeners voor buttons (als fallback of voor speciale handling)
+      </footer>  `;
+
+  // Event listeners voor navigatie knoppen
   const btnReg = document.getElementById('btn-register');
   const btnLog = document.getElementById('btn-login');
 
-  btnReg.addEventListener('click', () => {
-    Router.navigate('/registreer');
-  });
-  btnLog.addEventListener('click', () => {
-    Router.navigate('/login');
-  });
-  // Navigatie knoppen
-  const btnLogin = document.getElementById('btn-login');
-  const btnRegister = document.getElementById('btn-register');
-  if (btnLogin)
-    btnLogin.addEventListener('click', () =>
-      window.appRouter.navigate('/login')
-    );
-  if (btnRegister)
-    btnRegister.addEventListener('click', () =>
-      window.appRouter.navigate('/registreer')
-    );
+  if (btnReg) {
+    btnReg.addEventListener('click', () => {
+      Router.navigate('/registreer');
+    });
+  }
+
+  if (btnLog) {
+    btnLog.addEventListener('click', () => {
+      Router.navigate('/login');
+    });
+  }
 
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
