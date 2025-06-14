@@ -2303,6 +2303,341 @@ body.darkmode .student-profile-footer a:hover {
 }
 
 /* =============================================================================
+   12. STUDENT REGISTRATIE FORMULIEREN
+   ============================================================================= */
+
+/* Student Register Form Components */
+.form-container {
+  max-width: 500px;
+  margin: 2rem auto;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.bedrijfForm input {
+  width: 300px;
+}
+
+/* Terug knop */
+.back-button {
+  background: none;
+  border: none;
+  color: #004080;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+/* Upload sectie */
+.upload-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.upload-icon {
+  font-size: 2.5rem;
+  background-color: #e0e7ff;
+  color: #004080;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin: 0 auto 0.5rem;
+}
+
+.upload-section label {
+  display: block;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.upload-label {
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.file-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.file-input {
+  display: none;
+}
+
+.browse-button {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.browse-button:hover {
+  background-color: #e0e0e0;
+}
+
+.file-status {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Input groups and labels */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.input-label {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+/* Form fields */
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.name-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.name-row .input-group {
+  flex: 1;
+}
+
+.form-spacing {
+  margin-bottom: 1rem;
+}
+
+.input-half {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.input-full {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.input-half,
+.input-full {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-half:focus,
+.input-full:focus {
+  outline: none;
+  border-color: #004080;
+  box-shadow: 0 0 0 2px rgba(0, 64, 128, 0.1);
+}
+
+/* Volgende knop */
+.next-button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: #004080;
+  color: white;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.next-button:hover {
+  background-color: #003060;
+}
+
+/* Save knop */
+.save-button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: #004080;
+  color: white;
+  border-radius: 2px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-button:hover {
+  background-color: #003060;
+}
+
+/* Skip knop */
+.skip-button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: grey;
+  color: white;
+  border-radius: 2px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.skip-button:hover {
+  background-color: #555;
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 2rem;
+}
+
+/* Opleiding page specific styling */
+.opleiding-container {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.opleiding-content {
+  text-align: center;
+}
+
+.opleiding-title {
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.form-section {
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-weight: 400;
+  color: #333;
+}
+
+.radio-label:hover {
+  background-color: #f8f9fa;
+}
+
+.radio-label input[type='radio'] {
+  margin-right: 0.75rem;
+}
+
+.radio-label:has(input[type='radio']:checked) {
+  border-color: #004080;
+  background-color: #f8f9ff;
+}
+
+.select-label {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.opleiding-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: white;
+  color: #333;
+}
+
+.opleiding-select:focus {
+  outline: none;
+  border-color: #004080;
+}
+
+.create-account-button {
+  width: 100%;
+  padding: 1rem;
+  background: #004080;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 400;
+  cursor: pointer;
+  margin-top: 2rem;
+}
+
+.create-account-button:hover {
+  background: #003060;
+}
+
+.back-button-outside {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1rem;
+  cursor: pointer;
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  padding: 0.5rem;
+  z-index: 10;
+}
+
+.back-button-outside:hover {
+  color: #004080;
+}
+
+/* =============================================================================
    13. UTILITIES EN HELPERS
    ========================================================================== */
 
@@ -2752,5 +3087,637 @@ body.darkmode .checkbox-option input[type='radio'] {
 }
 
 /* =============================================================================
-   EINDE GECONSOLIDEERDE CSS
+   13. UTILITIES EN HELPERS
+   ========================================================================== */
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6c757d;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.clickable-processing {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clickable-processing:hover {
+  background-color: #f8f9fa;
+}
+
+.back-btn {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px; /* Or margin-bottom as per existing consolidated style - choosing margin-top from backup */
+  transition: background-color 0.3s ease;
+}
+
+.back-btn:hover {
+  background-color: #5a6268;
+}
+
+/* LinkedIn Link Style */
+.linkedin-link {
+  color: #0077b5;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 8px 0;
+  transition: color 0.3s ease;
+}
+
+.linkedin-link:hover {
+  color: #005885;
+  text-decoration: underline;
+}
+
+/* Fade in animatie */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Checkbox options */
+.checkbox-option {
+  font-weight: 600;
+  color: #333;
+  background: #fff;
+  border-radius: 8px;
+  padding: 10px 22px 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 120px;
+  border: 2px solid #e1e5e9;
+  cursor: pointer;
+  font-size: 1.08rem;
+  box-shadow: 0 2px 8px 0 rgba(44, 44, 44, 0.04);
+  margin-bottom: 0;
+  transition: border 0.15s, background 0.15s, color 0.15s;
+  user-select: none;
+}
+
+.checkbox-option input[type='checkbox'],
+.checkbox-option input[type='radio'] {
+  accent-color: grey;
+  width: 20px;
+  height: 20px;
+  margin: 0 6px 0 0;
+  border-radius: 6px;
+}
+
+.checkbox-option input[type='checkbox']:checked + span,
+.checkbox-option input[type='checkbox']:checked {
+  color: grey !important;
+  border-color: grey;
+}
+
+body.darkmode .checkbox-option {
+  background: #181c1f !important;
+  border: 2px solid #00e6ef !important;
+  color: #e0f7fa !important;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+body.darkmode .checkbox-option input[type='checkbox'],
+body.darkmode .checkbox-option input[type='radio'] {
+  accent-color: #00e6ef !important;
+}
+
+/* =============================================================================
+   12. STUDENT REGISTRATIE FORMULIEREN
    ============================================================================= */
+
+/* Student Register Form Components */
+.form-container {
+  max-width: 500px;
+  margin: 2rem auto;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.bedrijfForm input {
+  width: 300px;
+}
+
+/* Terug knop */
+.back-button {
+  background: none;
+  border: none;
+  color: #004080;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+/* Upload sectie */
+.upload-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.upload-icon {
+  font-size: 2.5rem;
+  background-color: #e0e7ff;
+  color: #004080;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin: 0 auto 0.5rem;
+}
+
+.upload-section label {
+  display: block;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.upload-label {
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.file-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.file-input {
+  display: none;
+}
+
+.browse-button {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.browse-button:hover {
+  background-color: #e0e0e0;
+}
+
+.file-status {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Input groups and labels */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.input-label {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+/* Form fields */
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.name-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.name-row .input-group {
+  flex: 1;
+}
+
+.form-spacing {
+  margin-bottom: 1rem;
+}
+
+.input-half {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.input-full {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.input-half,
+.input-full {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-half:focus,
+.input-full:focus {
+  outline: none;
+  border-color: #004080;
+  box-shadow: 0 0 0 2px rgba(0, 64, 128, 0.1);
+}
+
+/* Volgende knop */
+.next-button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: #004080;
+  color: white;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.next-button:hover {
+  background-color: #003060;
+}
+
+/* Save knop */
+.save-button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: #004080;
+  color: white;
+  border-radius: 2px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-button:hover {
+  background-color: #003060;
+}
+
+/* Skip knop */
+.skip-button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: grey;
+  color: white;
+  border-radius: 2px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.skip-button:hover {
+  background-color: #555;
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 2rem;
+}
+
+/* Opleiding page specific styling */
+.opleiding-container {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.opleiding-content {
+  text-align: center;
+}
+
+.opleiding-title {
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.form-section {
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-weight: 400;
+  color: #333;
+}
+
+.radio-label:hover {
+  background-color: #f8f9fa;
+}
+
+.radio-label input[type='radio'] {
+  margin-right: 0.75rem;
+}
+
+.radio-label:has(input[type='radio']:checked) {
+  border-color: #004080;
+  background-color: #f8f9ff;
+}
+
+.select-label {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.opleiding-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: white;
+  color: #333;
+}
+
+.opleiding-select:focus {
+  outline: none;
+  border-color: #004080;
+}
+
+.create-account-button {
+  width: 100%;
+  padding: 1rem;
+  background: #004080;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 400;
+  cursor: pointer;
+  margin-top: 2rem;
+}
+
+.create-account-button:hover {
+  background: #003060;
+}
+
+.back-button-outside {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1rem;
+  cursor: pointer;
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  padding: 0.5rem;
+  z-index: 10;
+}
+
+.back-button-outside:hover {
+  color: #004080;
+}
+
+/* =============================================================================
+   13. UTILITIES EN HELPERS
+   ========================================================================== */
+
+/* Speeddates Modal Styles */
+.speeddates-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.speeddates-modal-content {
+  background-color: #8b4a6b; /* Existing color from admin-style.css */
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.speeddates-modal-header {
+  background-color: #8b4a6b; /* Existing color */
+  color: white;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.speeddates-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.close-modal-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.close-modal-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.speeddates-modal-body {
+  background-color: #8b4a6b; /* Existing color */
+  padding: 1.5rem;
+  max-height: 400px; /* Consider adjusting if needed */
+  overflow-y: auto;
+}
+
+.speeddates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.speeddate-item {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s ease;
+}
+
+.speeddate-item:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.speeddate-info {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex: 1;
+}
+
+.speeddate-time {
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  min-width: 60px;
+}
+
+.speeddate-company,
+.speeddate-student { /* Combined as they share styles */
+  color: white;
+  font-size: 1rem;
+  flex: 1;
+}
+
+.speeddate-cancel-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.speeddate-cancel-btn:hover {
+  background-color: #c82333;
+  transform: scale(1.1);
+}
+
+.no-speeddates {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+  padding: 2rem;
+  font-size: 1.1rem;
+}
+
+/* Responsive styling for speeddate modal */
+@media (max-width: 768px) {
+  .speeddates-modal-content {
+    width: 95%;
+    margin: 0 10px;
+  }
+
+  .speeddates-modal-header {
+    padding: 1rem;
+  }
+
+  .speeddates-modal-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .speeddates-modal-body {
+    padding: 1rem;
+  }
+
+  .speeddate-info {
+    gap: 15px;
+  }
+
+  .speeddate-time {
+    min-width: 50px;
+    font-size: 0.9rem;
+  }
+
+  .speeddate-company, /* Adjusted for combined selector */
+  .speeddate-student {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .speeddate-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .speeddate-time {
+    min-width: auto;
+  }
+}
