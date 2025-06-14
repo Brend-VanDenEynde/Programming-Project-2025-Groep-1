@@ -21,11 +21,10 @@ export function renderLogin(rootElement) {
             required 
             placeholder="Email"
             class="login-input"
-          >
-          <div class="form-group">
+          >          <div class="form-group">
             <label for="passwordInput">Wachtwoord</label>
             <div style="position:relative;display:flex;align-items:center;">
-              <input type="password" id="passwordInput" name="password" required style="flex:1;">
+              <input type="password" id="passwordInput" name="password" required placeholder="Wachtwoord" style="flex:1;">
               <button type="button" id="togglePassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">
                 <img id="togglePasswordIcon" src="src/Icons/hide.png" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
               </button>

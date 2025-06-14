@@ -6,14 +6,12 @@ export function renderAdmin(rootElement) {
         <div class="admin-container">
             <div class="admin-card">
                 <h1>Admin Login</h1>
-                <form id="admin-login-form" class="admin-form">
-                    <div class="form-group">
+                <form id="admin-login-form" class="admin-form">                    <div class="form-group">
                         <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
+                        <input type="email" id="email" name="email" required placeholder="Email">
+                    </div><div class="form-group">
                         <label for="password">Wachtwoord:</label>
-                        <input type="password" id="password" name="password" required>
+                        <input type="password" id="password" name="password" required placeholder="Wachtwoord">
                     </div>
                     <button type="submit" class="admin-btn">Inloggen</button>
                     <label id="error-message" class="error-message" style="display: none; color: red;"></label>
@@ -58,6 +56,7 @@ export function renderAdmin(rootElement) {
 
       // Debugging: Log API responses
       console.log('Login Response:', responseData); // Display the message from the API response in the label
+      
       errorMessage.textContent =
         responseData.message || 'Er is een fout opgetreden.';
       errorMessage.style.display = 'block';
