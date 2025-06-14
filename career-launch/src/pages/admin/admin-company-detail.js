@@ -325,9 +325,10 @@ function setupEventHandlers() {
   });
 
   const speedDatesBtn = document.getElementById('view-speeddates-btn');
-  speedDatesBtn.addEventListener('click', () => {
-    openSpeedDatesModal();
-  });
+  if (speedDatesBtn) {
+    speedDatesBtn.removeEventListener('click', openSpeedDatesModal);
+    speedDatesBtn.addEventListener('click', openSpeedDatesModal);
+  }
   const deleteBtn = document.getElementById('delete-company-btn');
   deleteBtn.addEventListener('click', async () => {
     if (confirm('Weet je zeker dat je dit bedrijf wilt verwijderen?')) {
@@ -378,7 +379,7 @@ function setupEventHandlers() {
 }
 
 // Modal functionality for speeddates
-function openSpeedDatesModal() {
+async function openSpeedDatesModal() {
   const modal = document.getElementById('speeddates-modal');
   const speedDatesList = document.getElementById('speeddates-list');
 
@@ -386,50 +387,62 @@ function openSpeedDatesModal() {
   const urlParams = new URLSearchParams(window.location.search);
   const companyId = urlParams.get('id') || 'demo';
 
-  // Get speeddates data for this company
-  const speeddates = getCompanySpeedDates(companyId);
-
   // Clear existing content
   speedDatesList.innerHTML = '';
 
-  if (speeddates.length === 0) {
-    speedDatesList.innerHTML =
-      '<div class="no-speeddates">Geen speeddates gevonden</div>';
-  } else {
-    speeddates.forEach((speeddate) => {
-      const speedDateItem = document.createElement('div');
-      speedDateItem.className = 'speeddate-item';
-      speedDateItem.innerHTML = `
-        <div class="speeddate-info">
-          <span class="speeddate-time">${speeddate.time}</span>
-          <span class="speeddate-student">${speeddate.student}</span>
-        </div>
-        <button class="speeddate-cancel-btn" data-speeddate-id="${speeddate.id}" title="Annuleren">✕</button>
-      `;
-      speedDatesList.appendChild(speedDateItem);
+  try {
+    // Fetch speeddates data from API with company ID
+    const accessToken = sessionStorage.getItem('accessToken');
+    const response = await fetch(`https://api.ehb-match.me/speeddates?id=${companyId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
     });
 
-    // Add event listeners for cancel buttons
-    const cancelButtons = speedDatesList.querySelectorAll(
-      '.speeddate-cancel-btn'
-    );
-    cancelButtons.forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const speedDateId = btn.dataset.speeddateId;
-        if (confirm('Weet je zeker dat je deze speeddate wilt annuleren?')) {
-          btn.closest('.speeddate-item').remove();
-          // Later, make an API call to cancel the speeddate
-          console.log(`Speeddate ${speedDateId} geannuleerd`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch speeddates data');
+    }
 
-          // Check if list is now empty
-          if (speedDatesList.children.length === 0) {
-            speedDatesList.innerHTML =
-              '<div class="no-speeddates">Geen speeddates gevonden</div>';
-          }
-        }
+    const speeddates = await response.json();
+
+    if (speeddates.length === 0) {
+      speedDatesList.innerHTML = '<div class="no-speeddates">Geen speeddates gevonden</div>';
+    } else {
+      speeddates.forEach((speeddate) => {
+        const speedDateItem = document.createElement('div');
+        speedDateItem.className = 'speeddate-item';
+        speedDateItem.innerHTML = `
+          <div class="speeddate-info">
+            <span class="speeddate-time">${new Date(speeddate.begin).toLocaleTimeString()} - ${new Date(speeddate.einde).toLocaleTimeString()}</span>
+            <span class="speeddate-student">${speeddate.voornaam_student} ${speeddate.achternaam_student}</span>
+          </div>
+          <button class="speeddate-cancel-btn" data-speeddate-id="${speeddate.id}" title="Annuleren">✕</button>
+        `;
+        speedDatesList.appendChild(speedDateItem);
       });
-    });
+
+      // Add event listeners for cancel buttons
+      const cancelButtons = speedDatesList.querySelectorAll('.speeddate-cancel-btn');
+      cancelButtons.forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const speedDateId = btn.dataset.speeddateId;
+          if (confirm('Weet je zeker dat je deze speeddate wilt annuleren?')) {
+            btn.closest('.speeddate-item').remove();
+            console.log(`Speeddate ${speedDateId} geannuleerd`);
+
+            // Check if list is now empty
+            if (speedDatesList.children.length === 0) {
+              speedDatesList.innerHTML = '<div class="no-speeddates">Geen speeddates gevonden</div>';
+            }
+          }
+        });
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching speeddates:', error);
+    speedDatesList.innerHTML = '<div class="error">Er is een probleem opgetreden bij het ophalen van de speeddates. Probeer het later opnieuw.</div>';
   }
 
   modal.style.display = 'flex';
