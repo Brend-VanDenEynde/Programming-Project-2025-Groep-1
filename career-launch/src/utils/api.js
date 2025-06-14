@@ -17,14 +17,17 @@ import {
  */
 export async function authenticatedFetch(url, options = {}) {
   // Get the auth token from session storage
+  // Try accessToken first (used by admin), fallback to authToken
+  const accessToken = window.sessionStorage.getItem('accessToken');
   const authToken = window.sessionStorage.getItem('authToken');
+  const token = accessToken || authToken;
 
   // Prepare headers with authentication
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers,
-    ...(authToken && {
-      Authorization: `Bearer ${authToken}`,
+    ...(token && {
+      Authorization: `Bearer ${token}`,
     }),
   };
 

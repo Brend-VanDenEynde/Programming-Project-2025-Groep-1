@@ -55,9 +55,8 @@ export function renderAdmin(rootElement) {
       const responseData = await response.json();
 
       // Debugging: Log API responses
-      console.log('Login Response:', responseData);
-
-      // Display the message from the API response in the label
+      console.log('Login Response:', responseData); // Display the message from the API response in the label
+      
       errorMessage.textContent =
         responseData.message || 'Er is een fout opgetreden.';
       errorMessage.style.display = 'block';
@@ -65,6 +64,7 @@ export function renderAdmin(rootElement) {
 
       if (response.ok) {
         // Store important information in session storage
+        sessionStorage.setItem('authToken', responseData.accessToken);
         sessionStorage.setItem('accessToken', responseData.accessToken);
         sessionStorage.setItem(
           'accessTokenExpiresAt',

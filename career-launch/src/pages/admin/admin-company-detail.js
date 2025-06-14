@@ -286,11 +286,18 @@ function setupEventHandlers() {
   });
 
   // Admin action buttons
-  // Update the contact button to use the correct email
+  // Zorg ervoor dat de contacteer-knop correct werkt
   const contactBtn = document.getElementById('contact-company-btn');
   contactBtn.addEventListener('click', async () => {
     try {
-      // Fetch company data again to ensure email is available
+      // Haal het huidige bedrijf ID op uit de URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const companyId = urlParams.get('id');
+
+      // Haal de toegangstoken op
+      const accessToken = sessionStorage.getItem('accessToken');
+
+      // Maak een API-aanroep om bedrijfsgegevens op te halen
       const response = await fetch(`https://api.ehb-match.me/bedrijven/${companyId}`, {
         method: 'GET',
         headers: {
@@ -304,7 +311,7 @@ function setupEventHandlers() {
 
       const companyData = await response.json();
 
-      // Use the contact_email from the fetched data
+      // Gebruik het contact_email van de opgehaalde gegevens
       const mailtoLink = `mailto:${companyData.contact_email || ''}`;
       if (companyData.contact_email) {
         window.location.href = mailtoLink;
