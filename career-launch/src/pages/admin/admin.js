@@ -6,14 +6,12 @@ export function renderAdmin(rootElement) {
         <div class="admin-container">
             <div class="admin-card">
                 <h1>Admin Login</h1>
-                <form id="admin-login-form" class="admin-form">
-                    <div class="form-group">
+                <form id="admin-login-form" class="admin-form">                    <div class="form-group">
                         <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
+                        <input type="email" id="email" name="email" required placeholder="Email">
+                    </div><div class="form-group">
                         <label for="password">Wachtwoord:</label>
-                        <input type="password" id="password" name="password" required>
+                        <input type="password" id="password" name="password" required placeholder="Wachtwoord">
                     </div>
                     <button type="submit" class="admin-btn">Inloggen</button>
                     <label id="error-message" class="error-message" style="display: none; color: red;"></label>
@@ -60,14 +58,18 @@ export function renderAdmin(rootElement) {
       console.log('Login Response:', responseData);
 
       // Display the message from the API response in the label
-      errorMessage.textContent = responseData.message || 'Er is een fout opgetreden.';
+      errorMessage.textContent =
+        responseData.message || 'Er is een fout opgetreden.';
       errorMessage.style.display = 'block';
       errorMessage.style.backgroundColor = 'transparent'; // Remove background styling
 
       if (response.ok) {
         // Store important information in session storage
         sessionStorage.setItem('accessToken', responseData.accessToken);
-        sessionStorage.setItem('accessTokenExpiresAt', responseData.accessTokenExpiresAt);
+        sessionStorage.setItem(
+          'accessTokenExpiresAt',
+          responseData.accessTokenExpiresAt
+        );
         // Set adminLoggedIn session variable
         sessionStorage.setItem('adminLoggedIn', 'true');
 
@@ -75,7 +77,7 @@ export function renderAdmin(rootElement) {
         const infoResponse = await fetch('https://api.ehb-match.me/auth/info', {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${responseData.accessToken}`,
+            Authorization: `Bearer ${responseData.accessToken}`,
           },
         });
 
@@ -96,7 +98,8 @@ export function renderAdmin(rootElement) {
       }
     } catch (error) {
       // Handle errors
-      errorMessage.textContent = 'Er is een fout opgetreden bij het maken van de API-aanroep.';
+      errorMessage.textContent =
+        'Er is een fout opgetreden bij het maken van de API-aanroep.';
       errorMessage.style.display = 'block';
       errorMessage.style.backgroundColor = 'transparent'; // Remove background styling
       console.error(error);

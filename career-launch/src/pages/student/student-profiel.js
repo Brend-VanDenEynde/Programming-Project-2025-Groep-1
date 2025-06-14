@@ -2,6 +2,8 @@ import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
 import { getOpleidingNaamById, opleidingen } from './student-opleidingen.js';
 import { logoutUser } from '../../utils/auth-api.js';
+import { renderBedrijven } from './bedrijven.js';
+
 
 // Use public assets for better production compatibility
 const logoIcon = '/icons/favicon-32x32.png';
@@ -36,17 +38,25 @@ export function renderStudentProfiel(
     } catch (e) {}
   }
 
+  // Gebruik altijd deze variabelen voor API-calls
+  // In deze omgeving zijn studentID en userID gelijk, maar future-proof splitsen
+  const studentID = studentData.id || studentData.gebruiker_id;
+  const userID = studentData.gebruiker_id || studentData.id;
+
   // Gebruik ENKEL de huidige API velden
   const {
     voornaam = defaultProfile.voornaam,
     achternaam = defaultProfile.achternaam,
     email = studentData.email || defaultProfile.email,
     studiejaar = defaultProfile.studiejaar,
-    profiel_foto = defaultProfile.profiel_foto,
+    profiel_foto: rawProfielFoto = defaultProfile.profiel_foto,
     linkedin = defaultProfile.linkedin,
     date_of_birth = defaultProfile.date_of_birth,
     opleiding_id = defaultProfile.opleiding_id,
   } = studentData;
+
+  // Gebruik default als profiel_foto null, leeg of undefined is
+  const profiel_foto = (!rawProfielFoto || rawProfielFoto === 'null') ? defaultAvatar : rawProfielFoto;
 
   // Map opleiding name to id if id is missing
   let resolvedOpleidingId = opleiding_id;
@@ -200,8 +210,8 @@ export function renderStudentProfiel(
   // Sidebar nav - gebruik de router voor echte URL navigatie
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
     btn.addEventListener('click', (e) => {
+      e.preventDefault();
       const route = e.currentTarget.getAttribute('data-route');
-      // Gebruik de router om naar de juiste URL te navigeren
       import('../../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
@@ -218,7 +228,7 @@ export function renderStudentProfiel(
             Router.navigate('/student/student-speeddates-verzoeken');
             break;
           case 'bedrijven':
-            Router.navigate('/student/bedrijven');
+            Router.navigate('/student/bedrijven')
             break;
           case 'qr':
             Router.navigate('/student/student-qr-popup');
@@ -347,10 +357,10 @@ export function renderStudentProfiel(
         );
         const token = sessionStorage.getItem('authToken');
         // Haal altijd de juiste ID’s uit sessionStorage
-        let studentID = studentData.gebruiker_id;
-        let userID = studentData.gebruiker_id;
+        // let studentID = studentData.gebruiker_id;
+        // let userID = studentData.gebruiker_id;
         if (!studentID || !userID) {
-          alert('Student ID (gebruiker_id) ontbreekt!');
+          alert('Student ID of gebruiker_id ontbreekt!');
           return;
         }
         // Debug: log de gebruikte ID's en token
@@ -463,6 +473,7 @@ export function renderStudentProfiel(
           email: '',
           date_of_birth: today,
           gebruiker_id: originalData.gebruiker_id,
+          id: originalData.id, // altijd id behouden
           opleiding_id: '', // forceer selectie
         };
         renderStudentProfiel(rootElement, resetData, false);

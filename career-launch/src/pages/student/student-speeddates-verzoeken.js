@@ -132,11 +132,11 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
   `;
 
   renderTable();
-  // Sidebar nav - gebruik de router voor echte URL navigatie
+  // --- Sidebar navigatie uniform maken ---
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
     btn.addEventListener('click', (e) => {
+      e.preventDefault();
       const route = e.currentTarget.getAttribute('data-route');
-      // Gebruik de router om naar de juiste URL te navigeren
       import('../../router.js').then((module) => {
         const Router = module.default;
         switch (route) {

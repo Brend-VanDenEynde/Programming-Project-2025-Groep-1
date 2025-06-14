@@ -58,32 +58,34 @@ export function renderQRPopup(rootElement, studentData = {}) {
     </div>
   `;
 
-  // Sidebar navigation (consistent with other student pages)
+  // --- Sidebar navigatie uniform maken ---
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
     btn.addEventListener('click', (e) => {
+      e.preventDefault();
       const route = e.currentTarget.getAttribute('data-route');
-      switch (route) {
-        case 'profile':
-          renderStudentProfiel(rootElement, studentData);
-          break;
-        case 'search':
-          renderSearchCriteriaStudent(rootElement, studentData);
-          break;
-        case 'speeddates':
-          renderSpeeddates(rootElement, studentData);
-          break;
-        case 'requests':
-          renderSpeeddatesRequests(rootElement, studentData);
-          break;
-        case 'bedrijven':
-          import('./bedrijven.js').then((m) =>
-            m.renderBedrijven(rootElement, studentData)
-          );
-          break;
-        case 'qr':
-          renderQRPopup(rootElement, studentData);
-          break;
-      }
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        switch (route) {
+          case 'profile':
+            Router.navigate('/student/student-profiel');
+            break;
+          case 'search':
+            Router.navigate('/student/zoek-criteria');
+            break;
+          case 'speeddates':
+            Router.navigate('/student/student-speeddates');
+            break;
+          case 'requests':
+            Router.navigate('/student/student-speeddates-verzoeken');
+            break;
+          case 'bedrijven':
+            Router.navigate('/student/bedrijven');
+            break;
+          case 'qr':
+            Router.navigate('/student/student-qr-popup');
+            break;
+        }
+      });
     });
   });
 

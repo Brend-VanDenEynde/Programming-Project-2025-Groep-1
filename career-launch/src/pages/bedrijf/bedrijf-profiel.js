@@ -83,22 +83,18 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}) {
         <div>
           <label for="photoInput">Logo (max 2MB)</label>
           <input type="file" accept="image/*" id="photoInput">
-        </div>
-        <div>
+        </div>        <div>
           <label for="nameInput">Bedrijfsnaam</label>
-          <input type="text" id="nameInput" value="${name}" required>
-        </div>
-        <div>
+          <input type="text" id="nameInput" value="${name}" placeholder="Bedrijfsnaam" required>
+        </div><div>
           <label for="emailInput">E-mailadres</label>
-          <input type="email" id="emailInput" value="${email}" required>
-        </div>
-        <div>
+          <input type="email" id="emailInput" value="${email}" placeholder="Email" required>
+        </div>        <div>
           <label for="descriptionInput">Beschrijving</label>
-          <textarea id="descriptionInput" rows="3">${description}</textarea>
-        </div>
-        <div>
+          <textarea id="descriptionInput" rows="3" placeholder="Beschrijf je bedrijf...">${description}</textarea>
+        </div>        <div>
           <label for="linkedinInput">LinkedIn-link</label>
-          <input type="url" id="linkedinInput" value="${linkedIn}">
+          <input type="url" id="linkedinInput" value="${linkedIn}" placeholder="https://www.linkedin.com/company/...">
         </div>
         <button id="cancel-edit-btn">Reset</button>
         <button id="save-profile-btn">Save</button>

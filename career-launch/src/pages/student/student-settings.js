@@ -39,7 +39,7 @@ export function showSettingsPopup(onClose) {
       .settings-action-btn:hover { filter: brightness(1.07) drop-shadow(0 0 12px #3dd68625); color: #fff; }
       .settings-action-btn.logout:hover { background: linear-gradient(90deg, #cfd7ea 0%, #e4eafd 100%);}
       .settings-action-btn.delete:hover { background: linear-gradient(90deg, #fd7855 0%, #fa626a 100%);}
-      @keyframes popupIn { 0% { transform: scale(0.85) translateY(40px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+      @keyframes popupIn { 0% { transform: scale(0.85) translateY(40px); } 100% { transform: scale(1) translateY(0); } }
       @media (max-width: 600px) { .settings-popup-card {padding:8px 2vw;} .settings-title {font-size:1.19rem;} }
       body.darkmode, .darkmode .settings-popup-card { background: #232846 !important; color: #f3f6fa; }
     `;

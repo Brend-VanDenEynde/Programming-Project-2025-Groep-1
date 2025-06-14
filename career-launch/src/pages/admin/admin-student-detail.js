@@ -1,10 +1,8 @@
 // Admin student detail pagina
 import Router from '../../router.js';
+import defaultAvatar from '../../images/default.png';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
-
-// Use public assets for better production compatibility
-const defaultAvatar = '/images/default.png';
 
 export async function renderAdminStudentDetail(rootElement) {
   // Check if user is logged in
@@ -29,9 +27,10 @@ export async function renderAdminStudentDetail(rootElement) {
   const studentData = getStudentData(studentId);
 
   rootElement.innerHTML = `
-    <div class="admin-dashboard-clean" style="background-color: white;">      <header class="admin-header-clean">
+    <div class="admin-dashboard-clean" style="background-color: white;">
+      <header class="admin-header-clean">
         <div class="admin-logo-section">
-          <img src="/images/ehb-logo-transparant.png" alt="Logo" width="40" height="40">
+          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
         </div>
         <div class="admin-header-right">
@@ -485,19 +484,21 @@ function setupEventHandlers() {
       try {
         // Get current student ID from URL
         const urlParams = new URLSearchParams(window.location.search);
-        const studentId = urlParams.get('id') || 'demo';
+        const studentId = urlParams.get('id');
 
-        // Get student data to access user ID (in real app this would be the actual user ID)
-        const studentData = getStudentData(studentId);
+        if (!studentId) {
+          alert('Student ID niet gevonden.');
+          return;
+        }
 
-        // In a real implementation, you would use the actual user ID from the student data
-        // For demo purposes, we'll use a mock ID
-        const userId = studentData.userId || 1; // This should be the actual user ID from your database
+        // Use the student ID as the user ID for the delete API call
+        // The studentId in the URL is actually the gebruiker_id from the API
+        const userId = studentId;
 
         // Call the delete API
         await deleteUser(userId);
 
-        alert('Account succesvol verwijderd.');
+        alert('Student succesvol verwijderd.');
 
         // Navigate back to students overview
         Router.navigate('/admin-dashboard/ingeschreven-studenten');
