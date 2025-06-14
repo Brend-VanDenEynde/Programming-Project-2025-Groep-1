@@ -13,10 +13,9 @@ export async function renderAdminIngeschrevenBedrijven(rootElement) {
   }
 
   rootElement.innerHTML = `
-    <div class="admin-dashboard-clean">
-      <header class="admin-header-clean">
+    <div class="admin-dashboard-clean">      <header class="admin-header-clean">
         <div class="admin-logo-section">
-          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+          <img src="/images/ehb-logo-transparant.png" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
         </div>
         <div class="admin-header-right">
@@ -97,12 +96,15 @@ export async function renderAdminIngeschrevenBedrijven(rootElement) {
   // Fetch approved companies from API
   const accessToken = sessionStorage.getItem('accessToken');
   try {
-    const response = await fetch('https://api.ehb-match.me/bedrijven/goedgekeurd', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
+    const response = await fetch(
+      'https://api.ehb-match.me/bedrijven/goedgekeurd',
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
 
     const companies = await response.json();
 
@@ -110,15 +112,17 @@ export async function renderAdminIngeschrevenBedrijven(rootElement) {
     companyListContainer.innerHTML = ''; // Clear existing content
 
     if (companies.length === 0) {
-      companyListContainer.innerHTML = '<p class="no-companies">Geen bedrijven zijn goedgekeurd om naar de Career Launch te komen.</p>';
+      companyListContainer.innerHTML =
+        '<p class="no-companies">Geen bedrijven zijn goedgekeurd om naar de Career Launch te komen.</p>';
     } else {
       companies.forEach((company) => {
         const companyItem = document.createElement('div');
         companyItem.className = 'company-item clickable-company';
         companyItem.dataset.companyId = company.gebruiker_id;
-
         companyItem.innerHTML = `
-          <img src="${company.profiel_foto || 'src/Images/default.png'}" alt="${company.naam}" class="company-logo" style="height: 40px; width: auto; margin-right: 10px;">
+          <img src="${company.profiel_foto || '/images/default.png'}" alt="${
+          company.naam
+        }" class="company-logo" style="height: 40px; width: auto; margin-right: 10px;">
           <span class="company-name">${company.naam}</span>
         `;
 

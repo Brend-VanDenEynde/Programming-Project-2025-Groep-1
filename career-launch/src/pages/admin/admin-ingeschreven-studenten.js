@@ -16,7 +16,7 @@ export async function renderAdminIngeschrevenStudenten(rootElement) {
     <div class="admin-dashboard-clean">
       <header class="admin-header-clean">
         <div class="admin-logo-section">
-          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+          <img src="/images/ehb-logo-transparant.png" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
         </div>
         <div class="admin-header-right">
@@ -102,7 +102,7 @@ export async function renderAdminIngeschrevenStudenten(rootElement) {
     const response = await fetch('https://api.ehb-match.me/studenten/', {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 
@@ -121,7 +121,9 @@ export async function renderAdminIngeschrevenStudenten(rootElement) {
       `;
 
       studentItem.addEventListener('click', () => {
-        Router.navigate(`/admin-dashboard/student-detail?id=${student.gebruiker_id}`);
+        Router.navigate(
+          `/admin-dashboard/student-detail?id=${student.gebruiker_id}`
+        );
       });
 
       studentListContainer.appendChild(studentItem);

@@ -1,10 +1,12 @@
 // src/views/bedrijf-profiel.js
 
-import defaultAvatar from '../../images/BedrijfDefault.jpg';
-import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
+
+// Use public assets for better production compatibility
+const defaultAvatar = '/images/BedrijfDefault.jpg';
+const logoIcon = '/icons/favicon-32x32.png';
 
 export function renderBedrijfProfiel(rootElement, bedrijfData = {}) {
   // Haal altijd de meest recente bedrijfData uit sessionStorage als deze leeg is

@@ -1,10 +1,12 @@
-import logoIcon from '../../icons/favicon-32x32.png';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { renderQRPopup } from './student-qr-popup.js';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
+
+// Use public assets for better production compatibility
+const logoIcon = '/icons/favicon-32x32.png';
 
 export function renderSearchCriteriaStudent(
   rootElement,

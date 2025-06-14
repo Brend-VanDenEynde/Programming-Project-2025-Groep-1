@@ -18,10 +18,9 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
   const companyId = urlParams.get('id');
 
   rootElement.innerHTML = `
-    <div class="admin-dashboard-clean">
-      <header class="admin-header-clean">
+    <div class="admin-dashboard-clean">      <header class="admin-header-clean">
         <div class="admin-logo-section">
-          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+          <img src="/images/ehb-logo-transparant.png" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
         </div>
         <div class="admin-header-right">
@@ -52,7 +51,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
                 <div class="detail-left">
                   <div class="detail-logo-section">
                     <img 
-                      src="src/Images/BedrijfDefault.jpg" 
+                      src="/images/BedrijfDefault.jpg" 
                       alt="Logo" 
                       class="detail-logo"
                     />
@@ -123,7 +122,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
       '#section-title'
     ).textContent = `Bedrijf in Behandeling - ${company.naam}`;
     document.querySelector('.detail-logo-section img').src =
-      company.profiel_foto || 'src/Images/BedrijfDefault.jpg';
+      company.profiel_foto || '/images/BedrijfDefault.jpg';
     document.querySelector('.detail-logo').alt = `Logo ${company.naam}`;
     document.querySelector('.detail-info').innerHTML = `
       <div class="detail-field">

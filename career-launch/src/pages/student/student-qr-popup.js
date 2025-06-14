@@ -1,11 +1,13 @@
-import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './student-settings.js';
-import defaultAvatar from '../../images/default.png';
+
+// Use public assets for better production compatibility
+const logoIcon = '/icons/favicon-32x32.png';
+const defaultAvatar = '/images/default.png';
 
 // src/views/student-qr-popup.js
 

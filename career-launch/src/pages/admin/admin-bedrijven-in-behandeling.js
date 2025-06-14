@@ -12,10 +12,9 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
   }
 
   rootElement.innerHTML = `
-    <div class="admin-dashboard-clean">
-      <header class="admin-header-clean">
+    <div class="admin-dashboard-clean">      <header class="admin-header-clean">
         <div class="admin-logo-section">
-          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+          <img src="/images/ehb-logo-transparant.png" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
         </div>
         <div class="admin-header-right">

@@ -1,4 +1,3 @@
-import logoIcon from '../../icons/favicon-32x32.png';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddates } from './student-speeddates.js';
@@ -7,7 +6,10 @@ import { renderQRPopup } from './student-qr-popup.js';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
 import { fetchCompanies } from '../../utils/data-api.js';
-import defaultBedrijfLogo from '../../images/BedrijfDefault.jpg';
+
+// Use public assets for better production compatibility
+const logoIcon = '/icons/favicon-32x32.png';
+const defaultBedrijfLogo = '/images/BedrijfDefault.jpg';
 
 // Globale variabele voor bedrijven data
 let bedrijven = [];

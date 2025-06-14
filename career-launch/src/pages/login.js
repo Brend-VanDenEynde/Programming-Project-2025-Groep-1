@@ -23,11 +23,10 @@ export function renderLogin(rootElement) {
             class="login-input"
           >
           <div class="form-group">
-            <label for="passwordInput">Wachtwoord</label>
-            <div style="position:relative;display:flex;align-items:center;">
+            <label for="passwordInput">Wachtwoord</label>            <div style="position:relative;display:flex;align-items:center;">
               <input type="password" id="passwordInput" name="password" required style="flex:1;">
               <button type="button" id="togglePassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">
-                <img id="togglePasswordIcon" src="src/Icons/hide.png" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
+                <img id="togglePasswordIcon" src="/icons/hide.png" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
               </button>
             </div>
           </div>
@@ -85,9 +84,7 @@ export function renderLogin(rootElement) {
     togglePassword.addEventListener('click', () => {
       const isVisible = passwordInput.type === 'text';
       passwordInput.type = isVisible ? 'password' : 'text';
-      togglePasswordIcon.src = isVisible
-        ? 'src/Icons/hide.png'
-        : 'src/Icons/eye.png';
+      togglePasswordIcon.src = isVisible ? '/icons/hide.png' : '/icons/eye.png';
       togglePasswordIcon.alt = isVisible
         ? 'Toon wachtwoord'
         : 'Verberg wachtwoord';
