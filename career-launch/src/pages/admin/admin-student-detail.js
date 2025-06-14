@@ -1,6 +1,7 @@
 // Admin student detail pagina
 import Router from '../../router.js';
-import defaultAvatar from '../../images/default.png';
+// Use public assets for better production compatibility
+const defaultAvatar = '/images/default.png';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
 
@@ -30,7 +31,7 @@ export async function renderAdminStudentDetail(rootElement) {
     <div class="admin-dashboard-clean" style="background-color: white;">
       <header class="admin-header-clean">
         <div class="admin-logo-section">
-          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+          <img src="/images/ehb-logo-transparant.png" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
         </div>
         <div class="admin-header-right">

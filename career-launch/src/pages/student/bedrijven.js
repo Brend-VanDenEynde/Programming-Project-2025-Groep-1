@@ -1,11 +1,10 @@
-import logoIcon from '../../icons/favicon-32x32.png';
+// Use public assets for better production compatibility
+const logoIcon = '/icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
 import { fetchCompanies } from '../../utils/data-api.js';
-import defaultBedrijfLogo from '../../images/BedrijfDefault.jpg';
-
-
-
+// Use public assets for better production compatibility
+const defaultBedrijfLogo = '/images/bedrijfdefault.jpg';
 
 // Globale variabele voor bedrijven data
 let bedrijven = [];
@@ -41,7 +40,7 @@ function showBedrijfPopup(bedrijf, studentId) {
       const mm = min < 10 ? `0${min}` : `${min}`;
       return {
         label: `${uur}u${mm}`,
-        value: `${datum}T${uur < 10 ? '0' : ''}${uur}:${mm}:00Z`
+        value: `${datum}T${uur < 10 ? '0' : ''}${uur}:${mm}:00Z`,
       };
     });
   }
@@ -50,8 +49,8 @@ function showBedrijfPopup(bedrijf, studentId) {
     <div id="bedrijf-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:420px;width:95vw;position:relative;display:flex;flex-direction:column;align-items:center;">
       <button id="bedrijf-popup-close" style="position:absolute;top:10px;right:14px;font-size:1.7rem;background:none;border:none;cursor:pointer;color:#888;">&times;</button>
       <img src="${bedrijf.foto}" alt="Logo ${
-        bedrijf.naam
-      }" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
+    bedrijf.naam
+  }" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
       <h2 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h2>
       <div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${
         bedrijf.locatie
@@ -67,7 +66,11 @@ function showBedrijfPopup(bedrijf, studentId) {
         <label for="speeddates-uur" style="font-weight:500;">Kies een uur:</label>
         <select id="speeddates-uur" style="width:100%;margin-top:0.5rem;padding:0.5rem;border-radius:6px;border:1.5px solid #e1e5e9;">
           <option value="">-- Selecteer een uur --</option>
-          ${uren.map((uur) => `<option value="${uur}">${uur}:00 - ${uur}:59</option>`).join('')}
+          ${uren
+            .map(
+              (uur) => `<option value="${uur}">${uur}:00 - ${uur}:59</option>`
+            )
+            .join('')}
         </select>
       </div>
       <div style="margin-bottom:1rem;width:100%;">
@@ -100,7 +103,7 @@ function showBedrijfPopup(bedrijf, studentId) {
     aanvraagBtn.disabled = true;
     if (uurSelect.value) {
       const slots = getSlotsForUur(Number(uurSelect.value));
-      slots.forEach(slot => {
+      slots.forEach((slot) => {
         const opt = document.createElement('option');
         opt.value = slot.value;
         opt.textContent = slot.label;
@@ -116,53 +119,51 @@ function showBedrijfPopup(bedrijf, studentId) {
 
   // Speeddate aanvraag knop (API-call)
   // Speeddate aanvraag knop (API-call)
-aanvraagBtn.onclick = async () => {
-  const status = document.getElementById('speeddates-aanvraag-status');
-  aanvraagBtn.disabled = true;
-  uurSelect.disabled = true;
-  minutenSelect.disabled = true;
-  status.textContent = 'Aanvraag wordt verstuurd...';
-  status.style.display = 'block';
-  try {
-    const req = await fetch('https://api.ehb-match.me/speeddate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${window.sessionStorage.getItem('authToken')}`
-      },
-      body: JSON.stringify({
-        id_student: studentId,
-        id_bedrijf: bedrijf.gebruiker_id,
-        datum: gekozenDatum
-      })
-    });
-    if (req.ok) {
-      status.textContent = `Speeddate aangevraagd voor ${uurSelect.value}u${minutenSelect.selectedOptions[0].textContent.slice(-2)}!`;
-      // ---->>> HIER confirmatie in de console
-      console.log(
-        '[Speeddate aanvraag verstuurd]',
-        {
+  aanvraagBtn.onclick = async () => {
+    const status = document.getElementById('speeddates-aanvraag-status');
+    aanvraagBtn.disabled = true;
+    uurSelect.disabled = true;
+    minutenSelect.disabled = true;
+    status.textContent = 'Aanvraag wordt verstuurd...';
+    status.style.display = 'block';
+    try {
+      const req = await fetch('https://api.ehb-match.me/speeddate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${window.sessionStorage.getItem('authToken')}`,
+        },
+        body: JSON.stringify({
           id_student: studentId,
           id_bedrijf: bedrijf.gebruiker_id,
-          datum: gekozenDatum
-        }
-      );
-    } else {
-      const err = await req.json();
-      status.textContent = err.message || 'Er ging iets mis!';
+          datum: gekozenDatum,
+        }),
+      });
+      if (req.ok) {
+        status.textContent = `Speeddate aangevraagd voor ${
+          uurSelect.value
+        }u${minutenSelect.selectedOptions[0].textContent.slice(-2)}!`;
+        // ---->>> HIER confirmatie in de console
+        console.log('[Speeddate aanvraag verstuurd]', {
+          id_student: studentId,
+          id_bedrijf: bedrijf.gebruiker_id,
+          datum: gekozenDatum,
+        });
+      } else {
+        const err = await req.json();
+        status.textContent = err.message || 'Er ging iets mis!';
+        status.style.color = '#da2727';
+      }
+    } catch (e) {
+      status.textContent = 'Er ging iets mis bij het verzenden!';
       status.style.color = '#da2727';
     }
-  } catch (e) {
-    status.textContent = 'Er ging iets mis bij het verzenden!';
-    status.style.color = '#da2727';
-  }
-  setTimeout(() => {
-    status.style.display = 'none';
-    popup.remove();
-  }, 1800);
-};
+    setTimeout(() => {
+      status.style.display = 'none';
+      popup.remove();
+    }, 1800);
+  };
 }
-
 
 // Filter en zoek functionaliteit (alleen op naam zoeken)
 function filterBedrijven({ zoek = '', locatie = '', werkdomein = '' }) {
@@ -193,9 +194,8 @@ function getUniekeDomeinen() {
 
 // Hoofdfunctie: lijst van bedrijven
 export async function renderBedrijven(rootElement, studentData = {}) {
-
   // DIT MAG NIET BOVENAAN STAAN:
-console.log(studentData); // <-- error!
+  console.log(studentData); // <-- error!
 
   setTimeout(async () => {
     let huidigeZoek = '';
@@ -208,7 +208,8 @@ console.log(studentData); // <-- error!
       return;
     }
     // Loading-indicator tijdens data ophalen
-    rootElement.innerHTML = '<div class="loading-spinner" style="text-align:center;padding:2em;"><span>Loading...</span></div>';
+    rootElement.innerHTML =
+      '<div class="loading-spinner" style="text-align:center;padding:2em;"><span>Loading...</span></div>';
     // Load companies from API
     try {
       const companies = await fetchCompanies();
@@ -257,8 +258,8 @@ console.log(studentData); // <-- error!
             .map(
               (bedrijf, idx) => `
     <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;" data-bedrijf-idx="${bedrijven.indexOf(
-        bedrijf
-      )}">
+      bedrijf
+    )}">
       <img src="${bedrijf.foto}" alt="Logo ${
                 bedrijf.naam
               }" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
@@ -275,13 +276,16 @@ console.log(studentData); // <-- error!
             .join('')
         : `<div style="text-align:center;width:100%;color:#888;">Geen bedrijven gevonden.</div>`;
 
-    document.querySelectorAll('.bedrijf-card').forEach((card) => {
-  card.addEventListener('click', () => {
-    const idx = card.getAttribute('data-bedrijf-idx');
-showBedrijfPopup(bedrijven[idx], studentData.id || studentData.gebruiker_id);
-  });
-});
- }
+      document.querySelectorAll('.bedrijf-card').forEach((card) => {
+        card.addEventListener('click', () => {
+          const idx = card.getAttribute('data-bedrijf-idx');
+          showBedrijfPopup(
+            bedrijven[idx],
+            studentData.id || studentData.gebruiker_id
+          );
+        });
+      });
+    }
     // Initial render with loading state
     rootElement.innerHTML = `
     <div class="student-profile-container">

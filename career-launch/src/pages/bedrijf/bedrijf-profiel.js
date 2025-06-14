@@ -5,7 +5,7 @@ import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
 
 // Use public assets for better production compatibility
-const defaultAvatar = '/images/BedrijfDefault.jpg';
+const defaultAvatar = '/images/bedrijfdefault.jpg';
 const logoIcon = '/icons/favicon-32x32.png';
 
 export function renderBedrijfProfiel(rootElement, bedrijfData = {}) {
