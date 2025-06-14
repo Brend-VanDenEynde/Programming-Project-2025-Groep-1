@@ -1119,6 +1119,22 @@ a:hover {
   background-color: #c82333;
 }
 
+.menu-toggle-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #495057;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.menu-toggle-btn:hover {
+  background-color: #dee2e6;
+}
+
 .admin-main-layout {
   display: flex;
   flex: 1;
@@ -1186,180 +1202,146 @@ a:hover {
   background: white;
 }
 
-/* Admin Action Buttons - REMOVED UNUSED CLASSES */
-
-/* Detail Pages */
-.detail-container {
+.student-item {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
   background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.detail-main-layout {
-  display: flex;
-  gap: 40px;
-  align-items: flex-start;
+.student-item:hover {
+  background-color: #f8f9fa;
 }
 
-.detail-left {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.detail-right {
-  flex: 0 0 200px;
-  display: flex;
-  justify-content: center;
-}
-
-.detail-logo {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #ddd;
-}
-
-.detail-info {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.detail-field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.detail-field label {
-  font-weight: bold;
-  color: #555;
-  font-size: 14px;
-}
-
-.detail-field span {
-  color: #333;
+.student-name {
   font-size: 16px;
-  padding: 8px 0;
+  font-weight: 500;
+  color: #333;
 }
 
-/* Admin Modals */
-.speeddates-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+.company-item {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: white;
 }
 
-.speeddates-modal-content {
-  background-color: #8b4a6b;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 80vh;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+.company-item:hover {
+  background-color: #f8f9fa;
 }
 
-.speeddates-modal-header {
-  background-color: #8b4a6b;
-  color: white;
-  padding: 1.5rem;
+.company-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.processing-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: white;
 }
 
-.speeddates-modal-header h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.close-modal-btn {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 2rem;
-  cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background-color 0.2s ease;
-}
-
-.close-modal-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.speeddates-modal-body {
-  background-color: #8b4a6b;
-  padding: 1.5rem;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.speeddates-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.speeddate-info {
-  display: flex;
-  gap: 20px;
-  align-items: center;
-  flex: 1;
-}
-
-.speeddate-time {
-  color: white;
-  font-weight: 600;
-  font-size: 1rem;
-  min-width: 60px;
-}
-
-.speeddate-company,
-.speeddate-student {
-  color: white;
-  font-size: 1rem;
-  flex: 1;
-}
-
-.speeddate-cancel-btn {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  cursor: pointer;
+.processing-company-name {
   font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+}
+
+.processing-company-name.clickable {
+  cursor: pointer;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.processing-company-name.clickable:hover {
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.processing-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.approve-btn,
+.reject-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
-.speeddate-cancel-btn:hover {
+.approve-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.approve-btn:hover {
+  background-color: #1e7e34;
+  transform: scale(1.1);
+}
+
+.reject-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.reject-btn:hover {
   background-color: #c82333;
   transform: scale(1.1);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6c757d;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.clickable-student {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clickable-student:hover {
+  background-color: #f8f9fa;
+}
+
+.clickable-processing {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clickable-processing:hover {
+  background-color: #f8f9fa;
+}
+
+.clickable-company {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clickable-company:hover {
+  background-color: #f8f9fa;
 }
 
 /* =============================================================================
@@ -2072,11 +2054,257 @@ body.darkmode .student-profile-footer a:hover {
   .modern-contact-form {
     gap: 1rem;
   }
+
+  /* Admin responsive design */
+  .admin-header-clean {
+    padding: 1rem;
+  }
+
+  .admin-header-right {
+    gap: 0.5rem;
+  }
+
+  .admin-username {
+    display: none;
+  }
+
+  .menu-toggle-btn {
+    display: block;
+  }
+
+  .admin-sidebar-clean {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .admin-sidebar-clean.active {
+    left: 0;
+  }
+
+  .admin-content-clean {
+    padding: 1rem;
+  }
+
+  .admin-section-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .student-item {
+    padding: 0.75rem 1rem;
+  }
+
+  /* Detail pages responsive */
+  .detail-main-layout,
+  .student-detail-main-layout,
+  .company-detail-main-layout {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .detail-right,
+  .student-detail-right,
+  .company-detail-right {
+    flex: none;
+    width: 100%;
+  }
+
+  .detail-actions,
+  .student-detail-actions,
+  .company-detail-actions {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .detail-action-btn,
+  .student-action-btn,
+  .company-action-btn {
+    flex: 1;
+    min-width: auto;
+    margin: 0 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-logo-section {
+    font-size: 1rem;
+  }
+
+  .admin-logo-section img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .admin-section-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .logout-btn-clean {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .student-detail-container,
+  .company-detail-container {
+    margin: 0 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .student-detail-section h3,
+  .company-detail-section h3 {
+    font-size: 1.1rem;
+  }
+
+  .detail-action-btn,
+  .student-action-btn,
+  .company-action-btn {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Unified Detail Page Styles - Used by all detail pages */
+.detail-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.detail-main-layout {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.detail-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.detail-right {
+  flex: 0 0 200px;
+  display: flex;
+  justify-content: center;
+}
+
+.detail-logo-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.detail-logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 3px solid #ddd;
+}
+
+.detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.detail-field label {
+  font-weight: bold;
+  color: #555;
+  font-size: 14px;
+}
+
+.detail-field span {
+  color: #333;
+  font-size: 16px;
+  padding: 8px 0;
+}
+
+.detail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.detail-action-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-align: center;
+  min-width: 120px;
+}
+
+/* Button color schemes for detail actions */
+.detail-action-btn.speeddates {
+  background-color: #007bff;
+  color: white;
+}
+
+.detail-action-btn.speeddates:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.detail-action-btn.contact {
+  background-color: #6c757d;
+  color: white;
+}
+
+.detail-action-btn.contact:hover {
+  background-color: #5a6268;
+  transform: translateY(-1px);
+}
+
+.detail-action-btn.accept {
+  background-color: #28a745;
+  color: white;
+}
+
+.detail-action-btn.accept:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+}
+
+.detail-action-btn.reject {
+  background-color: #dc3545;
+  color: white;
+}
+
+.detail-action-btn.reject:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+}
+
+.detail-action-btn.delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.detail-action-btn.delete:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
 }
 
 /* =============================================================================
    13. UTILITIES EN HELPERS
-   ============================================================================= */
+   ========================================================================== */
 
 .empty-state {
   text-align: center;
@@ -2099,19 +2327,22 @@ body.darkmode .student-profile-footer a:hover {
 }
 
 .back-btn {
-  background: none;
+  background-color: #6c757d;
+  color: white;
   border: none;
-  color: #007bff;
-  font-size: 16px;
+  padding: 8px 16px;
+  border-radius: 4px;
   cursor: pointer;
-  padding: 8px 0;
-  margin-bottom: 10px;
+  font-size: 14px;
+  margin-top: 10px; /* Or margin-bottom as per existing consolidated style - choosing margin-top from backup */
+  transition: background-color 0.3s ease;
 }
 
 .back-btn:hover {
-  text-decoration: underline;
+  background-color: #5a6268;
 }
 
+/* LinkedIn Link Style */
 .linkedin-link {
   color: #0077b5;
   text-decoration: none;
