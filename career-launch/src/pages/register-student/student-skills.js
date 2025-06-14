@@ -1,4 +1,4 @@
-import '../../css/student-register.css';
+import '../../css/consolidated-style.css';
 import Router from '../../router.js';
 
 export async function renderStudentSkills(rootElement) {

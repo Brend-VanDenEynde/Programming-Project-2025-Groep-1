@@ -1,5 +1,5 @@
 // import { renderStudentOpleiding } from '../register-student/student-opleiding.js';
-import '../../css/student-register.css';
+import '../../css/consolidated-style.css';
 import Router from '../../router.js';
 import { registerCompany } from '../../utils/data-api.js';
 

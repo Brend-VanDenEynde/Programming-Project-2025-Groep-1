@@ -1,6 +1,5 @@
 import Router from './router.js';
-import './css/style.css';
-import './css/admin-style.css';
+import './css/consolidated-style.css';
 
 import { renderHome } from './pages/home.js';
 import { renderRegister } from './pages/register.js';
