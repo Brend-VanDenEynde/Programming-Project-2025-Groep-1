@@ -47,17 +47,22 @@ const routes = {
   '/student/student-speeddates-verzoeken': renderSpeeddatesRequests,
   '/student/student-settings': showSettingsPopup,
   '/student/bedrijven': (rootElement) => {
-  const studentData = JSON.parse(window.sessionStorage.getItem('studentData'));
-  renderBedrijven(rootElement, studentData);},
+    const studentData = JSON.parse(
+      window.sessionStorage.getItem('studentData')
+    );
+    renderBedrijven(rootElement, studentData);
+  },
   '/admin-login': renderAdmin,
   '/admin-select-dashboard': renderAdminSelectDashboard,
   '/admin-dashboard': renderAdminSelectDashboard,
   '/admin-dashboard/ingeschreven-studenten': renderAdminIngeschrevenStudenten,
   '/admin-dashboard/ingeschreven-bedrijven': renderAdminIngeschrevenBedrijven,
-  '/admin-dashboard/bedrijven-in-behandeling': renderAdminBedrijvenInBehandeling,
+  '/admin-dashboard/bedrijven-in-behandeling':
+    renderAdminBedrijvenInBehandeling,
   '/admin-dashboard/student-detail': renderAdminStudentDetail,
   '/admin-dashboard/company-detail': renderAdminCompanyDetail,
-  '/admin-dashboard/processing-company-detail': renderAdminProcessingCompanyDetail,
+  '/admin-dashboard/processing-company-detail':
+    renderAdminProcessingCompanyDetail,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
   '/bedrijf/bedrijf-profiel': renderBedrijfProfiel,
@@ -84,7 +89,6 @@ class Router {
       }
     });
   }
-
   navigate(path, { replace = false } = {}) {
     if (replace) {
       window.history.replaceState(null, '', path);
@@ -92,6 +96,28 @@ class Router {
       window.history.pushState(null, '', path);
     }
     this.handleRouteChange();
+  }
+
+  // Verbeterde back navigation methode
+  goBack(fallbackPath = '/') {
+    // Probeer eerst terug te gaan via browser history
+    if (window.history.length > 1 && document.referrer) {
+      // Check of de referrer van dezelfde origin is om veiligheidsredenen
+      try {
+        const referrerUrl = new URL(document.referrer);
+        const currentUrl = new URL(window.location.href);
+
+        if (referrerUrl.origin === currentUrl.origin) {
+          window.history.back();
+          return;
+        }
+      } catch (e) {
+        // Als er een fout is bij het parsen van URLs, gebruik fallback
+      }
+    }
+
+    // Fallback naar de opgegeven route
+    this.navigate(fallbackPath);
   }
 
   handleRouteChange() {
@@ -131,10 +157,31 @@ class Router {
     };
     document.title = titles[path] || 'Career Launch 2025';
   }
-
   static navigate(path) {
     window.history.pushState(null, '', path);
     window.dispatchEvent(new PopStateEvent('popstate'));
+  }
+
+  static goBack(fallbackPath = '/') {
+    if (window.appRouter) {
+      window.appRouter.goBack(fallbackPath);
+    } else {
+      // Fallback als er geen router instance is
+      if (window.history.length > 1 && document.referrer) {
+        try {
+          const referrerUrl = new URL(document.referrer);
+          const currentUrl = new URL(window.location.href);
+
+          if (referrerUrl.origin === currentUrl.origin) {
+            window.history.back();
+            return;
+          }
+        } catch (e) {
+          // Error in URL parsing, use fallback
+        }
+      }
+      Router.navigate(fallbackPath);
+    }
   }
 }
 
@@ -152,5 +199,3 @@ if (
 
 // *** HIERONDER default export ***
 export default Router;
-
-

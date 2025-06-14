@@ -57,11 +57,7 @@ export function renderStudentOpleiding(rootElement) {
   if (backBtn) {
     backBtn.onclick = null;
     backBtn.addEventListener('click', () => {
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        Router.navigate('/registreer');
-      }
+      Router.goBack('/registreer');
     });
   }
 
@@ -175,21 +171,9 @@ async function handleJaarRegister(event) {
     errorLabel.textContent =
       'Er is een fout opgetreden bij het aanmaken van je account.';
     errorLabel.style.display = 'block';
-  }  }
+  }
+}
 
-  // Voorbeeld: als er een uitlogknop zou zijn
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Voorbeeld: als er een uitlogknop zou zijn
 
 // No changes needed for image imports in this file. All asset and API usage is correct.}  }    });      Router.navigate('/');      localStorage.clear();      window.sessionStorage.clear();      // Hier zou je eventueel een logoutUser() API call doen    logoutBtn.addEventListener('click', async () => {    logoutBtn.onclick = null;  if (logoutBtn) {  const logoutBtn = document.getElementById('logout-btn');// No changes needed for image imports in this file. All asset and API usage is correct.

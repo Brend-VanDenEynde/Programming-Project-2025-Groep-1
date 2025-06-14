@@ -40,13 +40,7 @@ export async function renderStudentSkills(rootElement) {
   const form = document.getElementById('skillsForm');
   form.addEventListener('submit', handleSkillsRegister);
   document.getElementById('back-button').addEventListener('click', () => {
-    // Check if there's a previous page in history
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      // Fallback to register if no history
-      Router.navigate('/registreer');
-    }
+    Router.goBack('/registreer');
   });
 
   // Footer links

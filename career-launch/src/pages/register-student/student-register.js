@@ -71,9 +71,8 @@ export function renderStudentRegister(rootElement) {
       fileStatus.textContent = 'No file selected.';
     }
   });
-
   document.getElementById('back-button').addEventListener('click', () => {
-    Router.navigate('/registreer');
+    Router.goBack('/registreer');
   });
 
   // Footer links
