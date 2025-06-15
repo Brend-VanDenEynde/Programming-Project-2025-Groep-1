@@ -120,12 +120,7 @@ export async function renderAdminIngeschrevenBedrijven(rootElement) {
       companies.forEach((company) => {
         const companyItem = document.createElement('div');
         companyItem.className = 'company-item clickable-company';
-        companyItem.dataset.companyId = company.gebruiker_id;
-
-        companyItem.innerHTML = `
-          <img src="${company.profiel_foto || 'src/Images/default.png'}" alt="${
-          company.naam
-        }" class="company-logo" style="height: 40px; width: auto; margin-right: 10px;">
+        companyItem.dataset.companyId = company.gebruiker_id;        companyItem.innerHTML = `
           <span class="company-name">${company.naam}</span>
         `;
 
