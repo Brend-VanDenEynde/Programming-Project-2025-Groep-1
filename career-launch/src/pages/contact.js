@@ -106,21 +106,12 @@ export function renderContact(rootElement) {
 
 // Functie om alle event listeners en validatie te initialiseren
 function initializeContactPage() {
-  // Terug knop functionaliteit
-  // Backbutton: eerst oude event listeners verwijderen
+  // Back button - same technique as login and register pages
   const backButton = document.getElementById('back-button');
   if (backButton) {
-    const newHandler = () => {
-      if (window.history.length > 1) {
-        window.history.back();
-      } else if (window.appRouter) {
-        window.appRouter.navigate('/', { replace: true });
-      } else {
-        window.location.replace('/');
-      }
-    };
-    backButton.onclick = null;
-    backButton.onclick = newHandler;
+    backButton.addEventListener('click', () => {
+      Router.goBack('/');
+    });
   }
   // Formulier elementen ophalen
   const form = document.getElementById('modernContactForm');
