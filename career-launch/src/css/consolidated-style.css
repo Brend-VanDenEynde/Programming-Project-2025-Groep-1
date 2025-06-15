@@ -2954,3 +2954,225 @@ body.darkmode .student-profile-footer a:hover {
     min-width: auto;
   }
 }
+
+/* =============================================================================
+   FAVORITES FUNCTIONALITY STYLES
+   ============================================================================= */
+
+/* Favorite button styling */
+.favorite-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 10;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.favorite-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.favorite-btn.favorited {
+  background: rgba(255, 182, 193, 0.9);
+}
+
+.favorite-btn.favorited:hover {
+  background: rgba(255, 182, 193, 1);
+}
+
+/* Dark mode favorites button */
+.darkmode .favorite-btn {
+  background: rgba(45, 45, 45, 0.9);
+  color: #fff;
+}
+
+.darkmode .favorite-btn:hover {
+  background: rgba(45, 45, 45, 1);
+}
+
+.darkmode .favorite-btn.favorited {
+  background: rgba(139, 69, 19, 0.9);
+}
+
+.darkmode .favorite-btn.favorited:hover {
+  background: rgba(139, 69, 19, 1);
+}
+
+/* Favorites filter checkbox styling */
+#filter-favorieten {
+  margin-left: 10px;
+  transform: scale(1.2);
+  accent-color: #da2727;
+}
+
+.favorites-filter-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+}
+
+.favorites-filter-label:hover {
+  color: #da2727;
+}
+
+/* Feedback notification animations */
+.feedback-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4caf50;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  z-index: 10000;
+  animation: slideInRight 0.3s ease-out, fadeOut 0.3s ease-in 2.7s;
+  animation-fill-mode: both;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.feedback-notification.error {
+  background: #da2727;
+}
+
+.feedback-notification.info {
+  background: #2196f3;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Heart animation for favorite action */
+@keyframes heartBeat {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.favorite-btn.animating {
+  animation: heartBeat 0.4s ease-in-out;
+}
+
+/* Company card hover effect enhancement for favorites */
+.company-card {
+  position: relative;
+}
+
+.company-card:hover .favorite-btn {
+  transform: scale(1.05);
+}
+
+/* Popup favorite button specific styling */
+.popup-favorite-btn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.popup-favorite-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: #da2727;
+  transform: scale(1.1);
+}
+
+.popup-favorite-btn.favorited {
+  background: rgba(255, 182, 193, 0.95);
+  border-color: #da2727;
+}
+
+.darkmode .popup-favorite-btn {
+  background: rgba(45, 45, 45, 0.95);
+  border-color: #555;
+  color: #fff;
+}
+
+.darkmode .popup-favorite-btn:hover {
+  background: rgba(45, 45, 45, 1);
+  border-color: #da2727;
+}
+
+.darkmode .popup-favorite-btn.favorited {
+  background: rgba(139, 69, 19, 0.95);
+  border-color: #da2727;
+}
+
+/* Responsive adjustments for favorites */
+@media (max-width: 768px) {
+  .favorite-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+    top: 8px;
+    right: 8px;
+  }
+
+  .popup-favorite-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 16px;
+    top: 10px;
+    right: 10px;
+  }
+
+  .feedback-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    text-align: center;
+  }
+
+  .favorites-filter-label {
+    font-size: 14px;
+  }
+}
