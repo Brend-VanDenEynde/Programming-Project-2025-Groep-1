@@ -49,10 +49,9 @@ export async function renderStudentSkills(rootElement) {
             <button class="skip-button" id="skip-button">SKIP</button>
             <button class="save-button" id="save-button">SAVE</button>
           </div>
-        </form>
-      </main>
+        </form>      </main>
       <footer class="footer">
-        <a href="#" id="privacy-link">Privacy Policy</a> | <a href="#" id="contact-link">Contacteer Ons</a>
+        <a href="/privacy" data-route="/privacy">Privacy Policy</a> | <a href="/contact" data-route="/contact">Contacteer Ons</a>
       </footer>
     </div>
   `;
@@ -71,17 +70,6 @@ export async function renderStudentSkills(rootElement) {
       }
     });
   }
-  // Footer links
-  const privacyLink = document.getElementById('privacy-link');
-  privacyLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Privacy Policy pagina nog niet geïmplementeerd');
-  });
-  const contactLink = document.getElementById('contact-link');
-  contactLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Contact pagina nog niet geïmplementeerd');
-  });
 }
 
 function handleSkillsRegister(event) {
