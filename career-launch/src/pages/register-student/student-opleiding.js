@@ -84,7 +84,33 @@ export function renderStudentOpleiding(rootElement) {
 
 async function loadOpleidingen() {
   try {
-    const opleidingen = await apiGet('https://api.ehb-match.me/opleidingen/');
+    // Try direct fetch first since this might be a public endpoint
+    console.log('Fetching opleidingen from API...');
+
+    let opleidingen;
+    try {
+      const response = await fetch('https://api.ehb-match.me/opleidingen/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      opleidingen = await response.json();
+      console.log(
+        'Successfully fetched opleidingen with direct fetch:',
+        opleidingen
+      );
+    } catch (fetchError) {
+      console.warn('Direct fetch failed, trying with apiGet:', fetchError);
+      // Fallback to apiGet in case authentication is required
+      opleidingen = await apiGet('https://api.ehb-match.me/opleidingen/');
+    }
+
     const opleidingSelect = document.querySelector('.opleiding-select');
     opleidingSelect.innerHTML = ''; // Clear all existing options
 
@@ -94,7 +120,7 @@ async function loadOpleidingen() {
     defaultOption.textContent = 'Opleiding';
     opleidingSelect.appendChild(defaultOption); // Add default option
 
-    if (opleidingen.length === 0) {
+    if (!opleidingen || opleidingen.length === 0) {
       const option = document.createElement('option');
       option.disabled = true;
       option.textContent = 'Geen opleidingen beschikbaar';
@@ -109,7 +135,21 @@ async function loadOpleidingen() {
     }
   } catch (error) {
     console.error('Fout bij het ophalen van opleidingen:', error);
-    alert('Er is een fout opgetreden bij het ophalen van opleidingen.');
+
+    // Show more specific error message
+    const opleidingSelect = document.querySelector('.opleiding-select');
+    opleidingSelect.innerHTML = '';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.selected = true;
+    defaultOption.disabled = true;
+    defaultOption.textContent = 'Fout bij laden opleidingen';
+    opleidingSelect.appendChild(defaultOption);
+
+    const errorOption = document.createElement('option');
+    errorOption.disabled = true;
+    errorOption.textContent = `Error: ${error.message}`;
+    opleidingSelect.appendChild(errorOption);
   }
 }
 
@@ -153,7 +193,6 @@ async function handleJaarRegister(event) {
   } else {
     linkedinValue = '/in/profile'; // Default placeholder instead of full URL
   }
-
   const data = {
     email: previousData.email || '',
     password: previousData.password || '',
@@ -165,8 +204,68 @@ async function handleJaarRegister(event) {
     opleiding_id: parseInt(opleiding, 10),
     date_of_birth: previousData.date_of_birth || '',
   };
+
+  // Validate required fields before sending
+  const requiredFields = [
+    'email',
+    'password',
+    'voornaam',
+    'achternaam',
+    'date_of_birth',
+  ];
+  const missingFields = requiredFields.filter(
+    (field) => !data[field] || data[field].trim() === ''
+  );
+
+  if (missingFields.length > 0) {
+    errorLabel.textContent = `Ontbrekende gegevens: ${missingFields.join(
+      ', '
+    )}. Ga terug naar de vorige stap om deze in te vullen.`;
+    errorLabel.style.display = 'block';
+    return;
+  }
+
+  // Validate numeric fields
+  if (isNaN(data.studiejaar) || data.studiejaar < 1 || data.studiejaar > 3) {
+    errorLabel.textContent = 'Ongeldig studiejaar geselecteerd.';
+    errorLabel.style.display = 'block';
+    return;
+  }
+  if (isNaN(data.opleiding_id) || data.opleiding_id <= 0) {
+    errorLabel.textContent = 'Ongeldige opleiding geselecteerd.';
+    errorLabel.style.display = 'block';
+    return;
+  }
+
   try {
     console.log('Sending data to API:', JSON.stringify(data, null, 2));
+
+    // Log environment info for debugging
+    console.log('Current hostname:', window.location.hostname);
+    console.log('User agent:', navigator.userAgent);
+    console.log(
+      'LocalStorage userData keys:',
+      Object.keys(
+        localStorage.getItem('userData')
+          ? JSON.parse(localStorage.getItem('userData'))
+          : {}
+      )
+    );
+
+    // Alternative approach: Try using the existing apiPost utility
+    // which might handle CORS or other production issues better
+    try {
+      console.log('Attempting registration with apiPost utility...');
+      const result = await apiPost(
+        'https://api.ehb-match.me/auth/register/student',
+        data
+      );
+      console.log('Registration successful with apiPost:', result);
+      Router.navigate('/login');
+      return;
+    } catch (apiPostError) {
+      console.warn('apiPost failed, falling back to fetch:', apiPostError);
+    }
 
     const response = await fetch(
       'https://api.ehb-match.me/auth/register/student',
@@ -180,26 +279,55 @@ async function handleJaarRegister(event) {
     );
 
     console.log('Response status:', response.status);
-    console.log('Response headers:', response.headers);
+    console.log(
+      'Response headers:',
+      Object.fromEntries(response.headers.entries())
+    );
 
     if (!response.ok) {
       // Try to get the actual error message from the API
-      let errorMessage = 'Fout bij het aanmaken van account.';
+      let errorMessage = `Fout bij het aanmaken van account (${response.status}).`;
+      let detailedError = '';
+
       try {
         const errorData = await response.json();
         console.error('API error response:', errorData);
-        errorMessage = errorData.message || errorData.error || errorMessage;
+
+        // Extract error details more comprehensively
+        if (errorData.message) {
+          errorMessage = errorData.message;
+        } else if (errorData.error) {
+          errorMessage = errorData.error;
+        } else if (errorData.details) {
+          errorMessage = errorData.details;
+        }
+
+        // Log additional error information for debugging
+        if (errorData.errors) {
+          console.error('Validation errors:', errorData.errors);
+          detailedError = JSON.stringify(errorData.errors);
+        }
       } catch (jsonError) {
-        const errorText = await response.text();
-        console.error('API error text:', errorText);
-        errorMessage = errorText || errorMessage;
+        console.error('Failed to parse error response as JSON:', jsonError);
+        try {
+          const errorText = await response.text();
+          console.error('API error text:', errorText);
+          errorMessage = errorText || errorMessage;
+        } catch (textError) {
+          console.error('Failed to read response as text:', textError);
+        }
       }
-      throw new Error(errorMessage);
+
+      // Include more debugging info in production
+      const fullErrorMessage = detailedError
+        ? `${errorMessage}. Details: ${detailedError}`
+        : errorMessage;
+
+      throw new Error(fullErrorMessage);
     }
 
     const result = await response.json();
     console.log('Registration successful:', result);
-
     Router.navigate('/login');
   } catch (error) {
     console.error('Fout bij het aanmaken van account:', error);
@@ -209,7 +337,3 @@ async function handleJaarRegister(event) {
     errorLabel.style.display = 'block';
   }
 }
-
-// Voorbeeld: als er een uitlogknop zou zijn
-
-// No changes needed for image imports in this file. All asset and API usage is correct.}  }    });      Router.navigate('/');      localStorage.clear();      window.sessionStorage.clear();      // Hier zou je eventueel een logoutUser() API call doen    logoutBtn.addEventListener('click', async () => {    logoutBtn.onclick = null;  if (logoutBtn) {  const logoutBtn = document.getElementById('logout-btn');// No changes needed for image imports in this file. All asset and API usage is correct.
