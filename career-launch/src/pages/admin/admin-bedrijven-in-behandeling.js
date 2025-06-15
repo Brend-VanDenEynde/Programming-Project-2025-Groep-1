@@ -1,6 +1,7 @@
 // Admin bedrijven in behandeling pagina
 import Router from '../../router.js';
 import { logoutUser } from '../../utils/auth-api.js';
+import ehbLogo from '../../images/EhB-logo-transparant.png';
 
 export async function renderAdminBedrijvenInBehandeling(rootElement) {
   // Check if user is logged in
@@ -14,11 +15,10 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
 
   rootElement.innerHTML = `
     <div class="admin-dashboard-clean">
-      <header class="admin-header-clean">
-        <div class="admin-logo-section">
-          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+      <header class="admin-header-clean">        <div class="admin-logo-section">
+          <img src="${ehbLogo}" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
-        </div>        <div class="admin-header-right">
+        </div><div class="admin-header-right">
           <span class="admin-username">Welkom, ${adminUsername}</span>
           <button id="logout-btn" class="logout-btn-clean">Uitloggen</button>
           <button id="menu-toggle" class="menu-toggle-btn">☰</button>

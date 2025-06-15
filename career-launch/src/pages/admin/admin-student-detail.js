@@ -3,6 +3,7 @@ import Router from '../../router.js';
 import defaultAvatar from '../../images/default.png';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
+import ehbLogo from '../../images/EhB-logo-transparant.png';
 
 export async function renderAdminStudentDetail(rootElement) {
   // Check if user is logged in
@@ -22,13 +23,12 @@ export async function renderAdminStudentDetail(rootElement) {
     console.error('Student ID is missing in the URL');
     return;
   }
-
   // Show loading state first
   rootElement.innerHTML = `
     <div class="admin-dashboard-clean" style="background-color: white;">
       <header class="admin-header-clean">
         <div class="admin-logo-section">
-          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+          <img src="${ehbLogo}" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
         </div>
         <div class="admin-header-right">
