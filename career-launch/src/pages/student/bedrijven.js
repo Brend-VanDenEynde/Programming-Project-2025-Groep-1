@@ -573,275 +573,92 @@ export async function renderBedrijven(rootElement, studentData = {}) {
     // Voeg moderne grid CSS toe voor de filterbalk en card
     const style = document.createElement('style');
     style.innerHTML = `
-      .student-profile-form-container.bedrijven-form-card {
-        background: #fff;
-        border-radius: 18px;
-        box-shadow: 0 4px 24px #0001;
-        padding: 2.2rem 2.2rem 2.5rem 2.2rem;
-        margin: 2.5rem auto 2.5rem auto;
-        max-width: 1200px;
-        width: 100%;
-        box-sizing: border-box;
-        position: relative;
-      }
-      .bedrijven-filterbar-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 1.2rem 1.6rem;
-        align-items: end;
-        background: transparent;
-        border-radius: 12px;
-        margin-bottom: 1.2rem;
-        padding: 0;
-        position: relative;
-      }
-      .bedrijven-filterbar-grid .filter-group,
-      .bedrijven-filterbar-grid .zoek-group,
-      .bedrijven-filterbar-grid .reset-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.2rem;
-        min-width: 0;
-        width: 100%;
-      }
-      .bedrijven-filterbar-grid label {
-        font-weight: 500;
-        font-size: 0.9rem;
-        margin-bottom: 0.2rem;
-      }
-      .bedrijven-filterbar-grid select,
-      .bedrijven-filterbar-grid input[type="text"] {
-        padding: 0.6rem 0.9rem;
-        border-radius: 8px;
-        border: 1.5px solid #e1e5e9;
-        font-size: 0.95rem;
-        min-height: 42px;
-        height: 42px;
-        box-sizing: border-box;
-        width: 100%;
-      }
-      .bedrijven-filterbar-grid .ss-main {
-        min-height: 42px !important;
-        height: 42px !important;
-        box-sizing: border-box;
-      }
-      /* SlimSelect: scrollbare chips bij veel geselecteerde opties */
-      .bedrijven-filterbar-grid .ss-main.multi {
-        max-height: 86px !important;
-        overflow-y: auto !important;
-        flex-wrap: wrap !important;
-        align-items: flex-start !important;
-        scrollbar-width: thin;
-      }
-      .bedrijven-filterbar-grid .ss-main {
-        padding: 0.6rem 0.8rem;
-      }
-      /* Scrollbar styling voor Chrome */
-      .bedrijven-filterbar-grid .ss-main.multi::-webkit-scrollbar {
-        height: 6px;
-        width: 6px;
-      }
-      .bedrijven-filterbar-grid .ss-main.multi::-webkit-scrollbar-thumb {
-        background: #ccc;
-        border-radius: 6px;
-      }
-      .bedrijven-divider {
-        border: none;
-        border-top: 1.5px solid #e1e5e9;
-        margin: 1.2rem 0 2.2rem 0;
-      }
-      @media (min-width: 1200px) {
-        .bedrijven-filterbar-grid {
-          grid-template-columns: repeat(6, 1fr);
-        }
-        .student-profile-form-container.bedrijven-form-card {
-          padding: 2.5rem 3.5rem 2.8rem 3.5rem;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-
-    // Custom filter UI rendering
-    function renderFilterOptions() {
-      // Locaties (popup trigger ipv select)
-      const locaties = getUniekeLocaties();
-      const locatieDiv = document.getElementById('filter-locaties');
-      locatieDiv.innerHTML = `
-        <label for="locaties-popup-trigger">Locatie</label>
-        <button id="locaties-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
-          ${huidigeLocaties.length ? huidigeLocaties.join(', ') : 'Locatie kiezen...'}
-        </button>
-      `;
-      // Functies (popup trigger ipv select)
-      const functies = getUniekeFuncties();
-      const functieDiv = document.getElementById('filter-functies');
-      functieDiv.innerHTML = `
-        <label for="functies-popup-trigger">Functie</label>
-        <button id="functies-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
-          ${huidigeFuncties.length ? huidigeFuncties.join(', ') : 'Functie kiezen...'}
-        </button>
-      `;
-      // Skills (popup trigger ipv select)
-      const skills = getUniekeSkills();
-      const skillDiv = document.getElementById('filter-skills');
-      skillDiv.innerHTML = `
-        <label for="skills-popup-trigger">Skills</label>
-        <button id="skills-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
-          ${huidigeSkills.length ? huidigeSkills.join(', ') : 'Skills kiezen...'}
-        </button>
-      `;
-      // Talen (popup trigger ipv select)
-      const talen = getUniekeTalen();
-      const taalDiv = document.getElementById('filter-talen');
-      taalDiv.innerHTML = `
-        <label for="talen-popup-trigger">Talen</label>
-        <button id="talen-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
-          ${huidigeTalen.length ? huidigeTalen.join(', ') : 'Talen kiezen...'}
-        </button>
-      `;
-      // Popup triggers voor alle filters
-      document.getElementById('locaties-popup-trigger').addEventListener('click', () => {
-        createPopup({
-          id: 'locaties-filter-popup',
-          title: 'Kies locaties',
-          options: getUniekeLocaties(),
-          selected: huidigeLocaties,
-          onSave: (gekozen) => {
-            huidigeLocaties = gekozen;
-            renderFilterOptions();
-            renderList();
-          }
-        });
-      });
-      document.getElementById('functies-popup-trigger').addEventListener('click', () => {
-        createPopup({
-          id: 'functies-filter-popup',
-          title: 'Kies functies',
-          options: getUniekeFuncties(),
-          selected: huidigeFuncties,
-          onSave: (gekozen) => {
-            huidigeFuncties = gekozen;
-            renderFilterOptions();
-            renderList();
-          }
-        });
-      });
-      document.getElementById('skills-popup-trigger').addEventListener('click', () => {
-        createPopup({
-          id: 'skills-filter-popup',
-          title: 'Kies je skills',
-          options: getUniekeSkills(),
-          selected: huidigeSkills,
-          onSave: (gekozen) => {
-            huidigeSkills = gekozen;
-            renderFilterOptions();
-            renderList();
-          }
-        });
-      });
-      document.getElementById('talen-popup-trigger').addEventListener('click', () => {
-        createPopup({
-          id: 'talen-filter-popup',
-          title: 'Kies je talen',
-          options: getUniekeTalen(),
-          selected: huidigeTalen,
-          onSave: (gekozen) => {
-            huidigeTalen = gekozen;
-            renderFilterOptions();
-            renderList();
-          }
-        });
-      });
-      // Favorieten-toggle
-      const filterbar = document.getElementById('bedrijven-filterbar');
-      if (filterbar && !document.getElementById('favorieten-toggle-group')) {
-        const favDiv = document.createElement('div');
-        favDiv.className = 'filter-group';
-        favDiv.id = 'favorieten-toggle-group';
-        favDiv.innerHTML = `
-          <label for="filter-favorieten">Favorieten</label>
-          <label class="favorites-filter-label" style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;padding:0.5rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#f8f9fa;">
-            <input type="checkbox" id="filter-favorieten" style="margin:0;">
-            <span style="font-size:0.9rem;">Alleen favorieten ❤️</span>
-            <span id="favorites-count" style="font-size:0.8rem;color:#666;font-weight:normal;">(0)</span>
-          </label>
-        `;
-        filterbar.appendChild(favDiv);
-      }
-      .bedrijven-filterbar-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 1.2rem 1.6rem;
-        align-items: end;
-        background: transparent;
-        border-radius: 12px;
-        margin-bottom: 1.2rem;
-        padding: 0;
-      }
-      .bedrijven-filterbar-grid .filter-group,
-      .bedrijven-filterbar-grid .zoek-group,
-      .bedrijven-filterbar-grid .reset-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.2rem;
-        min-width: 0;
-        width: 100%;
-      }
-      .bedrijven-filterbar-grid label {
-        font-weight: 500;
-        font-size: 0.9rem;
-        margin-bottom: 0.2rem;
-      }
-      .bedrijven-filterbar-grid select,
-      .bedrijven-filterbar-grid input[type="text"] {
-        padding: 0.6rem 0.9rem;
-        border-radius: 8px;
-        border: 1.5px solid #e1e5e9;
-        font-size: 0.95rem;
-        min-height: 42px;
-        height: 42px;
-        box-sizing: border-box;
-        width: 100%;
-      }
-      .bedrijven-filterbar-grid .ss-main {
-        min-height: 42px !important;
-        height: 42px !important;
-        box-sizing: border-box;
-      }
-      /* SlimSelect: scrollbare chips bij veel geselecteerde opties */
-      .bedrijven-filterbar-grid .ss-main.multi {
-        max-height: 86px !important;
-        overflow-y: auto !important;
-        flex-wrap: wrap !important;
-        align-items: flex-start !important;
-        scrollbar-width: thin;
-      }
-      .bedrijven-filterbar-grid .ss-main {
-        padding: 0.6rem 0.8rem;
-      }
-      /* Scrollbar styling voor Chrome */
-      .bedrijven-filterbar-grid .ss-main.multi::-webkit-scrollbar {
-        height: 6px;
-        width: 6px;
-      }
-      .bedrijven-filterbar-grid .ss-main.multi::-webkit-scrollbar-thumb {
-        background: #ccc;
-        border-radius: 6px;
-      }
-      .bedrijven-divider {
-        border: none;
-        border-top: 1.5px solid #e1e5e9;
-        margin: 1.2rem 0 2.2rem 0;
-      }
-      @media (min-width: 1200px) {
-        .bedrijven-filterbar-grid {
-          grid-template-columns: repeat(6, 1fr);
-        }
-        .student-profile-form-container.bedrijven-form-card {
-          padding: 2.5rem 3.5rem 2.8rem 3.5rem;
-        }
-      }
-    `;
+.student-profile-form-container.bedrijven-form-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px #0001;
+  padding: 2.2rem 2.2rem 2.5rem 2.2rem;
+  margin: 2.5rem auto 2.5rem auto;
+  max-width: 1200px;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+.bedrijven-filterbar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.2rem 1.6rem;
+  align-items: end;
+  background: transparent;
+  border-radius: 12px;
+  margin-bottom: 1.2rem;
+  padding: 0;
+  position: relative;
+}
+.bedrijven-filterbar-grid .filter-group,
+.bedrijven-filterbar-grid .zoek-group,
+.bedrijven-filterbar-grid .reset-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  width: 100%;
+}
+.bedrijven-filterbar-grid label {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 0.2rem;
+}
+.bedrijven-filterbar-grid select,
+.bedrijven-filterbar-grid input[type="text"] {
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  border: 1.5px solid #e1e5e9;
+  font-size: 0.95rem;
+  min-height: 42px;
+  height: 42px;
+  box-sizing: border-box;
+  width: 100%;
+}
+.bedrijven-filterbar-grid .ss-main {
+  min-height: 42px !important;
+  height: 42px !important;
+  box-sizing: border-box;
+}
+/* SlimSelect: scrollbare chips bij veel geselecteerde opties */
+.bedrijven-filterbar-grid .ss-main.multi {
+  max-height: 86px !important;
+  overflow-y: auto !important;
+  flex-wrap: wrap !important;
+  align-items: flex-start !important;
+  scrollbar-width: thin;
+}
+.bedrijven-filterbar-grid .ss-main {
+  padding: 0.6rem 0.8rem;
+}
+/* Scrollbar styling voor Chrome */
+.bedrijven-filterbar-grid .ss-main.multi::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.bedrijven-filterbar-grid .ss-main.multi::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 6px;
+}
+.bedrijven-divider {
+  border: none;
+  border-top: 1.5px solid #e1e5e9;
+  margin: 1.2rem 0 2.2rem 0;
+}
+@media (min-width: 1200px) {
+  .bedrijven-filterbar-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .student-profile-form-container.bedrijven-form-card {
+    padding: 2.5rem 3.5rem 2.8rem 3.5rem;
+  }
+}
+`;
     document.head.appendChild(style);
 
     // Custom filter UI rendering
