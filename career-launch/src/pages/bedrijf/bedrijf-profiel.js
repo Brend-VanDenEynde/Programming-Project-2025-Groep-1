@@ -1,6 +1,6 @@
 // src/views/bedrijf-profiel.js
 
-import defaultAvatar from '../../images/BedrijfDefault.jpg';
+import defaultAvatar from '../../images/defaultlogo.webp';
 import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';

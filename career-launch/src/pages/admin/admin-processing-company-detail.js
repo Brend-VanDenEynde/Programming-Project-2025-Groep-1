@@ -52,7 +52,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
                 <div class="detail-left">
                   <div class="detail-logo-section">
                     <img 
-                      src="src/Images/BedrijfDefault.jpg" 
+                      src="src/images/defaultlogo.webp" 
                       alt="Logo" 
                       class="detail-logo"
                     />
@@ -123,7 +123,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
       '#section-title'
     ).textContent = `Bedrijf in Behandeling - ${company.naam}`;
     document.querySelector('.detail-logo-section img').src =
-      company.profiel_foto || 'src/Images/BedrijfDefault.jpg';
+      company.profiel_foto || 'src/images/defaultlogo.webp';
     document.querySelector('.detail-logo').alt = `Logo ${company.naam}`;
     document.querySelector('.detail-info').innerHTML = `
       <div class="detail-field">

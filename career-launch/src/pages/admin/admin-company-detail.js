@@ -1,6 +1,6 @@
 // Admin company detail pagina
 import Router from '../../router.js';
-import defaultCompanyLogo from '../../images/BedrijfDefault.jpg';
+import defaultCompanyLogo from '../../images/defaultlogo.webp';
 import { logoutUser } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
 
