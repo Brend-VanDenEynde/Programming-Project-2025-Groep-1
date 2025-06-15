@@ -134,21 +134,40 @@ async function handleJaarRegister(event) {
     return;
   }
   const previousData = JSON.parse(localStorage.getItem('userData')) || {};
+
+  // Format LinkedIn URL to match API expectations
+  let linkedinValue = '';
+  if (previousData.linkedin && previousData.linkedin.trim() !== '') {
+    const linkedin = previousData.linkedin.trim();
+    // If it's a full URL, extract the path part
+    if (linkedin.startsWith('https://www.linkedin.com/in/')) {
+      linkedinValue = linkedin.replace('https://www.linkedin.com', '');
+    } else if (linkedin.startsWith('/in/')) {
+      linkedinValue = linkedin;
+    } else if (linkedin !== 'https://www.linkedin.com/') {
+      // Assume it's a username and format it properly
+      linkedinValue = `/in/${linkedin}`;
+    } else {
+      linkedinValue = '/in/profile'; // Default placeholder
+    }
+  } else {
+    linkedinValue = '/in/profile'; // Default placeholder instead of full URL
+  }
+
   const data = {
     email: previousData.email || '',
     password: previousData.password || '',
     voornaam: previousData.voornaam || '',
     achternaam: previousData.achternaam || '',
-    linkedin:
-      previousData.linkedin && previousData.linkedin.trim() !== ''
-        ? previousData.linkedin
-        : 'https://www.linkedin.com/',
-    profielFoto: previousData.profielFoto,
+    linkedin: linkedinValue,
+    profiel_foto: previousData.profielFoto,
     studiejaar: parseInt(jaar, 10),
     opleiding_id: parseInt(opleiding, 10),
     date_of_birth: previousData.date_of_birth || '',
   };
   try {
+    console.log('Sending data to API:', JSON.stringify(data, null, 2));
+
     const response = await fetch(
       'https://api.ehb-match.me/auth/register/student',
       {
@@ -159,16 +178,33 @@ async function handleJaarRegister(event) {
         body: JSON.stringify(data),
       }
     );
+
+    console.log('Response status:', response.status);
+    console.log('Response headers:', response.headers);
+
     if (!response.ok) {
-      throw new Error('Fout bij het aanmaken van account.');
+      // Try to get the actual error message from the API
+      let errorMessage = 'Fout bij het aanmaken van account.';
+      try {
+        const errorData = await response.json();
+        console.error('API error response:', errorData);
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch (jsonError) {
+        const errorText = await response.text();
+        console.error('API error text:', errorText);
+        errorMessage = errorText || errorMessage;
+      }
+      throw new Error(errorMessage);
     }
 
     const result = await response.json();
+    console.log('Registration successful:', result);
 
     Router.navigate('/login');
   } catch (error) {
     console.error('Fout bij het aanmaken van account:', error);
     errorLabel.textContent =
+      error.message ||
       'Er is een fout opgetreden bij het aanmaken van je account.';
     errorLabel.style.display = 'block';
   }

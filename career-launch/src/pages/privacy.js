@@ -88,14 +88,13 @@ export function renderPrivacy(rootElement) {
         <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
         <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
       </footer>
-    </div>
-  `;
-  // Backbutton: eerst oude event listeners verwijderen  const backBtn = document.getElementById('back-button');
+    </div>  `;
+
+  // Back button - same technique as login and register pages
+  const backBtn = document.getElementById('back-button');
   if (backBtn) {
-    const newHandler = () => {
+    backBtn.addEventListener('click', () => {
       Router.goBack('/');
-    };
-    backBtn.onclick = null;
-    backBtn.onclick = newHandler;
+    });
   }
 }
