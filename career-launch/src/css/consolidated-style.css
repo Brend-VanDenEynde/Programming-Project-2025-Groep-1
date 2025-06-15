@@ -1,0 +1,2873 @@
+/*
+ * EhB Career Launch - Geconsolideerde CSS
+ * 
+ * Dit bestand bevat alle styling voor de Career Launch applicatie:
+ * - Reset en basis styles
+ * - Home pagina
+ * - Formulieren (login, registratie)
+ * - Student profiel systeem
+ * - Admin dashboard en functionaliteit
+ * - Tabellen en modals
+ * - Dark mode styling
+ * - Responsive design
+ */
+
+/* =============================================================================
+   1. RESET EN BASIS STYLES
+   ============================================================================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Algemene link-stijlen */
+a {
+  color: #0077b5;
+  transition: color 0.18s;
+}
+
+a:hover {
+  color: #28bb8a;
+}
+
+/* =============================================================================
+   2. HOME PAGINA STYLING
+   ============================================================================= */
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 50px);
+  padding: 20px;
+  padding-bottom: 70px;
+  background-color: white;
+}
+
+.home-container img {
+  max-width: 300px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.home-container h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.home-container h2 {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 40px;
+  text-align: center;
+  letter-spacing: 2px;
+}
+
+.home-container p {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* =============================================================================
+   3. BUTTON STYLING
+   ============================================================================= */
+
+.btn {
+  background-color: #c0c0c0;
+  color: #333;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 30px;
+  min-width: 200px;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #b0b0b0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* =============================================================================
+   4. FORMULIEREN (LOGIN/REGISTRATIE)
+   ============================================================================= */
+
+.register-container,
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.register-card,
+.login-card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  margin-bottom: 48px;
+}
+
+.register-header,
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.register-header h1,
+.login-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.register-header p,
+.login-header p {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 0;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #666;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  margin-bottom: 20px;
+}
+
+.back-button:hover {
+  background-color: #f0f0f0;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.register-input,
+.login-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: border-color 0.2s;
+  background-color: white;
+}
+
+.register-input:focus,
+.login-input:focus {
+  outline: none;
+  border-color: #0077b5;
+  box-shadow: 0 0 0 3px rgba(0, 119, 181, 0.1);
+}
+
+.login-btn,
+.register-btn {
+  width: 100%;
+  background-color: #00acc1;
+  color: white;
+  border: none;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-bottom: 20px;
+}
+
+.login-btn:hover,
+.register-btn:hover {
+  background-color: #01bdd6;
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.register-link p {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+}
+
+.register-link a {
+  color: #0077b5;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}
+
+.divider {
+  margin: 20px 0;
+  text-align: center;
+  position: relative;
+}
+
+.divider hr {
+  border: none;
+  height: 1px;
+  background-color: #e1e5e9;
+  margin: 0;
+}
+
+.linkedin-btn {
+  width: 100%;
+  background-color: #0077b5;
+  color: white;
+  border: none;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.linkedin-btn:hover {
+  background-color: #005885;
+}
+
+/* =============================================================================
+   4B. GEAVANCEERDE FORMULIEREN (ZOEKCRITERIA)
+   ============================================================================= */
+
+/* Zoekcriteria Form */
+.criteria-form {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 3rem 2.5rem 2.5rem 2.5rem;
+  margin: 2.5rem auto 0 auto;
+  max-width: 800px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Search fieldset styling - ontbrekend vanuit backup */
+.search-fieldset {
+  border: none;
+  margin-bottom: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 1.2rem 1rem 1rem 1rem;
+  box-shadow: 0 1px 8px 0 rgba(44, 44, 44, 0.04);
+}
+
+.search-fieldset legend {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #0077b5;
+  padding-bottom: 3px;
+  border-bottom: none;
+  display: block;
+  letter-spacing: 0.03em;
+}
+
+/* Add custom wrapper styling - ontbrekend vanuit backup */
+.add-custom-wrapper {
+  display: flex;
+  gap: 10px;
+  margin: 9px 0 0 0;
+  align-items: center;
+}
+
+.form-input {
+  font-size: 1.08rem;
+  padding: 10px 13px;
+  border-radius: 8px;
+  border: 2px solid #e1e5e9;
+  outline: none;
+  background: #fff;
+  transition: border 0.16s;
+}
+
+.form-input:focus {
+  border-color: grey;
+  background: #f6fffa;
+}
+
+.criteria-form h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #0077b5;
+  text-align: center;
+}
+
+.form-section {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.form-section h3 {
+  font-size: 1.3rem;
+  color: #0077b5;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.form-section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-size: 1.07rem;
+  letter-spacing: 0.01em;
+}
+
+.form-section select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1.07rem;
+  background: #f8f9fa;
+  color: #333;
+  margin-top: 2px;
+  outline: none;
+  transition: border 0.17s;
+}
+
+.form-section select:focus {
+  border-color: #00bcd4;
+  background: #fff;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  font-weight: 400;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.checkbox-group label:hover {
+  background: #f8f9fa;
+}
+
+.checkbox-group input[type='checkbox'] {
+  margin-right: 0.5rem;
+  width: 18px;
+  height: 18px;
+  accent-color: #00bcd4;
+}
+
+.add-btn {
+  display: inline-block;
+  background: #00bcd4;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  min-width: 92px;
+  box-shadow: 0 2px 6px 0 rgba(44, 44, 44, 0.05);
+}
+
+.add-btn:hover,
+.add-btn:active {
+  background: #00acc1;
+  color: #fff;
+  box-shadow: 0 3px 16px 0 rgba(0, 188, 212, 0.13);
+}
+
+/* =============================================================================
+   5. STUDENT PROFIEL SYSTEEM
+   ============================================================================= */
+
+.student-profile-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.student-profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 2rem;
+  background: #fff;
+  border-bottom: 1px solid #e1e5e9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.student-profile-header .logo-section {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.student-profile-header .logo-section img {
+  margin-right: 0.75rem;
+}
+
+.student-profile-burger {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.student-profile-burger:hover {
+  background: #f0f0f0;
+}
+
+.student-profile-dropdown {
+  position: absolute;
+  top: 4rem;
+  right: 2rem;
+  list-style: none;
+  padding: 0.5rem 0;
+  margin: 0;
+  border: 1px solid #e1e5e9;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+  z-index: 1000;
+  display: none;
+}
+
+.student-profile-dropdown.open {
+  display: block;
+}
+
+.student-profile-dropdown li button {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  color: #333;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.student-profile-dropdown li button:hover {
+  background: #f5f5f5;
+}
+
+.student-profile-main {
+  display: flex;
+  flex: 1;
+}
+
+.student-profile-sidebar {
+  width: 260px;
+  background: #f8f9fa;
+  border-right: 1px solid #e1e5e9;
+  padding: 2rem 0;
+}
+
+.student-profile-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.student-profile-sidebar li {
+  margin-bottom: 0.5rem;
+}
+
+.student-profile-sidebar button {
+  background: none;
+  border: none;
+  padding: 1rem 2rem;
+  width: 100%;
+  text-align: left;
+  color: #333;
+  font-size: 1rem;
+  border-left: 4px solid transparent;
+  transition: background 0.2s, border-color 0.2s;
+  cursor: pointer;
+}
+
+.student-profile-sidebar button.active,
+.student-profile-sidebar button:hover {
+  background: #e1e5e9;
+  border-left: 4px solid grey;
+}
+
+.student-profile-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.student-profile-form-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 3rem 2.5rem 2.5rem 2.5rem;
+  margin: 2.5rem auto 0 auto;
+  max-width: 800px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.student-profile-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #0077b5;
+  text-align: center;
+}
+
+.student-profile-avatar-section {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.student-profile-avatar {
+  object-fit: cover;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px #0001;
+  border: 3px solid #e1e5e9;
+  background: #fff;
+}
+
+.student-profile-form-group {
+  margin-bottom: 1.2rem;
+  width: 100%;
+}
+
+.student-profile-form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-size: 1.07rem;
+  letter-spacing: 0.01em;
+}
+
+.student-profile-form-group input[type='text'],
+.student-profile-form-group input[type='email'],
+.student-profile-form-group input[type='date'],
+.student-profile-form-group input[type='url'],
+.student-profile-form-group select,
+.student-profile-form-group textarea {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1.07rem;
+  background: #f8f9fa;
+  color: #333;
+  margin-top: 2px;
+  outline: none;
+  transition: border 0.17s;
+  resize: none;
+}
+
+.student-profile-form-group input[type='text']:focus,
+.student-profile-form-group input[type='email']:focus,
+.student-profile-form-group input[type='date']:focus,
+.student-profile-form-group input[type='url']:focus,
+.student-profile-form-group select:focus,
+.student-profile-form-group textarea:focus {
+  border-color: grey;
+  background: #f6fffa;
+}
+
+.student-profile-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.student-profile-btn {
+  background-color: grey !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 12px 28px !important;
+  font-size: 1.08rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
+  box-shadow: 0 2px 8px rgba(0, 188, 212, 0.08) !important;
+  outline: none !important;
+  min-width: 120px !important;
+  display: inline-block !important;
+}
+
+.student-profile-btn-primary {
+  background-color: grey !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 12px 28px !important;
+  font-size: 1.08rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
+  box-shadow: 0 2px 8px rgba(0, 188, 212, 0.08) !important;
+  outline: none !important;
+  min-width: 120px !important;
+  display: inline-block !important;
+}
+
+.student-profile-btn-secondary {
+  background-color: #e1e5e9 !important;
+  color: #333 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 12px 28px !important;
+  font-size: 1.08rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
+  box-shadow: 0 2px 8px rgba(0, 188, 212, 0.08) !important;
+  outline: none !important;
+  min-width: 120px !important;
+  display: inline-block !important;
+}
+
+.student-profile-btn:hover,
+.student-profile-btn-primary:hover {
+  background-color: #00acc1 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(0, 188, 212, 0.13) !important;
+  transform: translateY(-2px) !important;
+}
+
+.student-profile-btn-secondary:hover {
+  background-color: #00acc1 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(0, 188, 212, 0.13) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* =============================================================================
+   6. SETTINGS POPUP
+   ============================================================================= */
+
+.settings-modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(30, 34, 54, 0.38);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.22s;
+}
+
+.settings-popup-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 2.2rem 1.5rem 1.7rem 1.5rem;
+  min-width: 320px;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+  align-items: center;
+}
+
+.settings-title {
+  color: #0077b5;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 1.1rem;
+}
+
+.settings-action-btn {
+  width: 100%;
+  background: grey;
+  color: #fff;
+  border: none;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.settings-action-btn:hover {
+  background: #00acc1;
+  color: #fff;
+}
+
+.settings-action-btn.logout {
+  background: grey !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 1.08rem !important;
+  padding: 12px 28px !important;
+  min-width: 120px !important;
+  display: inline-block !important;
+  box-shadow: 0 2px 8px rgba(0, 188, 212, 0.08) !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
+}
+
+.settings-action-btn.logout:hover {
+  background: #00acc1 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(0, 188, 212, 0.13) !important;
+  transform: translateY(-2px) !important;
+}
+
+.settings-action-btn.delete {
+  background: #fa626a !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 1.08rem !important;
+  padding: 12px 28px !important;
+  min-width: 120px !important;
+  display: inline-block !important;
+  box-shadow: 0 2px 8px rgba(250, 98, 106, 0.1) !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
+}
+
+.settings-action-btn.delete:hover {
+  background: #c82333 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(250, 98, 106, 0.18) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* =============================================================================
+   7. TABELLEN (SPEEDDATES)
+   ============================================================================= */
+
+.speeddates-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+  margin-bottom: 2rem;
+  font-size: 1.07rem;
+}
+
+.speeddates-table th {
+  background: #f5f6f7;
+  color: #0077b5;
+  font-weight: 700;
+  padding: 1.1rem 1rem;
+  border-bottom: 2px solid #e1e5e9;
+  text-align: center;
+  vertical-align: middle;
+  letter-spacing: 0.01em;
+}
+
+.speeddates-table td {
+  background: #fff;
+  color: #222;
+  padding: 1rem 1rem;
+  border-bottom: 1px solid #e1e5e9;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.speeddates-table tr:last-child td {
+  border-bottom: none;
+}
+
+.speeddates-table tr:nth-child(even) td {
+  background: #f8f9fa;
+}
+
+/* QR code styling */
+.qr-code-img {
+  display: block;
+  margin: 0 auto 1.2rem auto;
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.qr-code-label {
+  font-size: 1.1rem;
+  color: #0077b5;
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Speeddate buttons */
+.speeddates-table .status-badge,
+.speeddates-table .accept-btn,
+.speeddates-table .deny-btn {
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95em;
+  padding: 0 18px;
+  min-width: 110px;
+  height: 38px;
+  margin: 0 2px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border 0.18s, transform 0.18s;
+}
+
+.speeddates-table .status-badge {
+  cursor: default;
+}
+
+.speeddates-table .status-badge.badge-accepted {
+  background: #e6f9ed !important;
+  color: #1db954 !important;
+  border: 1.5px solid #1db954 !important;
+}
+
+.speeddates-table .accept-btn {
+  background: #e6f9ed !important;
+  color: #1db954 !important;
+  border: 1.5px solid #1db954 !important;
+}
+
+.speeddates-table .accept-btn:hover {
+  background: #1db954 !important;
+  color: #fff !important;
+  border-color: #1db954 !important;
+  transform: translateY(-2px);
+}
+
+.speeddates-table .status-badge.badge-denied {
+  background: #ffeaea !important;
+  color: #fa626a !important;
+  border: 1.5px solid #fa626a !important;
+}
+
+.speeddates-table .deny-btn {
+  background: #ffeaea !important;
+  color: #fa626a !important;
+  border: 1.5px solid #fa626a !important;
+}
+
+.speeddates-table .deny-btn:hover {
+  background: #fa626a !important;
+  color: #fff !important;
+  border-color: #fa626a !important;
+  transform: translateY(-2px);
+}
+
+.speeddates-table .status-badge.badge-waiting {
+  background: #fffbe6 !important;
+  color: #ffd740 !important;
+  border: 1.5px solid #ffd740 !important;
+}
+
+.speeddates-table .status-badge.badge-other {
+  background: #f5f5f5 !important;
+  color: #b0b6c6 !important;
+  border: 1.5px solid #b0b6c6 !important;
+}
+
+/* =============================================================================
+   8. ADMIN DASHBOARD STYLING
+   ============================================================================= */
+
+/* Admin Login */
+.admin-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  padding: 20px;
+}
+
+.admin-card {
+  background: white;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.admin-card h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+  font-size: 2rem;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.admin-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.admin-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Admin Dashboard */
+.admin-dashboard-clean {
+  min-height: 100vh;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-header-clean {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-logo-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.admin-logo-section img {
+  width: 40px;
+  height: 40px;
+}
+
+.admin-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-username {
+  color: #495057;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.logout-btn-clean {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.logout-btn-clean:hover {
+  background-color: #c82333;
+}
+
+.menu-toggle-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #495057;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.menu-toggle-btn:hover {
+  background-color: #dee2e6;
+}
+
+.admin-main-layout {
+  display: flex;
+  flex: 1;
+}
+
+.admin-sidebar-clean {
+  width: 280px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  padding: 2rem 0;
+}
+
+.admin-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-nav li {
+  margin-bottom: 0.5rem;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  padding: 1rem 2rem;
+  width: 100%;
+  text-align: left;
+  color: #495057;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border-left: 4px solid transparent;
+}
+
+.nav-btn:hover,
+.nav-btn.active {
+  background-color: #dee2e6;
+  border-left-color: #6c757d;
+}
+
+.admin-content-clean {
+  flex: 1;
+  background: white;
+  padding: 2rem;
+}
+
+.admin-section-header {
+  margin-bottom: 2rem;
+}
+
+.admin-section-header h1 {
+  color: #333;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Student/Company Lists */
+.student-list,
+.companies-list,
+.processing-list {
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.student-item {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: white;
+}
+
+.student-item:hover {
+  background-color: #f8f9fa;
+}
+
+.student-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.company-item {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: white;
+}
+
+.company-item:hover {
+  background-color: #f8f9fa;
+}
+
+.company-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.processing-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: white;
+}
+
+.processing-company-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+}
+
+.processing-company-name.clickable {
+  cursor: pointer;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.processing-company-name.clickable:hover {
+  color: #007bff;
+  text-decoration: underline;
+}
+
+.processing-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.approve-btn,
+.reject-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.approve-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.approve-btn:hover {
+  background-color: #1e7e34;
+  transform: scale(1.1);
+}
+
+.reject-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.reject-btn:hover {
+  background-color: #c82333;
+  transform: scale(1.1);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6c757d;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.clickable-student {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clickable-student:hover {
+  background-color: #f8f9fa;
+}
+
+.clickable-processing {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clickable-processing:hover {
+  background-color: #f8f9fa;
+}
+
+.clickable-company {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clickable-company:hover {
+  background-color: #f8f9fa;
+}
+
+/* =============================================================================
+   9. DARK MODE STYLING
+   ============================================================================= */
+
+/* Dark mode CSS variabelen */
+body.darkmode {
+  --accent: lightgrey;
+  --accent-contrast: #181c1f;
+  --header-logo: url('/src/Images/EhB-logo-transparant-558-DarkMode.png');
+  background: #000 !important;
+  color: #e0f7fa !important;
+}
+
+/* Dark mode voor links */
+body.darkmode a {
+  color: #00e6ef;
+  transition: color 0.18s;
+}
+
+body.darkmode a:hover {
+  color: #3dd686;
+}
+
+/* Dark mode voor formulieren */
+body.darkmode .register-container,
+body.darkmode .login-container {
+  background-color: #000 !important;
+}
+
+body.darkmode .register-card,
+body.darkmode .login-card {
+  background: #181c1f !important;
+  color: #e0f7fa !important;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px 0 rgba(0, 230, 239, 0.1), 0 1.5px 0 0 #232323;
+}
+
+body.darkmode .register-header h1,
+body.darkmode .login-header h1 {
+  color: #00e6ef !important;
+}
+
+body.darkmode .register-header p,
+body.darkmode .login-header p {
+  color: #b0b6c6 !important;
+}
+
+body.darkmode .register-input,
+body.darkmode .login-input {
+  background: #181c1f !important;
+  color: #e0f7fa !important;
+  border: 2px solid #00e6ef !important;
+}
+
+body.darkmode .register-input:focus,
+body.darkmode .login-input:focus {
+  border-color: #00e6ef !important;
+  background: #181c1f !important;
+}
+
+/* Dark mode voor student profiel */
+body.darkmode .student-profile-container {
+  background: #000 !important;
+}
+
+body.darkmode .student-profile-header,
+body.darkmode .student-profile-sidebar {
+  background: #000 !important;
+  color: #00e6ef !important;
+  border-color: #232323 !important;
+}
+
+body.darkmode .student-profile-header .logo-section span {
+  color: #00e6ef !important;
+}
+
+body.darkmode .student-profile-header .logo-section img {
+  content: var(--header-logo);
+  filter: none !important;
+}
+
+body.darkmode .student-profile-sidebar button {
+  color: #e0f7fa !important;
+  background: #000 !important;
+  border-left: 4px solid transparent !important;
+  font-weight: 500;
+}
+
+body.darkmode .student-profile-sidebar button.active,
+body.darkmode .student-profile-sidebar button:hover {
+  background: #181c1f !important;
+  color: #00e6ef !important;
+  border-left: 4px solid #00e6ef !important;
+  font-weight: 700;
+}
+
+body.darkmode .student-profile-content {
+  background: #000 !important;
+}
+
+body.darkmode .student-profile-form-container,
+body.darkmode .settings-popup-card {
+  background: #000 !important;
+  color: #e0f7fa !important;
+  border-radius: 14px;
+  border: 1.5px solid #232323;
+  box-shadow: 0 4px 24px 0 rgba(0, 230, 239, 0.1), 0 1.5px 0 0 #232323;
+}
+
+body.darkmode .student-profile-dropdown {
+  background: #000 !important;
+  border-color: #333 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22) !important;
+}
+
+body.darkmode .student-profile-dropdown li button {
+  color: #e0f7fa !important;
+}
+
+body.darkmode .student-profile-dropdown li button:hover {
+  background: #181c1f !important;
+  color: var(--accent) !important;
+}
+
+/* Dark mode voor buttons */
+body.darkmode .student-profile-btn,
+body.darkmode .student-profile-btn-primary {
+  background-color: grey !important;
+  color: #fff !important;
+  border-radius: 8px !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0, 230, 239, 0.1) !important;
+}
+
+body.darkmode .student-profile-btn-secondary {
+  background-color: #232323 !important;
+  color: #00e6ef !important;
+  border-radius: 8px !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0, 230, 239, 0.1) !important;
+}
+
+body.darkmode .student-profile-btn:hover,
+body.darkmode .student-profile-btn-primary:hover,
+body.darkmode .student-profile-btn-secondary:hover {
+  background-color: #181c1f !important;
+  color: #00e6ef !important;
+  box-shadow: 0 4px 16px rgba(0, 230, 239, 0.13) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Dark mode voor tabellen */
+body.darkmode .speeddates-table {
+  background: #000 !important;
+  border-radius: 12px;
+  border: 1.5px solid #232323;
+  box-shadow: 0 2px 12px rgba(0, 230, 239, 0.07);
+}
+
+body.darkmode .speeddates-table th {
+  background: #101214 !important;
+  color: #00e6ef !important;
+  border-bottom: 1.5px solid #232323 !important;
+  text-align: center;
+  vertical-align: middle;
+}
+
+body.darkmode .speeddates-table td {
+  background: #000 !important;
+  color: #e0f7fa !important;
+  border-bottom: 1px solid #232323 !important;
+  text-align: center;
+  vertical-align: middle;
+}
+
+body.darkmode .speeddates-table tr:nth-child(even) td {
+  background: #181c1f !important;
+}
+
+body.darkmode .speeddates-table tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* Dark mode voor speeddate buttons */
+body.darkmode .speeddates-table .status-badge.badge-accepted {
+  background: #1a3d1a !important;
+  color: #00ff7f !important;
+  border: 1.5px solid #00ff7f !important;
+}
+
+body.darkmode .speeddates-table .accept-btn {
+  background: #1a3d1a !important;
+  color: #00ff7f !important;
+  border: 1.5px solid #00ff7f !important;
+}
+
+body.darkmode .speeddates-table .accept-btn:hover {
+  background: #00ff7f !important;
+  color: #181c1f !important;
+  border-color: #00ff7f !important;
+  transform: translateY(-2px);
+}
+
+body.darkmode .speeddates-table .status-badge.badge-denied {
+  background: #3d1a1a !important;
+  color: #ff4d4f !important;
+  border: 1.5px solid #ff4d4f !important;
+}
+
+body.darkmode .speeddates-table .deny-btn {
+  background: #3d1a1a !important;
+  color: #ff4d4f !important;
+  border: 1.5px solid #ff4d4f !important;
+}
+
+body.darkmode .speeddates-table .deny-btn:hover {
+  background: #ff4d4f !important;
+  color: #181c1f !important;
+  border-color: #ff4d4f !important;
+  transform: translateY(-2px);
+}
+
+body.darkmode .speeddates-table .status-badge.badge-waiting {
+  background: #3d3a1a !important;
+  color: #ffd740 !important;
+  border: 1.5px solid #ffd740 !important;
+}
+
+body.darkmode .speeddates-table .status-badge.badge-other {
+  background: #181c1f !important;
+  color: #b0b6c6 !important;
+  border: 1.5px solid #b0b6c6 !important;
+}
+
+/* Dark mode voor QR code */
+body.darkmode .qr-code-img {
+  background: #181c1f !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22) !important;
+}
+
+body.darkmode .qr-code-label {
+  color: var(--accent) !important;
+}
+
+/* =============================================================================
+   10. FOOTER
+   ============================================================================= */
+
+.student-profile-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  background: #fff;
+  border-top: 1px solid #e1e5e9;
+  text-align: center;
+  padding: 12px 0 10px 0;
+  z-index: 100;
+  text-decoration: none;
+  font-size: 0.95rem;
+  color: #7a7a7a;
+}
+
+.student-profile-footer a {
+  color: #7a7a7a;
+  text-decoration: none;
+  margin: 0 0.5rem;
+  transition: color 0.2s;
+}
+
+.student-profile-footer a:hover {
+  color: #009ca6;
+  text-decoration: underline;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  background: #fff;
+  border-top: 1px solid #e1e5e9;
+  text-align: center;
+  padding: 12px 0 10px 0;
+  z-index: 100;
+  text-decoration: none;
+  font-size: 0.95rem;
+  color: #7a7a7a;
+}
+
+.footer a {
+  color: #7a7a7a;
+  text-decoration: none;
+  margin: 0 0.5rem;
+  transition: color 0.2s;
+}
+
+.footer a:hover {
+  color: #009ca6;
+  text-decoration: underline;
+}
+
+body.darkmode .footer {
+  background: #181c1f !important;
+  color: #b0b6c6 !important;
+  border-top: 1px solid #232323 !important;
+}
+
+body.darkmode .footer a {
+  color: #b0b6c6 !important;
+  text-decoration: none;
+}
+
+body.darkmode .footer a:hover {
+  color: #009ca6 !important;
+  text-decoration: underline;
+}
+
+body.darkmode .student-profile-footer {
+  background: #181c1f !important;
+  color: #b0b6c6 !important;
+  border-top: 1px solid #232323 !important;
+}
+
+body.darkmode .student-profile-footer a {
+  color: #b0b6c6 !important;
+  text-decoration: none;
+}
+
+body.darkmode .student-profile-footer a:hover {
+  color: #009ca6 !important;
+  text-decoration: underline;
+}
+
+/* =============================================================================
+   11. PRIVACY EN CONTACT PAGINA'S
+   ============================================================================= */
+
+.privacy-container,
+.contact-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  background: white;
+}
+
+.content-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #dee2e6;
+}
+
+.content-card .header {
+  background: #f8f9fa;
+  color: #333;
+  padding: 2rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.content-card .header h1 {
+  margin: 0.5rem 0 0 0;
+  font-size: 2rem;
+}
+
+.content-card .content {
+  padding: 2rem;
+  line-height: 1.6;
+}
+
+.content-card .content h2 {
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.content-card .content h3 {
+  color: #555;
+  margin: 1.5rem 0 0.5rem 0;
+}
+
+.content-card .content ul {
+  margin: 0.5rem 0 1rem 1.5rem;
+}
+
+.content-card .content li {
+  margin-bottom: 0.5rem;
+}
+
+.content-card .content a {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.content-card .content a:hover {
+  text-decoration: underline;
+}
+
+/* Contact specific styles */
+.contact-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.contact-item {
+  padding: 1rem;
+  border-left: 4px solid #667eea;
+  background: #f8f9fa;
+  border-radius: 0 8px 8px 0;
+}
+
+.contact-item h3 {
+  margin: 0 0 0.5rem 0;
+  color: #667eea;
+  font-size: 1.1rem;
+}
+
+.contact-item p {
+  margin: 0;
+  color: #555;
+}
+
+.contact-item a {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.contact-item a:hover {
+  text-decoration: underline;
+}
+
+/* Contact form */
+.contact-form {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
+}
+
+.contact-form h3 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.contact-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.contact-form input,
+.contact-form textarea {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+/* Modern Contact Form Styling */
+.modern-contact-content {
+  max-width: 800px;
+  width: 100%;
+  margin: 2rem 0;
+}
+
+.contact-form-section {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem;
+  border: 1px solid #e1e5e9;
+}
+
+.contact-form-section h2 {
+  color: #333;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.modern-contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.modern-contact-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modern-contact-form label {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.modern-contact-form input,
+.modern-contact-form textarea {
+  padding: 12px 16px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modern-contact-form input:focus,
+.modern-contact-form textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.modern-contact-form input::placeholder,
+.modern-contact-form textarea::placeholder {
+  color: #999;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: none;
+}
+
+.error-message.show {
+  display: block;
+}
+
+.character-count {
+  font-size: 0.875rem;
+  color: #666;
+  text-align: right;
+  margin-top: 0.25rem;
+}
+
+.modern-submit-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.modern-submit-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+}
+
+.modern-submit-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.form-status {
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 1rem;
+  display: none;
+}
+
+.form-status.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  display: block;
+}
+
+.form-status.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  display: block;
+}
+
+/* Success Modal */
+.success-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.success-modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  margin-bottom: 1.5rem;
+}
+
+.success-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.modal-header h3 {
+  color: #28a745;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.modal-body p {
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.modal-reference {
+  font-weight: 600;
+  color: #667eea;
+}
+
+.modal-close-button {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.modal-close-button:hover {
+  background: #5a6fd8;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 1001;
+}
+
+.loading-overlay.show {
+  display: flex;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-overlay p {
+  color: white;
+  font-size: 1.1rem;
+}
+
+/* General Loading Spinner (voor pagina content) */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.loading-container .loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.loading-container .loading-text {
+  color: #666;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* Responsive voor contact pagina */
+@media (max-width: 768px) {
+  .contact-form-section {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .contact-form-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .modern-contact-form {
+    gap: 1rem;
+  }
+
+  /* Admin responsive design */
+  .admin-header-clean {
+    padding: 1rem;
+  }
+
+  .admin-header-right {
+    gap: 0.5rem;
+  }
+
+  .admin-username {
+    display: none;
+  }
+
+  .menu-toggle-btn {
+    display: block;
+  }
+
+  .admin-sidebar-clean {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .admin-sidebar-clean.active {
+    left: 0;
+  }
+
+  .admin-content-clean {
+    padding: 1rem;
+  }
+
+  .admin-section-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .student-item {
+    padding: 0.75rem 1rem;
+  }
+
+  /* Detail pages responsive */
+  .detail-main-layout,
+  .student-detail-main-layout,
+  .company-detail-main-layout {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .detail-right,
+  .student-detail-right,
+  .company-detail-right {
+    flex: none;
+    width: 100%;
+  }
+
+  .detail-actions,
+  .student-detail-actions,
+  .company-detail-actions {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .detail-action-btn,
+  .student-action-btn,
+  .company-action-btn {
+    flex: 1;
+    min-width: auto;
+    margin: 0 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-logo-section {
+    font-size: 1rem;
+  }
+
+  .admin-logo-section img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .admin-section-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .logout-btn-clean {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .student-detail-container,
+  .company-detail-container {
+    margin: 0 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .student-detail-section h3,
+  .company-detail-section h3 {
+    font-size: 1.1rem;
+  }
+
+  .detail-action-btn,
+  .student-action-btn,
+  .company-action-btn {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Unified Detail Page Styles - Used by all detail pages */
+.detail-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.detail-main-layout {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.detail-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.detail-right {
+  flex: 0 0 200px;
+  display: flex;
+  justify-content: center;
+}
+
+.detail-logo-section {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.detail-logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 3px solid #ddd;
+}
+
+.detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.detail-field label {
+  font-weight: bold;
+  color: #555;
+  font-size: 14px;
+}
+
+.detail-field span {
+  color: #333;
+  font-size: 16px;
+  padding: 8px 0;
+}
+
+.detail-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.detail-action-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-align: center;
+  min-width: 120px;
+}
+
+/* Button color schemes for detail actions */
+.detail-action-btn.speeddates {
+  background-color: #007bff;
+  color: white;
+}
+
+.detail-action-btn.speeddates:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.detail-action-btn.contact {
+  background-color: #6c757d;
+  color: white;
+}
+
+.detail-action-btn.contact:hover {
+  background-color: #5a6268;
+  transform: translateY(-1px);
+}
+
+.detail-action-btn.accept {
+  background-color: #28a745;
+  color: white;
+}
+
+.detail-action-btn.accept:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+}
+
+.detail-action-btn.reject {
+  background-color: #dc3545;
+  color: white;
+}
+
+.detail-action-btn.reject:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+}
+
+.detail-action-btn.delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.detail-action-btn.delete:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+}
+
+/* =============================================================================
+   12. STUDENT REGISTRATIE FORMULIEREN
+   ============================================================================= */
+
+/* Student Register Form Components */
+.form-container {
+  max-width: 500px;
+  margin: 2rem auto;
+  background-color: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.bedrijfForm input {
+  width: 300px;
+}
+
+/* Terug knop */
+.back-button {
+  background: none;
+  border: none;
+  color: #004080;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+/* Upload sectie */
+.upload-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.upload-icon {
+  font-size: 2.5rem;
+  background-color: #e0e7ff;
+  color: #004080;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin: 0 auto 0.5rem;
+}
+
+.upload-section label {
+  display: block;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.upload-label {
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.file-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.file-input {
+  display: none;
+}
+
+.browse-button {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.browse-button:hover {
+  background-color: #e0e0e0;
+}
+
+.file-status {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Input groups and labels */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.input-label {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+/* Form fields */
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.name-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.name-row .input-group {
+  flex: 1;
+}
+
+.form-spacing {
+  margin-bottom: 1rem;
+}
+
+.input-half {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.input-full {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.input-half,
+.input-full {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-half:focus,
+.input-full:focus {
+  outline: none;
+  border-color: #004080;
+  box-shadow: 0 0 0 2px rgba(0, 64, 128, 0.1);
+}
+
+/* Volgende knop */
+.next-button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: #004080;
+  color: white;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.next-button:hover {
+  background-color: #003060;
+}
+
+/* Save knop */
+.save-button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: #004080;
+  color: white;
+  border-radius: 2px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-button:hover {
+  background-color: #003060;
+}
+
+/* Skip knop */
+.skip-button {
+  margin-top: 2rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: grey;
+  color: white;
+  border-radius: 2px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.skip-button:hover {
+  background-color: #555;
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 2rem;
+}
+
+/* Opleiding page specific styling */
+.opleiding-container {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.opleiding-content {
+  text-align: center;
+}
+
+.opleiding-title {
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.form-section {
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-weight: 400;
+  color: #333;
+}
+
+.radio-label:hover {
+  background-color: #f8f9fa;
+}
+
+.radio-label input[type='radio'] {
+  margin-right: 0.75rem;
+}
+
+.radio-label:has(input[type='radio']:checked) {
+  border-color: #004080;
+  background-color: #f8f9ff;
+}
+
+.select-label {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.opleiding-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: white;
+  color: #333;
+}
+
+.opleiding-select:focus {
+  outline: none;
+  border-color: #004080;
+}
+
+.create-account-button {
+  width: 100%;
+  padding: 1rem;
+  background: #004080;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 400;
+  cursor: pointer;
+  margin-top: 2rem;
+}
+
+.create-account-button:hover {
+  background: #003060;
+}
+
+.back-button-outside {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1rem;
+  cursor: pointer;
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  padding: 0.5rem;
+  z-index: 10;
+}
+
+.back-button-outside:hover {
+  color: #004080;
+}
+
+/* =============================================================================
+   13. UTILITIES EN HELPERS
+   ========================================================================== */
+
+/* Speeddates Modal Styles */
+.speeddates-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.speeddates-modal-content {
+  background-color: #8b4a6b; /* Existing color from admin-style.css */
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.speeddates-modal-header {
+  background-color: #8b4a6b; /* Existing color */
+  color: white;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.speeddates-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.close-modal-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.close-modal-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.speeddates-modal-body {
+  background-color: #8b4a6b; /* Existing color */
+  padding: 1.5rem;
+  max-height: 400px; /* Consider adjusting if needed */
+  overflow-y: auto;
+}
+
+.speeddates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.speeddate-item {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s ease;
+}
+
+.speeddate-item:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.speeddate-info {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex: 1;
+}
+
+.speeddate-time {
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  min-width: 60px;
+}
+
+.speeddate-company,
+.speeddate-student {
+  /* Combined as they share styles */
+  color: white;
+  font-size: 1rem;
+  flex: 1;
+}
+
+.speeddate-cancel-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.speeddate-cancel-btn:hover {
+  background-color: #c82333;
+  transform: scale(1.1);
+}
+
+.no-speeddates {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-style: italic;
+  padding: 2rem;
+  font-size: 1.1rem;
+}
+
+/* Responsive styling for speeddate modal */
+@media (max-width: 768px) {
+  .speeddates-modal-content {
+    width: 95%;
+    margin: 0 10px;
+  }
+
+  .speeddates-modal-header {
+    padding: 1rem;
+  }
+
+  .speeddates-modal-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .speeddates-modal-body {
+    padding: 1rem;
+  }
+
+  .speeddate-info {
+    gap: 15px;
+  }
+
+  .speeddate-time {
+    min-width: 50px;
+    font-size: 0.9rem;
+  }
+
+  .speeddate-company, /* Adjusted for combined selector */
+  .speeddate-student {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .speeddate-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .speeddate-time {
+    min-width: auto;
+  }
+}

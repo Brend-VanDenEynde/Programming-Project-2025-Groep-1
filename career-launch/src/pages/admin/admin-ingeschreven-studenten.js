@@ -18,8 +18,7 @@ export async function renderAdminIngeschrevenStudenten(rootElement) {
         <div class="admin-logo-section">
           <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
-        </div>
-        <div class="admin-header-right">
+        </div>        <div class="admin-header-right">
           <span class="admin-username">Welkom, ${adminUsername}</span>
           <button id="logout-btn" class="logout-btn-clean">Uitloggen</button>
           <button id="menu-toggle" class="menu-toggle-btn">☰</button>
@@ -76,14 +75,14 @@ export async function renderAdminIngeschrevenStudenten(rootElement) {
       const route = btn.dataset.route;
       Router.navigate(route);
     });
-  });
-
-  // Mobile menu toggle
+  }); // Mobile menu toggle
   const menuToggle = document.getElementById('menu-toggle');
   const sidebar = document.querySelector('.admin-sidebar-clean');
-  menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
-  });
+  if (menuToggle && sidebar) {
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+  }
 
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
@@ -102,7 +101,7 @@ export async function renderAdminIngeschrevenStudenten(rootElement) {
     const response = await fetch('https://api.ehb-match.me/studenten/', {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 
@@ -121,7 +120,9 @@ export async function renderAdminIngeschrevenStudenten(rootElement) {
       `;
 
       studentItem.addEventListener('click', () => {
-        Router.navigate(`/admin-dashboard/student-detail?id=${student.gebruiker_id}`);
+        Router.navigate(
+          `/admin-dashboard/student-detail?id=${student.gebruiker_id}`
+        );
       });
 
       studentListContainer.appendChild(studentItem);

@@ -1,5 +1,5 @@
 import { renderStudentOpleiding } from './student-opleiding.js';
-import '../../css/student-register.css';
+import '../../css/consolidated-style.css';
 import Router from '../../router.js';
 
 export function renderStudentRegister(rootElement) {
@@ -24,11 +24,10 @@ export function renderStudentRegister(rootElement) {
         <button type="submit" class="next-button">Volgende →</button>
       </form>
 
-      
-    </main>
+        </main>
 
     <footer class="footer">
-      <a href="#" id="privacy-link">Privacy Policy</a> | <a href="#" id="contact-link">Contacteer Ons</a>
+      <a href="/privacy" data-route="/privacy">Privacy Policy</a> | <a href="/contact" data-route="/contact">Contacteer Ons</a>
     </footer>
   </div>
   `;
@@ -47,19 +46,6 @@ export function renderStudentRegister(rootElement) {
       }
     });
   }
-
-  // Footer links
-  const privacyLink = document.getElementById('privacy-link');
-  privacyLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Privacy Policy pagina nog niet geïmplementeerd');
-  });
-
-  const contactLink = document.getElementById('contact-link');
-  contactLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Contact pagina nog niet geïmplementeerd');
-  });
 }
 
 function handleNaamRegister(event) {
