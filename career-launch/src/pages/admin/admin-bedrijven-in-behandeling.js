@@ -1,6 +1,7 @@
 // Admin bedrijven in behandeling pagina
 import Router from '../../router.js';
 import { logoutUser } from '../../utils/auth-api.js';
+import ehbLogo from '../../images/EhB-logo-transparant.png';
 
 export async function renderAdminBedrijvenInBehandeling(rootElement) {
   // Check if user is logged in
@@ -14,11 +15,10 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
 
   rootElement.innerHTML = `
     <div class="admin-dashboard-clean">
-      <header class="admin-header-clean">
-        <div class="admin-logo-section">
-          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+      <header class="admin-header-clean">        <div class="admin-logo-section">
+          <img src="${ehbLogo}" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
-        </div>        <div class="admin-header-right">
+        </div><div class="admin-header-right">
           <span class="admin-username">Welkom, ${adminUsername}</span>
           <button id="logout-btn" class="logout-btn-clean">Uitloggen</button>
           <button id="menu-toggle" class="menu-toggle-btn">☰</button>
@@ -38,29 +38,8 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
         
         <main class="admin-content-clean">
           <div class="admin-section-header">
-            <h1 id="section-title">Bedrijven in Behandeling</h1>
-          </div>            <div class="admin-content-area" id="content-area">            <div class="processing-list">
-              <div class="processing-item clickable-processing" data-company-id="carrefour">
-                <span class="processing-company-name">Carrefour</span>
-                <div class="processing-actions">
-                  <button class="approve-btn" data-company="Carrefour" title="Goedkeuren">✓</button>
-                  <button class="reject-btn" data-company="Carrefour" title="Afwijzen">✕</button>
-                </div>
-              </div>
-              <div class="processing-item clickable-processing" data-company-id="mediamarkt">
-                <span class="processing-company-name">MediaMarkt</span>
-                <div class="processing-actions">
-                  <button class="approve-btn" data-company="MediaMarkt" title="Goedkeuren">✓</button>
-                  <button class="reject-btn" data-company="MediaMarkt" title="Afwijzen">✕</button>
-                </div>
-              </div>
-              <div class="processing-item clickable-processing" data-company-id="bol.com">
-                <span class="processing-company-name">Bol.com</span>
-                <div class="processing-actions">
-                  <button class="approve-btn" data-company="Bol.com" title="Goedkeuren">✓</button>
-                  <button class="reject-btn" data-company="Bol.com" title="Afwijzen">✕</button>
-                </div>
-              </div>
+            <h1 id="section-title">Bedrijven in Behandeling</h1>          </div>            <div class="admin-content-area" id="content-area">            <div class="processing-list">
+              <!-- Companies will be populated by API call -->
             </div>
           </div>
         </main>

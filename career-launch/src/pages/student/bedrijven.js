@@ -2,7 +2,7 @@ import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
 import { fetchCompanies } from '../../utils/data-api.js';
-import defaultBedrijfLogo from '../../images/BedrijfDefault.jpg';
+import defaultBedrijfLogo from '../../images/defaultlogo.webp';
 
 // Globale variabele voor bedrijven data
 let bedrijven = [];

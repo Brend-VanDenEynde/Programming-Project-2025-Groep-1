@@ -1,6 +1,6 @@
 // src/views/bedrijf-profiel.js
 
-import defaultAvatar from '../../images/BedrijfDefault.jpg';
+import defaultAvatar from '../../images/defaultlogo.webp';
 import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
@@ -14,10 +14,9 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}) {
       if (stored) bedrijfData = JSON.parse(stored);
     } catch (e) {}
   }
-
   const {
-    name = 'Microsoft',
-    email = 'bedrijf@voorbeeld.com',
+    name = '',
+    email = '',
     profilePictureUrl = defaultAvatar,
     linkedIn = '',
     description = '',

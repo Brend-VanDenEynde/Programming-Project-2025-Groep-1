@@ -1193,6 +1193,53 @@ a:hover {
   margin: 0;
 }
 
+/* Search Bar Styling */
+.search-bar-container {
+  position: relative;
+  margin-top: 1rem;
+  max-width: 400px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 40px 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #fff;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.search-input::placeholder {
+  color: #999;
+}
+
+.search-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  pointer-events: none;
+}
+
+/* No results message */
+.no-results {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #666;
+  font-size: 1.1rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
 /* Student/Company Lists */
 .student-list,
 .companies-list,
@@ -1365,6 +1412,15 @@ body.darkmode a {
 
 body.darkmode a:hover {
   color: #3dd686;
+}
+
+/* Dark mode voor admin back knop */
+body.darkmode .back-btn {
+  color: #00e6ef !important;
+}
+
+body.darkmode .back-btn:hover {
+  color: #3dd686 !important;
 }
 
 /* Dark mode voor formulieren */
@@ -2136,9 +2192,19 @@ body.darkmode .student-profile-footer a:hover {
   .admin-content-clean {
     padding: 1rem;
   }
-
   .admin-section-header h1 {
     font-size: 1.5rem;
+  }
+
+  /* Search bar responsive */
+  .search-bar-container {
+    max-width: 100%;
+    margin-top: 1rem;
+  }
+
+  .search-input {
+    padding: 10px 35px 10px 14px;
+    font-size: 16px; /* Prevents zoom on iOS */
   }
 
   .student-item {
@@ -2380,6 +2446,23 @@ body.darkmode .student-profile-footer a:hover {
   font-size: 1rem;
   margin-bottom: 1rem;
   cursor: pointer;
+}
+
+/* Admin terug naar studenten/bedrijven knop */
+.back-btn {
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px 0;
+  margin-bottom: 10px;
+  transition: color 0.3s ease;
+}
+
+.back-btn:hover {
+  color: #0056b3;
+  text-decoration: underline;
 }
 
 /* Upload sectie */

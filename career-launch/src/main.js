@@ -41,6 +41,7 @@ const routes = {
   '/login': renderLogin,
   '/student/student-profiel': renderStudentProfiel,
   '/student/zoek-criteria': renderSearchCriteriaStudent,
+  '/admin': renderAdmin,
   '/admin-login': renderAdmin,
   '/admin-select-dashboard': renderAdminSelectDashboard,
   '/admin-dashboard': renderAdminSelectDashboard,
