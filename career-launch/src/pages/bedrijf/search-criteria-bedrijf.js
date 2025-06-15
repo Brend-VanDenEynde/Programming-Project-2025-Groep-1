@@ -1,9 +1,11 @@
 // src/views/search-criteria-bedrijf.js
 
-import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderBedrijfProfiel } from './bedrijf-profiel.js';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
+
+// Use public assets for better production compatibility
+const logoIcon = '/icons/favicon-32x32.png';
 
 export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
   if (!bedrijfData.criteria) {

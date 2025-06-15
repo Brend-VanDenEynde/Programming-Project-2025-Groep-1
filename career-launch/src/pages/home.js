@@ -1,5 +1,7 @@
 import Router from '../router.js';
-import ehbLogo from '../images/EhB-logo-transparant.png';
+
+// Use public assets for better production compatibility
+const ehbLogo = '/images/ehb-logo-transparant.png';
 
 export function renderHome(rootElement) {
   // Zet altijd light mode bij laden van home

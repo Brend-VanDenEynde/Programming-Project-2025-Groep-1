@@ -238,7 +238,8 @@ body {
 }
 
 /* Login/Register footer altijd onderaan */
-.login-container, .register-container {
+.login-container,
+.register-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -355,8 +356,6 @@ body.darkmode .footer-links {
   text-decoration: none;
   font-weight: 500;
 }
-
-
 
 /* Privacy and Contact pages */
 .privacy-container,
@@ -592,7 +591,7 @@ body.darkmode .footer-links {
   border: 1px solid #e1e5e9;
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   min-width: 160px;
   z-index: 1000;
 }
@@ -710,13 +709,13 @@ body.darkmode .student-profile-content {
   margin-bottom: 0.5rem;
   color: #333;
   font-size: 1.07rem;
-  letter-spacing: .01em;
+  letter-spacing: 0.01em;
 }
 
-.student-profile-form-group input[type="text"],
-.student-profile-form-group input[type="email"],
-.student-profile-form-group input[type="date"],
-.student-profile-form-group input[type="url"],
+.student-profile-form-group input[type='text'],
+.student-profile-form-group input[type='email'],
+.student-profile-form-group input[type='date'],
+.student-profile-form-group input[type='url'],
 .student-profile-form-group select,
 .student-profile-form-group textarea {
   width: 100%;
@@ -730,14 +729,14 @@ body.darkmode .student-profile-content {
   color: #333;
   margin-top: 2px;
   outline: none;
-  transition: border .17s;
+  transition: border 0.17s;
   resize: none;
 }
 
-.student-profile-form-group input[type="text"]:focus,
-.student-profile-form-group input[type="email"]:focus,
-.student-profile-form-group input[type="date"]:focus,
-.student-profile-form-group input[type="url"]:focus,
+.student-profile-form-group input[type='text']:focus,
+.student-profile-form-group input[type='email']:focus,
+.student-profile-form-group input[type='date']:focus,
+.student-profile-form-group input[type='url']:focus,
 .student-profile-form-group select:focus,
 .student-profile-form-group textarea:focus {
   border-color: grey;
@@ -760,7 +759,7 @@ body.darkmode .student-profile-content {
   font-size: 1.1rem;
   padding: 13px 0;
   cursor: pointer;
-  transition: background .18s, color .18s, box-shadow .18s;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
 }
 
 .student-profile-btn-primary {
@@ -784,7 +783,7 @@ body.darkmode .student-profile-content {
   font-weight: 600 !important;
   cursor: pointer !important;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
-  box-shadow: 0 2px 8px rgba(0,188,212,0.08) !important;
+  box-shadow: 0 2px 8px rgba(0, 188, 212, 0.08) !important;
   outline: none !important;
   min-width: 120px !important;
   display: inline-block !important;
@@ -793,7 +792,7 @@ body.darkmode .student-profile-content {
 .student-profile-btn-secondary:hover {
   background-color: #00acc1 !important;
   color: #fff !important;
-  box-shadow: 0 4px 16px rgba(0,188,212,0.13) !important;
+  box-shadow: 0 4px 16px rgba(0, 188, 212, 0.13) !important;
   transform: translateY(-2px) !important;
 }
 
@@ -801,13 +800,13 @@ body.darkmode .student-profile-content {
 .student-profile-btn_primary:active {
   background-color: #009ca6 !important;
   color: #fff !important;
-  box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
+  box-shadow: 0 2px 4px rgba(0, 188, 212, 0.1) !important;
   transform: translateY(0) !important;
 }
 .student-profile-btn-secondary:active {
   background-color: #009ca6 !important;
   color: #fff !important;
-  box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
+  box-shadow: 0 2px 4px rgba(0, 188, 212, 0.1) !important;
   transform: translateY(0) !important;
 }
 
@@ -819,14 +818,14 @@ body.darkmode .student-profile-btn-secondary {
   color: #00e6ef !important;
   border-radius: 8px !important;
   border: none !important;
-  box-shadow: 0 2px 8px rgba(0,230,239,0.10) !important;
+  box-shadow: 0 2px 8px rgba(0, 230, 239, 0.1) !important;
 }
 body.darkmode .student-profile-btn:hover,
 body.darkmode .student-profile-btn-primary:hover,
 body.darkmode .student-profile-btn-secondary:hover {
   background-color: #181c1f !important;
   color: #00e6ef !important;
-  box-shadow: 0 4px 16px rgba(0,230,239,0.13) !important;
+  box-shadow: 0 4px 16px rgba(0, 230, 239, 0.13) !important;
   transform: translateY(-2px) !important;
 }
 body.darkmode .student-profile-btn:active,
@@ -834,7 +833,7 @@ body.darkmode .student-profile-btn-primary:active,
 body.darkmode .student-profile-btn-secondary:active {
   background-color: grey !important;
   color: #fff !important;
-  box-shadow: 0 2px 4px rgba(0,230,239,0.10) !important;
+  box-shadow: 0 2px 4px rgba(0, 230, 239, 0.1) !important;
   transform: translateY(0) !important;
 }
 
@@ -891,8 +890,8 @@ body.darkmode .student-profile-btn-secondary:active {
   user-select: none;
 }
 
-.checkbox-option input[type="checkbox"],
-.checkbox-option input[type="radio"] {
+.checkbox-option input[type='checkbox'],
+.checkbox-option input[type='radio'] {
   accent-color: grey;
   width: 20px;
   height: 20px;
@@ -900,8 +899,8 @@ body.darkmode .student-profile-btn-secondary:active {
   border-radius: 6px;
 }
 
-.checkbox-option input[type="checkbox"]:checked + span,
-.checkbox-option input[type="checkbox"]:checked {
+.checkbox-option input[type='checkbox']:checked + span,
+.checkbox-option input[type='checkbox']:checked {
   color: grey !important;
   border-color: grey;
 }
@@ -921,7 +920,7 @@ body.darkmode .student-profile-btn-secondary:active {
   border: 2px solid #e1e5e9;
   outline: none;
   background: #fff;
-  transition: border .16s;
+  transition: border 0.16s;
 }
 
 .form-input:focus {
@@ -936,7 +935,7 @@ body.darkmode .student-profile-btn-secondary:active {
   font-weight: 700;
   padding: 10px 20px;
   cursor: pointer;
-  transition: background .18s, color .18s, box-shadow .18s;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
   min-width: 92px;
   box-shadow: 0 2px 6px 0 rgba(44, 44, 44, 0.05);
 }
@@ -963,7 +962,7 @@ body.darkmode .student-profile-btn-secondary:active {
 .settings-popup-card {
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   padding: 2.2rem 1.5rem 1.7rem 1.5rem;
   min-width: 320px;
   max-width: 420px;
@@ -1004,7 +1003,7 @@ body.darkmode .student-profile-btn-secondary:active {
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
   margin-bottom: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
 }
 
 .settings-action-btn:hover {
@@ -1022,9 +1021,9 @@ body.darkmode .student-profile-btn-secondary:active {
   padding: 13px 0;
   min-width: 140px;
   cursor: pointer;
-  box-shadow: 0 2px 10px 0 rgba(44,44,44,0.06);
-  letter-spacing: .04em;
-  transition: background .17s, color .17s, box-shadow .17s;
+  box-shadow: 0 2px 10px 0 rgba(44, 44, 44, 0.06);
+  letter-spacing: 0.04em;
+  transition: background 0.17s, color 0.17s, box-shadow 0.17s;
   margin: 0;
 }
 .settings-action-btn.logout:hover {
@@ -1045,7 +1044,7 @@ body.darkmode .student-profile-btn-secondary:active {
   font-weight: 600 !important;
   cursor: pointer !important;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
-  box-shadow: 0 2px 8px rgba(0,188,212,0.08) !important;
+  box-shadow: 0 2px 8px rgba(0, 188, 212, 0.08) !important;
   outline: none !important;
   min-width: 120px !important;
   display: inline-block !important;
@@ -1060,7 +1059,7 @@ body.darkmode .student-profile-btn-secondary:active {
   font-weight: 600 !important;
   cursor: pointer !important;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
-  box-shadow: 0 2px 8px rgba(0,188,212,0.08) !important;
+  box-shadow: 0 2px 8px rgba(0, 188, 212, 0.08) !important;
   outline: none !important;
   min-width: 120px !important;
   display: inline-block !important;
@@ -1069,26 +1068,26 @@ body.darkmode .student-profile-btn-secondary:active {
 .student-profile-btn-primary:hover {
   background-color: #00acc1 !important;
   color: #fff !important;
-  box-shadow: 0 4px 16px rgba(0,188,212,0.13) !important;
+  box-shadow: 0 4px 16px rgba(0, 188, 212, 0.13) !important;
   transform: translateY(-2px) !important;
 }
 .student-profile-btn-secondary:hover {
   background-color: #00acc1 !important;
   color: #fff !important;
-  box-shadow: 0 4px 16px rgba(0,188,212,0.13) !important;
+  box-shadow: 0 4px 16px rgba(0, 188, 212, 0.13) !important;
   transform: translateY(-2px) !important;
 }
 .student-profile-btn:active,
 .student-profile-btn_primary:active {
   background-color: #009ca6 !important;
   color: #fff !important;
-  box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
+  box-shadow: 0 2px 4px rgba(0, 188, 212, 0.1) !important;
   transform: translateY(0) !important;
 }
 .student-profile-btn-secondary:active {
   background-color: #009ca6 !important;
   color: #fff !important;
-  box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
+  box-shadow: 0 2px 4px rgba(0, 188, 212, 0.1) !important;
   transform: translateY(0) !important;
 }
 
@@ -1100,14 +1099,14 @@ body.darkmode .student-profile-btn-secondary {
   color: #00e6ef !important;
   border-radius: 8px !important;
   border: none !important;
-  box-shadow: 0 2px 8px rgba(0,230,239,0.10) !important;
+  box-shadow: 0 2px 8px rgba(0, 230, 239, 0.1) !important;
 }
 body.darkmode .student-profile-btn:hover,
 body.darkmode .student-profile-btn-primary:hover,
 body.darkmode .student-profile-btn-secondary:hover {
   background-color: #181c1f !important;
   color: #00e6ef !important;
-  box-shadow: 0 4px 16px rgba(0,230,239,0.13) !important;
+  box-shadow: 0 4px 16px rgba(0, 230, 239, 0.13) !important;
   transform: translateY(-2px) !important;
 }
 body.darkmode .student-profile-btn:active,
@@ -1115,7 +1114,7 @@ body.darkmode .student-profile-btn-primary:active,
 body.darkmode .student-profile-btn-secondary:active {
   background-color: grey !important;
   color: #fff !important;
-  box-shadow: 0 2px 4px rgba(0,230,239,0.10) !important;
+  box-shadow: 0 2px 4px rgba(0, 230, 239, 0.1) !important;
   transform: translateY(0) !important;
 }
 
@@ -1172,8 +1171,8 @@ body.darkmode .student-profile-btn-secondary:active {
   user-select: none;
 }
 
-.checkbox-option input[type="checkbox"],
-.checkbox-option input[type="radio"] {
+.checkbox-option input[type='checkbox'],
+.checkbox-option input[type='radio'] {
   accent-color: grey;
   width: 20px;
   height: 20px;
@@ -1181,8 +1180,8 @@ body.darkmode .student-profile-btn-secondary:active {
   border-radius: 6px;
 }
 
-.checkbox-option input[type="checkbox"]:checked + span,
-.checkbox-option input[type="checkbox"]:checked {
+.checkbox-option input[type='checkbox']:checked + span,
+.checkbox-option input[type='checkbox']:checked {
   color: grey !important;
   border-color: grey;
 }
@@ -1202,7 +1201,7 @@ body.darkmode .student-profile-btn-secondary:active {
   border: 2px solid #e1e5e9;
   outline: none;
   background: #fff;
-  transition: border .16s;
+  transition: border 0.16s;
 }
 
 .form-input:focus {
@@ -1217,7 +1216,7 @@ body.darkmode .student-profile-btn-secondary:active {
   font-weight: 700;
   padding: 10px 20px;
   cursor: pointer;
-  transition: background .18s, color .18s, box-shadow .18s;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
   min-width: 92px;
   box-shadow: 0 2px 6px 0 rgba(44, 44, 44, 0.05);
 }
@@ -1244,7 +1243,7 @@ body.darkmode .student-profile-btn-secondary:active {
 .settings-popup-card {
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   padding: 2.2rem 1.5rem 1.7rem 1.5rem;
   min-width: 320px;
   max-width: 420px;
@@ -1285,7 +1284,7 @@ body.darkmode .student-profile-btn-secondary:active {
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
   margin-bottom: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
 }
 
 .settings-action-btn:hover {
@@ -1303,9 +1302,9 @@ body.darkmode .student-profile-btn-secondary:active {
   padding: 13px 0;
   min-width: 140px;
   cursor: pointer;
-  box-shadow: 0 2px 10px 0 rgba(44,44,44,0.06);
-  letter-spacing: .04em;
-  transition: background .17s, color .17s, box-shadow .17s;
+  box-shadow: 0 2px 10px 0 rgba(44, 44, 44, 0.06);
+  letter-spacing: 0.04em;
+  transition: background 0.17s, color 0.17s, box-shadow 0.17s;
   margin: 0;
 }
 .settings-action-btn.logout:hover {
@@ -1313,7 +1312,6 @@ body.darkmode .student-profile-btn-secondary:active {
   color: #fff;
   filter: brightness(1.07) drop-shadow(0 0 12px #3dd68625);
 }
-
 
 body.darkmode {
   font-family: 'Arial', sans-serif;
@@ -1342,7 +1340,7 @@ body.darkmode .login-card {
   background: #181c1f !important;
   color: #e0f7fa !important;
   border-radius: 14px;
-  box-shadow: 0 4px 24px 0 rgba(0,230,239,0.10), 0 1.5px 0 0 #232323;
+  box-shadow: 0 4px 24px 0 rgba(0, 230, 239, 0.1), 0 1.5px 0 0 #232323;
 }
 body.darkmode .register-header h1,
 body.darkmode .login-header h1 {
@@ -1405,7 +1403,7 @@ body.darkmode .settings-popup-card {
   color: #e0f7fa !important;
   border-radius: 14px;
   border: 1.5px solid #232323;
-  box-shadow: 0 4px 24px 0 rgba(0,230,239,0.10), 0 1.5px 0 0 #232323;
+  box-shadow: 0 4px 24px 0 rgba(0, 230, 239, 0.1), 0 1.5px 0 0 #232323;
 }
 body.darkmode .student-profile-form-group label,
 body.darkmode .checkbox-option span {
@@ -1443,15 +1441,15 @@ body.darkmode .checkbox-option {
   border-radius: 8px;
   margin-bottom: 0.5rem;
 }
-body.darkmode .checkbox-option input[type="checkbox"],
-body.darkmode .checkbox-option input[type="radio"] {
+body.darkmode .checkbox-option input[type='checkbox'],
+body.darkmode .checkbox-option input[type='radio'] {
   accent-color: #00e6ef !important;
 }
 body.darkmode .speeddates-table {
   background: #000 !important;
   border-radius: 12px;
   border: 1.5px solid #232323;
-  box-shadow: 0 2px 12px rgba(0,230,239,0.07);
+  box-shadow: 0 2px 12px rgba(0, 230, 239, 0.07);
 }
 body.darkmode .speeddates-table th {
   background: #101214 !important;
@@ -1478,7 +1476,7 @@ body.darkmode .speeddates-table tr:last-child td {
 body.darkmode {
   --accent: lightgrey;
   --accent-contrast: #181c1f;
-  --header-logo: url('/src/Images/EhB-logo-transparant-558-DarkMode.png');
+  --header-logo: url('/images/EhB-logo-transparant-558-DarkMode.png');
   background: #000 !important;
   color: #f8fafd !important;
 }
@@ -1492,7 +1490,7 @@ body.darkmode .settings-popup-card {
   color: #e0f7fa !important;
   border-radius: 14px;
   border: 1.5px solid #232323;
-  box-shadow: 0 4px 24px 0 rgba(0,230,239,0.10), 0 1.5px 0 0 #232323;
+  box-shadow: 0 4px 24px 0 rgba(0, 230, 239, 0.1), 0 1.5px 0 0 #232323;
 }
 
 body.darkmode .student-profile-header,
@@ -1527,12 +1525,11 @@ body.darkmode .student-profile-sidebar button:hover {
   font-weight: 700;
 }
 
-
 /* Burger menu popup in darkmode */
 body.darkmode .student-profile-dropdown {
   background: #000 !important;
   border-color: #333 !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.22) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22) !important;
 }
 body.darkmode .student-profile-dropdown li button {
   color: #e0f7fa !important;
@@ -1547,7 +1544,7 @@ body.darkmode .speeddates-table {
   background: #000 !important;
   border-radius: 12px;
   border: 1.5px solid #232323;
-  box-shadow: 0 2px 12px rgba(0,230,239,0.07);
+  box-shadow: 0 2px 12px rgba(0, 230, 239, 0.07);
 }
 body.darkmode .speeddates-table th {
   background: #101214 !important;
@@ -1570,7 +1567,6 @@ body.darkmode .speeddates-table tr:last-child td {
   border-bottom: none !important;
 }
 
-
 /* --- MODERN TABLES: LIGHT & DARK MODE --- */
 .speeddates-table {
   width: 100%;
@@ -1578,7 +1574,7 @@ body.darkmode .speeddates-table tr:last-child td {
   border-spacing: 0;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
   overflow: hidden;
   margin-bottom: 2rem;
   font-size: 1.07rem;
@@ -1617,7 +1613,7 @@ body.darkmode .speeddates-table tr:last-child td {
   object-fit: contain;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
 body.darkmode .qr-code-img {
   background: #181c1f !important;
@@ -1636,7 +1632,7 @@ body.darkmode .modal-content,
 body.darkmode .content-card {
   background: #000 !important;
   color: #e0f7fa !important;
-  box-shadow: 0 4px 24px 0 rgba(0,230,239,0.13);
+  box-shadow: 0 4px 24px 0 rgba(0, 230, 239, 0.13);
 }
 body.darkmode .settings-title,
 body.darkmode .modal-header h1,
@@ -1654,7 +1650,7 @@ body.darkmode .search-fieldset {
   background: #000 !important;
   color: #e0f7fa !important;
   border-radius: 12px;
-  box-shadow: 0 1px 8px 0 rgba(0,230,239,0.08);
+  box-shadow: 0 1px 8px 0 rgba(0, 230, 239, 0.08);
 }
 body.darkmode .search-fieldset legend {
   color: var(--accent) !important;
@@ -1697,8 +1693,8 @@ body.darkmode .checkbox-option {
   border-radius: 8px;
   margin-bottom: 0.5rem;
 }
-body.darkmode .checkbox-option input[type="checkbox"],
-body.darkmode .checkbox-option input[type="radio"] {
+body.darkmode .checkbox-option input[type='checkbox'],
+body.darkmode .checkbox-option input[type='radio'] {
   accent-color: var(--accent) !important;
 }
 
@@ -1736,7 +1732,7 @@ body.darkmode .speeddates-table .deny-btn {
 /* QR-code en labels in darkmode */
 body.darkmode .qr-code-img {
   background: #181c1f !important;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.22) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22) !important;
 }
 body.darkmode .qr-code-label,
 body.darkmode .qr-code-description {
@@ -1911,10 +1907,9 @@ body.darkmode .speeddates-table .status-badge.badge-other {
   }
 }
 
-
 body.darkmode .student-profile-header .logo-section span {
   font-weight: 700;
-  color: #e0f7fa  !important;
+  color: #e0f7fa !important;
 }
 
 /* --- UNIFORME BUTTON-STIJL VOOR PROFIELACTIEKNOPPEN (login/register look) --- */
@@ -1929,7 +1924,7 @@ body.darkmode .student-profile-header .logo-section span {
   font-weight: 600 !important;
   cursor: pointer !important;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
-  box-shadow: 0 2px 8px rgba(0,188,212,0.08) !important;
+  box-shadow: 0 2px 8px rgba(0, 188, 212, 0.08) !important;
   outline: none !important;
   min-width: 120px !important;
   display: inline-block !important;
@@ -1944,7 +1939,7 @@ body.darkmode .student-profile-header .logo-section span {
   font-weight: 600 !important;
   cursor: pointer !important;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
-  box-shadow: 0 2px 8px rgba(0,188,212,0.08) !important;
+  box-shadow: 0 2px 8px rgba(0, 188, 212, 0.08) !important;
   outline: none !important;
   min-width: 120px !important;
   display: inline-block !important;
@@ -1953,26 +1948,26 @@ body.darkmode .student-profile-header .logo-section span {
 .student-profile-btn-primary:hover {
   background-color: #00acc1 !important;
   color: #fff !important;
-  box-shadow: 0 4px 16px rgba(0,188,212,0.13) !important;
+  box-shadow: 0 4px 16px rgba(0, 188, 212, 0.13) !important;
   transform: translateY(-2px) !important;
 }
 .student-profile-btn-secondary:hover {
   background-color: #00acc1 !important;
   color: #fff !important;
-  box-shadow: 0 4px 16px rgba(0,188,212,0.13) !important;
+  box-shadow: 0 4px 16px rgba(0, 188, 212, 0.13) !important;
   transform: translateY(-2px) !important;
 }
 .student-profile-btn:active,
 .student-profile-btn_primary:active {
   background-color: #009ca6 !important;
   color: #fff !important;
-  box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
+  box-shadow: 0 2px 4px rgba(0, 188, 212, 0.1) !important;
   transform: translateY(0) !important;
 }
 .student-profile-btn-secondary:active {
   background-color: #009ca6 !important;
   color: #fff !important;
-  box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
+  box-shadow: 0 2px 4px rgba(0, 188, 212, 0.1) !important;
   transform: translateY(0) !important;
 }
 
@@ -1984,22 +1979,23 @@ body.darkmode .student-profile-btn-secondary {
   color: lightgray !important;
   border-radius: 8px !important;
   border: none !important;
-  box-shadow: 0 2px 8px rgba(0,230,239,0.10) !important;
+  box-shadow: 0 2px 8px rgba(0, 230, 239, 0.1) !important;
 }
 body.darkmode .student-profile-btn:hover,
 body.darkmode .student-profile-btn-primary:hover,
 body.darkmode .student-profile-btn-secondary:hover {
   background-color: #181c1f !important;
   color: lightgray !important;
-  box-shadow: 0 4px 16px rgba(0,230,239,0.13) !important;
+  box-shadow: 0 4px 16px rgba(0, 230, 239, 0.13) !important;
   transform: translateY(-2px) !important;
 }
 body.darkmode .student-profile-btn:active,
 body.darkmode .student-profile-btn-primary:active,
 body.darkmode .student-profile-btn-secondary:active {
-  background-color: grey !important;}
+  background-color: grey !important;
+}
 
-  /* --- UNIFORME BUTTON STIJL VOOR LOGOUT EN DELETE IN SETTINGS --- */
+/* --- UNIFORME BUTTON STIJL VOOR LOGOUT EN DELETE IN SETTINGS --- */
 .settings-action-btn.logout {
   background: grey !important;
   color: #fff !important;
@@ -2010,20 +2006,20 @@ body.darkmode .student-profile-btn-secondary:active {
   padding: 12px 28px !important;
   min-width: 120px !important;
   display: inline-block !important;
-  box-shadow: 0 2px 8px rgba(0,188,212,0.08) !important;
+  box-shadow: 0 2px 8px rgba(0, 188, 212, 0.08) !important;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
 }
 .settings-action-btn.logout:hover,
 .settings-action-btn.logout:focus {
   background: #00acc1 !important;
   color: #fff !important;
-  box-shadow: 0 4px 16px rgba(0,188,212,0.13) !important;
+  box-shadow: 0 4px 16px rgba(0, 188, 212, 0.13) !important;
   transform: translateY(-2px) !important;
 }
 .settings-action-btn.logout:active {
   background: #009ca6 !important;
   color: #fff !important;
-  box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
+  box-shadow: 0 2px 4px rgba(0, 188, 212, 0.1) !important;
   transform: translateY(0) !important;
 }
 
@@ -2038,7 +2034,7 @@ body.darkmode .student-profile-btn-secondary:active {
   padding: 12px 28px !important;
   min-width: 120px !important;
   display: inline-block !important;
-  box-shadow: 0 2px 8px rgba(250, 98, 106, 0.10) !important;
+  box-shadow: 0 2px 8px rgba(250, 98, 106, 0.1) !important;
   transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
 }
 .settings-action-btn.delete:hover,
@@ -2055,7 +2051,7 @@ body.darkmode .student-profile-btn-secondary:active {
   transform: translateY(0) !important;
 }
 
-body.darkmode #burger-menu:hover{
+body.darkmode #burger-menu:hover {
   background-color: lightgray !important;
 }
 
@@ -2080,8 +2076,6 @@ body.darkmode #burger-menu:hover{
   text-decoration: none;
 }
 
-
-
 /* Algemene link-stijlen */
 a {
   color: #0077b5;
@@ -2097,7 +2091,6 @@ body.darkmode a {
 body.darkmode a:hover {
   color: #3dd686;
 }
-
 
 /* Links in .student-profile-footer zijn standaard niet onderlijnd, maar wel bij hover. Dit geldt voor zowel light als darkmode. */
 .student-profile-footer a {
