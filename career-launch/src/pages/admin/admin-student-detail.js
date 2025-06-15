@@ -291,162 +291,28 @@ function closeSpeedDatesModal() {
 }
 
 function getStudentSpeedDates(studentId) {
-  // Mock speeddate data - in real app this would come from API
-  const speedDatesDatabase = {
-    'tiberius-kirk': [
-      { id: 1, time: '12u40', company: 'Carrefour' },
-      { id: 2, time: '13u00', company: 'Microsoft' },
-      { id: 3, time: '13u20', company: 'Amazon' },
-    ],
-    'john-smith': [
-      { id: 4, time: '12u45', company: 'Philips' },
-      { id: 5, time: '13u10', company: 'Amazon' },
-    ],
-    'jean-luc-picard': [
-      { id: 6, time: '12u40', company: 'Carrefour' },
-      { id: 7, time: '12u45', company: 'Philips' },
-      { id: 8, time: '13u00', company: 'Microsoft' },
-      { id: 9, time: '13u10', company: 'Amazon' },
-    ],
-    'daniel-vonkman': [
-      { id: 10, time: '12u50', company: 'Bol.com' },
-      { id: 11, time: '13u15', company: 'MediaMarkt' },
-    ],
-    'len-jaxtyn': [{ id: 12, time: '12u55', company: 'Google' }],
-  };
-
-  return speedDatesDatabase[studentId] || [];
+  // This function is no longer needed as speeddate data comes from API
+  return [];
 }
 
 function getStudentData(studentId) {
-  // Mock data - in real app this would fetch from API
-  const studentDatabase = {
-    'tiberius-kirk': {
-      userId: 101,
-      firstName: 'Tiberius',
-      lastName: 'Kirk',
-      email: 'Tiberius.Kirk@Enterprise.space',
-      studyProgram: 'Computer Science',
-      year: '3e jaar',
-      birthDate: '1995-05-15',
-      linkedIn: 'linkedin.com/in/Tiberius-Kirk',
-      description:
-        'Ambitieuze student met passie voor technologie en innovatie.',
-      profilePictureUrl: null,
-      registrationDate: '2024-09-15',
-      status: 'Actief',
-      lastLogin: '2024-12-08',
-    },
-    'john-smith': {
-      userId: 102,
-      firstName: 'John',
-      lastName: 'Smith',
-      email: 'john.smith@student.ehb.be',
-      studyProgram: 'Business Administration',
-      year: '2e jaar',
-      birthDate: '1996-03-22',
-      linkedIn: '',
-      description: 'Gedreven student met interesse in ondernemerschap.',
-      profilePictureUrl: null,
-      registrationDate: '2024-09-10',
-      status: 'Actief',
-      lastLogin: '2024-12-07',
-    },
-    'jean-luc-picard': {
-      userId: 103,
-      firstName: 'Jean-Luc',
-      lastName: 'Picard',
-      email: 'jean.luc.picard@student.ehb.be',
-      studyProgram: 'International Relations',
-      year: '4e jaar',
-      birthDate: '1994-07-13',
-      linkedIn: 'linkedin.com/in/jean-luc-picard',
-      description:
-        'Student met sterke leiderschapsvaardigheden en interesse in diplomatie.',
-      profilePictureUrl: null,
-      registrationDate: '2024-08-20',
-      status: 'Actief',
-      lastLogin: '2024-12-09',
-    },
-    'daniel-vonkman': {
-      userId: 104,
-      firstName: 'Daniel',
-      lastName: 'Vonkman',
-      email: 'daniel.vonkman@student.ehb.be',
-      studyProgram: 'Marketing',
-      year: '3e jaar',
-      birthDate: '1995-11-08',
-      linkedIn: '',
-      description: 'Creatieve student met passie voor digitale marketing.',
-      profilePictureUrl: null,
-      registrationDate: '2024-09-05',
-      status: 'Actief',
-      lastLogin: '2024-12-06',
-    },
-    'len-jaxtyn': {
-      userId: 105,
-      firstName: 'Len',
-      lastName: 'Jaxtyn',
-      email: 'len.jaxtyn@student.ehb.be',
-      studyProgram: 'Graphic Design',
-      year: '2e jaar',
-      birthDate: '1996-12-25',
-      linkedIn: 'linkedin.com/in/len-jaxtyn',
-      description: 'Artistieke student met expertise in visuele communicatie.',
-      profilePictureUrl: null,
-      registrationDate: '2024-09-12',
-      status: 'Actief',
-      lastLogin: '2024-12-08',
-    },
-    'kimberley-hester': {
-      userId: 106,
-      firstName: 'Kimberley',
-      lastName: 'Hester',
-      email: 'kimberley.hester@student.ehb.be',
-      studyProgram: 'Psychology',
-      year: '1e jaar',
-      birthDate: '1997-04-17',
-      linkedIn: '',
-      description: 'Empathische student met interesse in menselijk gedrag.',
-      profilePictureUrl: null,
-      registrationDate: '2024-09-18',
-      status: 'Actief',
-      lastLogin: '2024-12-05',
-    },
-    'ed-marvin': {
-      userId: 107,
-      firstName: 'Ed',
-      lastName: 'Marvin',
-      email: 'ed.marvin@student.ehb.be',
-      studyProgram: 'Engineering',
-      year: '4e jaar',
-      birthDate: '1994-09-30',
-      linkedIn: 'linkedin.com/in/ed-marvin',
-      description:
-        'Technische student met specialisatie in duurzame technologieën.',
-      profilePictureUrl: null,
-      registrationDate: '2024-08-15',
-      status: 'Actief',
-      lastLogin: '2024-12-07',
-    },
-    demo: {
-      userId: 999,
-      firstName: 'Demo',
-      lastName: 'Student',
-      email: 'demo@student.ehb.be',
-      studyProgram: 'Demo Programma',
-      year: '1e jaar',
-      birthDate: '1997-01-01',
-      linkedIn: '',
-      description: 'Dit is een demo student profiel.',
-      profilePictureUrl: null,
-      registrationDate: '2024-01-01',
-      status: 'Actief',
-      lastLogin: '2024-12-09',
-    },
+  // This function is no longer needed as student data comes from API
+  // Return minimal fallback data only
+  return {
+    userId: 999,
+    firstName: 'Onbekend',
+    lastName: 'Student',
+    email: 'onbekend@student.ehb.be',
+    studyProgram: 'Onbekend',
+    year: 'Onbekend',
+    birthDate: '1997-01-01',
+    linkedIn: '',
+    description: 'Student data wordt opgehaald van de API.',
+    profilePictureUrl: null,
+    registrationDate: '2024-01-01',
+    status: 'Actief',
+    lastLogin: '2024-12-09',
   };
-
-  return studentDatabase[studentId] || studentDatabase['demo'];
 }
 
 function setupEventHandlers() {

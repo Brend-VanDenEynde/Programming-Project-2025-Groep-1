@@ -129,12 +129,15 @@ export async function renderAdminCompanyDetail(rootElement) {
   // Fetch company data from API
   const accessToken = sessionStorage.getItem('accessToken');
   try {
-    const response = await fetch(`https://api.ehb-match.me/bedrijven/${companyId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
+    const response = await fetch(
+      `https://api.ehb-match.me/bedrijven/${companyId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error('Failed to fetch company data');
@@ -143,8 +146,11 @@ export async function renderAdminCompanyDetail(rootElement) {
     const companyData = await response.json();
 
     // Update the page with company data
-    document.querySelector('#section-title').textContent = `Bedrijf Details: ${companyData.naam}`;
-    document.querySelector('.detail-logo-section img').src = companyData.profiel_foto || defaultCompanyLogo;
+    document.querySelector(
+      '#section-title'
+    ).textContent = `Bedrijf Details: ${companyData.naam}`;
+    document.querySelector('.detail-logo-section img').src =
+      companyData.profiel_foto || defaultCompanyLogo;
     document.querySelector('.detail-info').innerHTML = `
       <div class="detail-field">
         <label>Naam:</label>
@@ -160,7 +166,11 @@ export async function renderAdminCompanyDetail(rootElement) {
       </div>
       <div class="detail-field">
         <label>LinkedIn:</label>
-        <span>${companyData.linkedin ? `<a href="https://www.linkedin.com/in/${companyData.linkedin}" target="_blank">${companyData.linkedin}</a>` : 'Niet ingesteld'}</span>
+        <span>${
+          companyData.linkedin
+            ? `<a href="https://www.linkedin.com/in/${companyData.linkedin}" target="_blank">${companyData.linkedin}</a>`
+            : 'Niet ingesteld'
+        }</span>
       </div>
       <div class="detail-field">
         <label>Sector ID:</label>
@@ -169,9 +179,11 @@ export async function renderAdminCompanyDetail(rootElement) {
     `;
   } catch (error) {
     console.error('Error fetching company details:', error);
-    document.querySelector('#section-title').textContent = 'Er is een probleem. Probeer opnieuw.';
+    document.querySelector('#section-title').textContent =
+      'Er is een probleem. Probeer opnieuw.';
     document.querySelector('.detail-logo-section img').src = defaultCompanyLogo;
-    document.querySelector('.detail-info').innerHTML = '<p>Er is een probleem met het ophalen van de bedrijfsgegevens. Probeer het later opnieuw.</p>';
+    document.querySelector('.detail-info').innerHTML =
+      '<p>Er is een probleem met het ophalen van de bedrijfsgegevens. Probeer het later opnieuw.</p>';
   }
 
   // Event handlers
@@ -181,70 +193,18 @@ export async function renderAdminCompanyDetail(rootElement) {
 }
 
 function getCompanyData(companyId) {
-  // Mock data - in real app this would fetch from API
-  const companyDatabase = {
-    carrefour: {
-      userId: 201,
-      name: 'Carrefour',
-      email: 'contact@carrefour.be',
-      location: 'Brussel',
-      logoUrl: null,
-      registrationDate: '2024-08-20',
-      status: 'Actief',
-      lastLogin: '2024-12-08',
-    },
-    delhaize: {
-      userId: 202,
-      name: 'Delhaize',
-      email: 'hr@delhaize.be',
-      location: 'Antwerpen',
-      logoUrl: null,
-      registrationDate: '2024-09-05',
-      status: 'Actief',
-      lastLogin: '2024-12-07',
-    },
-    colruyt: {
-      userId: 203,
-      name: 'Colruyt',
-      email: 'jobs@colruyt.com',
-      location: 'Gent',
-      logoUrl: null,
-      registrationDate: '2024-09-12',
-      status: 'Actief',
-      lastLogin: '2024-12-06',
-    },
-    proximus: {
-      userId: 204,
-      name: 'Proximus',
-      email: 'careers@proximus.be',
-      location: 'Brussel',
-      logoUrl: null,
-      registrationDate: '2024-10-01',
-      status: 'Actief',
-      lastLogin: '2024-12-09',
-    },
-    kbc: {
-      userId: 205,
-      name: 'KBC Bank',
-      email: 'talent@kbc.be',
-      location: 'Leuven',
-      logoUrl: null,
-      registrationDate: '2024-10-15',
-      status: 'Actief',
-      lastLogin: '2024-12-08',    },
-    demo: {
-      userId: 999,
-      name: 'Demo Bedrijf',
-      email: 'demo@bedrijf.be',
-      location: 'Demo Stad',
-      logoUrl: null,
-      registrationDate: '2024-01-01',
-      status: 'Actief',
-      lastLogin: '2024-12-09',
-    },
+  // This function is no longer needed as company data comes from API
+  // Return minimal fallback data only
+  return {
+    userId: 999,
+    name: 'Onbekend Bedrijf',
+    email: 'onbekend@bedrijf.be',
+    location: 'Onbekend',
+    logoUrl: null,
+    registrationDate: '2024-01-01',
+    status: 'Actief',
+    lastLogin: '2024-12-09',
   };
-
-  return companyDatabase[companyId] || companyDatabase['demo'];
 }
 
 function setupEventHandlers() {
@@ -298,12 +258,15 @@ function setupEventHandlers() {
       const accessToken = sessionStorage.getItem('accessToken');
 
       // Maak een API-aanroep om bedrijfsgegevens op te halen
-      const response = await fetch(`https://api.ehb-match.me/bedrijven/${companyId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
-      });
+      const response = await fetch(
+        `https://api.ehb-match.me/bedrijven/${companyId}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch company data');
@@ -320,7 +283,9 @@ function setupEventHandlers() {
       }
     } catch (error) {
       console.error('Error fetching company details for contact:', error);
-      alert('Er is een probleem opgetreden bij het ophalen van de contactgegevens. Probeer het later opnieuw.');
+      alert(
+        'Er is een probleem opgetreden bij het ophalen van de contactgegevens. Probeer het later opnieuw.'
+      );
     }
   });
 
@@ -336,31 +301,33 @@ function setupEventHandlers() {
         // Get current company ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         const companyId = urlParams.get('id') || 'demo';
-        
+
         // Get company data to access user ID (in real app this would be the actual user ID)
         const companyData = getCompanyData(companyId);
-        
+
         // In a real implementation, you would use the actual user ID from the company data
         // For demo purposes, we'll use a mock ID
         const userId = companyData.userId || 2; // This should be the actual user ID from your database
-        
+
         // Call the delete API
         await deleteUser(userId);
-        
+
         alert('Bedrijf succesvol verwijderd.');
-        
+
         // Navigate back to companies overview
         Router.navigate('/admin-dashboard/ingeschreven-bedrijven');
       } catch (error) {
         console.error('Error deleting company:', error);
-        
+
         // Handle different error types
         if (error.message.includes('403')) {
           alert('Je hebt geen toestemming om dit bedrijf te verwijderen.');
         } else if (error.message.includes('404')) {
           alert('Bedrijf niet gevonden.');
         } else {
-          alert('Er is een fout opgetreden bij het verwijderen van het bedrijf. Probeer het opnieuw.');
+          alert(
+            'Er is een fout opgetreden bij het verwijderen van het bedrijf. Probeer het opnieuw.'
+          );
         }
       }
     }
@@ -393,12 +360,15 @@ async function openSpeedDatesModal() {
   try {
     // Fetch speeddates data from API with company ID
     const accessToken = sessionStorage.getItem('accessToken');
-    const response = await fetch(`https://api.ehb-match.me/speeddates?id=${companyId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
+    const response = await fetch(
+      `https://api.ehb-match.me/speeddates?id=${companyId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error('Failed to fetch speeddates data');
@@ -407,23 +377,34 @@ async function openSpeedDatesModal() {
     const speeddates = await response.json();
 
     if (speeddates.length === 0) {
-      speedDatesList.innerHTML = '<div class="no-speeddates">Geen speeddates gevonden</div>';
+      speedDatesList.innerHTML =
+        '<div class="no-speeddates">Geen speeddates gevonden</div>';
     } else {
       speeddates.forEach((speeddate) => {
         const speedDateItem = document.createElement('div');
         speedDateItem.className = 'speeddate-item';
         speedDateItem.innerHTML = `
           <div class="speeddate-info">
-            <span class="speeddate-time">${new Date(speeddate.begin).toLocaleTimeString()} - ${new Date(speeddate.einde).toLocaleTimeString()}</span>
-            <span class="speeddate-student">${speeddate.voornaam_student} ${speeddate.achternaam_student}</span>
+            <span class="speeddate-time">${new Date(
+              speeddate.begin
+            ).toLocaleTimeString()} - ${new Date(
+          speeddate.einde
+        ).toLocaleTimeString()}</span>
+            <span class="speeddate-student">${speeddate.voornaam_student} ${
+          speeddate.achternaam_student
+        }</span>
           </div>
-          <button class="speeddate-cancel-btn" data-speeddate-id="${speeddate.id}" title="Annuleren">✕</button>
+          <button class="speeddate-cancel-btn" data-speeddate-id="${
+            speeddate.id
+          }" title="Annuleren">✕</button>
         `;
         speedDatesList.appendChild(speedDateItem);
       });
 
       // Add event listeners for cancel buttons
-      const cancelButtons = speedDatesList.querySelectorAll('.speeddate-cancel-btn');
+      const cancelButtons = speedDatesList.querySelectorAll(
+        '.speeddate-cancel-btn'
+      );
       cancelButtons.forEach((btn) => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -434,7 +415,8 @@ async function openSpeedDatesModal() {
 
             // Check if list is now empty
             if (speedDatesList.children.length === 0) {
-              speedDatesList.innerHTML = '<div class="no-speeddates">Geen speeddates gevonden</div>';
+              speedDatesList.innerHTML =
+                '<div class="no-speeddates">Geen speeddates gevonden</div>';
             }
           }
         });
@@ -442,7 +424,8 @@ async function openSpeedDatesModal() {
     }
   } catch (error) {
     console.error('Error fetching speeddates:', error);
-    speedDatesList.innerHTML = '<div class="error">Er is een probleem opgetreden bij het ophalen van de speeddates. Probeer het later opnieuw.</div>';
+    speedDatesList.innerHTML =
+      '<div class="error">Er is een probleem opgetreden bij het ophalen van de speeddates. Probeer het later opnieuw.</div>';
   }
 
   modal.style.display = 'flex';
@@ -473,32 +456,6 @@ function closeSpeedDatesModal() {
 }
 
 function getCompanySpeedDates(companyId) {
-  // Mock speeddate data for companies - later this would come from an API
-  const speedDatesDatabase = {
-    carrefour: [
-      { id: 1, time: '12u40', student: 'Tiberius Kirk' },
-      { id: 2, time: '12u40', student: 'Jean-Luc Picard' },
-      { id: 3, time: '13u00', student: 'John Smith' },
-    ],
-    delhaize: [
-      { id: 4, time: '12u45', student: 'Daniel Vonkman' },
-      { id: 5, time: '13u10', student: 'Ed Marvin' },
-    ],
-    colruyt: [
-      { id: 6, time: '12u50', student: 'Kimberley Hester' },
-      { id: 7, time: '13u05', student: 'Len Jaxtyn' },
-    ],
-    proximus: [
-      { id: 8, time: '12u55', student: 'Tiberius Kirk' },
-      { id: 9, time: '13u15', student: 'Jean-Luc Picard' },
-      { id: 10, time: '13u25', student: 'John Smith' },
-    ],
-    kbc: [
-      { id: 11, time: '12u45', student: 'Daniel Vonkman' },
-      { id: 12, time: '13u05', student: 'Ed Marvin' },
-      { id: 13, time: '13u20', student: 'Len Jaxtyn' },
-    ],
-  };
-
-  return speedDatesDatabase[companyId] || [];
+  // This function is no longer needed as speeddate data comes from API
+  return [];
 }

@@ -85,33 +85,15 @@ export async function sendRegistrationToAPI(userData) {
 
 /**
  * Voorbeeldfunctie voor het simuleren van een backend response
- * Gebruik dit voor testing wanneer er nog geen echte backend is
+ * Deze functie is niet meer nodig en wordt vervangen door echte API calls
  * @param {Object} userData
  * @returns {Promise<Object>}
  */
 export async function mockRegistrationAPI(userData) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      // Simuleer verschillende scenario's
-      const shouldSucceed = Math.random() > 0.1; // 90% success rate
-
-      if (shouldSucceed) {
-        resolve({
-          success: true,
-          userId: Math.floor(Math.random() * 10000),
-          message: 'Registratie succesvol! Check je e-mail voor verificatie.',
-          data: {
-            id: Math.floor(Math.random() * 10000),
-            email: userData.email,
-            role: userData.role,
-            createdAt: new Date().toISOString(),
-          },
-        });
-      } else {
-        reject(new Error('E-mailadres is al in gebruik.'));
-      }
-    }, 1500); // Simuleer netwerk delay
-  });
+  // Deze mock functie is vervangen door echte API integratie
+  throw new Error(
+    'Mock API is niet meer beschikbaar. Gebruik echte API endpoints.'
+  );
 }
 
 /**
@@ -172,28 +154,8 @@ export function validateRegistrationData(formData) {
 }
 
 /**
- * Voorbeeldstructuur van het vereenvoudigde JSON-object dat naar de backend wordt gestuurd
+ * Voorbeeldstructuur is verwijderd - gebruik echte API endpoints
  */
 export const EXAMPLE_REGISTRATION_JSON = {
-  // Voor een student
-  student: {
-    user: {
-      firstName: 'Jan',
-      lastName: 'Janssen',
-      email: 'jan.janssen@student.ehb.be',
-      password: 'securePassword123',
-      role: 'student',
-    },
-  },
-
-  // Voor een bedrijf
-  company: {
-    user: {
-      firstName: 'Marie',
-      lastName: 'Peeters',
-      email: 'marie.peeters@techcorp.be',
-      password: 'companyPass456',
-      role: 'bedrijf',
-    },
-  },
+  message: 'Hardcoded examples zijn verwijderd. Gebruik echte API data.',
 };

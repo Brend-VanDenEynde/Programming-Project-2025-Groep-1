@@ -14,10 +14,9 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}) {
       if (stored) bedrijfData = JSON.parse(stored);
     } catch (e) {}
   }
-
   const {
-    name = 'Microsoft',
-    email = 'bedrijf@voorbeeld.com',
+    name = '',
+    email = '',
     profilePictureUrl = defaultAvatar,
     linkedIn = '',
     description = '',

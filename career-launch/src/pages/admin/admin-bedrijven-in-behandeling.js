@@ -38,29 +38,8 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
         
         <main class="admin-content-clean">
           <div class="admin-section-header">
-            <h1 id="section-title">Bedrijven in Behandeling</h1>
-          </div>            <div class="admin-content-area" id="content-area">            <div class="processing-list">
-              <div class="processing-item clickable-processing" data-company-id="carrefour">
-                <span class="processing-company-name">Carrefour</span>
-                <div class="processing-actions">
-                  <button class="approve-btn" data-company="Carrefour" title="Goedkeuren">✓</button>
-                  <button class="reject-btn" data-company="Carrefour" title="Afwijzen">✕</button>
-                </div>
-              </div>
-              <div class="processing-item clickable-processing" data-company-id="mediamarkt">
-                <span class="processing-company-name">MediaMarkt</span>
-                <div class="processing-actions">
-                  <button class="approve-btn" data-company="MediaMarkt" title="Goedkeuren">✓</button>
-                  <button class="reject-btn" data-company="MediaMarkt" title="Afwijzen">✕</button>
-                </div>
-              </div>
-              <div class="processing-item clickable-processing" data-company-id="bol.com">
-                <span class="processing-company-name">Bol.com</span>
-                <div class="processing-actions">
-                  <button class="approve-btn" data-company="Bol.com" title="Goedkeuren">✓</button>
-                  <button class="reject-btn" data-company="Bol.com" title="Afwijzen">✕</button>
-                </div>
-              </div>
+            <h1 id="section-title">Bedrijven in Behandeling</h1>          </div>            <div class="admin-content-area" id="content-area">            <div class="processing-list">
+              <!-- Companies will be populated by API call -->
             </div>
           </div>
         </main>
