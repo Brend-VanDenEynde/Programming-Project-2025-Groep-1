@@ -1,5 +1,5 @@
 import { renderStudentSkills } from './student-skills.js';
-import '../../css/student-register.css';
+import '../../css/consolidated-style.css';
 import Router from '../../router.js';
 import { apiGet, apiPost } from '../../utils/api.js';
 
@@ -42,10 +42,8 @@ export function renderStudentOpleiding(rootElement) {
             <button type="submit" class="create-account-button">Account Aanmaken</button>
           </form>
         </div>
-      </main>
-
-      <footer class="footer">
-        <a href="#" id="privacy-link">Privacy Policy</a> | <a href="#" id="contact-link">Contacteer Ons</a>
+      </main>      <footer class="footer">
+        <a href="/privacy" data-route="/privacy">Privacy Policy</a> | <a href="/contact" data-route="/contact">Contacteer Ons</a>
         <label id="footer-error-label" class="error-label" style="color: #e74c3c; display: none; margin-top: 0.5rem;"></label>
       </footer>
     </div>
@@ -60,23 +58,8 @@ export function renderStudentOpleiding(rootElement) {
       Router.goBack('/registreer');
     });
   }
-
   // Footer links
-  const privacyLink = document.getElementById('privacy-link');
-  privacyLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    const footerErrorLabel = document.getElementById('footer-error-label');
-    footerErrorLabel.textContent =
-      'Privacy Policy pagina nog niet geïmplementeerd';
-    footerErrorLabel.style.display = 'block';
-  });
-  const contactLink = document.getElementById('contact-link');
-  contactLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    const footerErrorLabel = document.getElementById('footer-error-label');
-    footerErrorLabel.textContent = 'Contact pagina nog niet geïmplementeerd';
-    footerErrorLabel.style.display = 'block';
-  });
+  // Privacy and Contact pages are now properly routed via data-route attributes
 
   // Fetch opleidingen from API and populate dropdown
   loadOpleidingen();

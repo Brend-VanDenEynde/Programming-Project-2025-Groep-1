@@ -92,11 +92,9 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
           </div>
         </div>
       </main>
-    </div>
-
-    <footer style="text-align: center; margin-top: 1rem;">
-      <a id="privacy-policy" href="#">Privacy Policy</a> |
-      <a id="contacteer-ons" href="#">Contacteer ons</a>
+    </div>    <footer style="text-align: center; margin-top: 1rem;">
+      <a href="/privacy" data-route="/privacy">Privacy Policy</a> |
+      <a href="/contact" data-route="/contact">Contacteer ons</a>
     </footer>
   `;
 

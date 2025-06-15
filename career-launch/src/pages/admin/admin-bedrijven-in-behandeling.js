@@ -1,5 +1,6 @@
 // Admin bedrijven in behandeling pagina
 import Router from '../../router.js';
+import { logoutUser } from '../../utils/auth-api.js';
 
 export async function renderAdminBedrijvenInBehandeling(rootElement) {
   // Check if user is logged in
@@ -17,8 +18,7 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
         <div class="admin-logo-section">
           <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
-        </div>
-        <div class="admin-header-right">
+        </div>        <div class="admin-header-right">
           <span class="admin-username">Welkom, ${adminUsername}</span>
           <button id="logout-btn" class="logout-btn-clean">Uitloggen</button>
           <button id="menu-toggle" class="menu-toggle-btn">☰</button>
@@ -144,9 +144,11 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
   // Mobile menu toggle
   const menuToggle = document.getElementById('menu-toggle');
   const sidebar = document.querySelector('.admin-sidebar-clean');
-  menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
-  });
+  if (menuToggle && sidebar) {
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+  }
 
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {

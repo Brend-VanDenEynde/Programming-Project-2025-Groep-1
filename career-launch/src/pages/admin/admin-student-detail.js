@@ -32,8 +32,7 @@ export async function renderAdminStudentDetail(rootElement) {
         <div class="admin-logo-section">
           <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
-        </div>
-        <div class="admin-header-right">
+        </div>        <div class="admin-header-right">
           <span class="admin-username">Welkom, ${adminUsername}</span>
           <button id="logout-btn" class="logout-btn-clean">Uitloggen</button>
           <button id="menu-toggle" class="menu-toggle-btn">☰</button>
@@ -225,10 +224,14 @@ async function openSpeedDatesModal() {
           <div class="speeddate-info">
             <span class="speeddate-time">${new Date(
               speeddate.begin
-            ).toLocaleTimeString()} - ${new Date(speeddate.einde).toLocaleTimeString()}</span>
+            ).toLocaleTimeString()} - ${new Date(
+          speeddate.einde
+        ).toLocaleTimeString()}</span>
             <span class="speeddate-company">${speeddate.naam_bedrijf}</span>
           </div>
-          <button class="speeddate-cancel-btn" data-speeddate-id="${speeddate.id}" title="Annuleren">✕</button>
+          <button class="speeddate-cancel-btn" data-speeddate-id="${
+            speeddate.id
+          }" title="Annuleren">✕</button>
         `;
         speedDatesList.appendChild(speedDateItem);
       });
@@ -478,9 +481,11 @@ function setupEventHandlers() {
   // Mobile menu toggle
   const menuToggle = document.getElementById('menu-toggle');
   const sidebar = document.querySelector('.admin-sidebar-clean');
-  menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
-  });
+  if (menuToggle && sidebar) {
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+  }
 
   // Admin action buttons
   const contactBtn = document.getElementById('contact-student-btn');
