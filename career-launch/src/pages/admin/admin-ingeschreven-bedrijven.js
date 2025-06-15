@@ -120,7 +120,8 @@ export async function renderAdminIngeschrevenBedrijven(rootElement) {
       companies.forEach((company) => {
         const companyItem = document.createElement('div');
         companyItem.className = 'company-item clickable-company';
-        companyItem.dataset.companyId = company.gebruiker_id;        companyItem.innerHTML = `
+        companyItem.dataset.companyId = company.gebruiker_id;
+        companyItem.innerHTML = `
           <span class="company-name">${company.naam}</span>
         `;
 
