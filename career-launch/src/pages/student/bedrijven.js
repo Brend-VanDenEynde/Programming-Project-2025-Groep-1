@@ -106,9 +106,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
   popup.innerHTML = `
     <div id="bedrijf-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:420px;width:95vw;position:relative;display:flex;flex-direction:column;align-items:center;">
       <button id="bedrijf-popup-close" style="position:absolute;top:10px;right:14px;font-size:1.7rem;background:none;border:none;cursor:pointer;color:#888;">&times;</button>
-      <button id="popup-favorite-btn" class="popup-favorite-btn" title="${
-        isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'
-      }">${hartIcon}</button>
+      <button id="popup-favorite-btn" class="popup-favorite-btn" title="${isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'}">${hartIcon}</button>
       <img src="${bedrijf.foto}" alt="Logo ${
     bedrijf.naam
   }" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
@@ -377,6 +375,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       }
     }
     currentStudentId = actualStudentData?.id || actualStudentData?.gebruiker_id;
+    // Check if user is authenticated
     const authToken = window.sessionStorage.getItem('authToken');
     if (!authToken) {
       renderLogin(rootElement);
@@ -594,6 +593,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         border-radius: 12px;
         margin-bottom: 1.2rem;
         padding: 0;
+        position: relative;
       }
       .bedrijven-filterbar-grid .filter-group,
       .bedrijven-filterbar-grid .zoek-group,
@@ -768,9 +768,179 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         `;
         filterbar.appendChild(favDiv);
       }
+      .bedrijven-filterbar-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1.2rem 1.6rem;
+        align-items: end;
+        background: transparent;
+        border-radius: 12px;
+        margin-bottom: 1.2rem;
+        padding: 0;
+      }
+      .bedrijven-filterbar-grid .filter-group,
+      .bedrijven-filterbar-grid .zoek-group,
+      .bedrijven-filterbar-grid .reset-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        min-width: 0;
+        width: 100%;
+      }
+      .bedrijven-filterbar-grid label {
+        font-weight: 500;
+        font-size: 0.9rem;
+        margin-bottom: 0.2rem;
+      }
+      .bedrijven-filterbar-grid select,
+      .bedrijven-filterbar-grid input[type="text"] {
+        padding: 0.6rem 0.9rem;
+        border-radius: 8px;
+        border: 1.5px solid #e1e5e9;
+        font-size: 0.95rem;
+        min-height: 42px;
+        height: 42px;
+        box-sizing: border-box;
+        width: 100%;
+      }
+      .bedrijven-filterbar-grid .ss-main {
+        min-height: 42px !important;
+        height: 42px !important;
+        box-sizing: border-box;
+      }
+      /* SlimSelect: scrollbare chips bij veel geselecteerde opties */
+      .bedrijven-filterbar-grid .ss-main.multi {
+        max-height: 86px !important;
+        overflow-y: auto !important;
+        flex-wrap: wrap !important;
+        align-items: flex-start !important;
+        scrollbar-width: thin;
+      }
+      .bedrijven-filterbar-grid .ss-main {
+        padding: 0.6rem 0.8rem;
+      }
+      /* Scrollbar styling voor Chrome */
+      .bedrijven-filterbar-grid .ss-main.multi::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+      }
+      .bedrijven-filterbar-grid .ss-main.multi::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 6px;
+      }
+      .bedrijven-divider {
+        border: none;
+        border-top: 1.5px solid #e1e5e9;
+        margin: 1.2rem 0 2.2rem 0;
+      }
+      @media (min-width: 1200px) {
+        .bedrijven-filterbar-grid {
+          grid-template-columns: repeat(6, 1fr);
+        }
+        .student-profile-form-container.bedrijven-form-card {
+          padding: 2.5rem 3.5rem 2.8rem 3.5rem;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Custom filter UI rendering
+    function renderFilterOptions() {
+      // Locaties (popup trigger ipv select)
+      const locaties = getUniekeLocaties();
+      const locatieDiv = document.getElementById('filter-locaties');
+      locatieDiv.innerHTML = `
+        <label for="locaties-popup-trigger">Locatie</label>
+        <button id="locaties-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
+          ${huidigeLocaties.length ? huidigeLocaties.join(', ') : 'Locatie kiezen...'}
+        </button>
+      `;
+      // Functies (popup trigger ipv select)
+      const functies = getUniekeFuncties();
+      const functieDiv = document.getElementById('filter-functies');
+      functieDiv.innerHTML = `
+        <label for="functies-popup-trigger">Functie</label>
+        <button id="functies-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
+          ${huidigeFuncties.length ? huidigeFuncties.join(', ') : 'Functie kiezen...'}
+        </button>
+      `;
+      // Skills (popup trigger ipv select)
+      const skills = getUniekeSkills();
+      const skillDiv = document.getElementById('filter-skills');
+      skillDiv.innerHTML = `
+        <label for="skills-popup-trigger">Skills</label>
+        <button id="skills-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
+          ${huidigeSkills.length ? huidigeSkills.join(', ') : 'Skills kiezen...'}
+        </button>
+      `;
+      // Talen (popup trigger ipv select)
+      const talen = getUniekeTalen();
+      const taalDiv = document.getElementById('filter-talen');
+      taalDiv.innerHTML = `
+        <label for="talen-popup-trigger">Talen</label>
+        <button id="talen-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
+          ${huidigeTalen.length ? huidigeTalen.join(', ') : 'Talen kiezen...'}
+        </button>
+      `;
+      // Popup triggers voor alle filters
+      document.getElementById('locaties-popup-trigger').addEventListener('click', () => {
+        createPopup({
+          id: 'locaties-filter-popup',
+          title: 'Kies locaties',
+          options: getUniekeLocaties(),
+          selected: huidigeLocaties,
+          onSave: (gekozen) => {
+            huidigeLocaties = gekozen;
+            renderFilterOptions();
+            renderList();
+          }
+        });
+      });
+      document.getElementById('functies-popup-trigger').addEventListener('click', () => {
+        createPopup({
+          id: 'functies-filter-popup',
+          title: 'Kies functies',
+          options: getUniekeFuncties(),
+          selected: huidigeFuncties,
+          onSave: (gekozen) => {
+            huidigeFuncties = gekozen;
+            renderFilterOptions();
+            renderList();
+          }
+        });
+      });
+      document.getElementById('skills-popup-trigger').addEventListener('click', () => {
+        createPopup({
+          id: 'skills-filter-popup',
+          title: 'Kies je skills',
+          options: getUniekeSkills(),
+          selected: huidigeSkills,
+          onSave: (gekozen) => {
+            huidigeSkills = gekozen;
+            renderFilterOptions();
+            renderList();
+          }
+        });
+      });
+      document.getElementById('talen-popup-trigger').addEventListener('click', () => {
+        createPopup({
+          id: 'talen-filter-popup',
+          title: 'Kies je talen',
+          options: getUniekeTalen(),
+          selected: huidigeTalen,
+          onSave: (gekozen) => {
+            huidigeTalen = gekozen;
+            renderFilterOptions();
+            renderList();
+          }
+        });
+      });
     }
+
+    // Update filters and render list after data is loaded
     renderFilterOptions();
     renderList();
+
     // --- Sidebar navigatie uniform maken ---
     document.querySelectorAll('.sidebar-link').forEach((btn) => {
       btn.addEventListener('click', (e) => {
@@ -819,6 +989,36 @@ export async function renderBedrijven(rootElement, studentData = {}) {
           renderList();
         });
       }
+      // Multi-select events
+      const locatieSelect = document.getElementById('filter-locaties-select');
+      if (locatieSelect) {
+        locatieSelect.addEventListener('change', (e) => {
+          huidigeLocaties = Array.from(e.target.selectedOptions).map(opt => opt.value);
+          renderList();
+        });
+      }
+      const functieSelect = document.getElementById('filter-functies-select');
+      if (functieSelect) {
+        functieSelect.addEventListener('change', (e) => {
+          huidigeFuncties = Array.from(e.target.selectedOptions).map(opt => opt.value);
+          renderList();
+        });
+      }
+      const skillSelect = document.getElementById('filter-skills-select');
+      if (skillSelect) {
+        skillSelect.addEventListener('change', (e) => {
+          huidigeSkills = Array.from(e.target.selectedOptions).map(opt => opt.value);
+          renderList();
+        });
+      }
+      const taalSelect = document.getElementById('filter-talen-select');
+      if (taalSelect) {
+        taalSelect.addEventListener('change', (e) => {
+          huidigeTalen = Array.from(e.target.selectedOptions).map(opt => opt.value);
+          renderList();
+        });
+      }
+      // Reset button
       document.getElementById('reset-filters').addEventListener('click', () => {
         huidigeZoek = '';
         huidigeLocaties = [];
