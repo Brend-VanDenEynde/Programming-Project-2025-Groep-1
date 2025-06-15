@@ -2,6 +2,8 @@ import { renderStudentRegister } from './student-register.js';
 import { renderBedrijfRegister } from './bedrijf-register.js';
 import Router from '../router.js';
 import { renderLogin } from './login.js';
+import hideIcon from '../icons/hide.png';
+import eyeIcon from '../icons/eye.png';
 
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `
@@ -27,18 +29,16 @@ export function renderRegister(rootElement) {
             <div class="form-group">
             <label for="passwordInput">Wachtwoord</label>
             <div style="position:relative;display:flex;align-items:center;">
-              <input type="password" id="passwordInput" name="password" required placeholder="Wachtwoord" style="flex:1;">
-              <button type="button" id="togglePassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">
-                <img id="togglePasswordIcon" src="src/Icons/hide.png" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
+              <input type="password" id="passwordInput" name="password" required placeholder="Wachtwoord" style="flex:1;">              <button type="button" id="togglePassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">
+                <img id="togglePasswordIcon" src="${hideIcon}" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
               </button>
             </div>
           </div>
           <div class="form-group">
             <label for="confirmPasswordInput">Bevestig wachtwoord</label>
             <div style="position:relative;display:flex;align-items:center;">
-              <input type="password" id="confirmPasswordInput" name="confirmPassword" required placeholder="Bevestig wachtwoord" style="flex:1;">
-              <button type="button" id="toggleConfirmPassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">
-                <img id="toggleConfirmPasswordIcon" src="src/Icons/hide.png" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
+              <input type="password" id="confirmPasswordInput" name="confirmPassword" required placeholder="Bevestig wachtwoord" style="flex:1;">              <button type="button" id="toggleConfirmPassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">
+                <img id="toggleConfirmPasswordIcon" src="${hideIcon}" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
               </button>
             </div>
           </div>
@@ -127,9 +127,7 @@ export function renderRegister(rootElement) {
       toggleButton.addEventListener('click', () => {
         const isVisible = input.type === 'text';
         input.type = isVisible ? 'password' : 'text';
-        icon.src = isVisible
-          ? 'src/Icons/icons8-closed-eye-HIDDEN.png'
-          : 'src/Icons/icons8-closed-eye-CLEAR.png';
+        icon.src = isVisible ? hideIcon : eyeIcon;
         icon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
       });
     }
@@ -142,9 +140,7 @@ export function renderRegister(rootElement) {
     togglePassword.addEventListener('click', () => {
       const isVisible = passwordInput.type === 'text';
       passwordInput.type = isVisible ? 'password' : 'text';
-      togglePasswordIcon.src = isVisible
-        ? 'src/Icons/hide.png'
-        : 'src/Icons/eye.png';
+      togglePasswordIcon.src = isVisible ? hideIcon : eyeIcon;
       togglePasswordIcon.alt = isVisible
         ? 'Toon wachtwoord'
         : 'Verberg wachtwoord';
@@ -165,9 +161,7 @@ export function renderRegister(rootElement) {
     toggleConfirmPassword.addEventListener('click', () => {
       const isVisible = confirmPasswordInput.type === 'text';
       confirmPasswordInput.type = isVisible ? 'password' : 'text';
-      toggleConfirmPasswordIcon.src = isVisible
-        ? 'src/Icons/icons8-closed-eye-HIDDEN.png'
-        : 'src/Icons/icons8-closed-eye-CLEAR.png';
+      toggleConfirmPasswordIcon.src = isVisible ? hideIcon : eyeIcon;
       toggleConfirmPasswordIcon.alt = isVisible
         ? 'Toon wachtwoord'
         : 'Verberg wachtwoord';

@@ -1,6 +1,7 @@
 // Admin company detail pagina
 import Router from '../../router.js';
 import defaultCompanyLogo from '../../images/BedrijfDefault.jpg';
+import ehbLogo from '../../images/EhB-logo-transparant.png';
 import { logoutUser } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
 
@@ -25,7 +26,7 @@ export async function renderAdminCompanyDetail(rootElement) {
     <div class="admin-dashboard-clean" style="background-color: white;">
       <header class="admin-header-clean">
         <div class="admin-logo-section">
-          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+          <img src="${ehbLogo}" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
         </div>
         <div class="admin-header-right">
@@ -59,7 +60,7 @@ export async function renderAdminCompanyDetail(rootElement) {
                   <!-- Company Logo Section -->
                   <div class="detail-logo-section">
                     <img 
-                      src="${companyData.logoUrl || defaultCompanyLogo}" 
+                      src="${companyData.logoUrl || ASSETS.BEDRIJF_DEFAULT}" 
                       alt="Logo ${companyData.name}" 
                       class="detail-logo"
                     />
@@ -129,12 +130,15 @@ export async function renderAdminCompanyDetail(rootElement) {
   // Fetch company data from API
   const accessToken = sessionStorage.getItem('accessToken');
   try {
-    const response = await fetch(`https://api.ehb-match.me/bedrijven/${companyId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
+    const response = await fetch(
+      `https://api.ehb-match.me/bedrijven/${companyId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error('Failed to fetch company data');
@@ -143,8 +147,11 @@ export async function renderAdminCompanyDetail(rootElement) {
     const companyData = await response.json();
 
     // Update the page with company data
-    document.querySelector('#section-title').textContent = `Bedrijf Details: ${companyData.naam}`;
-    document.querySelector('.detail-logo-section img').src = companyData.profiel_foto || defaultCompanyLogo;
+    document.querySelector(
+      '#section-title'
+    ).textContent = `Bedrijf Details: ${companyData.naam}`;
+    document.querySelector('.detail-logo-section img').src =
+      companyData.profiel_foto || ASSETS.BEDRIJF_DEFAULT;
     document.querySelector('.detail-info').innerHTML = `
       <div class="detail-field">
         <label>Naam:</label>
@@ -160,7 +167,11 @@ export async function renderAdminCompanyDetail(rootElement) {
       </div>
       <div class="detail-field">
         <label>LinkedIn:</label>
-        <span>${companyData.linkedin ? `<a href="https://www.linkedin.com/in/${companyData.linkedin}" target="_blank">${companyData.linkedin}</a>` : 'Niet ingesteld'}</span>
+        <span>${
+          companyData.linkedin
+            ? `<a href="https://www.linkedin.com/in/${companyData.linkedin}" target="_blank">${companyData.linkedin}</a>`
+            : 'Niet ingesteld'
+        }</span>
       </div>
       <div class="detail-field">
         <label>Sector ID:</label>
@@ -169,9 +180,12 @@ export async function renderAdminCompanyDetail(rootElement) {
     `;
   } catch (error) {
     console.error('Error fetching company details:', error);
-    document.querySelector('#section-title').textContent = 'Er is een probleem. Probeer opnieuw.';
-    document.querySelector('.detail-logo-section img').src = defaultCompanyLogo;
-    document.querySelector('.detail-info').innerHTML = '<p>Er is een probleem met het ophalen van de bedrijfsgegevens. Probeer het later opnieuw.</p>';
+    document.querySelector('#section-title').textContent =
+      'Er is een probleem. Probeer opnieuw.';
+    document.querySelector('.detail-logo-section img').src =
+      ASSETS.BEDRIJF_DEFAULT;
+    document.querySelector('.detail-info').innerHTML =
+      '<p>Er is een probleem met het ophalen van de bedrijfsgegevens. Probeer het later opnieuw.</p>';
   }
 
   // Event handlers
@@ -231,7 +245,8 @@ function getCompanyData(companyId) {
       logoUrl: null,
       registrationDate: '2024-10-15',
       status: 'Actief',
-      lastLogin: '2024-12-08',    },
+      lastLogin: '2024-12-08',
+    },
     demo: {
       userId: 999,
       name: 'Demo Bedrijf',
@@ -298,12 +313,15 @@ function setupEventHandlers() {
       const accessToken = sessionStorage.getItem('accessToken');
 
       // Maak een API-aanroep om bedrijfsgegevens op te halen
-      const response = await fetch(`https://api.ehb-match.me/bedrijven/${companyId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
-      });
+      const response = await fetch(
+        `https://api.ehb-match.me/bedrijven/${companyId}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch company data');
@@ -320,7 +338,9 @@ function setupEventHandlers() {
       }
     } catch (error) {
       console.error('Error fetching company details for contact:', error);
-      alert('Er is een probleem opgetreden bij het ophalen van de contactgegevens. Probeer het later opnieuw.');
+      alert(
+        'Er is een probleem opgetreden bij het ophalen van de contactgegevens. Probeer het later opnieuw.'
+      );
     }
   });
 
@@ -336,31 +356,33 @@ function setupEventHandlers() {
         // Get current company ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         const companyId = urlParams.get('id') || 'demo';
-        
+
         // Get company data to access user ID (in real app this would be the actual user ID)
         const companyData = getCompanyData(companyId);
-        
+
         // In a real implementation, you would use the actual user ID from the company data
         // For demo purposes, we'll use a mock ID
         const userId = companyData.userId || 2; // This should be the actual user ID from your database
-        
+
         // Call the delete API
         await deleteUser(userId);
-        
+
         alert('Bedrijf succesvol verwijderd.');
-        
+
         // Navigate back to companies overview
         Router.navigate('/admin-dashboard/ingeschreven-bedrijven');
       } catch (error) {
         console.error('Error deleting company:', error);
-        
+
         // Handle different error types
         if (error.message.includes('403')) {
           alert('Je hebt geen toestemming om dit bedrijf te verwijderen.');
         } else if (error.message.includes('404')) {
           alert('Bedrijf niet gevonden.');
         } else {
-          alert('Er is een fout opgetreden bij het verwijderen van het bedrijf. Probeer het opnieuw.');
+          alert(
+            'Er is een fout opgetreden bij het verwijderen van het bedrijf. Probeer het opnieuw.'
+          );
         }
       }
     }
@@ -393,12 +415,15 @@ async function openSpeedDatesModal() {
   try {
     // Fetch speeddates data from API with company ID
     const accessToken = sessionStorage.getItem('accessToken');
-    const response = await fetch(`https://api.ehb-match.me/speeddates?id=${companyId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
-    });
+    const response = await fetch(
+      `https://api.ehb-match.me/speeddates?id=${companyId}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error('Failed to fetch speeddates data');
@@ -407,23 +432,34 @@ async function openSpeedDatesModal() {
     const speeddates = await response.json();
 
     if (speeddates.length === 0) {
-      speedDatesList.innerHTML = '<div class="no-speeddates">Geen speeddates gevonden</div>';
+      speedDatesList.innerHTML =
+        '<div class="no-speeddates">Geen speeddates gevonden</div>';
     } else {
       speeddates.forEach((speeddate) => {
         const speedDateItem = document.createElement('div');
         speedDateItem.className = 'speeddate-item';
         speedDateItem.innerHTML = `
           <div class="speeddate-info">
-            <span class="speeddate-time">${new Date(speeddate.begin).toLocaleTimeString()} - ${new Date(speeddate.einde).toLocaleTimeString()}</span>
-            <span class="speeddate-student">${speeddate.voornaam_student} ${speeddate.achternaam_student}</span>
+            <span class="speeddate-time">${new Date(
+              speeddate.begin
+            ).toLocaleTimeString()} - ${new Date(
+          speeddate.einde
+        ).toLocaleTimeString()}</span>
+            <span class="speeddate-student">${speeddate.voornaam_student} ${
+          speeddate.achternaam_student
+        }</span>
           </div>
-          <button class="speeddate-cancel-btn" data-speeddate-id="${speeddate.id}" title="Annuleren">✕</button>
+          <button class="speeddate-cancel-btn" data-speeddate-id="${
+            speeddate.id
+          }" title="Annuleren">✕</button>
         `;
         speedDatesList.appendChild(speedDateItem);
       });
 
       // Add event listeners for cancel buttons
-      const cancelButtons = speedDatesList.querySelectorAll('.speeddate-cancel-btn');
+      const cancelButtons = speedDatesList.querySelectorAll(
+        '.speeddate-cancel-btn'
+      );
       cancelButtons.forEach((btn) => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -434,7 +470,8 @@ async function openSpeedDatesModal() {
 
             // Check if list is now empty
             if (speedDatesList.children.length === 0) {
-              speedDatesList.innerHTML = '<div class="no-speeddates">Geen speeddates gevonden</div>';
+              speedDatesList.innerHTML =
+                '<div class="no-speeddates">Geen speeddates gevonden</div>';
             }
           }
         });
@@ -442,7 +479,8 @@ async function openSpeedDatesModal() {
     }
   } catch (error) {
     console.error('Error fetching speeddates:', error);
-    speedDatesList.innerHTML = '<div class="error">Er is een probleem opgetreden bij het ophalen van de speeddates. Probeer het later opnieuw.</div>';
+    speedDatesList.innerHTML =
+      '<div class="error">Er is een probleem opgetreden bij het ophalen van de speeddates. Probeer het later opnieuw.</div>';
   }
 
   modal.style.display = 'flex';

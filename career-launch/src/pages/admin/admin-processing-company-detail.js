@@ -1,5 +1,7 @@
 // Admin processing company detail pagina
 import Router from '../../router.js';
+import ehbLogo from '../../images/EhB-logo-transparant.png';
+import defaultCompanyLogo from '../../images/BedrijfDefault.jpg';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
 
 // Make the render function async to support await
@@ -21,7 +23,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
     <div class="admin-dashboard-clean">
       <header class="admin-header-clean">
         <div class="admin-logo-section">
-          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+          <img src="${ehbLogo}" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
         </div>
         <div class="admin-header-right">
@@ -52,7 +54,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
                 <div class="detail-left">
                   <div class="detail-logo-section">
                     <img 
-                      src="src/Images/BedrijfDefault.jpg" 
+                      src="${defaultCompanyLogo}" 
                       alt="Logo" 
                       class="detail-logo"
                     />
@@ -123,7 +125,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
       '#section-title'
     ).textContent = `Bedrijf in Behandeling - ${company.naam}`;
     document.querySelector('.detail-logo-section img').src =
-      company.profiel_foto || 'src/Images/BedrijfDefault.jpg';
+      company.profiel_foto || defaultCompanyLogo;
     document.querySelector('.detail-logo').alt = `Logo ${company.naam}`;
     document.querySelector('.detail-info').innerHTML = `
       <div class="detail-field">

@@ -1,5 +1,7 @@
 // Admin ingeschreven bedrijven pagina
 import Router from '../../router.js';
+import ehbLogo from '../../images/EhB-logo-transparant.png';
+import defaultImage from '../../images/default.png';
 import { logoutUser } from '../../utils/auth-api.js';
 
 export async function renderAdminIngeschrevenBedrijven(rootElement) {
@@ -16,7 +18,7 @@ export async function renderAdminIngeschrevenBedrijven(rootElement) {
     <div class="admin-dashboard-clean">
       <header class="admin-header-clean">
         <div class="admin-logo-section">
-          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+          <img src="${ehbLogo}" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
         </div>        <div class="admin-header-right">
           <span class="admin-username">Welkom, ${adminUsername}</span>
@@ -123,7 +125,7 @@ export async function renderAdminIngeschrevenBedrijven(rootElement) {
         companyItem.dataset.companyId = company.gebruiker_id;
 
         companyItem.innerHTML = `
-          <img src="${company.profiel_foto || 'src/Images/default.png'}" alt="${
+          <img src="${company.profiel_foto || defaultImage}" alt="${
           company.naam
         }" class="company-logo" style="height: 40px; width: auto; margin-right: 10px;">
           <span class="company-name">${company.naam}</span>

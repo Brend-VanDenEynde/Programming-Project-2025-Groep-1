@@ -1,5 +1,6 @@
 // Admin select dashboard page
 import Router from '../../router.js';
+import ehbLogo from '../../images/EhB-logo-transparant.png';
 
 export function renderAdminSelectDashboard(rootElement) {
   // Check if user is logged in
@@ -12,7 +13,7 @@ export function renderAdminSelectDashboard(rootElement) {
 
   rootElement.innerHTML = `
     <div class="admin-select-container" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; padding: 20px; text-align: center;">
-        <img src="src/Images/EhB-logo-transparant.png" alt="Logo" style="max-width: 150px; margin-bottom: 30px;">
+        <img src="${ehbLogo}" alt="Logo" style="max-width: 150px; margin-bottom: 30px;">
         <h1>Admin Dashboard Selectie</h1>
         <p style="margin-bottom: 30px;">Kies een sectie om naar te navigeren:</p>
         <ul style="list-style: none; padding: 0;">
