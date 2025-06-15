@@ -193,7 +193,8 @@
   background: #f8f9fa;
   color: #333;
   margin-top: 2px;
-  outline: none;
+  padding: 12px 15px;
+    outline: none;
   transition: border 0.17s;
   resize: none;
 }
