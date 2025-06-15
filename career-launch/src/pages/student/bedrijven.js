@@ -3,9 +3,39 @@ import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
 import { fetchCompanies } from '../../utils/data-api.js';
 import defaultBedrijfLogo from '../../images/defaultlogo.webp';
+import {
+  getFavoriteCompanies,
+  addFavoriteCompany,
+  removeFavoriteCompany,
+  isCompanyFavorite,
+  toggleFavoriteCompany,
+  filterFavoriteCompanies,
+} from '../../utils/favorites-storage.js';
+import { fetchAndStoreStudentProfile } from '../../utils/fetch-student-profile.js';
 
 // Globale variabele voor bedrijven data
 let bedrijven = [];
+let currentStudentId = null;
+
+// Feedback notification function
+function showFeedbackNotification(message, type = 'success') {
+  // Remove any existing notification
+  const existing = document.querySelector('.feedback-notification');
+  if (existing) existing.remove();
+
+  const notification = document.createElement('div');
+  notification.className = `feedback-notification ${type}`;
+  notification.textContent = message;
+
+  document.body.appendChild(notification);
+
+  // Auto remove after 3 seconds
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove();
+    }
+  }, 3000);
+}
 
 // Popup voor bedrijf detail
 // Popup voor bedrijf detail - MET slots en speeddate verzoek
@@ -42,10 +72,17 @@ function showBedrijfPopup(bedrijf, studentId) {
       };
     });
   }
+  const isFavoriet = currentStudentId
+    ? isCompanyFavorite(currentStudentId, bedrijf.gebruiker_id)
+    : false;
+  const hartIcon = isFavoriet ? '❤️' : '🤍';
 
   popup.innerHTML = `
     <div id="bedrijf-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:420px;width:95vw;position:relative;display:flex;flex-direction:column;align-items:center;">
       <button id="bedrijf-popup-close" style="position:absolute;top:10px;right:14px;font-size:1.7rem;background:none;border:none;cursor:pointer;color:#888;">&times;</button>
+      <button id="popup-favorite-btn" class="popup-favorite-btn" title="${
+        isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'
+      }">${hartIcon}</button>
       <img src="${bedrijf.foto}" alt="Logo ${
     bedrijf.naam
   }" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
@@ -82,12 +119,56 @@ function showBedrijfPopup(bedrijf, studentId) {
     </div>
   `;
   document.body.appendChild(popup);
-
   // Sluiten popup
   document.getElementById('bedrijf-popup-close').onclick = () => popup.remove();
   popup.addEventListener('click', (e) => {
     if (e.target === popup) popup.remove();
   });
+
+  // Favoriet knop in popup
+  const popupFavoriteBtn = document.getElementById('popup-favorite-btn');
+  if (popupFavoriteBtn && currentStudentId) {
+    popupFavoriteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+
+      const isNowFavorite = toggleFavoriteCompany(
+        currentStudentId,
+        bedrijf.gebruiker_id
+      );
+
+      // Update de button icon en tooltip
+      popupFavoriteBtn.innerHTML = isNowFavorite ? '❤️' : '🤍';
+      popupFavoriteBtn.title = isNowFavorite
+        ? 'Verwijder uit favorieten'
+        : 'Voeg toe aan favorieten';
+      // Update ook de kaart in de achtergrond als die nog zichtbaar is
+      const cardFavoriteBtn = document.querySelector(
+        `[data-company-id="${bedrijf.gebruiker_id}"]`
+      );
+      if (cardFavoriteBtn) {
+        cardFavoriteBtn.innerHTML = isNowFavorite ? '❤️' : '🤍';
+        cardFavoriteBtn.title = isNowFavorite
+          ? 'Verwijder uit favorieten'
+          : 'Voeg toe aan favorieten';
+      }
+
+      // Toon feedback notificatie
+      const message = isNowFavorite
+        ? `${bedrijf.naam} toegevoegd aan favorieten!`
+        : `${bedrijf.naam} verwijderd uit favorieten`;
+      showFeedbackNotification(message, isNowFavorite ? 'success' : 'info');
+      // Voeg animatie toe aan de button
+      popupFavoriteBtn.classList.add('animating');
+      setTimeout(() => popupFavoriteBtn.classList.remove('animating'), 400);
+
+      // Update favorites count
+      const countElement = document.getElementById('favorites-count');
+      if (countElement) {
+        const favoriteCompanies = getFavoriteCompanies(currentStudentId);
+        countElement.textContent = `(${favoriteCompanies.length})`;
+      }
+    });
+  }
 
   // Dynamische slots vullen na uur-keuze
   const uurSelect = document.getElementById('speeddates-uur');
@@ -141,12 +222,6 @@ function showBedrijfPopup(bedrijf, studentId) {
         status.textContent = `Speeddate aangevraagd voor ${
           uurSelect.value
         }u${minutenSelect.selectedOptions[0].textContent.slice(-2)}!`;
-        // ---->>> HIER confirmatie in de console
-        console.log('[Speeddate aanvraag verstuurd]', {
-          id_student: studentId,
-          id_bedrijf: bedrijf.gebruiker_id,
-          datum: gekozenDatum,
-        });
       } else {
         const err = await req.json();
         status.textContent = err.message || 'Er ging iets mis!';
@@ -163,9 +238,14 @@ function showBedrijfPopup(bedrijf, studentId) {
   };
 }
 
-// Filter en zoek functionaliteit (alleen op naam zoeken)
-function filterBedrijven({ zoek = '', locatie = '', werkdomein = '' }) {
-  return bedrijven.filter((b) => {
+// Filter en zoek functionaliteit (inclusief favorieten)
+function filterBedrijven({
+  zoek = '',
+  locatie = '',
+  werkdomein = '',
+  toonAlleFavorieten = false,
+}) {
+  let gefilterdeBedrijven = bedrijven.filter((b) => {
     const matchZoek = zoek
       ? b.naam.toLowerCase().includes(zoek.toLowerCase())
       : true;
@@ -175,6 +255,16 @@ function filterBedrijven({ zoek = '', locatie = '', werkdomein = '' }) {
       : true;
     return matchZoek && matchLocatie && matchDomein;
   });
+
+  // Als alleen favorieten moeten worden getoond
+  if (toonAlleFavorieten && currentStudentId) {
+    gefilterdeBedrijven = filterFavoriteCompanies(
+      gefilterdeBedrijven,
+      currentStudentId
+    );
+  }
+
+  return gefilterdeBedrijven;
 }
 
 // Unieke locaties en domeinen voor filters
@@ -192,19 +282,53 @@ function getUniekeDomeinen() {
 
 // Hoofdfunctie: lijst van bedrijven
 export async function renderBedrijven(rootElement, studentData = {}) {
-  // DIT MAG NIET BOVENAAN STAAN:
-  console.log(studentData); // <-- error!
-
   setTimeout(async () => {
     let huidigeZoek = '';
     let huidigeLocatie = '';
     let huidigeDomein = '';
-    // Check if user is authenticated
+    let toonAlleFavorieten = false; // Stel de huidige student ID in voor favorieten
+    // Probeer eerst studentData uit sessionStorage te halen
+    let actualStudentData = studentData;
+
+    // Als studentData niet geldig is, probeer uit sessionStorage
+    if (
+      !actualStudentData ||
+      (!actualStudentData.id && !actualStudentData.gebruiker_id)
+    ) {
+      const storedData = window.sessionStorage.getItem('studentData');
+      if (storedData) {
+        try {
+          actualStudentData = JSON.parse(storedData);
+        } catch (e) {
+          // Silently handle JSON parsing errors
+        }
+      }
+    }
+
+    // Als we nog steeds geen geldige data hebben, probeer de API
+    if (
+      !actualStudentData ||
+      (!actualStudentData.id && !actualStudentData.gebruiker_id)
+    ) {
+      try {
+        actualStudentData = await fetchAndStoreStudentProfile();
+      } catch (error) {
+        // Silently handle API errors and use fallback
+        actualStudentData = {
+          id: 'anonymous-user',
+          gebruiker_id: 'anonymous-user',
+        };
+      }
+    }
+
+    currentStudentId = actualStudentData?.id || actualStudentData?.gebruiker_id; // Check if user is authenticated
     const authToken = window.sessionStorage.getItem('authToken');
     if (!authToken) {
       renderLogin(rootElement);
       return;
-    } // Loading-indicator tijdens data ophalen
+    }
+
+    // Loading-indicator tijdens data ophalen
     rootElement.innerHTML = `
       <div class="loading-container">
         <div class="loading-spinner"></div>
@@ -238,6 +362,14 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       }
       bedrijven = [];
     }
+    // Function to update favorites count display
+    function updateFavoritesCount() {
+      const countElement = document.getElementById('favorites-count');
+      if (countElement && currentStudentId) {
+        const favoriteCompanies = getFavoriteCompanies(currentStudentId);
+        countElement.textContent = `(${favoriteCompanies.length})`;
+      }
+    }
     function renderList() {
       const bedrijvenListElement = document.getElementById('bedrijven-list');
 
@@ -247,20 +379,30 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         bedrijvenListElement.innerHTML = `<div style="text-align:center;width:100%;color:#888;">Laden van bedrijven...</div>`;
         return;
       }
-
       const gefilterd = filterBedrijven({
         zoek: huidigeZoek,
         locatie: huidigeLocatie,
         werkdomein: huidigeDomein,
+        toonAlleFavorieten: toonAlleFavorieten,
       });
-
       bedrijvenListElement.innerHTML = gefilterd.length
         ? gefilterd
-            .map(
-              (bedrijf, idx) => `
-    <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;" data-bedrijf-idx="${bedrijven.indexOf(
+            .map((bedrijf, idx) => {
+              const isFavoriet = currentStudentId
+                ? isCompanyFavorite(currentStudentId, bedrijf.gebruiker_id)
+                : false;
+              const hartIcon = isFavoriet ? '❤️' : '🤍';
+              return `
+    <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;position:relative;" data-bedrijf-idx="${bedrijven.indexOf(
       bedrijf
     )}">
+      <button class="favorite-btn" data-company-id="${
+        bedrijf.gebruiker_id
+      }" title="${
+                isFavoriet
+                  ? 'Verwijder uit favorieten'
+                  : 'Voeg toe aan favorieten'
+              }">${hartIcon}</button>
       <img src="${bedrijf.foto}" alt="Logo ${
                 bedrijf.naam
               }" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
@@ -272,20 +414,63 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         bedrijf.werkdomein
       }</div>
     </div>
-  `
-            )
+  `;
+            })
             .join('')
         : `<div style="text-align:center;width:100%;color:#888;">Geen bedrijven gevonden.</div>`;
-
       document.querySelectorAll('.bedrijf-card').forEach((card) => {
-        card.addEventListener('click', () => {
+        card.addEventListener('click', (e) => {
+          // Voorkom dat favoriet button klik de kaart klik triggert
+          if (e.target.classList.contains('favorite-btn')) {
+            return;
+          }
           const idx = card.getAttribute('data-bedrijf-idx');
           showBedrijfPopup(
             bedrijven[idx],
-            studentData.id || studentData.gebruiker_id
+            actualStudentData.id || actualStudentData.gebruiker_id
           );
         });
+      }); // Event listeners voor favorite buttons
+      document.querySelectorAll('.favorite-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation(); // Voorkom dat de kaart klik wordt getriggerd
+
+          const companyId = btn.getAttribute('data-company-id');
+
+          if (!currentStudentId || !companyId) {
+            return;
+          }
+
+          const isNowFavorite = toggleFavoriteCompany(
+            currentStudentId,
+            companyId
+          );
+
+          // Update de button icon en tooltip
+          btn.innerHTML = isNowFavorite ? '❤️' : '🤍';
+          btn.title = isNowFavorite
+            ? 'Verwijder uit favorieten'
+            : 'Voeg toe aan favorieten';
+          // Toon feedback
+          const bedrijf = bedrijven.find((b) => b.gebruiker_id == companyId);
+          const bedrijfNaam = bedrijf ? bedrijf.naam : 'Bedrijf';
+
+          // Toon feedback notificatie
+          const message = isNowFavorite
+            ? `${bedrijfNaam} toegevoegd aan favorieten!`
+            : `${bedrijfNaam} verwijderd uit favorieten`;
+          showFeedbackNotification(message, isNowFavorite ? 'success' : 'info');
+          // Voeg animatie toe aan de button
+          btn.classList.add('animating');
+          setTimeout(() => btn.classList.remove('animating'), 400);
+
+          // Update favorites count
+          updateFavoritesCount();
+        });
       });
+
+      // Update favorites count display
+      updateFavoritesCount();
     }
     // Initial render with loading state
     rootElement.innerHTML = `
@@ -313,8 +498,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
           </ul>
         </nav>
         <div class="student-profile-content">
-          <div class="student-profile-form-container">
-            <h1 class="student-profile-title">Bedrijven</h1>
+          <div class="student-profile-form-container">            <h1 class="student-profile-title">Bedrijven</h1>
             <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1.2rem;">
               <input id="bedrijf-zoek" type="text" placeholder="Zoek bedrijf, locatie of domein..." style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;min-width:180px;">
               <select id="bedrijf-filter-locatie" style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;">
@@ -322,7 +506,11 @@ export async function renderBedrijven(rootElement, studentData = {}) {
               </select>
               <select id="bedrijf-filter-domein" style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;">
                 <option value="">Alle domeinen</option>
-              </select>
+              </select>              <label class="favorites-filter-label" style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;padding:0.5rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#f8f9fa;">
+                <input type="checkbox" id="filter-favorieten" style="margin:0;">
+                <span style="font-size:0.9rem;">Alleen favorieten ❤️</span>
+                <span id="favorites-count" style="font-size:0.8rem;color:#666;font-weight:normal;">(0)</span>
+              </label>
             </div>
             <div id="bedrijven-list" class="bedrijven-list" style="display:flex;flex-wrap:wrap;gap:2rem;justify-content:center;">
               <div style="text-align:center;width:100%;color:#888;">Laden van bedrijven...</div>
@@ -394,11 +582,13 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         });
       });
     });
+
     // Filter & zoek events - setup after data is loaded
     const setupEventListeners = () => {
       const zoekElement = document.getElementById('bedrijf-zoek');
       const locatieElement = document.getElementById('bedrijf-filter-locatie');
       const domeinElement = document.getElementById('bedrijf-filter-domein');
+      const favorietenElement = document.getElementById('filter-favorieten');
 
       if (zoekElement) {
         zoekElement.addEventListener('input', (e) => {
@@ -417,6 +607,13 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       if (domeinElement) {
         domeinElement.addEventListener('change', (e) => {
           huidigeDomein = e.target.value;
+          renderList();
+        });
+      }
+
+      if (favorietenElement) {
+        favorietenElement.addEventListener('change', (e) => {
+          toonAlleFavorieten = e.target.checked;
           renderList();
         });
       }
@@ -448,7 +645,9 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       });
       document.getElementById('nav-settings').addEventListener('click', () => {
         dropdown.classList.remove('open');
-        showSettingsPopup(() => renderBedrijven(rootElement, studentData));
+        showSettingsPopup(() =>
+          renderBedrijven(rootElement, actualStudentData)
+        );
       });
       document.getElementById('nav-logout').addEventListener('click', () => {
         dropdown.classList.remove('open');
@@ -472,6 +671,5 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         Router.navigate('/contact');
       });
     });
-  }, 200);
-  return;
-}
+  }, 200); // End setTimeout
+} // End renderBedrijven function
