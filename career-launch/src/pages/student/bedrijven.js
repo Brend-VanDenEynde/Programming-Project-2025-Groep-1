@@ -542,7 +542,10 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         </nav>
         <div class="student-profile-content">
           <div class="student-profile-form-container" style="padding:2.5rem 2.2rem 2.2rem 2.2rem; border-radius:18px; background:#fff; box-shadow:0 4px 24px #0001; max-width:1200px; margin:auto;">
-            <h1 class="student-profile-title">Bedrijven</h1>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.4rem;">
+              <h1 class="student-profile-title" style="margin: 0;">Bedrijven</h1>
+              <button id="filter-favorieten-btn" title="Toon alleen favorieten" style="font-size: 1.5rem; background: none; border: none; cursor: pointer; transition: transform 0.3s ease;" class="${toonAlleFavorieten ? 'animating' : ''}">${toonAlleFavorieten ? '❤️' : '🤍'}</button>
+            </div>
             <div id="bedrijven-filterbar" class="bedrijven-filterbar-grid" style="background:#f8fafc; padding:1.2rem 1.2rem 1.2rem 1.2rem; border-radius:14px; margin-bottom:2.2rem; box-shadow:0 2px 8px #0001; border:1.5px solid #e1e5e9;">
               <div class="zoek-group">
                 <label for="bedrijf-zoek">Zoeken</label>
@@ -650,6 +653,9 @@ export async function renderBedrijven(rootElement, studentData = {}) {
   border-top: 1.5px solid #e1e5e9;
   margin: 1.2rem 0 2.2rem 0;
 }
+#filter-favorieten-btn.animating {
+  transform: scale(1.3);
+}
 @media (min-width: 1200px) {
   .bedrijven-filterbar-grid {
     grid-template-columns: repeat(6, 1fr);
@@ -699,6 +705,25 @@ export async function renderBedrijven(rootElement, studentData = {}) {
           ${huidigeTalen.length ? huidigeTalen.join(', ') : 'Talen kiezen...'}
         </button>
       `;
+      // Favorietenknop rechtsboven in de filterbalk
+      const filterbar = document.getElementById('bedrijven-filterbar');
+      let favBtn = document.getElementById('filter-favorieten-btn');
+      if (favBtn) favBtn.remove();
+      favBtn = document.createElement('button');
+      favBtn.id = 'filter-favorieten-btn';
+      favBtn.title = 'Toon alleen favorieten';
+      favBtn.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 14px;
+        font-size: 1.4rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        z-index: 5;
+      `;
+      favBtn.innerHTML = toonAlleFavorieten ? '❤️' : '🤍';
+      filterbar.appendChild(favBtn);
       // Popup triggers voor alle filters
       document.getElementById('locaties-popup-trigger').addEventListener('click', () => {
         createPopup({
@@ -798,12 +823,15 @@ export async function renderBedrijven(rootElement, studentData = {}) {
           renderList();
         });
       }
-      // Favorieten-toggle event
-      const favorietenElement = document.getElementById('filter-favorieten');
-      if (favorietenElement) {
-        favorietenElement.addEventListener('change', (e) => {
-          toonAlleFavorieten = e.target.checked;
+      // Favorieten-toggle event (icon button)
+      const favorietenBtn = document.getElementById('filter-favorieten-btn');
+      if (favorietenBtn) {
+        favorietenBtn.addEventListener('click', () => {
+          toonAlleFavorieten = !toonAlleFavorieten;
+          favorietenBtn.innerHTML = toonAlleFavorieten ? '❤️' : '🤍';
+          favorietenBtn.classList.add('animating');
           renderList();
+          setTimeout(() => favorietenBtn.classList.remove('animating'), 400);
         });
       }
       // Multi-select events
