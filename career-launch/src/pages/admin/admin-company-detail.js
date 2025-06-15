@@ -14,13 +14,16 @@ export async function renderAdminCompanyDetail(rootElement) {
     return;
   }
 
-  // Get company ID from URL or use default for demo
+  // Get company ID from URL
   const urlParams = new URLSearchParams(window.location.search);
-  const companyId = urlParams.get('id') || 'demo';
+  const companyId = urlParams.get('id');
 
-  // Mock company data - in real app this would come from API
-  const companyData = getCompanyData(companyId);
+  if (!companyId) {
+    console.error('Company ID is missing in the URL');
+    return;
+  }
 
+  // Show loading state first
   rootElement.innerHTML = `
     <div class="admin-dashboard-clean" style="background-color: white;">
       <header class="admin-header-clean">
@@ -49,75 +52,22 @@ export async function renderAdminCompanyDetail(rootElement) {
         <main class="admin-content-clean" style="background-color: white;">
           <div class="admin-section-header">
             <button id="back-btn" class="back-btn">← Terug naar bedrijven</button>
-            <h1 id="section-title">Bedrijf Details: ${companyData.name}</h1>
+            <h1 id="section-title">Bedrijf Details laden...</h1>
           </div>
-            <div class="admin-content-area" id="content-area" style="background-color: white;">
-            <div class="detail-container">
-              <div class="detail-main-layout">
-                <!-- Left side - Company Information -->
-                <div class="detail-left">
-                  <!-- Company Logo Section -->
-                  <div class="detail-logo-section">
-                    <img 
-                      src="${companyData.logoUrl || defaultCompanyLogo}" 
-                      alt="Logo ${companyData.name}" 
-                      class="detail-logo"
-                    />
-                  </div>
-                  
-                  <!-- Company Information -->
-                  <div class="detail-info">
-                    <div class="detail-field">
-                      <label>Naam:</label>
-                      <span>${companyData.name}</span>
-                    </div>
-                    
-                    <div class="detail-field">
-                      <label>Contact-Email:</label>
-                      <span>${companyData.email}</span>
-                    </div>
-                    
-                    <div class="detail-field">
-                      <label>Locatie:</label>
-                      <span>${companyData.location}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- Right side - Action Buttons -->
-                <div class="detail-right">
-                  <div class="detail-actions">
-                    <button id="view-speeddates-btn" class="detail-action-btn speeddates">
-                      Speeddates
-                    </button>
-                    <button id="contact-company-btn" class="detail-action-btn contact">
-                      Contacteren
-                    </button>
-                    <button id="delete-company-btn" class="detail-action-btn delete">
-                      Verwijderen
-                    </button>
-                  </div>
-                </div>
-              </div>
+          <div class="admin-content-area" id="content-area" style="background-color: white;">
+            <div class="loading-container" style="display: flex; justify-content: center; align-items: center; height: 200px;">
+              <div class="loading-spinner" style="border: 5px solid #f3f3f3; border-top: 5px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;"></div>
             </div>
-          </div>        </main>
+            <style>
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            </style>
+          </div>
+        </main>
       </div>
       
-      <!-- Speeddates Modal -->
-      <div id="speeddates-modal" class="speeddates-modal" style="display: none;">
-        <div class="speeddates-modal-content">
-          <div class="speeddates-modal-header">
-            <h2>Speeddates</h2>
-            <button id="close-modal" class="close-modal-btn">&times;</button>
-          </div>
-          <div class="speeddates-modal-body">
-            <div id="speeddates-list" class="speeddates-list">
-              <!-- Speeddates will be populated here -->
-            </div>
-          </div>
-        </div>
-      </div>
-        
       <!-- FOOTER -->
       <footer class="student-profile-footer">
         <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
@@ -126,9 +76,30 @@ export async function renderAdminCompanyDetail(rootElement) {
     </div>
   `;
 
+  // Set up basic event handlers for the loading state
+  document.getElementById('back-btn').addEventListener('click', () => {
+    Router.navigate('/admin-dashboard/ingeschreven-bedrijven');
+  });
+
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    await logoutUser();
+    window.sessionStorage.clear();
+    localStorage.clear();
+    Router.navigate('/');
+  });
+
+  const navButtons = document.querySelectorAll('.nav-btn');
+  navButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const route = btn.dataset.route;
+      Router.navigate(route);
+    });
+  });
+
   // Fetch company data from API
   const accessToken = sessionStorage.getItem('accessToken');
   try {
+    // Fetch fresh data from the API
     const response = await fetch(
       `https://api.ehb-match.me/bedrijven/${companyId}`,
       {
@@ -136,78 +107,143 @@ export async function renderAdminCompanyDetail(rootElement) {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
+        // Disable caching to always get fresh data
+        cache: 'no-store',
       }
     );
 
     if (!response.ok) {
-      throw new Error('Failed to fetch company data');
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const companyData = await response.json();
 
-    // Update the page with company data
-    document.querySelector(
-      '#section-title'
-    ).textContent = `Bedrijf Details: ${companyData.naam}`;
-    document.querySelector('.detail-logo-section img').src =
-      companyData.profiel_foto || defaultCompanyLogo;
-    document.querySelector('.detail-info').innerHTML = `
-      <div class="detail-field">
-        <label>Naam:</label>
-        <span>${companyData.naam}</span>
-      </div>
-      <div class="detail-field">
-        <label>Locatie:</label>
-        <span>${companyData.plaats || 'Niet beschikbaar'}</span>
-      </div>
-      <div class="detail-field">
-        <label>Contact-Email:</label>
-        <span>${companyData.contact_email || 'Niet beschikbaar'}</span>
-      </div>
-      <div class="detail-field">
-        <label>LinkedIn:</label>
-        <span>${
-          companyData.linkedin
-            ? `<a href="https://www.linkedin.com/in/${companyData.linkedin}" target="_blank">${companyData.linkedin}</a>`
-            : 'Niet ingesteld'
-        }</span>
-      </div>
-      <div class="detail-field">
-        <label>Sector ID:</label>
-        <span>${companyData.sector_id || 'Niet beschikbaar'}</span>
-      </div>
-    `;
+    // Render the full page with the fetched data
+    renderFullDetailPage(rootElement, companyData, adminUsername);
   } catch (error) {
     console.error('Error fetching company details:', error);
+    // Show error state
+    document.getElementById('content-area').innerHTML = `
+      <div class="error-container" style="text-align: center; padding: 20px;">
+        <h2 style="color: #e74c3c;">Fout bij het laden van bedrijfsgegevens</h2>
+        <p>Er is een probleem opgetreden bij het laden van de bedrijfsgegevens. Probeer het later opnieuw.</p>
+        <button onclick="location.reload()" style="padding: 10px; margin-top: 10px;">Opnieuw proberen</button>
+      </div>
+    `;
     document.querySelector('#section-title').textContent =
-      'Er is een probleem. Probeer opnieuw.';
-    document.querySelector('.detail-logo-section img').src = defaultCompanyLogo;
-    document.querySelector('.detail-info').innerHTML =
-      '<p>Er is een probleem met het ophalen van de bedrijfsgegevens. Probeer het later opnieuw.</p>';
+      'Fout bij laden van bedrijfsgegevens';
   }
-
-  // Event handlers
-  setupEventHandlers();
-
-  document.title = `Bedrijf Details: ${companyData.name} - Admin Dashboard`;
 }
 
-function getCompanyData(companyId) {
-  // This function is no longer needed as company data comes from API
-  // Return minimal fallback data only
-  return {
-    userId: 999,
-    name: 'Onbekend Bedrijf',
-    email: 'onbekend@bedrijf.be',
-    location: 'Onbekend',
-    logoUrl: null,
-    registrationDate: '2024-01-01',
-    status: 'Actief',
-    lastLogin: '2024-12-09',
-  };
+// Function to render the full detail page once data is loaded
+function renderFullDetailPage(rootElement, companyData, adminUsername) {
+  // Replace the loading view with the complete detail view
+  const contentArea = document.getElementById('content-area');
+
+  // Update the page title
+  document.querySelector('#section-title').textContent = `Bedrijf Details: ${
+    companyData.naam || 'Onbekend'
+  }`;
+
+  // Replace the content area with the company details
+  contentArea.innerHTML = `
+    <div class="detail-container">
+      <div class="detail-main-layout">
+        <!-- Left side - Company Information -->
+        <div class="detail-left">
+          <!-- Company Logo Section -->
+          <div class="detail-logo-section">
+            <img 
+              src="${companyData.profiel_foto || defaultCompanyLogo}" 
+              alt="Logo ${companyData.naam}" 
+              class="detail-logo"
+            />
+          </div>
+          
+          <!-- Company Information -->
+          <div class="detail-info">
+            <div class="detail-field">
+              <label>Naam:</label>
+              <span>${companyData.naam}</span>
+            </div>
+            
+            <div class="detail-field">
+              <label>Locatie:</label>
+              <span>${companyData.plaats || 'Niet beschikbaar'}</span>
+            </div>
+            
+            <div class="detail-field">
+              <label>Contact-Email:</label>
+              <span>${companyData.contact_email || 'Niet beschikbaar'}</span>
+            </div>
+            
+            <div class="detail-field">
+              <label>LinkedIn:</label>
+              <span>${
+                companyData.linkedin
+                  ? `<a href="https://www.linkedin.com/in/${companyData.linkedin}" target="_blank">${companyData.linkedin}</a>`
+                  : 'Niet ingesteld'
+              }</span>
+            </div>
+            
+            <div class="detail-field">
+              <label>Sector ID:</label>
+              <span>${companyData.sector_id || 'Niet beschikbaar'}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Right side - Action Buttons -->
+        <div class="detail-right">
+          <div class="detail-actions">
+            <button id="view-speeddates-btn" class="detail-action-btn speeddates">
+              Speeddates
+            </button>
+            <button id="contact-company-btn" class="detail-action-btn contact">
+              Contacteren
+            </button>
+            <button id="delete-company-btn" class="detail-action-btn delete">
+              Verwijderen
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Add the speeddates modal to the page
+  const modalContainer = document.createElement('div');
+  modalContainer.id = 'speeddates-modal';
+  modalContainer.className = 'speeddates-modal';
+  modalContainer.style.display = 'none';
+  modalContainer.innerHTML = `
+    <div class="speeddates-modal-content">
+      <div class="speeddates-modal-header">
+        <h2>Speeddates</h2>
+        <button id="close-modal" class="close-modal-btn">&times;</button>
+      </div>
+      <div class="speeddates-modal-body">
+        <div id="speeddates-list" class="speeddates-list">
+          <!-- Speeddates will be populated here -->
+        </div>
+      </div>
+    </div>
+  `;
+
+  rootElement
+    .querySelector('.admin-dashboard-clean')
+    .appendChild(modalContainer);
+
+  // Set up all event handlers
+  setupEventHandlers(companyData);
+
+  // Set the document title
+  document.title = `Bedrijf Details: ${
+    companyData.naam || 'Onbekend'
+  } - Admin Dashboard`;
 }
 
-function setupEventHandlers() {
+function setupEventHandlers(companyData) {
   // Back button
   const backBtn = document.getElementById('back-btn');
   if (backBtn) {
@@ -241,97 +277,78 @@ function setupEventHandlers() {
   // Mobile menu toggle
   const menuToggle = document.getElementById('menu-toggle');
   const sidebar = document.querySelector('.admin-sidebar-clean');
-  menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
-  });
+  if (menuToggle && sidebar) {
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+  }
 
   // Admin action buttons
-  // Zorg ervoor dat de contacteer-knop correct werkt
   const contactBtn = document.getElementById('contact-company-btn');
-  contactBtn.addEventListener('click', async () => {
-    try {
-      // Haal het huidige bedrijf ID op uit de URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const companyId = urlParams.get('id');
-
-      // Haal de toegangstoken op
-      const accessToken = sessionStorage.getItem('accessToken');
-
-      // Maak een API-aanroep om bedrijfsgegevens op te halen
-      const response = await fetch(
-        `https://api.ehb-match.me/bedrijven/${companyId}`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch company data');
-      }
-
-      const companyData = await response.json();
-
-      // Gebruik het contact_email van de opgehaalde gegevens
+  if (contactBtn) {
+    contactBtn.addEventListener('click', () => {
+      // Create mailto link using the current company data
       const mailtoLink = `mailto:${companyData.contact_email || ''}`;
       if (companyData.contact_email) {
         window.location.href = mailtoLink;
       } else {
         alert('Het e-mailadres is niet beschikbaar.');
       }
-    } catch (error) {
-      console.error('Error fetching company details for contact:', error);
-      alert(
-        'Er is een probleem opgetreden bij het ophalen van de contactgegevens. Probeer het later opnieuw.'
-      );
-    }
-  });
+    });
+  }
 
   const speedDatesBtn = document.getElementById('view-speeddates-btn');
   if (speedDatesBtn) {
     speedDatesBtn.removeEventListener('click', openSpeedDatesModal);
     speedDatesBtn.addEventListener('click', openSpeedDatesModal);
   }
+
   const deleteBtn = document.getElementById('delete-company-btn');
-  deleteBtn.addEventListener('click', async () => {
-    if (confirm('Weet je zeker dat je dit bedrijf wilt verwijderen?')) {
-      try {
-        // Get current company ID from URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const companyId = urlParams.get('id') || 'demo';
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', async () => {
+      if (confirm('Weet je zeker dat je dit bedrijf wilt verwijderen?')) {
+        try {
+          // Get current company ID from URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const companyId = urlParams.get('id');
 
-        // Get company data to access user ID (in real app this would be the actual user ID)
-        const companyData = getCompanyData(companyId);
+          if (!companyId) {
+            alert('Bedrijf ID niet gevonden.');
+            return;
+          }
 
-        // In a real implementation, you would use the actual user ID from the company data
-        // For demo purposes, we'll use a mock ID
-        const userId = companyData.userId || 2; // This should be the actual user ID from your database
+          // In a real implementation, you would use the actual user ID from the company data
+          const userId = companyData.gebruiker_id;
 
-        // Call the delete API
-        await deleteUser(userId);
+          if (!userId) {
+            alert('Gebruiker ID voor dit bedrijf niet gevonden.');
+            return;
+          }
 
-        alert('Bedrijf succesvol verwijderd.');
+          // Call the delete API
+          await deleteUser(userId);
 
-        // Navigate back to companies overview
-        Router.navigate('/admin-dashboard/ingeschreven-bedrijven');
-      } catch (error) {
-        console.error('Error deleting company:', error);
+          alert('Bedrijf succesvol verwijderd.');
 
-        // Handle different error types
-        if (error.message.includes('403')) {
-          alert('Je hebt geen toestemming om dit bedrijf te verwijderen.');
-        } else if (error.message.includes('404')) {
-          alert('Bedrijf niet gevonden.');
-        } else {
-          alert(
-            'Er is een fout opgetreden bij het verwijderen van het bedrijf. Probeer het opnieuw.'
-          );
+          // Navigate back to companies overview
+          Router.navigate('/admin-dashboard/ingeschreven-bedrijven');
+        } catch (error) {
+          console.error('Error deleting company:', error);
+
+          // Handle different error types
+          if (error.message.includes('403')) {
+            alert('Je hebt geen toestemming om dit bedrijf te verwijderen.');
+          } else if (error.message.includes('404')) {
+            alert('Bedrijf niet gevonden.');
+          } else {
+            alert(
+              'Er is een fout opgetreden bij het verwijderen van het bedrijf. Probeer het opnieuw.'
+            );
+          }
         }
       }
-    }
-  });
+    });
+  }
 
   // Footer links
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
@@ -352,7 +369,12 @@ async function openSpeedDatesModal() {
 
   // Get current company ID from URL
   const urlParams = new URLSearchParams(window.location.search);
-  const companyId = urlParams.get('id') || 'demo';
+  const companyId = urlParams.get('id');
+
+  if (!companyId) {
+    console.error('Company ID is missing in the URL');
+    return;
+  }
 
   // Clear existing content
   speedDatesList.innerHTML = '';
@@ -367,6 +389,7 @@ async function openSpeedDatesModal() {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
+        cache: 'no-store',
       }
     );
 
@@ -453,9 +476,4 @@ async function openSpeedDatesModal() {
 function closeSpeedDatesModal() {
   const modal = document.getElementById('speeddates-modal');
   modal.style.display = 'none';
-}
-
-function getCompanySpeedDates(companyId) {
-  // This function is no longer needed as speeddate data comes from API
-  return [];
 }
