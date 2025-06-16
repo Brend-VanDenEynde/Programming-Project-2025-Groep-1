@@ -155,7 +155,7 @@ async function rejectSpeeddate(id) {
 }
 
 
-export function renderSpeeddatesRequests(rootElement, studentData = {}) {
+async function renderSpeeddatesRequests(rootElement, studentData = {}) {
   rootElement.innerHTML = `
     <div class="student-profile-container">
       <header class="student-profile-header">
@@ -386,4 +386,4 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
       Router.navigate('/contact');
     });
   });
-}
+}}

@@ -342,7 +342,6 @@ export function renderStudentProfiel(
           'Student update payload:',
           JSON.stringify(updatedStudentData)
         );
-        const token = sessionStorage.getItem('authToken');
         // Haal altijd de juiste ID’s uit sessionStorage
         // let studentID = studentData.gebruiker_id;
         // let userID = studentData.gebruiker_id;

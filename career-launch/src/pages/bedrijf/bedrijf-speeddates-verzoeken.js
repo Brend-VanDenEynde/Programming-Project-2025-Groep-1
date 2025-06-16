@@ -1,4 +1,3 @@
-
 import {
   createBedrijfNavbar,
   closeBedrijfNavbar,
@@ -213,4 +212,5 @@ function renderPageContent(rootElement, verzoeken, companyData) {
         buttonElement.textContent = 'Weigeren';
       }
     }
-  }
+  };
+}

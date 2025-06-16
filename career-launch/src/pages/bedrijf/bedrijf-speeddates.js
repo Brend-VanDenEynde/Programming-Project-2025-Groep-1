@@ -305,7 +305,7 @@ export function setupNavigationLinks() {
       console.error('Fout bij ophalen van gebruikersinformatie:', error);
       alert('Er is een fout opgetreden bij het ophalen van gebruikersinformatie. Controleer de console voor meer details.');
     });
-}
+
 
 
 
@@ -317,6 +317,6 @@ export function setupNavigationLinks() {
       });
     }
   });
-}
+
 
 setupNavigationLinks();
