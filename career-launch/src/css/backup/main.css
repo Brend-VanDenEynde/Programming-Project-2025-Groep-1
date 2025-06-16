@@ -1,0 +1,44 @@
+/*
+ * EhB Career Launch - Modulaire CSS Import
+ * 
+ * Dit bestand bevat alle CSS modules voor modulaire development.
+ * BELANGRIJK: Dit bestand wordt momenteel NIET gebruikt!
+ * 
+ * De applicatie gebruikt nu style.css (volledig werkende versie)
+ * 
+ * Om over te schakelen naar modulaire CSS:
+ * 1. Vervang in main.js: import './css/style.css' 
+ * 2. Met de imports hieronder
+ * 3. Test grondig alle pagina's
+ */
+
+/* 
+// Uncomment deze imports om modulaire CSS te gebruiken:
+
+// 1. Base styles - reset, typography, utilities
+// import './base.css';
+
+// 2. Layout components - containers, headers, footers  
+// import './layout.css';
+
+// 3. Basic forms - login, registration
+// import './forms.css';
+
+// 4. Advanced forms - search criteria, complex forms
+// import './forms-advanced.css';
+
+// 5. Student profile - complete profile system
+// import './student-profile.css';
+
+// 6. Tables - data presentation
+// import './tables.css';
+
+// 7. Modals and popups
+// import './modals.css';
+
+// 8. Dark mode - theming
+// import './dark-mode.css';
+
+// 9. Responsive design - media queries (moet als laatste)
+// import './responsive.css';
+*/

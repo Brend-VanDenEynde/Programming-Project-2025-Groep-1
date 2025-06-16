@@ -1,8 +1,9 @@
 // Admin ingeschreven studenten pagina
 import Router from '../../router.js';
-import { performLogout } from '../../utils/auth-api.js';
+import { logoutUser } from '../../utils/auth-api.js';
+import ehbLogo from '../../images/EhB-logo-transparant.png';
 
-export function renderAdminIngeschrevenStudenten(rootElement) {
+export async function renderAdminIngeschrevenStudenten(rootElement) {
   // Check if user is logged in
   const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
   const adminUsername = sessionStorage.getItem('adminUsername');
@@ -16,10 +17,9 @@ export function renderAdminIngeschrevenStudenten(rootElement) {
     <div class="admin-dashboard-clean">
       <header class="admin-header-clean">
         <div class="admin-logo-section">
-          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+          <img src="${ehbLogo}" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
-        </div>
-        <div class="admin-header-right">
+        </div>        <div class="admin-header-right">
           <span class="admin-username">Welkom, ${adminUsername}</span>
           <button id="logout-btn" class="logout-btn-clean">Uitloggen</button>
           <button id="menu-toggle" class="menu-toggle-btn">☰</button>
@@ -36,35 +36,22 @@ export function renderAdminIngeschrevenStudenten(rootElement) {
             </ul>
           </nav>
         </aside>
-        
-        <main class="admin-content-clean">
+          <main class="admin-content-clean">
           <div class="admin-section-header">
             <h1 id="section-title">Ingeschreven Studenten</h1>
+            <div class="search-bar-container">
+              <input 
+                type="text" 
+                id="student-search" 
+                placeholder="Zoek op naam van student..." 
+                class="search-input"
+              />
+            </div>
           </div>
           
           <div class="admin-content-area" id="content-area">
             <div class="student-list">
-              <div class="student-item clickable-student" data-student-id="tiberius-kirk">
-                <span class="student-name">Tiberius Kirk</span>
-              </div>
-              <div class="student-item clickable-student" data-student-id="john-smith">
-                <span class="student-name">John Smith</span>
-              </div>
-              <div class="student-item clickable-student" data-student-id="jean-luc-picard">
-                <span class="student-name">Jean-Luc Picard</span>
-              </div>
-              <div class="student-item clickable-student" data-student-id="daniel-vonkman">
-                <span class="student-name">Daniel Vonkman</span>
-              </div>
-              <div class="student-item clickable-student" data-student-id="len-jaxtyn">
-                <span class="student-name">Len Jaxtyn</span>
-              </div>
-              <div class="student-item clickable-student" data-student-id="kimberley-hester">
-                <span class="student-name">Kimberley Hester</span>
-              </div>
-              <div class="student-item clickable-student" data-student-id="ed-marvin">
-                <span class="student-name">Ed Marvin</span>
-              </div>
+              <!-- Student items will be populated by JavaScript -->
             </div>
           </div>
         </main>
@@ -79,17 +66,15 @@ export function renderAdminIngeschrevenStudenten(rootElement) {
   `;
   // Handle logout
   const logoutBtn = document.getElementById('logout-btn');
-  logoutBtn.addEventListener('click', async () => {
-    try {
-      const result = await performLogout();
-      console.log('Admin logout result:', result);
-      Router.navigate('/admin-login');
-    } catch (error) {
-      console.error('Admin logout error:', error);
-      // Still navigate to login even if logout API fails
-      Router.navigate('/admin-login');
-    }
-  });
+  if (logoutBtn) {
+    logoutBtn.onclick = null;
+    logoutBtn.addEventListener('click', async () => {
+      await logoutUser();
+      window.sessionStorage.clear();
+      localStorage.clear();
+      Router.navigate('/');
+    });
+  }
 
   // Handle navigation between sections
   const navButtons = document.querySelectorAll('.nav-btn');
@@ -98,14 +83,14 @@ export function renderAdminIngeschrevenStudenten(rootElement) {
       const route = btn.dataset.route;
       Router.navigate(route);
     });
-  });
-
-  // Mobile menu toggle
+  }); // Mobile menu toggle
   const menuToggle = document.getElementById('menu-toggle');
   const sidebar = document.querySelector('.admin-sidebar-clean');
-  menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
-  });
+  if (menuToggle && sidebar) {
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+  }
 
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
@@ -117,15 +102,72 @@ export function renderAdminIngeschrevenStudenten(rootElement) {
     e.preventDefault();
     Router.navigate('/contact');
   });
+  // Fetch students data from API
+  const accessToken = sessionStorage.getItem('accessToken');
+  let allStudents = []; // Store all students for filtering
 
-  // Add click handlers for student items
-  const studentItems = document.querySelectorAll('.clickable-student');
-  studentItems.forEach((item) => {
-    item.addEventListener('click', () => {
-      const studentId = item.dataset.studentId;
-      Router.navigate(`/admin-dashboard/student-detail?id=${studentId}`);
+  try {
+    const response = await fetch('https://api.ehb-match.me/studenten/', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
-  });
+
+    allStudents = await response.json();
+    renderStudentList(allStudents); // Initial render of all students
+  } catch (error) {
+    console.error('Error fetching students:', error);
+  }
+
+  // Function to render student list
+  function renderStudentList(students) {
+    const studentListContainer = document.querySelector('.student-list');
+    studentListContainer.innerHTML = ''; // Clear existing content
+
+    if (students.length === 0) {
+      studentListContainer.innerHTML =
+        '<div class="no-results">Geen studenten gevonden.</div>';
+      return;
+    }
+
+    students.forEach((student) => {
+      const studentItem = document.createElement('div');
+      studentItem.className = 'student-item clickable-student';
+      studentItem.dataset.studentId = student.gebruiker_id;
+
+      studentItem.innerHTML = `
+        <span class="student-name">${student.voornaam} ${student.achternaam}</span>
+      `;
+
+      studentItem.addEventListener('click', () => {
+        Router.navigate(
+          `/admin-dashboard/student-detail?id=${student.gebruiker_id}`
+        );
+      });
+
+      studentListContainer.appendChild(studentItem);
+    });
+  }
+
+  // Search functionality
+  const searchInput = document.getElementById('student-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase().trim();
+
+      if (searchTerm === '') {
+        renderStudentList(allStudents); // Show all students if search is empty
+      } else {
+        const filteredStudents = allStudents.filter((student) => {
+          const fullName =
+            `${student.voornaam} ${student.achternaam}`.toLowerCase();
+          return fullName.includes(searchTerm);
+        });
+        renderStudentList(filteredStudents);
+      }
+    });
+  }
 
   document.title = 'Ingeschreven Studenten - Admin Dashboard';
 }

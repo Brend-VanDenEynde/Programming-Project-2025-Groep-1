@@ -88,23 +88,13 @@ export function renderPrivacy(rootElement) {
         <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
         <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
       </footer>
-    </div>
-  `;
+    </div>  `;
+
+  // Back button - same technique as login and register pages
   const backBtn = document.getElementById('back-button');
   if (backBtn) {
     backBtn.addEventListener('click', () => {
-      // Gebruik alleen history.back() zodat je altijd teruggaat naar de vorige pagina
-      window.history.back();
+      Router.goBack('/');
     });
   }
-  // FOOTER LINKS
-  document.getElementById('privacy-policy').addEventListener('click', (e) => {
-    e.preventDefault();
-    Router.navigate('/privacy');
-  });
-
-  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
-    e.preventDefault();
-    Router.navigate('/contact');
-  });
 }

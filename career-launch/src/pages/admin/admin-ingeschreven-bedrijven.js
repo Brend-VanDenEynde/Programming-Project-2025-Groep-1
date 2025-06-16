@@ -1,8 +1,9 @@
 // Admin ingeschreven bedrijven pagina
 import Router from '../../router.js';
-import { performLogout } from '../../utils/auth-api.js';
+import { logoutUser } from '../../utils/auth-api.js';
+import ehbLogo from '../../images/EhB-logo-transparant.png';
 
-export function renderAdminIngeschrevenBedrijven(rootElement) {
+export async function renderAdminIngeschrevenBedrijven(rootElement) {
   // Check if user is logged in
   const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
   const adminUsername = sessionStorage.getItem('adminUsername');
@@ -16,10 +17,9 @@ export function renderAdminIngeschrevenBedrijven(rootElement) {
     <div class="admin-dashboard-clean">
       <header class="admin-header-clean">
         <div class="admin-logo-section">
-          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+          <img src="${ehbLogo}" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
-        </div>
-        <div class="admin-header-right">
+        </div>        <div class="admin-header-right">
           <span class="admin-username">Welkom, ${adminUsername}</span>
           <button id="logout-btn" class="logout-btn-clean">Uitloggen</button>
           <button id="menu-toggle" class="menu-toggle-btn">☰</button>
@@ -36,28 +36,21 @@ export function renderAdminIngeschrevenBedrijven(rootElement) {
             </ul>
           </nav>
         </aside>
-        
-        <main class="admin-content-clean">
+          <main class="admin-content-clean">
           <div class="admin-section-header">
             <h1 id="section-title">Ingeschreven Bedrijven</h1>
+            <div class="search-bar-container">
+              <input 
+                type="text" 
+                id="company-search" 
+                placeholder="Zoek op naam van bedrijf..." 
+                class="search-input"
+              />
+            </div>
           </div>
             <div class="admin-content-area" id="content-area">
-            <div class="companies-list">
-              <div class="company-item clickable-company" data-company-id="carrefour">
-                <span class="company-name">Carrefour</span>
-              </div>
-              <div class="company-item clickable-company" data-company-id="delhaize">
-                <span class="company-name">Delhaize</span>
-              </div>
-              <div class="company-item clickable-company" data-company-id="colruyt">
-                <span class="company-name">Colruyt</span>
-              </div>
-              <div class="company-item clickable-company" data-company-id="proximus">
-                <span class="company-name">Proximus</span>
-              </div>
-              <div class="company-item clickable-company" data-company-id="kbc">
-                <span class="company-name">KBC Bank</span>
-              </div>
+            <div class="companies-list company-list">
+              <!-- Dynamically populated company items will be inserted here -->
             </div>
           </div>
         </main>
@@ -72,17 +65,15 @@ export function renderAdminIngeschrevenBedrijven(rootElement) {
   `;
   // Handle logout
   const logoutBtn = document.getElementById('logout-btn');
-  logoutBtn.addEventListener('click', async () => {
-    try {
-      const result = await performLogout();
-      console.log('Admin logout result:', result);
-      Router.navigate('/admin-login');
-    } catch (error) {
-      console.error('Admin logout error:', error);
-      // Still navigate to login even if logout API fails
-      Router.navigate('/admin-login');
-    }
-  });
+  if (logoutBtn) {
+    logoutBtn.onclick = null;
+    logoutBtn.addEventListener('click', async () => {
+      await logoutUser();
+      window.sessionStorage.clear();
+      localStorage.clear();
+      Router.navigate('/');
+    });
+  }
 
   // Handle navigation between sections
   const navButtons = document.querySelectorAll('.nav-btn');
@@ -96,9 +87,11 @@ export function renderAdminIngeschrevenBedrijven(rootElement) {
   // Mobile menu toggle
   const menuToggle = document.getElementById('menu-toggle');
   const sidebar = document.querySelector('.admin-sidebar-clean');
-  menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
-  });
+  if (menuToggle && sidebar) {
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+  }
 
   // FOOTER LINKS
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
@@ -109,15 +102,73 @@ export function renderAdminIngeschrevenBedrijven(rootElement) {
     e.preventDefault();
     Router.navigate('/contact');
   });
+  // Fetch approved companies from API
+  const accessToken = sessionStorage.getItem('accessToken');
+  let allCompanies = []; // Store all companies for filtering
 
-  // Add click handlers for company items
-  const companyItems = document.querySelectorAll('.clickable-company');
-  companyItems.forEach((item) => {
-    item.addEventListener('click', () => {
-      const companyId = item.dataset.companyId;
-      Router.navigate(`/admin-dashboard/company-detail?id=${companyId}`);
+  try {
+    const response = await fetch(
+      'https://api.ehb-match.me/bedrijven/goedgekeurd',
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    allCompanies = await response.json();
+    renderCompanyList(allCompanies); // Initial render of all companies
+  } catch (error) {
+    console.error('Error fetching approved companies:', error);
+  }
+
+  // Function to render company list
+  function renderCompanyList(companies) {
+    const companyListContainer = document.querySelector('.companies-list');
+    companyListContainer.innerHTML = ''; // Clear existing content
+
+    if (companies.length === 0) {
+      companyListContainer.innerHTML =
+        '<div class="no-results">Geen bedrijven gevonden.</div>';
+      return;
+    }
+
+    companies.forEach((company) => {
+      const companyItem = document.createElement('div');
+      companyItem.className = 'company-item clickable-company';
+      companyItem.dataset.companyId = company.gebruiker_id;
+      companyItem.innerHTML = `
+        <span class="company-name">${company.naam}</span>
+      `;
+
+      companyItem.addEventListener('click', () => {
+        Router.navigate(
+          `/admin-dashboard/company-detail?id=${company.gebruiker_id}`
+        );
+      });
+
+      companyListContainer.appendChild(companyItem);
     });
-  });
+  }
+
+  // Search functionality
+  const searchInput = document.getElementById('company-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase().trim();
+
+      if (searchTerm === '') {
+        renderCompanyList(allCompanies); // Show all companies if search is empty
+      } else {
+        const filteredCompanies = allCompanies.filter((company) => {
+          const companyName = company.naam.toLowerCase();
+          return companyName.includes(searchTerm);
+        });
+        renderCompanyList(filteredCompanies);
+      }
+    });
+  }
 
   document.title = 'Ingeschreven Bedrijven - Admin Dashboard';
 }

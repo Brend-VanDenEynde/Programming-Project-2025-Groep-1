@@ -11,10 +11,9 @@ import { apiGet, apiPost, apiPut, apiDelete } from '../utils/api.js';
  */
 export async function fetchSkills() {
   try {
-    const skills = await apiGet('http://localhost:3001/skills/');
+    const skills = await apiGet('https://api.ehb-match.me/skills');
     return skills;
   } catch (error) {
-    console.error('Error fetching skills:', error);
     throw error;
   }
 }
@@ -25,10 +24,9 @@ export async function fetchSkills() {
  */
 export async function fetchStudents() {
   try {
-    const students = await apiGet('http://localhost:3001/studenten/');
+    const students = await apiGet('https://api.ehb-match.me/studenten');
     return students;
   } catch (error) {
-    console.error('Error fetching students:', error);
     throw error;
   }
 }
@@ -41,11 +39,10 @@ export async function fetchStudents() {
 export async function fetchStudentById(studentId) {
   try {
     const student = await apiGet(
-      `http://localhost:3001/studenten/${studentId}`
+      `https://api.ehb-match.me/studenten/${studentId}`
     );
     return student;
   } catch (error) {
-    console.error('Error fetching student:', error);
     throw error;
   }
 }
@@ -56,10 +53,9 @@ export async function fetchStudentById(studentId) {
  */
 export async function fetchCompanies() {
   try {
-    const companies = await apiGet('http://localhost:3001/bedrijven/');
+    const companies = await apiGet('https://api.ehb-match.me/bedrijven');
     return companies;
   } catch (error) {
-    console.error('Error fetching companies:', error);
     throw error;
   }
 }
@@ -73,12 +69,11 @@ export async function fetchCompanies() {
 export async function updateStudentProfile(studentId, profileData) {
   try {
     const updatedStudent = await apiPut(
-      `http://localhost:3001/studenten/${studentId}`,
+      `https://api.ehb-match.me/studenten/${studentId}`,
       profileData
     );
     return updatedStudent;
   } catch (error) {
-    console.error('Error updating student profile:', error);
     throw error;
   }
 }
@@ -92,12 +87,158 @@ export async function updateStudentProfile(studentId, profileData) {
 export async function saveSearchCriteria(studentId, criteria) {
   try {
     const response = await apiPost(
-      `http://localhost:3001/studenten/${studentId}/criteria`,
+      `https://api.ehb-match.me/studenten/${studentId}/criteria`,
       criteria
     );
     return response;
   } catch (error) {
-    console.error('Error saving search criteria:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete a user account (accessible to account owner and admins)
+ * @param {number} userId - The user ID to delete
+ * @returns {Promise<Object>} Response from server
+ */
+export async function deleteUser(userId) {
+  try {
+    const response = await apiDelete(`https://api.ehb-match.me/user/${userId}`);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Register a new company
+ * @param {Object} companyData - The company registration data
+ * @returns {Promise<Object>} Registration response from server
+ */
+export async function registerCompany(companyData) {
+  try {
+    const response = await fetch(
+      'https://api.ehb-match.me/auth/register/bedrijf',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(companyData),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Company registration failed');
+    }
+
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Fetch pending speeddate requests for the authenticated company
+ * @param {number} companyId - Optional company ID to fetch pending speeddates for. If omitted, uses the authenticated user.
+ * @returns {Promise<Array>} Array of pending speeddate requests
+ */
+export async function fetchPendingSpeeddates(companyId = null) {
+  try {
+    const url = companyId
+      ? `https://api.ehb-match.me/speeddates/pending?id=${companyId}`
+      : 'https://api.ehb-match.me/speeddates/pending';
+
+    const speeddates = await apiGet(url);
+    return speeddates;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Accept a speeddate request
+ * @param {number} speeddateId - The speeddate ID to accept
+ * @returns {Promise<Object>} The accepted speeddate data
+ */
+export async function acceptSpeeddateRequest(speeddateId) {
+  try {
+    const response = await apiPost(
+      `https://api.ehb-match.me/speeddates/accept/${speeddateId}`
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Reject a speeddate request
+ * @param {number} speeddateId - The speeddate ID to reject
+ * @returns {Promise<Object>} The rejected speeddate data
+ */
+export async function rejectSpeeddateRequest(speeddateId) {
+  try {
+    const response = await apiPost(
+      `https://api.ehb-match.me/speeddates/reject/${speeddateId}`
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Fetch confirmed speeddates for a company
+ * @param {number} companyId - Optional company ID to fetch speeddates for. If omitted, uses the authenticated user.
+ * @returns {Promise<Array>} Array of confirmed speeddate data
+ */
+export async function fetchCompanySpeeddates(companyId = null) {
+  try {
+    const url = companyId
+      ? `https://api.ehb-match.me/speeddates?id=${companyId}`
+      : 'https://api.ehb-match.me/speeddates';
+
+    const speeddates = await apiGet(url);
+    return speeddates;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Fetch speeddates for a student
+ * @param {number} studentId - Optional student ID to fetch speeddates for. If omitted, uses the authenticated user.
+ * @returns {Promise<Array>} Array of student speeddate data
+ */
+export async function fetchStudentSpeeddates(studentId = null) {
+  try {
+    const url = studentId
+      ? `https://api.ehb-match.me/speeddates/student?id=${studentId}`
+      : 'https://api.ehb-match.me/speeddates/student';
+
+    const speeddates = await apiGet(url);
+    return speeddates;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Fetch speeddate requests for a student
+ * @param {number} studentId - Optional student ID to fetch speeddate requests for. If omitted, uses the authenticated user.
+ * @returns {Promise<Array>} Array of student speeddate request data
+ */
+export async function fetchStudentSpeeddateRequests(studentId = null) {
+  try {
+    const url = studentId
+      ? `https://api.ehb-match.me/speeddates/student/requests?id=${studentId}`
+      : 'https://api.ehb-match.me/speeddates/student/requests';
+
+    const requests = await apiGet(url);
+    return requests;
+  } catch (error) {
     throw error;
   }
 }

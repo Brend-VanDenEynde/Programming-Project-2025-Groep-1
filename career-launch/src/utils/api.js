@@ -17,14 +17,17 @@ import {
  */
 export async function authenticatedFetch(url, options = {}) {
   // Get the auth token from session storage
+  // Try accessToken first (used by admin), fallback to authToken
+  const accessToken = window.sessionStorage.getItem('accessToken');
   const authToken = window.sessionStorage.getItem('authToken');
+  const token = accessToken || authToken;
 
   // Prepare headers with authentication
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers,
-    ...(authToken && {
-      Authorization: `Bearer ${authToken}`,
+    ...(token && {
+      Authorization: `Bearer ${token}`,
     }),
   };
 
@@ -93,7 +96,24 @@ export async function apiGet(url, options = {}) {
   });
 
   if (!response.ok) {
+    const errorText = await response.text();
+    console.error(
+      `API GET error for ${url}:`,
+      response.status,
+      response.statusText,
+      errorText
+    );
     throw new Error(`API GET error: ${response.status} ${response.statusText}`);
+  }
+
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    const responseText = await response.text();
+    console.error(
+      `Expected JSON but got ${contentType} for ${url}:`,
+      responseText
+    );
+    throw new Error(`Expected JSON response but got ${contentType}`);
   }
 
   return await response.json();
@@ -147,7 +167,7 @@ export async function apiPut(url, data = null, options = {}) {
  * Makes a DELETE request with automatic token refresh
  * @param {string} url - The API endpoint URL
  * @param {Object} options - Additional fetch options
- * @returns {Promise<Object>} The JSON response data
+ * @returns {Promise<Object>} The JSON response data or empty object for 204
  */
 export async function apiDelete(url, options = {}) {
   const response = await authenticatedFetch(url, {
@@ -161,7 +181,18 @@ export async function apiDelete(url, options = {}) {
     );
   }
 
-  return await response.json();
+  // Handle 204 No Content response (successful deletion)
+  if (response.status === 204) {
+    return { success: true, message: 'Resource deleted successfully' };
+  }
+
+  // For other successful responses, try to parse JSON
+  const contentType = response.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    return await response.json();
+  }
+  // If no JSON content, return success object
+  return { success: true, message: 'Operation completed successfully' };
 }
 
 /**
