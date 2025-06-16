@@ -238,6 +238,10 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
             <a href="/contact" data-route="/contact">Contact</a>
           </div>
         </div>
+      </div>
+      <footer class="student-profile-footer">
+        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
       </footer>
     </div>
   `;

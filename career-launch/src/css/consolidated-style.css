@@ -3427,3 +3427,79 @@ body.darkmode .content-header p {
 body.darkmode .no-requests {
   color: #b0b6c6;
 }
+
+/* =============================================================================
+   14. TABLE CONTAINER STYLING
+   ============================================================================= */
+
+.speeddates-table-container {
+  min-width: 700px;
+  max-width: 950px;
+  margin: 0 auto 2rem auto;
+  overflow-x: auto;
+  /* Zorgt dat beide tabellen altijd even breed zijn */
+}
+
+.speeddates-table .bedrijf-popup-trigger {
+  color: #222;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  background: none;
+  transition: color 0.18s, background 0.18s;
+}
+.speeddates-table .bedrijf-popup-trigger:hover {
+  color: #28bb8a;
+  background: #f1f9f6;
+  text-decoration: none;
+}
+
+/* Slot status styling */
+.slot-pending {
+  background: #fffbe6 !important;
+  color: #bfa700 !important;
+  border: 1px solid #ffe58f !important;
+  cursor: not-allowed !important;
+}
+.slot-taken {
+  background: #ffeaea !important;
+  color: #d32f2f !important;
+  border: 1px solid #ffb3b3 !important;
+  cursor: not-allowed !important;
+}
+.slot-btn[disabled] {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* =============================================================================
+   FILTER BUTTONS STYLING
+   ============================================================================= */
+
+.filter-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.filter-btn {
+  background: #f5f5f5;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  padding: 6px 18px;
+  font-size: 1rem;
+  color: #333;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.filter-btn:hover {
+  background: #e0eaff;
+  color: #0056b3;
+  border-color: #0056b3;
+}
+.filter-btn.active {
+  background: #0056b3;
+  color: #fff;
+  border-color: #0056b3;
+  font-weight: bold;
+}

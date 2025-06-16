@@ -254,22 +254,20 @@ export function renderStudentProfiel(
         });
       });
     }
-    document
-      .getElementById('nav-logout')
-      .addEventListener('click', async () => {
-        dropdown.classList.remove('open');
-        const response = await logoutUser();
-        console.log('Logout API response:', response);
-        window.sessionStorage.removeItem('studentData');
-        window.sessionStorage.removeItem('authToken');
-        window.sessionStorage.removeItem('userType');
-        localStorage.setItem('darkmode', 'false');
-        document.body.classList.remove('darkmode');
-        import('../../router.js').then((module) => {
-          const Router = module.default;
-          Router.navigate('/');
-        });
+    document.getElementById('nav-logout').addEventListener('click', async () => {
+      dropdown.classList.remove('open');
+      const response = await logoutUser();
+      console.log('Logout API response:', response);
+      window.sessionStorage.removeItem('studentData');
+      window.sessionStorage.removeItem('authToken');
+      window.sessionStorage.removeItem('userType');
+      localStorage.setItem('darkmode', 'false');
+      document.body.classList.remove('darkmode');
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/');
       });
+    });
 
     // Ook de LOG OUT knop in het profiel-formulier zelf (voor desktop)
     const logoutBtn = document.getElementById('logout-btn');

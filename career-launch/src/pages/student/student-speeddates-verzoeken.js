@@ -61,6 +61,7 @@ function formatTime(dtString) {
   return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
+// export function renderSpeeddatesRequests(rootElement, studentData = {}) {
 export function renderSpeeddatesRequests(rootElement, studentData = {}) {
   let currentSort = [{ key: 'begin', asc: true }];
 
@@ -73,6 +74,7 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
         <ul id="burger-dropdown" class="student-profile-dropdown">
+          <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
@@ -80,7 +82,6 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
-            <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link active">Speeddates-verzoeken</button></li>
@@ -109,29 +110,55 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     </div>
   `;
 
+  function getSortArrow(key) {
+    const found = currentSort.find(s => s.key === key);
+    if (!found) return '';
+    return found.asc ? ' ▲' : ' ▼';
+  }
+
+  function formatTimeFromBegin(begin) {
+    if (!begin) return '-';
+    const dt = new Date(begin);
+    if (isNaN(dt.getTime())) return '-';
+    return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  }
+
+  function compareValues(a, b, key) {
+    let aVal = a[key];
+    let bVal = b[key];
+    if (key === 'begin') {
+      aVal = aVal ? new Date(aVal).getTime() : Number.POSITIVE_INFINITY;
+      bVal = bVal ? new Date(bVal).getTime() : Number.POSITIVE_INFINITY;
+    } else if (typeof aVal === 'string' && typeof bVal === 'string') {
+      aVal = aVal.toLowerCase();
+      bVal = bVal.toLowerCase();
+    }
+    if (aVal < bVal) return -1;
+    if (aVal > bVal) return 1;
+    return 0;
+  }
+
   function renderTable(verzoeken) {
     if (!verzoeken || verzoeken.length === 0) {
       document.getElementById('speeddates-requests-table').innerHTML = `<p style="text-align:center;">Nog geen speeddates-verzoeken gevonden.</p>`;
       return;
     }
+    if (!currentSort.length) currentSort = [{ key: 'begin', asc: true }];
+    // --- SORTEREN ---
     const sorted = [...verzoeken].sort((a, b) => {
       for (const sort of currentSort) {
-        let cmp;
-        if (sort.key === 'begin') {
-          cmp = (new Date(a.begin) - new Date(b.begin));
-        } else {
-          cmp = (a[sort.key] || '').localeCompare(b[sort.key] || '');
-        }
+        const cmp = compareValues(a, b, sort.key);
         if (cmp !== 0) return sort.asc ? cmp : -cmp;
       }
       return 0;
     });
+    // --- RENDEREN ---
     const rows = sorted.map(v => `
       <tr>
-        <td><span class="bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(v)}' style="color:#0077cc;cursor:pointer;">${v.naam_bedrijf}</span></td>
+        <td><span class="bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(v)}' style="color:#0077cc;cursor:pointer;text-decoration:underline;">${v.naam_bedrijf}</span></td>
         <td>${v.lokaal || '-'}</td>
-        <td>${formatTime(v.begin)}</td>
-        <td>
+        <td>${formatTimeFromBegin(v.begin)}</td>
+        <td class="status-cell">
           <button class="accept-btn" data-id="${v.id}">Accepteer</button>
           <button class="deny-btn" data-id="${v.id}">Weiger</button>
         </td>
@@ -152,20 +179,34 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
         </table>
       </div>
     `;
+    // --- EVENTS op de headers voor sortering ---
     document.querySelectorAll('.sortable').forEach(th => {
-      th.addEventListener('mousedown', e => { if (e.shiftKey) e.preventDefault(); });
-      th.addEventListener('click', e => {
+      th.addEventListener('mousedown', (e) => {
+        if (e.shiftKey) e.preventDefault(); // geen text-select bij shift
+      });
+      th.addEventListener('click', (e) => {
         const key = th.dataset.key;
         const found = currentSort.find(s => s.key === key);
         if (!e.shiftKey) {
-          currentSort = [found ? { key, asc: !found.asc } : { key, asc: true }];
+          // Gewoon klik: alleen deze kolom (toggle asc/desc)
+          if (found) {
+            found.asc = !found.asc;
+            currentSort = [found];
+          } else {
+            currentSort = [{ key, asc: true }];
+          }
         } else {
-          if (found) { found.asc = !found.asc; }
-          else { currentSort.push({ key, asc: true }); }
+          // Shift+klik: multi-level toevoegen/toggles
+          if (found) {
+            found.asc = !found.asc;
+          } else {
+            currentSort.push({ key, asc: true });
+          }
         }
         renderTable(verzoeken);
       });
     });
+    // Knoppen event handlers
     document.querySelectorAll('.accept-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const id = e.currentTarget.dataset.id;
