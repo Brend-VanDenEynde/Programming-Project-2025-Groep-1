@@ -1,5 +1,7 @@
 import Router from '../router.js';
 import { fetchAndStoreStudentProfile } from './student/student-profiel.js';
+import hideIcon from '../icons/hide.png';
+import eyeIcon from '../icons/eye.png';
 
 // Zet altijd light mode bij laden van login
 localStorage.setItem('darkmode', 'false');
@@ -15,6 +17,8 @@ export function renderLogin(rootElement) {
           <p>Log je in met je school-email</p>
         </div>
         <form id="loginForm">
+        <div class="form-group">
+          <label for="email">E-mailadres</label>
           <input 
             type="email" 
             id="email" 
@@ -23,12 +27,13 @@ export function renderLogin(rootElement) {
             placeholder="Email"
             class="login-input"
           >
+        </div>
           <div class="form-group">
             <label for="passwordInput">Wachtwoord</label>
             <div style="position:relative;display:flex;align-items:center;">
               <input type="password" id="passwordInput" name="password" required placeholder="Wachtwoord" style="flex:1;">
               <button type="button" id="togglePassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">
-                <img id="togglePasswordIcon" src="src/Icons/hide.png" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
+                <img id="togglePasswordIcon" src="${hideIcon}" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
               </button>
             </div>
           </div>
@@ -76,7 +81,7 @@ export function renderLogin(rootElement) {
     togglePassword.addEventListener('click', () => {
       const isVisible = passwordInput.type === 'text';
       passwordInput.type = isVisible ? 'password' : 'text';
-      togglePasswordIcon.src = isVisible ? 'src/Icons/hide.png' : 'src/Icons/eye.png';
+      togglePasswordIcon.src = isVisible ? `${hideIcon}` : `${eyeIcon}`;
       togglePasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
     });
   }
