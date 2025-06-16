@@ -173,9 +173,8 @@ async function handleLogin(event, rootElement) {
     // Pak de user uit infoRes.user!
     const user = infoRes.user;
 
-    // Debug: check presence of opleiding_id in user object
+    // Debug: log de volledige user-object
     console.log('USER OBJECT:', user);
-    console.log('opleiding_id in user:', user ? user.opleiding_id : undefined);
 
     if (!user || !user.type) {
       alert(
@@ -187,17 +186,14 @@ async function handleLogin(event, rootElement) {
     if (user.type === 2) {
       window.sessionStorage.setItem('studentData', JSON.stringify(user));
       window.sessionStorage.setItem('userType', 'student');
-      // Debug: check presence of opleiding_id in sessionStorage
-      const storedStudent = JSON.parse(
-        window.sessionStorage.getItem('studentData')
-      );
-      console.log('STORED studentData:', storedStudent);
-      console.log(
-        'opleiding_id in stored studentData:',
-        storedStudent ? storedStudent.opleiding_id : undefined
-      );
       Router.navigate('/student/student-profiel');
     } else if (user.type === 3) {
+      // Controleer of id aanwezig is en geldig is
+      if (!user.id || typeof user.id !== 'number') {
+        console.error('Ongeldig of ontbrekend id in companyData:', user);
+        alert('Fout: Ongeldig of ontbrekend id in de bedrijfsgegevens.');
+        return;
+      }
       window.sessionStorage.setItem('companyData', JSON.stringify(user));
       window.sessionStorage.setItem('userType', 'company');
       Router.navigate('/bedrijf/bedrijf-profiel');
@@ -216,7 +212,6 @@ async function handleLogin(event, rootElement) {
     window.sessionStorage.removeItem('companyData');
     window.sessionStorage.removeItem('userType');
 
-    // (error-handling hetzelfde als eerder)
     alert('Inloggen mislukt. Controleer je e-mailadres en wachtwoord.');
   }
 }
