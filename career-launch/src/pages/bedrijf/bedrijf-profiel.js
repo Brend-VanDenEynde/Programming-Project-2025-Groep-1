@@ -217,7 +217,8 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
   if (privacyPolicyLink) {
     privacyPolicyLink.addEventListener('click', (e) => {
       e.preventDefault();
-      alert('Privacy Policy pagina wordt hier geladen.');
+      window.location.hash = '#/privacy';
+      import('../privacy.js').then((m) => m.renderPrivacy(document.getElementById('app')));
     });
   } else {
     console.error('Privacy Policy link niet gevonden in de DOM.');
@@ -227,7 +228,8 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
   if (contactLink) {
     contactLink.addEventListener('click', (e) => {
       e.preventDefault();
-      alert('Contacteer ons formulier wordt hier geladen.');
+      window.location.hash = '#/contact';
+      import('../contact.js').then((m) => m.renderContact(document.getElementById('app')));
     });
   } else {
     console.error('Contact link niet gevonden in de DOM.');

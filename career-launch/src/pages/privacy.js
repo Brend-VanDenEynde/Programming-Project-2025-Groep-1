@@ -83,18 +83,13 @@ export function renderPrivacy(rootElement) {
           <p class="last-updated"><strong>Laatste update:</strong> 5 juni 2025</p>
         </div>
       </div>
-      
-      <!-- FOOTER -->      <footer class="student-profile-footer">
-        <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
-      </footer>
     </div>  `;
 
   // Back button - same technique as login and register pages
   const backBtn = document.getElementById('back-button');
   if (backBtn) {
     backBtn.addEventListener('click', () => {
-      Router.goBack('/');
+      window.history.back();
     });
   }
 }
