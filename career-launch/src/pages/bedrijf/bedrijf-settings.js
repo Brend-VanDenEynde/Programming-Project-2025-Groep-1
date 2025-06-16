@@ -113,3 +113,5 @@ function renderSidebar() {
 
 renderSidebar();
 
+export { showSettingsPopup as showBedrijfSettingsPopup };
+
