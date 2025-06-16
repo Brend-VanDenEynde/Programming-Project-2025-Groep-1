@@ -61,21 +61,16 @@ export function renderBedrijfRegister(rootElement) {
     fileInput.click();
   });
 
-  let overlayEnabled = false;
+  let hasUploadedPhoto = false;
 
   function updateDeleteOverlay() {
-    // Only enable overlay if an image is uploaded (src is not empty, not default, and not a data-alt fallback)
-    overlayEnabled = uploadedPhoto.src &&
-      uploadedPhoto.src !== window.location.href &&
-      uploadedPhoto.src !== '' &&
-      uploadedPhoto.src !== undefined &&
-      !uploadedPhoto.src.endsWith('/');
+    hasUploadedPhoto = !!fileKey;
     // Always hide overlay by default
     deleteOverlay.style.display = 'none';
   }
 
   uploadIcon.addEventListener('mouseenter', () => {
-    if (overlayEnabled) {
+    if (hasUploadedPhoto) {
       deleteOverlay.style.display = 'flex';
     }
   });
@@ -86,19 +81,20 @@ export function renderBedrijfRegister(rootElement) {
   deleteOverlay.addEventListener('click', handlePhotoClick);
 
   async function handlePhotoClick() {
-    const deleteResponse = await fetch(`https://api.ehb-match.me/profielfotos/${fileKey}`, {
+    fetch(`https://api.ehb-match.me/profielfotos/${fileKey}`, {
       method: 'DELETE',
+    }).then((response) => {
+      if (!response.ok) {
+        console.error(`Failed to delete photo: ${response.status}`);
+      }
+      console.log(response);
     });
-    if (!deleteResponse.ok) {
-      console.error(`Failed to delete photo: ${deleteResponse.status}`);
-    }
-    console.log(deleteResponse);
     uploadedPhoto.alt = '⬆';
     uploadedPhoto.src = '';
     fileStatus.textContent = 'No file selected.'; // Reset file status
+    uploadedPhoto.removeEventListener('click', handlePhotoClick);
     fileKey = null; // Reset file key
     updateDeleteOverlay();
-    uploadedPhoto.removeEventListener('click', handlePhotoClick);
   }
 
   fileInput.addEventListener('change', async (e) => {
@@ -122,7 +118,6 @@ export function renderBedrijfRegister(rootElement) {
 
       fileKey = uploadResponse.profiel_foto_key || null;
 
-      const uploadedPhoto = document.querySelector('.uploaded-photo');
       uploadedPhoto.alt = '';
       uploadedPhoto.src = uploadResponse.profiel_foto_url || '';
       updateDeleteOverlay();
@@ -183,9 +178,6 @@ async function handleBedrijfRegister(event) {
       linkedinValue = null;
     }
   }
-
-  // Prepare profile photo
-  const profielFotoFile = formData.get('profielFoto');
 
   // Prepare data according to API specification
   const data = {

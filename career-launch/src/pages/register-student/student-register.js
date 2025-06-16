@@ -13,7 +13,7 @@ export function renderStudentRegister(rootElement) {
       <div class="upload-section">
         <div class="upload-icon" data-alt="⬆" style="position:relative;">
           <img src="" alt="⬆" class="uploaded-photo" />
-          <span class="delete-overlay" style="display:none;">&#10006;</span>
+          <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
         </div>
         <label for="profielFoto" class="upload-label">Foto</label>
         <div class="file-input-wrapper">
@@ -71,21 +71,16 @@ export function renderStudentRegister(rootElement) {
     fileInput.click();
   });
 
-  let overlayEnabled = false;
+  let hasUploadedPhoto = false;
 
   function updateDeleteOverlay() {
-    // Only enable overlay if an image is uploaded (src is not empty, not default, and not a data-alt fallback)
-    overlayEnabled = uploadedPhoto.src &&
-      uploadedPhoto.src !== window.location.href &&
-      uploadedPhoto.src !== '' &&
-      uploadedPhoto.src !== undefined &&
-      !uploadedPhoto.src.endsWith('/');
+    hasUploadedPhoto = !!fileKey;
     // Always hide overlay by default
     deleteOverlay.style.display = 'none';
   }
 
   uploadIcon.addEventListener('mouseenter', () => {
-    if (overlayEnabled) {
+    if (hasUploadedPhoto) {
       deleteOverlay.style.display = 'flex';
     }
   });
@@ -96,19 +91,20 @@ export function renderStudentRegister(rootElement) {
   deleteOverlay.addEventListener('click', handlePhotoClick);
 
   async function handlePhotoClick() {
-    const deleteResponse = await fetch(`https://api.ehb-match.me/profielfotos/${fileKey}`, {
+    fetch(`https://api.ehb-match.me/profielfotos/${fileKey}`, {
       method: 'DELETE',
+    }).then((response) => {
+      if (!response.ok) {
+        console.error(`Failed to delete photo: ${response.status}`);
+      }
+      console.log(response);
     });
-    if (!deleteResponse.ok) {
-      console.error(`Failed to delete photo: ${deleteResponse.status}`);
-    }
-    console.log(deleteResponse);
     uploadedPhoto.alt = '⬆';
     uploadedPhoto.src = '';
     fileStatus.textContent = 'No file selected.'; // Reset file status
+    uploadedPhoto.removeEventListener('click', handlePhotoClick);
     fileKey = null; // Reset file key
     updateDeleteOverlay();
-    uploadedPhoto.removeEventListener('click', handlePhotoClick);
   }
 
   fileInput.addEventListener('change', async (e) => {
