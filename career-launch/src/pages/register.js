@@ -2,8 +2,8 @@ import { renderStudentRegister } from './student-register.js';
 import { renderBedrijfRegister } from './bedrijf-register.js';
 import Router from '../router.js';
 import { renderLogin } from './login.js';
-import hideIcon from '../Icons/hide.png';
-import eyeIcon from '../Icons/eye.png';
+import hideIcon from '../icons/hide.png';
+import eyeIcon from '../icons/eye.png';
 
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `
