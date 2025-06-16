@@ -156,3 +156,73 @@ export async function fetchPendingSpeeddates(companyId = null) {
     throw error;
   }
 }
+
+/**
+ * Accept a speeddate request
+ * @param {number} speeddateId - The speeddate ID to accept
+ * @returns {Promise<Object>} The accepted speeddate data
+ */
+export async function acceptSpeeddateRequest(speeddateId) {
+  try {
+    const response = await apiPost(
+      `https://api.ehb-match.me/speeddates/accept/${speeddateId}`
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Fetch confirmed speeddates for a company
+ * @param {number} companyId - Optional company ID to fetch speeddates for. If omitted, uses the authenticated user.
+ * @returns {Promise<Array>} Array of confirmed speeddate data
+ */
+export async function fetchCompanySpeeddates(companyId = null) {
+  try {
+    const url = companyId
+      ? `https://api.ehb-match.me/speeddates?id=${companyId}`
+      : 'https://api.ehb-match.me/speeddates';
+
+    const speeddates = await apiGet(url);
+    return speeddates;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Fetch speeddates for a student
+ * @param {number} studentId - Optional student ID to fetch speeddates for. If omitted, uses the authenticated user.
+ * @returns {Promise<Array>} Array of student speeddate data
+ */
+export async function fetchStudentSpeeddates(studentId = null) {
+  try {
+    const url = studentId
+      ? `https://api.ehb-match.me/speeddates/student?id=${studentId}`
+      : 'https://api.ehb-match.me/speeddates/student';
+
+    const speeddates = await apiGet(url);
+    return speeddates;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Fetch speeddate requests for a student
+ * @param {number} studentId - Optional student ID to fetch speeddate requests for. If omitted, uses the authenticated user.
+ * @returns {Promise<Array>} Array of student speeddate request data
+ */
+export async function fetchStudentSpeeddateRequests(studentId = null) {
+  try {
+    const url = studentId
+      ? `https://api.ehb-match.me/speeddates/requests/student?id=${studentId}`
+      : 'https://api.ehb-match.me/speeddates/requests/student';
+
+    const requests = await apiGet(url);
+    return requests;
+  } catch (error) {
+    throw error;
+  }
+}

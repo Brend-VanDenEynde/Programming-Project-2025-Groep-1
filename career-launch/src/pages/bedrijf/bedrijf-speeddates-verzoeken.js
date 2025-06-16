@@ -3,7 +3,10 @@ import {
   closeBedrijfNavbar,
   setupBedrijfNavbarEvents,
 } from '../../utils/bedrijf-navbar.js';
-import { fetchPendingSpeeddates } from '../../utils/data-api.js';
+import {
+  fetchPendingSpeeddates,
+  acceptSpeeddateRequest,
+} from '../../utils/data-api.js';
 
 export async function renderBedrijfSpeeddatesVerzoeken(
   rootElement,
@@ -137,20 +140,38 @@ function renderPageContent(rootElement, verzoeken, companyData) {
   setTimeout(() => {
     setupBedrijfNavbarEvents();
   }, 100);
-
   // Setup request management functions
   window.acceptRequest = async (requestId, studentName) => {
     try {
-      // TODO: Implement API call to accept speeddate request
-      // const result = await acceptSpeeddateRequest(requestId);
+      // Show loading state
+      const buttonElement = document.querySelector(
+        `[onclick="acceptRequest(${requestId}, '${studentName}')"]`
+      );
+      if (buttonElement) {
+        buttonElement.disabled = true;
+        buttonElement.textContent = 'Accepteren...';
+      } // Call API to accept speeddate request
+      const result = await acceptSpeeddateRequest(requestId);
 
-      alert(`Speeddate verzoek van ${studentName} geaccepteerd!`);
+      // Show success message with information about where to find the speeddate
+      alert(
+        `Speeddate verzoek van ${studentName} geaccepteerd!\n\nDe speeddate is nu toegevoegd aan je speeddates overzicht en is zichtbaar voor de student.`
+      );
 
       // Refresh the page to show updated data
       await renderBedrijfSpeeddatesVerzoeken(rootElement, companyData);
     } catch (error) {
       console.error('Error accepting request:', error);
       alert('Er is een fout opgetreden bij het accepteren van het verzoek.');
+
+      // Re-enable button on error
+      const buttonElement = document.querySelector(
+        `[onclick="acceptRequest(${requestId}, '${studentName}')"]`
+      );
+      if (buttonElement) {
+        buttonElement.disabled = false;
+        buttonElement.textContent = 'Accepteren';
+      }
     }
   };
 

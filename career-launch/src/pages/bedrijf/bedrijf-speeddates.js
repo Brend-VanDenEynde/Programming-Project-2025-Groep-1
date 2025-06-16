@@ -3,34 +3,49 @@ import {
   createBedrijfNavbar,
   setupBedrijfNavbarEvents,
 } from '../../utils/bedrijf-navbar.js';
+import { fetchCompanySpeeddates } from '../../utils/data-api.js';
 
-export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
-  const speeddates = [
-    {
-      id: 1,
-      student: 'Emma Janssen',
-      datum: '2025-01-20',
-      tijd: '10:00',
-      lokaal: 'A201',
-      status: 'Bevestigd',
-    },
-    {
-      id: 2,
-      student: 'Lucas De Groot',
-      datum: '2025-01-20',
-      tijd: '10:30',
-      lokaal: 'A201',
-      status: 'In afwachting',
-    },
-    {
-      id: 3,
-      student: 'Sophie Willems',
-      datum: '2025-01-21',
-      tijd: '14:00',
-      lokaal: 'B103',
-      status: 'Bevestigd',
-    },
-  ];
+export async function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
+  // Show loading state
+  rootElement.innerHTML = `
+    ${createBedrijfNavbar('speeddates')}
+      <div class="content-header">
+        <h1>Speeddates Overzicht</h1>
+        <p>Bekijk en beheer al je geplande speeddates</p>
+      </div>
+      <div class="speeddates-content">
+        <div class="loading-state">
+          <p>Speeddates laden...</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  let speeddates = [];
+
+  try {
+    // Fetch speeddates from API
+    const apiSpeeddates = await fetchCompanySpeeddates();
+
+    // Transform API data to expected format
+    speeddates = apiSpeeddates.map((speeddate) => ({
+      id: speeddate.id,
+      student: `${speeddate.voornaam_student} ${speeddate.achternaam_student}`,
+      datum: new Date(speeddate.begin).toLocaleDateString('nl-NL'),
+      tijd: new Date(speeddate.begin).toLocaleTimeString('nl-NL', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      lokaal: speeddate.lokaal,
+      status: speeddate.akkoord ? 'Bevestigd' : 'In afwachting',
+      begin: speeddate.begin,
+      einde: speeddate.einde,
+    }));
+  } catch (error) {
+    console.error('Error fetching speeddates:', error);
+    // Fall back to empty array, will show "no speeddates" message
+    speeddates = [];
+  }
   function getStatusBadge(status) {
     if (status === 'Bevestigd') {
       return `<span class="status-badge badge-accepted">Bevestigd</span>`;
