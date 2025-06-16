@@ -217,3 +217,47 @@ export async function apiPatch(url, data = null, options = {}) {
 
   return await response.json();
 }
+
+/**
+ * Makes a non-authenticated POST request for public endpoints
+ * @param {string} url - The API endpoint URL
+ * @param {Object} data - The data to send in the request body
+ * @param {Object} options - Additional fetch options
+ * @returns {Promise<Object>} The JSON response data
+ */
+export async function publicApiPost(url, data = null, options = {}) {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+    body: data ? JSON.stringify(data) : null,
+    ...options,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(
+      `Public API POST error for ${url}:`,
+      response.status,
+      response.statusText,
+      errorText
+    );
+    throw new Error(
+      `API POST error: ${response.status} ${response.statusText}`
+    );
+  }
+
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    const responseText = await response.text();
+    console.error(
+      `Expected JSON but got ${contentType} for ${url}:`,
+      responseText
+    );
+    throw new Error(`Expected JSON response but got ${contentType}`);
+  }
+
+  return await response.json();
+}
