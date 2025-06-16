@@ -3,6 +3,9 @@ import { deleteUser } from '../../utils/data-api.js';
 
 // Main renderfunctie:
 export function showBedrijfSettingsPopup(onClose) {
+
+export function showSettingsPopup(onClose) {
+
   // Voeg popup-styles toe
   if (!document.getElementById('settings-popup-style')) {
     const style = document.createElement('style');
@@ -81,12 +84,34 @@ export function showBedrijfSettingsPopup(onClose) {
     logoutUser();
     window.location.reload();
   });
-  document
-    .getElementById('delete-account-btn')
-    .addEventListener('click', () => {
-      if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
-        deleteUser();
-        window.location.reload();
-      }
-    });
+
+
+  document.getElementById('delete-account-btn').addEventListener('click', () => {
+    if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
+      deleteUser();
+      window.location.reload();
+    }
+  });
 }
+
+function renderSidebar() {
+  const sidebarHtml = `
+    <nav class="company-profile-sidebar">
+      <ul>
+        <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
+        <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
+        <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
+        <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
+      </ul>
+    </nav>`;
+
+  const sidebarContainer = document.querySelector('.sidebar-container');
+  if (sidebarContainer) {
+    sidebarContainer.innerHTML = sidebarHtml;
+  }
+
+  setupNavigationLinks();
+}
+
+renderSidebar();
+

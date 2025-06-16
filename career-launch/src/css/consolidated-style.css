@@ -318,19 +318,20 @@ a:hover {
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  padding: 3rem 2.5rem 2.5rem 2.5rem;
+  padding: 2.5rem 2rem 2rem 2rem;
   margin: 2.5rem auto 0 auto;
-  max-width: 800px;
+  max-width: 600px;
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+  gap: 1.2rem;
 }
 
 /* Search fieldset styling - ontbrekend vanuit backup */
 .search-fieldset {
   border: none;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
   background: #f8f9fa;
   border-radius: 10px;
   padding: 1.2rem 1rem 1rem 1rem;
@@ -371,101 +372,53 @@ a:hover {
   background: #f6fffa;
 }
 
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 1.07rem;
+  background: #f3f6fa;
+  border-radius: 6px;
+  padding: 0.3em 0.8em 0.3em 0.5em;
+  margin-bottom: 0.2em;
+  cursor: pointer;
+  border: 1.5px solid #e1e5e9;
+  transition: border 0.15s, background 0.15s;
+}
+
+.checkbox-option input[type="checkbox"],
+.checkbox-option input[type="radio"] {
+  accent-color: #0077b5;
+  width: 1.1em;
+  height: 1.1em;
+  margin-right: 0.3em;
+}
+
+.student-profile-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.student-profile-buttons .student-profile-btn {
+  flex: 1 1 0;
+  min-width: 120px !important;
+}
+
 .criteria-form h1 {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 2rem;
   color: #0077b5;
   text-align: center;
-}
-
-.form-section {
-  width: 100%;
-  margin-bottom: 2rem;
-}
-
-.form-section h3 {
-  font-size: 1.3rem;
-  color: #0077b5;
-  margin-bottom: 1rem;
-  font-weight: 600;
-}
-
-.form-section label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #333;
-  font-size: 1.07rem;
-  letter-spacing: 0.01em;
-}
-
-.form-section select {
-  width: 100%;
-  padding: 12px 15px;
-  border: 2px solid #e1e5e9;
-  border-radius: 8px;
-  font-size: 1.07rem;
-  background: #f8f9fa;
-  color: #333;
-  margin-top: 2px;
-  outline: none;
-  transition: border 0.17s;
-}
-
-.form-section select:focus {
-  border-color: #00bcd4;
-  background: #fff;
-}
-
-.checkbox-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem 1.2rem;
-  margin-bottom: 0.5rem;
-}
-
-.checkbox-group label {
-  display: flex;
-  align-items: center;
-  font-weight: 400;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: background 0.2s;
-}
-
-.checkbox-group label:hover {
-  background: #f8f9fa;
-}
-
-.checkbox-group input[type='checkbox'] {
-  margin-right: 0.5rem;
-  width: 18px;
-  height: 18px;
-  accent-color: #00bcd4;
-}
-
-.add-btn {
-  display: inline-block;
-  background: #00bcd4;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  padding: 10px 20px;
-  cursor: pointer;
-  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-  min-width: 92px;
-  box-shadow: 0 2px 6px 0 rgba(44, 44, 44, 0.05);
-}
-
-.add-btn:hover,
-.add-btn:active {
-  background: #00acc1;
-  color: #fff;
-  box-shadow: 0 3px 16px 0 rgba(0, 188, 212, 0.13);
 }
 
 /* =============================================================================
@@ -688,6 +641,11 @@ a:hover {
   width: 100%;
 }
 
+.student-profile-buttons .student-profile-btn {
+  flex: 1 1 0;
+  min-width: 120px !important;
+}
+
 .student-profile-btn {
   background-color: grey !important;
   color: #fff !important;
@@ -872,6 +830,8 @@ a:hover {
   text-align: center;
   vertical-align: middle;
   letter-spacing: 0.01em;
+  user-select: none;
+  cursor: pointer;
 }
 
 .speeddates-table td {
@@ -2719,7 +2679,7 @@ body.darkmode .student-profile-footer a:hover {
 }
 
 .opleiding-select:focus {
-  outline: none;
+   outline: none;
   border-color: #004080;
 }
 
@@ -2760,6 +2720,19 @@ body.darkmode .student-profile-footer a:hover {
 /* =============================================================================
    13. UTILITIES EN HELPERS
    ========================================================================== */
+
+/* Badges voor functies */
+.functie-badge {
+  display: inline-block;
+  background: #e3f2fd;
+  color: #1976d2;
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.92em;
+
+  margin: 0 0.2rem 0.2rem 0;
+  font-weight: 500;
+}
 
 /* Speeddates Modal Styles */
 .speeddates-modal {
@@ -3046,6 +3019,291 @@ body.darkmode .btn-decline:hover {
 body.darkmode .status-final {
   color: #b0b6c6;
 }
+
+
+
+/* Bedrijf Profile Styles */
+.bedrijf-profile-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.bedrijf-profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 2rem;
+  background: #fff;
+  border-bottom: 1px solid #e1e5e9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.bedrijf-profile-header .logo-section {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.bedrijf-profile-header .logo-section img {
+  margin-right: 0.75rem;
+}
+
+.bedrijf-profile-burger {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.bedrijf-profile-burger:hover {
+  background: #f0f0f0;
+}
+
+.bedrijf-profile-dropdown {
+  position: absolute;
+  top: 4rem;
+  right: 2rem;
+  list-style: none;
+  padding: 0.5rem 0;
+  margin: 0;
+  border: 1px solid #e1e5e9;
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  z-index: 1000;
+  min-width: 160px;
+}
+
+.bedrijf-profile-dropdown li {
+  margin: 0;
+}
+
+.bedrijf-profile-dropdown button {
+  background: none;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  width: 100%;
+  text-align: left;
+  color: #333;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.bedrijf-profile-dropdown button:hover {
+  background: #f5f5f5;
+}
+
+.bedrijf-profile-main {
+  display: flex;
+  flex: 1;
+}
+
+.bedrijf-profile-sidebar {
+  width: 220px;
+  background: #fff;
+  border-right: 1px solid #e1e5e9;
+  padding: 0;
+}
+
+.bedrijf-profile-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bedrijf-profile-sidebar li {
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 0.5rem;
+}
+
+.bedrijf-profile-sidebar button {
+  background: none;
+  border: none;
+  padding: 1rem 2rem;
+  width: 100%;
+  text-align: left;
+  color: #333;
+  font-size: 1rem;
+  border-left: 4px solid transparent;
+  transition: background 0.2s, border-color 0.2s;
+  cursor: pointer;
+}
+
+.bedrijf-profile-sidebar button.active,
+.bedrijf-profile-sidebar button:hover {
+  background: #e1e5e9;
+  border-left: 4px solid #00bcd4;
+}
+
+.bedrijf-profile-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.bedrijf-profile-form-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 3rem 2.5rem 2.5rem 2.5rem;
+  margin: 2.5rem auto 0 auto;
+  max-width: 800px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bedrijf-profile-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #0077b5;
+  text-align: center;
+}
+
+.bedrijf-profile-avatar-section {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.bedrijf-profile-avatar {
+  object-fit: cover;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px #0001;
+  border: 3px solid #e1e5e9;
+  background: #fff;
+}
+
+.bedrijf-profile-form-group {
+  margin-bottom: 1.2rem;
+  width: 100%;
+}
+
+.bedrijf-profile-form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-size: 1.07rem;
+  letter-spacing: 0.01em;
+}
+
+.bedrijf-profile-form-group input[type='text'],
+.bedrijf-profile-form-group input[type='email'],
+.bedrijf-profile-form-group input[type='url'],
+.bedrijf-profile-form-group textarea {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1.07rem;
+  background: #f8f9fa;
+  color: #333;
+  margin-top: 2px;
+  outline: none;
+  transition: border 0.17s;
+  resize: none;
+}
+
+.bedrijf-profile-form-group input[type='text']:focus,
+.bedrijf-profile-form-group input[type='email']:focus,
+.bedrijf-profile-form-group input[type='url']:focus,
+.bedrijf-profile-form-group textarea:focus {
+  border-color: #00bcd4;
+  background: #fff;
+}
+
+.bedrijf-profile-form-group input:disabled,
+.bedrijf-profile-form-group textarea:disabled {
+  background: #f1f1f1;
+  color: #888;
+  cursor: not-allowed;
+}
+
+.bedrijf-profile-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.bedrijf-profile-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  min-width: 120px;
+  transition: all 0.2s ease;
+}
+
+.bedrijf-profile-btn-primary {
+  background-color: #00bcd4;
+  color: white;
+}
+
+.bedrijf-profile-btn-primary:hover {
+  background-color: #00acc1;
+  transform: translateY(-1px);
+}
+
+.bedrijf-profile-btn-secondary {
+  background-color: #f8f9fa;
+  color: #333;
+  border: 2px solid #e1e5e9;
+}
+
+.bedrijf-profile-btn-secondary:hover {
+  background-color: #e9ecef;
+  border-color: #d6dbdf;
+  transform: translateY(-1px);
+}
+
+.bedrijf-profile-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100vw;
+  background: #f5f6f7;
+  color: #7a7a7a;
+  border-top: 1px solid #e1e5e9;
+  text-align: center;
+  font-size: 0.95rem;
+  padding: 18px 0 14px 0;
+  margin: 0;
+  box-shadow: none;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  z-index: 100;
+}
+
+.bedrijf-profile-footer a {
+  color: #7a7a7a;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.bedrijf-profile-footer a:hover {
+  color: #009ca6;
+  text-decoration: underline;
+}
+
 
 /* =============================================================================
    12. BEDRIJF PROFIEL SYSTEEM
@@ -3447,3 +3705,4 @@ body.darkmode .content-header p {
 body.darkmode .no-requests {
   color: #b0b6c6;
 }
+

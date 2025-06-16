@@ -7,6 +7,7 @@ import { renderQRPopup } from './student-qr-popup.js';
 import { showSettingsPopup } from './student-settings.js';
 import { fetchStudentSpeeddateRequests } from '../../utils/data-api.js';
 
+
 export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
   // Initially show loading state
   let verzoeken = [];
@@ -122,7 +123,39 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
         </div>      `;
     document.getElementById('speeddates-requests-table').innerHTML = tableHtml;
   }
+// API helpers
+async function fetchPendingSpeeddates() {
+  const token = sessionStorage.getItem('authToken');
+  const resp = await fetch(`https://api.ehb-match.me/speeddates/pending`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`Fout bij ophalen: ${resp.status} – ${text}`);
+  }
+  return await resp.json();
+}
 
+async function acceptSpeeddate(id) {
+  const token = sessionStorage.getItem('authToken');
+  const resp = await fetch(`https://api.ehb-match.me/speeddates/accept/${id}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!resp.ok) throw new Error('Accepteren mislukt');
+}
+
+async function rejectSpeeddate(id) {
+  const token = sessionStorage.getItem('authToken');
+  const resp = await fetch(`https://api.ehb-match.me/speeddates/reject/${id}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!resp.ok) throw new Error('Weigeren mislukt');
+}
+
+
+export function renderSpeeddatesRequests(rootElement, studentData = {}) {
   rootElement.innerHTML = `
     <div class="student-profile-container">
       <header class="student-profile-header">
@@ -136,7 +169,6 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
           <li><button id="nav-logout">Log out</button></li>
         </ul>
       </header>
-
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
@@ -154,7 +186,6 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
             <div id="speeddates-requests-table"></div>        </div>
         </div>
       </div>
-
       <footer class="student-profile-footer">
         <div class="footer-content">
           <span>&copy; 2025 EhB Career Launch</span>
@@ -167,7 +198,114 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
     </div>
   `;
 
-  renderTable();
+  function getSortArrow(key) {
+    const found = currentSort.find(s => s.key === key);
+    if (!found) return '';
+    return found.asc ? ' ▲' : ' ▼';
+  }
+
+  let currentSort = [{ key: 'begin', asc: true }];
+
+  function renderTable(verzoeken) {
+    if (!verzoeken || verzoeken.length === 0) {
+      document.getElementById('speeddates-requests-table').innerHTML =
+        `<p style="text-align:center;">Nog geen speeddates-verzoeken gevonden.</p>`;
+      return;
+    }
+    // Sorteren (meerdere kolommen)
+    const sorted = [...verzoeken].sort((a, b) => {
+      for (const sort of currentSort) {
+        let aVal = a[sort.key];
+        let bVal = b[sort.key];
+        if (sort.key === 'begin') {
+          aVal = aVal ? new Date(aVal).getTime() : 0;
+          bVal = bVal ? new Date(bVal).getTime() : 0;
+        }
+        if (aVal < bVal) return sort.asc ? -1 : 1;
+        if (aVal > bVal) return sort.asc ? 1 : -1;
+      }
+      return 0;
+    });
+    const rows = sorted.map(v => `
+      <tr>
+        <td>${v.naam_bedrijf}</td>
+        <td>${v.lokaal || '-'}</td>
+        <td>${v.begin ? new Date(v.begin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}</td>
+        <td class="status-cell">
+          <button class="accept-btn" data-id="${v.id}">Accepteer</button>
+          <button class="deny-btn" data-id="${v.id}">Weiger</button>
+        </td>
+      </tr>
+    `).join('');
+    document.getElementById('speeddates-requests-table').innerHTML = `
+      <div class="speeddates-table-container">
+        <table class="speeddates-table">
+          <thead>
+            <tr>
+              <th class="sortable" data-key="naam_bedrijf">Bedrijf${getSortArrow('naam_bedrijf')}</th>
+              <th class="sortable" data-key="lokaal">Lokaal${getSortArrow('lokaal')}</th>
+              <th class="sortable" data-key="begin">Tijd${getSortArrow('begin')}</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    `;
+    document.querySelectorAll('.accept-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = e.currentTarget.dataset.id;
+        try {
+          await acceptSpeeddate(id);
+          const updated = await fetchPendingSpeeddates();
+          renderTable(updated);
+        } catch (err) {
+          alert('Fout bij accepteren: ' + err.message);
+        }
+      });
+    });
+    document.querySelectorAll('.deny-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = e.currentTarget.dataset.id;
+        try {
+          await rejectSpeeddate(id);
+          const updated = await fetchPendingSpeeddates();
+          renderTable(updated);
+        } catch (err) {
+          alert('Fout bij weigeren: ' + err.message);
+        }
+      });
+    });
+    // Sorteerbare kolommen (shift-klik = multi, gewone klik = enkel)
+    document.querySelectorAll('.sortable').forEach(th => {
+      th.addEventListener('mousedown', (e) => {
+        if (e.shiftKey) e.preventDefault(); // voorkomt selectie bij shift-klik
+      });
+      th.addEventListener('click', (e) => {
+        const key = th.dataset.key;
+        if (!e.shiftKey) {
+          currentSort = [{ key, asc: true }];
+        } else {
+          const existing = currentSort.find(s => s.key === key);
+          if (existing) {
+            existing.asc = !existing.asc;
+          } else {
+            currentSort.push({ key, asc: true });
+          }
+        }
+        // Herteken tabel met nieuwe sortering
+        renderTable(verzoeken);
+      });
+    });
+  }
+
+  fetchPendingSpeeddates()
+    .then(verzoeken => renderTable(verzoeken))
+    .catch(err => {
+      document.getElementById('speeddates-requests-table').innerHTML =
+        `<p style="color:red;">Fout: ${err.message}</p>`;
+    });
+
   // --- Sidebar navigatie uniform maken ---
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
     btn.addEventListener('click', (e) => {
