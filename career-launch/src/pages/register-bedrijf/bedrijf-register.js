@@ -87,7 +87,6 @@ export function renderBedrijfRegister(rootElement) {
       if (!response.ok) {
         console.error(`Failed to delete photo: ${response.status}`);
       }
-      console.log(response);
     });
     uploadedPhoto.alt = '⬆';
     uploadedPhoto.src = '';
