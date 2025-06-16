@@ -108,5 +108,33 @@ function renderSidebar() {
   // setupNavigationLinks(); // Dummy file: functie bestaat niet, dus niet aanroepen
 }
 
+function setupNavigationLinks(companyData = {}) {
+  document.querySelectorAll('.sidebar-link').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const route = btn.getAttribute('data-route');
+      switch (route) {
+        case 'profile':
+          import('./bedrijf-profiel.js').then((m) => m.renderBedrijfProfiel(document.getElementById('app'), companyData));
+          break;
+        case 'search':
+          import('./search-criteria-bedrijf.js').then((m) => m.renderSearchCriteriaBedrijf(document.getElementById('app'), companyData));
+          break;
+        case 'speeddates':
+          import('./bedrijf-speeddates.js').then((m) => m.renderBedrijfSpeeddates(document.getElementById('app'), companyData));
+          break;
+        case 'requests':
+          import('./bedrijf-speeddates-verzoeken.js').then((m) => m.renderBedrijfSpeeddatesRequests(document.getElementById('app'), companyData));
+          break;
+        case 'studenten':
+          import('./studenten.js').then((m) => m.renderStudenten(document.getElementById('app'), companyData));
+          break;
+        case 'qr':
+          import('./bedrijf-qr-popup.js').then((m) => m.renderBedrijfQRPopup(document.getElementById('app'), companyData));
+          break;
+      }
+    });
+  });
+}
+
 renderSidebar();
 
