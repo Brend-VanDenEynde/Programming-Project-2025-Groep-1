@@ -59,9 +59,7 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
 
   try {
     // Fetch speeddate requests from API
-    const apiRequests = await fetchStudentSpeeddateRequests();
-
-    // Transform API data to expected format
+    const apiRequests = await fetchStudentSpeeddateRequests(); // Transform API data to expected format
     verzoeken = apiRequests.map((request) => ({
       bedrijf: request.naam_bedrijf,
       lokaal: request.lokaal,
@@ -69,7 +67,12 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
         hour: '2-digit',
         minute: '2-digit',
       }),
-      status: request.akkoord ? 'Geaccepteerd' : 'In afwachting',
+      status:
+        request.akkoord === true
+          ? 'Geaccepteerd'
+          : request.akkoord === false
+          ? 'Geweigerd'
+          : 'In afwachting',
       id: request.id,
       datum: new Date(request.begin).toLocaleDateString('nl-NL'),
     }));

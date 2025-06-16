@@ -174,6 +174,22 @@ export async function acceptSpeeddateRequest(speeddateId) {
 }
 
 /**
+ * Reject a speeddate request
+ * @param {number} speeddateId - The speeddate ID to reject
+ * @returns {Promise<Object>} The rejected speeddate data
+ */
+export async function rejectSpeeddateRequest(speeddateId) {
+  try {
+    const response = await apiPost(
+      `https://api.ehb-match.me/speeddates/reject/${speeddateId}`
+    );
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
  * Fetch confirmed speeddates for a company
  * @param {number} companyId - Optional company ID to fetch speeddates for. If omitted, uses the authenticated user.
  * @returns {Promise<Array>} Array of confirmed speeddate data
@@ -217,8 +233,8 @@ export async function fetchStudentSpeeddates(studentId = null) {
 export async function fetchStudentSpeeddateRequests(studentId = null) {
   try {
     const url = studentId
-      ? `https://api.ehb-match.me/speeddates/requests/student?id=${studentId}`
-      : 'https://api.ehb-match.me/speeddates/requests/student';
+      ? `https://api.ehb-match.me/speeddates/student/requests?id=${studentId}`
+      : 'https://api.ehb-match.me/speeddates/student/requests';
 
     const requests = await apiGet(url);
     return requests;

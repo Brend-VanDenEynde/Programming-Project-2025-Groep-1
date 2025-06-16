@@ -6,6 +6,7 @@ import {
 import {
   fetchPendingSpeeddates,
   acceptSpeeddateRequest,
+  rejectSpeeddateRequest,
 } from '../../utils/data-api.js';
 
 export async function renderBedrijfSpeeddatesVerzoeken(
@@ -29,9 +30,7 @@ export async function renderBedrijfSpeeddatesVerzoeken(
 
   try {
     // Fetch pending speeddate requests from API
-    const apiVerzoeken = await fetchPendingSpeeddates();
-
-    // Transform API data to match expected format
+    const apiVerzoeken = await fetchPendingSpeeddates(); // Transform API data to match expected format
     const verzoeken = apiVerzoeken.map((request) => ({
       id: request.id,
       student: `${request.voornaam_student} ${request.achternaam_student}`,
@@ -45,7 +44,12 @@ export async function renderBedrijfSpeeddatesVerzoeken(
       datum: new Date(request.begin).toLocaleDateString('nl-NL'),
       begin: request.begin,
       einde: request.einde,
-      status: request.akkoord ? 'Geaccepteerd' : 'In afwachting',
+      status:
+        request.akkoord === true
+          ? 'Geaccepteerd'
+          : request.akkoord === false
+          ? 'Geweigerd'
+          : 'In afwachting',
       akkoord: request.akkoord,
     }));
 
@@ -174,19 +178,39 @@ function renderPageContent(rootElement, verzoeken, companyData) {
       }
     }
   };
-
   window.declineRequest = async (requestId, studentName) => {
     try {
-      // TODO: Implement API call to decline speeddate request
-      // const result = await declineSpeeddateRequest(requestId);
+      // Show loading state
+      const buttonElement = document.querySelector(
+        `[onclick="declineRequest(${requestId}, '${studentName}')"]`
+      );
+      if (buttonElement) {
+        buttonElement.disabled = true;
+        buttonElement.textContent = 'Weigeren...';
+      }
 
-      alert(`Speeddate verzoek van ${studentName} geweigerd.`);
+      // Call API to reject speeddate request
+      const result = await rejectSpeeddateRequest(requestId);
+
+      // Show success message
+      alert(
+        `Speeddate verzoek van ${studentName} geweigerd.\n\nHet verzoek is afgewezen en de student is hiervan op de hoogte gesteld.`
+      );
 
       // Refresh the page to show updated data
       await renderBedrijfSpeeddatesVerzoeken(rootElement, companyData);
     } catch (error) {
       console.error('Error declining request:', error);
       alert('Er is een fout opgetreden bij het weigeren van het verzoek.');
+
+      // Re-enable button on error
+      const buttonElement = document.querySelector(
+        `[onclick="declineRequest(${requestId}, '${studentName}')"]`
+      );
+      if (buttonElement) {
+        buttonElement.disabled = false;
+        buttonElement.textContent = 'Weigeren';
+      }
     }
   };
 }
