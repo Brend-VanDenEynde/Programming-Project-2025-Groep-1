@@ -246,6 +246,7 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
       const route = btn.getAttribute('data-route');
       if (route === 'speeddates') {
         import('./bedrijf-speeddates.js').then((module) => {
+          const bedrijfData = JSON.parse(sessionStorage.getItem('companyData')) || {};
           module.renderBedrijfSpeeddates(document.getElementById('app'), bedrijfData);
         });
       }
