@@ -2,8 +2,6 @@ import { logoutUser } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
 
 // Main renderfunctie:
-export function showBedrijfSettingsPopup(onClose) {
-
 export function showSettingsPopup(onClose) {
 
   // Voeg popup-styles toe
