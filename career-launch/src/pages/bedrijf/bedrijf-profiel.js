@@ -90,7 +90,7 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="bedrijven" class="sidebar-link">Bedrijven</button></li>
+            <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
             <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
           </ul>
         </nav>
@@ -267,7 +267,7 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
             m.renderBedrijfSpeeddatesRequests(document.getElementById('app'), bedrijfData)
           );
           break;
-        case 'bedrijven':
+        case 'studenten':
           import('./studenten.js').then((m) =>
             m.renderStudenten(document.getElementById('app'), bedrijfData)
           );
@@ -284,11 +284,13 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
 
 function renderSidebar() {
   const sidebarHtml = `
-    <nav class="company-profile-sidebar">
+    <nav class="bedrijf-profile-sidebar">
       <ul>
         <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
+        <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
         <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
         <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
+        <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
         <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
       </ul>
     </nav>`;
@@ -298,7 +300,42 @@ function renderSidebar() {
     sidebarContainer.innerHTML = sidebarHtml;
   }
 
-  setupNavigationLinks();
+  // Voeg dezelfde navigatie toe als in renderBedrijfProfiel
+  document.querySelectorAll('.sidebar-link').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const route = btn.getAttribute('data-route');
+      switch (route) {
+        case 'profile':
+          renderBedrijfProfiel(document.getElementById('app'), {});
+          break;
+        case 'search':
+          import('./search-criteria-bedrijf.js').then((m) =>
+            m.renderSearchCriteriaBedrijf(document.getElementById('app'), {})
+          );
+          break;
+        case 'speeddates':
+          import('./bedrijf-speeddates.js').then((m) =>
+            m.renderBedrijfSpeeddates(document.getElementById('app'), {})
+          );
+          break;
+        case 'requests':
+          import('./bedrijf-speeddates-verzoeken.js').then((m) =>
+            m.renderBedrijfSpeeddatesRequests(document.getElementById('app'), {})
+          );
+          break;
+        case 'studenten':
+          import('./studenten.js').then((m) =>
+            m.renderStudenten(document.getElementById('app'), {})
+          );
+          break;
+        case 'qr':
+          import('./bedrijf-qr-popup.js').then((m) =>
+            m.renderBedrijfQRPopup(document.getElementById('app'), {})
+          );
+          break;
+      }
+    });
+  });
 }
 
 renderSidebar();

@@ -1,7 +1,7 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import defaultAvatar from '../../images/default.png';
 
-export function renderQRPopup(rootElement, companyData = {}) {
+export function renderBedrijfQRPopup(rootElement, companyData = {}) {
   rootElement.innerHTML = `
     <div class="company-profile-container">
       <header class="company-profile-header">
@@ -60,6 +60,28 @@ function renderSidebar() {
   }
 
   setupNavigationLinks();
+}
+
+function setupNavigationLinks(companyData = {}) {
+  document.querySelectorAll('.sidebar-link').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const route = btn.getAttribute('data-route');
+      switch (route) {
+        case 'profile':
+          import('./bedrijf-profiel.js').then((m) => m.renderBedrijfProfiel(document.getElementById('app'), companyData));
+          break;
+        case 'speeddates':
+          import('./bedrijf-speeddates.js').then((m) => m.renderBedrijfSpeeddates(document.getElementById('app'), companyData));
+          break;
+        case 'requests':
+          import('./bedrijf-speeddates-verzoeken.js').then((m) => m.renderBedrijfSpeeddatesRequests(document.getElementById('app'), companyData));
+          break;
+        case 'qr':
+          // Already on QR page, do nothing
+          break;
+      }
+    });
+  });
 }
 
 renderSidebar();

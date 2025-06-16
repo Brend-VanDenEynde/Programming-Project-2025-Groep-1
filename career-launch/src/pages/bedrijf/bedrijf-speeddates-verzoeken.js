@@ -1,6 +1,6 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 
-export function renderSpeeddatesRequests(rootElement, companyData = {}) {
+export function renderBedrijfSpeeddatesRequests(rootElement, companyData = {}) {
   let verzoeken = [
     {
       student: 'John Doe',
