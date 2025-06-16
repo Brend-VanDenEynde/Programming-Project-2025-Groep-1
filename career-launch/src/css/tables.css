@@ -5,7 +5,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   padding: 3rem 2.5rem 2.5rem 2.5rem;
   margin: 2.5rem auto 0 auto;
-  max-width: 800px;
+  max-width: 1000px; /* was 800px */
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -22,6 +22,7 @@
 
 .speeddates-table {
   width: 100%;
+  min-width: 700px; /* added for more width */
   border-collapse: collapse;
   margin-top: 1rem;
   background: #fff;
@@ -33,15 +34,31 @@
 .speeddates-table th {
   background: #0077b5;
   color: #fff;
-  padding: 16px 12px;
+  padding: 18px 18px; /* was 16px 12px */
   text-align: left;
   font-weight: 600;
   font-size: 1rem;
   letter-spacing: 0.02em;
+  position: relative;
+}
+
+.speeddates-table th .sort-arrow {
+  display: inline-block;
+  width: 1.2em;
+  text-align: center;
+  font-size: 1em;
+  vertical-align: middle;
+  margin-left: 0.2em;
+}
+
+.speeddates-table th .sort-arrow:empty {
+  display: inline-block;
+  width: 1.2em;
+  visibility: hidden;
 }
 
 .speeddates-table td {
-  padding: 16px 12px;
+  padding: 18px 18px; /* was 16px 12px */
   border-bottom: 1px solid #f0f0f0;
   font-size: 0.95rem;
   color: #333;

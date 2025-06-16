@@ -45,20 +45,9 @@ export function renderQRPopup(rootElement, studentData = {}) {
       </div>
       
       <footer class="student-profile-footer">
-        <div class="footer-content">
-          <span>&copy; 2025 EhB Career Launch</span>
-          <div class="footer-links">
-            <a href="/privacy" data-route="/privacy">Privacy</a>
-            <a href="/contact" data-route="/contact">Contact</a>
-          </div>
-        </div>
+        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
       </footer>
-      
-      <div id="qr-modal" class="qr-modal" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;">
-        <div id="qr-modal-content" style="position:relative;background:#fff;padding:2rem;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.3);display:flex;flex-direction:column;align-items:center;">
-          <img src="${defaultAvatar}" alt="QR code groot" style="width:300px;height:300px;object-fit:contain;" id="qr-modal-img">
-        </div>
-      </div>
     </div>
   `;
 

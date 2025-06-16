@@ -102,8 +102,10 @@ async function fetchSpeeddatesWithStatus(rootElement, status = null, studentId =
 }
 
 export async function renderSpeeddates(rootElement, studentData = {}) {
-  // Altijd resetten naar alleen tijd bij initialisatie
-  currentSort = [{ key: 'begin', asc: true }];
+  // Sorteervolgorde behouden als er al gesorteerd is, anders default op tijd
+  if (!currentSort || !Array.isArray(currentSort) || currentSort.length === 0) {
+    currentSort = [{ key: 'begin', asc: true }];
+  }
   let speeddates = [];
   try {
     speeddates = await fetchSpeeddates(rootElement);
@@ -142,6 +144,7 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     speeddates = [];
   }
   // Sorteren (meerdere kolommen)
+  const collator = new Intl.Collator('nl', { sensitivity: 'base' });
   const sorted = [...speeddates].sort((a, b) => {
     for (const sort of currentSort) {
       let aVal = a[sort.key];
@@ -152,6 +155,9 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       } else if (sort.key === 'naam_bedrijf' || sort.key === 'lokaal') {
         aVal = (aVal || '').toLowerCase();
         bVal = (bVal || '').toLowerCase();
+        const cmp = collator.compare(aVal, bVal);
+        if (cmp !== 0) return sort.asc ? cmp : -cmp;
+        continue;
       }
       if (aVal < bVal) return sort.asc ? -1 : 1;
       if (aVal > bVal) return sort.asc ? 1 : -1;
@@ -231,15 +237,6 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
           </div>        </div>
       </div>
       <footer class="student-profile-footer">
-        <div class="footer-content">
-          <span>&copy; 2025 EhB Career Launch</span>
-          <div class="footer-links">
-            <a href="/privacy" data-route="/privacy">Privacy</a>
-            <a href="/contact" data-route="/contact">Contact</a>
-          </div>
-        </div>
-      </div>
-      <footer class="student-profile-footer">
         <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
         <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
       </footer>
@@ -249,14 +246,21 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
   // Sorteerbare kolommen (shift-klik = multi, gewone klik = enkel)
   document.querySelectorAll('.sortable').forEach(th => {
     th.addEventListener('mousedown', (e) => {
-      if (e.shiftKey) e.preventDefault();
+      if (e.shiftKey) e.preventDefault(); // geen text-select bij shift
     });
     th.addEventListener('click', (e) => {
       const key = th.dataset.key;
       const found = currentSort.find(s => s.key === key);
       if (!e.shiftKey) {
-        currentSort = [found ? { key, asc: !found.asc } : { key, asc: true }];
+        // Gewoon klik: alleen deze kolom (toggle asc/desc)
+        if (found) {
+          found.asc = !found.asc;
+          currentSort = [found];
+        } else {
+          currentSort = [{ key, asc: true }];
+        }
       } else {
+        // Shift+klik: multi-level toevoegen/toggles
         if (found) {
           found.asc = !found.asc;
         } else {
