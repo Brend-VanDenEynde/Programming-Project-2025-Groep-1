@@ -151,9 +151,7 @@ async function handleLogin(event, rootElement) {
     if (user.type === 2) {
       window.sessionStorage.setItem('userType', 'student');
 
-
       await fetchAndStoreStudentProfile();
-
       Router.navigate('/student/student-profiel');
     } else if (user.type === 3) {
       // Controleer of id aanwezig is en geldig is

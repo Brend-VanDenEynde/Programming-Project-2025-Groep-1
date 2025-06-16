@@ -1,12 +1,17 @@
 // src/views/bedrijf-profiel.js
 
 import defaultAvatar from '../../images/defaultlogo.webp';
-import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
 import '../../css/consolidated-style.css';
 import { setupNavigationLinks } from './bedrijf-speeddates.js';
+
+import {
+  createBedrijfNavbar,
+  setupBedrijfNavbarEvents,
+} from '../../utils/bedrijf-navbar.js';
+
 
 export async function fetchAndRenderBedrijfProfiel(rootElement, bedrijfId) {
   const token = sessionStorage.getItem('authToken');
@@ -16,12 +21,17 @@ export async function fetchAndRenderBedrijfProfiel(rootElement, bedrijfId) {
   }
 
   try {
-    const response = await fetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
+
+    const response = await fetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -53,7 +63,12 @@ const defaultProfile = {
   description: '',
 };
 
-export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode = true) {
+export function renderBedrijfProfiel(
+  rootElement,
+  bedrijfData = {},
+  readonlyMode = true
+) {
+
   if (!bedrijfData || Object.keys(bedrijfData).length === 0) {
     try {
       const stored = window.sessionStorage.getItem('companyData');
@@ -69,8 +84,9 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
     plaats = '',
 
   } = bedrijfData;
-
   rootElement.innerHTML = `
+    ${createBedrijfNavbar('profile')}
+
     <div class="bedrijf-profile-container">
       <header class="bedrijf-profile-header">
         <div class="logo-section">
@@ -95,6 +111,7 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
           </ul>
         </nav>
         <div class="bedrijf-profile-content">
+
           <div class="bedrijf-profile-form-container">
             <h1 class="bedrijf-profile-title">Profiel</h1>
             <form id="profileForm" class="bedrijf-profile-form" autocomplete="off" enctype="multipart/form-data">
@@ -105,23 +122,34 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
                   id="avatar-preview"
                   class="bedrijf-profile-avatar"
                 />
-                <input type="file" accept="image/*" id="photoInput" style="display:${readonlyMode ? 'none' : 'block'};margin-top:10px;">
+                <input type="file" accept="image/*" id="photoInput" style="display:${
+                  readonlyMode ? 'none' : 'block'
+                };margin-top:10px;">
               </div>
               <div class="bedrijf-profile-form-group">
                 <label for="nameInput">Bedrijfsnaam</label>
-                <input type="text" id="nameInput" value="${naam}" placeholder="Bedrijfsnaam" required ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="nameInput" value="${naam}" placeholder="Bedrijfsnaam" required ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="bedrijf-profile-form-group">
                 <label for="emailInput">E-mailadres</label>
-                <input type="email" id="emailInput" value="${contact_email}" placeholder="E-mailadres" required ${readonlyMode ? 'disabled' : ''}>
+                <input type="email" id="emailInput" value="${contact_email}" placeholder="E-mailadres" required ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="bedrijf-profile-form-group">
                 <label for="descriptionInput">Plaats</label>
-                <input type="text" id="descriptionInput" value="${plaats}" placeholder="Plaats" ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="descriptionInput" value="${plaats}" placeholder="Plaats" ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="bedrijf-profile-form-group">
                 <label for="linkedinInput">LinkedIn-link</label>
-                <input type="url" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/company/..." ${readonlyMode ? 'disabled' : ''}>
+                <input type="url" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/company/..." ${
+    readonlyMode ? 'disabled' : ''
+  }>
+
               </div>
               <div class="bedrijf-profile-buttons">
                 ${
@@ -129,18 +157,163 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
                     ? `<button id="btn-edit-profile" type="button" class="bedrijf-profile-btn bedrijf-profile-btn-secondary">EDIT</button>`
                     : `<button id="btn-save-profile" type="submit" class="bedrijf-profile-btn bedrijf-profile-btn-primary">SAVE</button>
                        <button id="btn-reset-profile" type="button" class="bedrijf-profile-btn bedrijf-profile-btn-secondary">RESET</button>`
-                }
-              </div>
+
+                }              </div>
             </form>
-          </div>
-        </div>
+          </div>        </div>
       </div>
+
       <footer class="bedrijf-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+        <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
+
       </footer>
     </div>
   `;
+
+  // Setup navbar events
+  setupBedrijfNavbarEvents();
+
+  const form = document.getElementById('profileForm');
+  if (form) {
+    const editBtn = document.getElementById('btn-edit-profile');
+    if (editBtn) {
+      editBtn.addEventListener('click', () => {
+        renderBedrijfProfiel(rootElement, bedrijfData, false);
+      });
+    }
+
+    const saveBtn = document.getElementById('btn-save-profile');
+    if (saveBtn) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const updatedData = {
+          naam: document.getElementById('nameInput').value,
+          contact_email: document.getElementById('emailInput').value,
+          plaats: document.getElementById('descriptionInput').value,
+          linkedin: document.getElementById('linkedinInput').value,
+          profiel_foto:
+            document.getElementById('photoInput').files[0]?.name ||
+            bedrijfData.profiel_foto,
+        };
+
+        try {
+          const token = sessionStorage.getItem('authToken');
+          const bedrijfId = bedrijfData.id || bedrijfData.gebruiker_id;
+
+          const response = await fetch(
+            `https://api.ehb-match.me/bedrijven/${bedrijfId}`,
+            {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(updatedData),
+            }
+          );
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Fout bij opslaan: ${errorText}`);
+          }
+
+          const result = await response.json();
+          alert('Profiel succesvol opgeslagen!');
+          renderBedrijfProfiel(rootElement, result, true);
+        } catch (error) {
+          alert(`Er is een fout opgetreden: ${error.message}`);
+        }
+      });
+    }
+
+    const resetBtn = document.getElementById('btn-reset-profile');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        renderBedrijfProfiel(rootElement, bedrijfData, false);
+      });
+    }
+  } else {
+    console.error('Formulier niet gevonden in de DOM.');
+  }
+
+  // Remaining form-specific setup
+  const photoInput = document.getElementById('photoInput');
+  const avatarPreview = document.getElementById('avatar-preview');
+
+  if (photoInput && avatarPreview) {
+    photoInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          avatarPreview.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+}
+
+function renderSidebar() {
+  const sidebarHtml = `
+    <nav class="company-profile-sidebar">
+      <ul>
+        <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
+        <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
+        <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
+        <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
+      </ul>
+    </nav>`;
+
+  const sidebarContainer = document.querySelector('.sidebar-container');
+  if (sidebarContainer) {
+    sidebarContainer.innerHTML = sidebarHtml;
+  }
+
+  setupNavigationLinks();
+}
+
+renderSidebar();
+
+// Testaanroep om het juiste bedrijfId dynamisch op te halen
+window.addEventListener('DOMContentLoaded', () => {
+  const rootElement = document.getElementById('app'); // Zorg ervoor dat er een element met id 'app' bestaat
+
+  try {
+    const storedCompanyData = sessionStorage.getItem('companyData');
+
+    if (!storedCompanyData) {
+      console.error(
+        'Geen bedrijfgegevens gevonden in sessionStorage. Controleer of de data correct wordt opgeslagen.'
+      );
+      return;
+    }
+
+    const companyData = JSON.parse(storedCompanyData);
+
+    const bedrijfId = companyData.gebruiker_id || companyData.id; // Controleer alternatieve velden
+
+    if (!bedrijfId) {
+      console.error(
+        'Geen geldig bedrijfId gevonden in de opgeslagen gegevens. Controleer de structuur van companyData:',
+        companyData
+      );
+      return;
+    }
+
+    if (rootElement) {
+      fetchAndRenderBedrijfProfiel(rootElement, bedrijfId);
+    } else {
+      console.error(
+        'Root element met id "app" niet gevonden. Controleer of de HTML correct is geladen.'
+      );
+    }
+  } catch (error) {
+    console.error(
+      'Fout bij het ophalen van bedrijfgegevens uit sessionStorage:',
+      error
+    );
 
   const form = document.getElementById('profileForm');
   if (form) {
@@ -304,5 +477,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   } catch (error) {
     console.error('Fout bij het ophalen van bedrijfgegevens uit sessionStorage:', error);
+
   }
 });

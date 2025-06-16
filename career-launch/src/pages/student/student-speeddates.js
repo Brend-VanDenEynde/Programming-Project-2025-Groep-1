@@ -6,6 +6,8 @@ import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { renderQRPopup } from './student-qr-popup.js';
 import { showSettingsPopup } from './student-settings.js';
+import { fetchStudentSpeeddates } from '../../utils/data-api.js';
+
 
 // Nieuw: API fetch
 async function fetchSpeeddates(filter = null) {
@@ -22,6 +24,7 @@ async function fetchSpeeddates(filter = null) {
   if (!resp.ok) {
     const txt = await resp.text();
     throw new Error(`Kon speeddates niet ophalen: ${resp.status} – ${txt}`);
+
   }
   return await resp.json(); // array met speeddate-objecten
 }
@@ -89,6 +92,7 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     )
     .join('');
 
+  // Now render the complete page with the fetched data
   rootElement.innerHTML = `
     <div class="student-profile-container">
       <header class="student-profile-header">
@@ -146,13 +150,17 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
                   `
               }
             </div>
-          </div>
-        </div>
+          </div>        </div>
       </div>
 
       <footer class="student-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+        <div class="footer-content">
+          <span>&copy; 2025 EhB Career Launch</span>
+          <div class="footer-links">
+            <a href="/privacy" data-route="/privacy">Privacy</a>
+            <a href="/contact" data-route="/contact">Contact</a>
+          </div>
+        </div>
       </footer>
     </div>
   `;
