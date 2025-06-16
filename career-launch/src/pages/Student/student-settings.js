@@ -1,4 +1,5 @@
-// Verwijder ongeldige import en alle t()/setLanguage() functies
+import { logoutUser } from '../../utils/auth-api.js';
+import { deleteUser } from '../../utils/data-api.js';
 
 // Main renderfunctie:
 export function showSettingsPopup(onClose) {
@@ -38,7 +39,7 @@ export function showSettingsPopup(onClose) {
       .settings-action-btn:hover { filter: brightness(1.07) drop-shadow(0 0 12px #3dd68625); color: #fff; }
       .settings-action-btn.logout:hover { background: linear-gradient(90deg, #cfd7ea 0%, #e4eafd 100%);}
       .settings-action-btn.delete:hover { background: linear-gradient(90deg, #fd7855 0%, #fa626a 100%);}
-      @keyframes popupIn { 0% { transform: scale(0.85) translateY(40px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+      @keyframes popupIn { 0% { transform: scale(0.85) translateY(40px); } 100% { transform: scale(1) translateY(0); } }
       @media (max-width: 600px) { .settings-popup-card {padding:8px 2vw;} .settings-title {font-size:1.19rem;} }
       body.darkmode, .darkmode .settings-popup-card { background: #232846 !important; color: #f3f6fa; }
     `;
@@ -67,7 +68,9 @@ export function showSettingsPopup(onClose) {
         <label style="display:flex;align-items:center;gap:16px;">
           <span style="font-size:1.22em;">🌞</span>
           <span class="switch">
-            <input id="toggle-darkmode" type="checkbox" ${dark ? 'checked' : ''}/>
+            <input id="toggle-darkmode" type="checkbox" ${
+              dark ? 'checked' : ''
+            }/>
             <span class="slider"></span>
           </span>
           <span style="font-size:1.22em;">🌙</span>
@@ -94,24 +97,68 @@ export function showSettingsPopup(onClose) {
   };
 
   // Darkmode toggle
-  document.getElementById('toggle-darkmode').addEventListener('change', e => {
+  document.getElementById('toggle-darkmode').addEventListener('change', (e) => {
     localStorage.setItem('darkmode', e.target.checked);
     document.body.classList.toggle('darkmode', e.target.checked);
   });
-
   // Delete account
-  document.getElementById('btn-delete-account').addEventListener('click', () => {
-    if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
-      localStorage.clear();
-      window.location.reload();
-    }
-  });
+  document
+    .getElementById('btn-delete-account')
+    .addEventListener('click', async () => {
+      if (
+        confirm(
+          'Weet je zeker dat je je account wilt verwijderen? Deze actie kan niet ongedaan gemaakt worden.'
+        )
+      ) {
+        try {
+          // Get current user data to access user ID
+          const userData = JSON.parse(
+            window.sessionStorage.getItem('studentData')
+          );
+          const userId = userData?.userId || userData?.id;
+
+          if (!userId) {
+            alert(
+              'Kan gebruiker ID niet vinden. Probeer opnieuw in te loggen.'
+            );
+            return;
+          }
+
+          // Call delete API
+          await deleteUser(userId);
+
+          // Clear session data
+          window.sessionStorage.clear();
+          localStorage.clear();
+
+          alert('Je account is succesvol verwijderd.');
+
+          // Navigate to home page
+          window.location.href = '/';
+        } catch (error) {
+          console.error('Error deleting account:', error);
+
+          // Handle different error types
+          if (error.message.includes('403')) {
+            alert('Je hebt geen toestemming om dit account te verwijderen.');
+          } else if (error.message.includes('404')) {
+            alert('Account niet gevonden.');
+          } else {
+            alert(
+              'Er is een fout opgetreden bij het verwijderen van je account. Probeer het opnieuw.'
+            );
+          }
+        }
+      }
+    });
 
   // Logout
-  document.getElementById('btn-logout').addEventListener('click', () => {
-    localStorage.removeItem('user');
-    window.location.reload();
+  document.getElementById('btn-logout').onclick = null;
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    const response = await logoutUser();
+    console.log('Logout API response:', response);
+    window.sessionStorage.clear();
+    localStorage.clear();
+    window.location.href = '/';
   });
 }
-
-

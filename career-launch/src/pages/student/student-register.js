@@ -1,6 +1,6 @@
 import { renderStudentOpleiding } from './student-opleiding.js';
-import './student-register.css';
-import Router from '../router.js';
+import '../../css/consolidated-style.css';
+import Router from '../../router.js';
 
 export function renderStudentRegister(rootElement) {
   rootElement.innerHTML = `
@@ -24,49 +24,49 @@ export function renderStudentRegister(rootElement) {
         <button type="submit" class="next-button">Volgende →</button>
       </form>
 
-      
     </main>
 
     <footer class="footer">
-      <a href="#" id="privacy-link">Privacy Policy</a> | <a href="#" id="contact-link">Contacteer Ons</a>
+      <div class="footer-content">
+        <span>&copy; 2025 EhB Career Launch</span>
+        <div class="footer-links">
+          <a href="/privacy" data-route="/privacy">Privacy</a>
+          <a href="/contact" data-route="/contact">Contact</a>
+        </div>
+      </div>
     </footer>
   </div>
   `;
 
-  
-
   const form = document.getElementById('naamForm');
   form.addEventListener('submit', handleNaamRegister);
 
-  document.getElementById('back-button').addEventListener('click', () => {
-    Router.navigate('/registreer');
-  });
-
-  // Footer links
-  const privacyLink = document.getElementById('privacy-link');
-  privacyLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Privacy Policy pagina nog niet geïmplementeerd');
-  });
-
-  const contactLink = document.getElementById('contact-link');
-  contactLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Contact pagina nog niet geïmplementeerd');
-  });
+  const backBtn = document.getElementById('back-button');
+  if (backBtn) {
+    backBtn.onclick = null;
+    backBtn.addEventListener('click', () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        Router.navigate('/registreer');
+      }
+    });
+  }
 }
 
 function handleNaamRegister(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
+  const linkedinInput = formData.get('linkedin');
   const data = {
     voornaam: formData.get('voornaam'),
     achternaam: formData.get('achternaam'),
-    linkedinLink: formData.get('linkedin'),
+    linkedinLink:
+      linkedinInput && linkedinInput.trim() !== ''
+        ? linkedinInput
+        : 'https://www.linkedin.com/',
   };
-
-  
 
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);

@@ -61,13 +61,6 @@ function formatTime(dtString) {
   return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
-// Utility om correcte foto-URL te krijgen
-function getProfielFotoUrl(profiel_foto) {
-  if (!profiel_foto || profiel_foto === 'null') return '/src/Images/default.jpg';
-  if (profiel_foto.startsWith('http')) return profiel_foto;
-  return 'https://gt0kk4fbet.ufs.sh/f/' + profiel_foto;
-}
-
 // export function renderSpeeddatesRequests(rootElement, studentData = {}) {
 export function renderSpeeddatesRequests(rootElement, studentData = {}) {
   let currentSort = [{ key: 'begin', asc: true }];

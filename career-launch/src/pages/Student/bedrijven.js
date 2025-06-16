@@ -1,85 +1,74 @@
-import logoIcon from '../../Icons/favicon-32x32.png';
-import { renderStudentProfiel } from './student-profiel.js';
-import { renderSearchCriteriaStudent } from './search-criteria-student.js';
-import { renderSpeeddates } from './student-speeddates.js';
-import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
-import { renderQRPopup } from './student-qr-popup.js';
+import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
+import { fetchCompanies } from '../../utils/data-api.js';
+import defaultBedrijfLogo from '../../images/defaultlogo.webp';
+import {
+  getFavoriteCompanies,
+  addFavoriteCompany,
+  removeFavoriteCompany,
+  isCompanyFavorite,
+  toggleFavoriteCompany,
+  filterFavoriteCompanies,
+} from '../../utils/favorites-storage.js';
+import { fetchAndStoreStudentProfile } from '../../utils/fetch-student-profile.js';
 
-// Belgische bedrijven met locatie, werkdomein en bedrijfslogo's (PNG/JPG/SVG direct van bedrijven of Wikipedia)
-const bedrijven = [
-  {
-    naam: 'Proximus',
-    linkedin: 'https://www.linkedin.com/company/proximus',
-    bio: 'Proximus is een toonaangevende Belgische telecomoperator en ICT-provider.',
-    foto: 'https://www.proximus.com/dam/jcr:8e2e5c1e-7f8c-4e2f-8e5e-6b7e7b7e7b7e/proximus-logo.png', // PNG logo
-    locatie: 'Brussel, België',
-    werkdomein: 'Telecom, ICT'
-  },
-  {
-    naam: 'Colruyt Group',
-    linkedin: 'https://www.linkedin.com/company/colruyt-group',
-    bio: 'Colruyt Group is een Belgische retailgroep actief in voeding, energie en meer.',
-    foto: 'https://www.colruytgroup.com/sites/default/files/styles/og_image/public/2021-03/colruytgroup-logo.png', // PNG logo
-    locatie: 'Halle, België',
-    werkdomein: 'Retail, Energie'
-  },
-  {
-    naam: 'Barco',
-    linkedin: 'https://www.linkedin.com/company/barco',
-    bio: 'Barco is een Belgisch technologiebedrijf gespecialiseerd in visualisatie en displayoplossingen.',
-    foto: 'https://www.barco.com/content/dam/barco/global/logos/barco-logo.png', // PNG logo
-    locatie: 'Kortrijk, België',
-    werkdomein: 'Technologie, Visualisatie'
-  },
-  {
-    naam: 'UCB',
-    linkedin: 'https://www.linkedin.com/company/ucb-pharma',
-    bio: 'UCB is een Belgisch biofarmaceutisch bedrijf met focus op neurowetenschappen en immunologie.',
-    foto: 'https://www.ucb.com/sites/default/files/2021-03/ucb-logo.png', // PNG logo
-    locatie: 'Brussel, België',
-    werkdomein: 'Farmaceutica, Biotechnologie'
-  },
-  {
-    naam: 'Solvay',
-    linkedin: 'https://www.linkedin.com/company/solvay',
-    bio: 'Solvay is een Belgisch chemiebedrijf actief in geavanceerde materialen en chemie.',
-    foto: 'https://www.solvay.com/sites/g/files/srpend221/files/styles/og_image/public/2021-03/solvay-logo.png', // PNG logo
-    locatie: 'Brussel, België',
-    werkdomein: 'Chemie, Materialen'
-  },
-  {
-    naam: 'Belfius',
-    linkedin: 'https://www.linkedin.com/company/belfius',
-    bio: 'Belfius is een Belgische bank en verzekeraar met focus op digitale innovatie.',
-    foto: 'https://www.belfius.com/images/default-source/default-album/belfius-logo.png', // PNG logo
-    locatie: 'Brussel, België',
-    werkdomein: 'Bank, Verzekeringen'
-  },
-  {
-    naam: 'Telenet',
-    linkedin: 'https://www.linkedin.com/company/telenet',
-    bio: 'Telenet is een Belgische aanbieder van kabeltelevisie, internet en telefonie.',
-    foto: 'https://www.telenet.be/content/dam/www-telenet-be/logos/telenet-logo.png', // PNG logo
-    locatie: 'Mechelen, België',
-    werkdomein: 'Telecom, Media'
-  },
-  {
-    naam: 'Delhaize',
-    linkedin: 'https://www.linkedin.com/company/delhaize',
-    bio: 'Delhaize is een Belgische supermarktketen, onderdeel van Ahold Delhaize.',
-    foto: 'https://www.delhaize.be/etc/designs/delhaize/clientlibs/img/logo.png', // PNG logo
-    locatie: 'Brussel, België',
-    werkdomein: 'Retail, Voeding'
-  }
-];
+// Globale variabele voor bedrijven data
+let bedrijven = [];
+let currentStudentId = null;
+
+// Feedback notification function
+function showFeedbackNotification(message, type = 'success') {
+  // Remove any existing notification
+  const existing = document.querySelector('.feedback-notification');
+  if (existing) existing.remove();
+
+  const notification = document.createElement('div');
+  notification.className = `feedback-notification ${type}`;
+  notification.textContent = message;
+
+  document.body.appendChild(notification);
+
+  // Auto remove after 3 seconds
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove();
+    }
+  }, 3000);
+}
 
 // Popup voor bedrijf detail
-function showBedrijfPopup(bedrijf) {
-  // Verwijder bestaande popup als die er is
+// Popup voor bedrijf detail - MET slots en speeddate verzoek
+async function showBedrijfPopup(bedrijf, studentId) {
+  // Remove any existing popup
   const existing = document.getElementById('bedrijf-popup-modal');
   if (existing) existing.remove();
+
+  // Haal functies en skills op
+  let functies = [];
+  let skills = [];
+  try {
+    const functiesResp = await fetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/functies`,
+      {
+        headers: {
+          Authorization: 'Bearer ' + sessionStorage.getItem('authToken'),
+        },
+      }
+    );
+    if (functiesResp.ok) functies = await functiesResp.json();
+  } catch {}
+  try {
+    const skillsResp = await fetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/skills`,
+      {
+        headers: {
+          Authorization: 'Bearer ' + sessionStorage.getItem('authToken'),
+        },
+      }
+    );
+    if (skillsResp.ok) skills = await skillsResp.json();
+  } catch {}
 
   const popup = document.createElement('div');
   popup.id = 'bedrijf-popup-modal';
@@ -94,30 +83,117 @@ function showBedrijfPopup(bedrijf) {
   popup.style.justifyContent = 'center';
   popup.style.zIndex = '2000';
 
-  // Tijdslots voor speeddate
-  const tijdslots = [
-    '09:00 - 10:00',
-    '10:00 - 11:00',
-    '11:00 - 12:00',
-    '13:00 - 14:00',
-    '14:00 - 15:00',
-    '15:00 - 16:00'
-  ];
+  // Uren en slots genereren
+  const uren = [10, 11, 12, 13, 14, 15];
+  const slotDuur = 10; // minuten
+  const slotsPerUur = 6; // 0,10,20,30,40,50
+  const datum = '2025-10-01'; // vaste dag in jouw voorbeeld
+  // 1. Haal alle speeddates van student en bedrijf op
+  const [studentDates, companyDates] = await Promise.all([
+    fetch(`https://api.ehb-match.me/speeddates?id=${studentId}`, {
+      headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` },
+    })
+      .then((r) => (r.ok ? r.json() : [])),
+    fetch(`https://api.ehb-match.me/speeddates?id=${bedrijf.gebruiker_id}`, {
+      headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` },
+    })
+      .then((r) => (r.ok ? r.json() : [])),
+  ]);
+
+  // Helper: bouw alle slots met status en kleur (op basis van 'akkoord')
+  function buildTimeSlotOptions({ uren, slotDuur, slotsPerUur, datum, studentDates, companyDates, studentId }) {
+    const allDates = [...studentDates, ...companyDates];
+    const slotStatus = {};
+    allDates.forEach((s) => {
+      if (!s.begin.startsWith(datum)) return;
+      let status = s.akkoord === true ? 'confirmed' : 'pending';
+      slotStatus[s.begin] = {
+        status,
+        by: s.id_student === studentId ? 'student' : 'company',
+        speeddate: s,
+      };
+    });
+    const slots = [];
+    uren.forEach((uur) => {
+      for (let i = 0; i < slotsPerUur; ++i) {
+        const min = i * slotDuur;
+        const mm = min < 10 ? `0${min}` : `${min}`;
+        const iso = `${datum}T${uur < 10 ? '0' : ''}${uur}:${mm}:00Z`;
+        const slot = slotStatus[iso];
+        let status = 'free', kleur = '#fff', disabled = false, label = `${uur}u${mm}`;
+        if (slot) {
+          if (slot.status === 'pending') {
+            status = 'pending'; kleur = '#fff9d1'; disabled = true; label += ' (in afwachting)';
+          } else if (slot.status === 'confirmed') {
+            status = 'confirmed'; kleur = '#ffe0e0'; disabled = true; label += ' (bevestigd)';
+          }
+        }
+        slots.push({ value: iso, label, kleur, disabled, status });
+      }
+    });
+    return slots;
+  }
+
+  // Bouw alle slots met status
+  const allSlots = buildTimeSlotOptions({ uren, slotDuur, slotsPerUur, datum, studentDates, companyDates, studentId });
+
+  // Favoriet status bepalen vóór HTML genereren
+  const isFavoriet = isCompanyFavorite(studentId, bedrijf.gebruiker_id);
+  const hartIcon = isFavoriet ? '❤️' : '🤍';
 
   popup.innerHTML = `
-    <div id="bedrijf-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:400px;width:95vw;position:relative;display:flex;flex-direction:column;align-items:center;">
+    <div id="bedrijf-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:420px;width:95vw;position:relative;display:flex;flex-direction:column;align-items:center;">
       <button id="bedrijf-popup-close" style="position:absolute;top:10px;right:14px;font-size:1.7rem;background:none;border:none;cursor:pointer;color:#888;">&times;</button>
-      <img src="${bedrijf.foto}" alt="Logo ${bedrijf.naam}" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;">
+      <button id="popup-favorite-btn" class="popup-favorite-btn" title="${isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'}">${hartIcon}</button>
+      <img src="${bedrijf.foto}" alt="Logo ${
+    bedrijf.naam
+  }" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
       <h2 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h2>
       <div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${bedrijf.locatie}</div>
       <div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${bedrijf.werkdomein}</div>
       <a href="${bedrijf.linkedin}" target="_blank" style="color:#0077b5;margin-bottom:1rem;">LinkedIn</a>
       <p style="text-align:center;margin-bottom:1.2rem;">${bedrijf.bio}</p>
+      <div style="font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;">
+        <a href="mailto:${bedrijf.contact_email}" style="color:#444;">${bedrijf.contact_email}</a>
+      </div>
+      <div style="margin-bottom:1rem;text-align:left;width:100%;">
+        <strong>Openstaande functies:</strong>
+        <div style="margin-top:0.3rem;">
+          ${
+            functies.length
+              ? functies.map((f) => `<span class="functie-badge">${f.naam}</span>`).join(' ')
+              : '<span style="color:#aaa;">Geen functies bekend</span>'
+          }
+        </div>
+      </div>
+      <div style="margin-bottom:1rem;text-align:left;width:100%;">
+        <strong>Gevraagde skills:</strong>
+        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.4rem;">
+          ${
+            skills.length
+              ? skills
+                  .map(
+                    (s) =>
+                      `<span style="background:#eee;border-radius:6px;padding:0.3rem 0.7rem;font-size:0.85rem;">${s.naam}</span>`
+                  )
+                  .join('')
+              : '<span style="color:#aaa;">Geen skills opgegeven</span>'
+          }
+        </div>
+      </div>
+      <div style="margin-bottom:0.7rem;width:100%;">
+        <div style="margin-bottom:0.4rem;font-size:0.97rem;">
+          <strong>Legenda:</strong>
+          <span style="background:#fff;border:1px solid #ccc;padding:0.1rem 0.5rem;border-radius:5px;margin-left:0.5rem;">Vrij</span>
+          <span style="background:#fff9d1;border:1px solid #ffe9a0;padding:0.1rem 0.5rem;border-radius:5px;margin-left:0.5rem;">Pending</span>
+          <span style="background:#ffe0e0;border:1px solid #ffbdbd;padding:0.1rem 0.5rem;border-radius:5px;margin-left:0.5rem;">Bezet</span>
+        </div>
+      </div>
       <div style="margin-bottom:1rem;width:100%;">
-        <label for="speeddates-tijdslot" style="font-weight:500;">Kies een tijdslot:</label>
-        <select id="speeddates-tijdslot" style="width:100%;margin-top:0.5rem;padding:0.5rem;border-radius:6px;border:1.5px solid #e1e5e9;">
+        <label for="speeddates-slot" style="font-weight:500;">Kies een tijdslot:</label>
+        <select id="speeddates-slot" style="width:100%;margin-top:0.5rem;padding:0.5rem;border-radius:6px;border:1.5px solid #e1e5e9;">
           <option value="">-- Selecteer een tijdslot --</option>
-          ${tijdslots.map(slot => `<option value="${slot}">${slot}</option>`).join('')}
+          ${allSlots.map(slot => `<option value="${slot.value}" style="background:${slot.kleur};" ${slot.disabled ? 'disabled' : ''}>${slot.label}</option>`).join('')}
         </select>
       </div>
       <button id="speeddates-aanvraag-btn" style="background:#00bcd4;color:#fff;border:none;padding:0.7rem 1.5rem;border-radius:8px;font-size:1rem;cursor:pointer;" disabled>Confirmeer aanvraag</button>
@@ -125,96 +201,369 @@ function showBedrijfPopup(bedrijf) {
     </div>
   `;
   document.body.appendChild(popup);
-
-  // Sluit popup bij klik op kruisje of buiten popup
+  // Sluiten popup
   document.getElementById('bedrijf-popup-close').onclick = () => popup.remove();
   popup.addEventListener('click', (e) => {
     if (e.target === popup) popup.remove();
   });
 
-  // Enable/disable button op basis van tijdslot
-  const tijdslotSelect = document.getElementById('speeddates-tijdslot');
-  const aanvraagBtn = document.getElementById('speeddates-aanvraag-btn');
-  tijdslotSelect.addEventListener('change', () => {
-    aanvraagBtn.disabled = !tijdslotSelect.value;
-  });
+  // Favoriet knop in popup
+  const popupFavoriteBtn = document.getElementById('popup-favorite-btn');
+  if (popupFavoriteBtn && currentStudentId) {
+    popupFavoriteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
 
-  // Speeddate aanvraag knop
-  aanvraagBtn.onclick = () => {
-    const status = document.getElementById('speeddates-aanvraag-status');
-    status.textContent = `Speeddate aangevraagd voor ${tijdslotSelect.value}!`;
-    status.style.display = 'block';
-    aanvraagBtn.disabled = true;
-    tijdslotSelect.disabled = true;
-    setTimeout(() => {
-      status.style.display = 'none';
-      popup.remove();
-    }, 1500);
-  };
-}
+      const isNowFavorite = toggleFavoriteCompany(
+        currentStudentId,
+        bedrijf.gebruiker_id
+      );
 
-// Filter en zoek functionaliteit (alleen op naam zoeken)
-function filterBedrijven({ zoek = '', locatie = '', werkdomein = '' }) {
-  return bedrijven.filter(b => {
-    const matchZoek = zoek
-      ? b.naam.toLowerCase().includes(zoek.toLowerCase())
-      : true;
-    const matchLocatie = locatie ? b.locatie === locatie : true;
-    const matchDomein = werkdomein ? b.werkdomein.toLowerCase().includes(werkdomein.toLowerCase()) : true;
-    return matchZoek && matchLocatie && matchDomein;
-  });
-}
+      // Update de button icon en tooltip
+      popupFavoriteBtn.innerHTML = isNowFavorite ? '❤️' : '🤍';
+      popupFavoriteBtn.title = isNowFavorite
+        ? 'Verwijder uit favorieten'
+        : 'Voeg toe aan favorieten';
+      // Update ook de kaart in de achtergrond als die nog zichtbaar is
+      const cardFavoriteBtn = document.querySelector(
+        `[data-company-id="${bedrijf.gebruiker_id}"]`
+      );
+      if (cardFavoriteBtn) {
+        cardFavoriteBtn.innerHTML = isNowFavorite ? '❤️' : '🤍';
+        cardFavoriteBtn.title = isNowFavorite
+          ? 'Verwijder uit favorieten'
+          : 'Voeg toe aan favorieten';
+      }
 
-// Unieke locaties en domeinen voor filters
-function getUniekeLocaties() {
-  return [...new Set(bedrijven.map(b => b.locatie))];
-}
-function getUniekeDomeinen() {
-  // Splits domeinen op komma's en maak uniek
-  return [...new Set(bedrijven.flatMap(b => b.werkdomein.split(',').map(d => d.trim())))];
-}
+      // Toon feedback notificatie
+      const message = isNowFavorite
+        ? `${bedrijf.naam} toegevoegd aan favorieten!`
+        : `${bedrijf.naam} verwijderd uit favorieten`;
+      showFeedbackNotification(message, isNowFavorite ? 'success' : 'info');
+      // Voeg animatie toe aan de button
+      popupFavoriteBtn.classList.add('animating');
+      setTimeout(() => popupFavoriteBtn.classList.remove('animating'), 400);
 
-// Utility om correcte foto-URL te krijgen
-function getProfielFotoUrl(profiel_foto) {
-  if (!profiel_foto || profiel_foto === 'null') return '/src/Images/default.jpg';
-  if (profiel_foto.startsWith('http')) return profiel_foto;
-  return 'https://gt0kk4fbet.ufs.sh/f/' + profiel_foto;
-}
-
-// Hoofdfunctie: lijst van bedrijven
-export function renderBedrijven(rootElement, studentData = {}) {
-  let huidigeZoek = '';
-  let huidigeLocatie = '';
-  let huidigeDomein = '';
-
-  function renderList() {
-    const gefilterd = filterBedrijven({
-      zoek: huidigeZoek,
-      locatie: huidigeLocatie,
-      werkdomein: huidigeDomein
-    });
-
-    document.getElementById('bedrijven-list').innerHTML = gefilterd.length
-      ? gefilterd.map((bedrijf, idx) => `
-        <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;" data-bedrijf-idx="${bedrijven.indexOf(bedrijf)}">
-          <img src="${bedrijf.foto}" alt="Logo ${bedrijf.naam}" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;">
-          <h3 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h3>
-          <div style="font-size:0.97rem;color:#666;margin-bottom:0.3rem;">${bedrijf.locatie}</div>
-          <div style="font-size:0.97rem;color:#888;margin-bottom:0.3rem;">${bedrijf.werkdomein}</div>
-        </div>
-      `).join('')
-      : `<div style="text-align:center;width:100%;color:#888;">Geen bedrijven gevonden.</div>`;
-
-    // Popup event
-    document.querySelectorAll('.bedrijf-card').forEach((card) => {
-      card.addEventListener('click', () => {
-        const idx = card.getAttribute('data-bedrijf-idx');
-        showBedrijfPopup(bedrijven[idx]);
-      });
+      // Update favorites count
+      const countElement = document.getElementById('favorites-count');
+      if (countElement) {
+        const favoriteCompanies = getFavoriteCompanies(currentStudentId);
+        countElement.textContent = `(${favoriteCompanies.length})`;
+      }
     });
   }
 
-  rootElement.innerHTML = `
+  // Dynamische slots vullen
+  const slotSelect = document.getElementById('speeddates-slot');
+  const aanvraagBtn = document.getElementById('speeddates-aanvraag-btn');
+  let gekozenDatum = '';
+
+  slotSelect.addEventListener('change', () => {
+    aanvraagBtn.disabled = !slotSelect.value;
+    gekozenDatum = slotSelect.value;
+  });
+
+  // Speeddate aanvraag knop (API-call)
+  aanvraagBtn.onclick = async () => {
+    const status = document.getElementById('speeddates-aanvraag-status');
+    aanvraagBtn.disabled = true;
+    slotSelect.disabled = true;
+    status.textContent = 'Aanvraag wordt verstuurd...';
+    status.style.display = 'block';
+
+    // 🛑 DUBBELE BOEKING PREVENTIE: check of student op dit tijdstip al een speeddate heeft (pending/confirmed)
+    const studentSlot = studentDates.find(s => s.begin === gekozenDatum);
+    if (studentSlot) {
+      status.textContent = 'Je hebt al een speeddate op dit tijdstip! Kies een ander slot.';
+      status.style.color = '#da2727';
+      aanvraagBtn.disabled = false;
+      slotSelect.disabled = false;
+      return;
+    }
+
+    try {
+      const req = await fetch('https://api.ehb-match.me/speeddate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${window.sessionStorage.getItem('authToken')}`,
+        },
+        body: JSON.stringify({
+          id_student: studentId,
+          id_bedrijf: bedrijf.gebruiker_id,
+          datum: gekozenDatum,
+        }),
+      });
+      if (req.ok) {
+        status.textContent = `Speeddate aangevraagd voor ${gekozenDatum.slice(11,16)}!`;
+        status.style.color = '#2aa97b';
+        console.log(`[✅] Speeddate succesvol aangemaakt met ${bedrijf.naam} om ${gekozenDatum}`);
+        // 🔄 Refresh slots na succesvolle aanvraag
+        // Haal nieuwe speeddates op en update dropdown
+        const [newStudentDates, newCompanyDates] = await Promise.all([
+          fetch(`https://api.ehb-match.me/speeddates?id=${studentId}`, {
+            headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` },
+          }).then((r) => (r.ok ? r.json() : [])),
+          fetch(`https://api.ehb-match.me/speeddates?id=${bedrijf.gebruiker_id}`, {
+            headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` },
+          }).then((r) => (r.ok ? r.json() : [])),
+        ]);
+        const refreshedSlots = buildTimeSlotOptions({ uren, slotDuur, slotsPerUur, datum, studentDates: newStudentDates, companyDates: newCompanyDates, studentId });
+        // Ververs dropdown
+        slotSelect.innerHTML = `<option value="">-- Selecteer een tijdslot --</option>` +
+          refreshedSlots.map(slot => `<option value="${slot.value}" style="background:${slot.kleur};" ${slot.disabled ? 'disabled' : ''}>${slot.label}</option>`).join('');
+        slotSelect.disabled = false;
+        aanvraagBtn.disabled = true;
+        gekozenDatum = '';
+      } else {
+        const err = await req.json();
+        status.textContent = err.message || 'Er ging iets mis!';
+        status.style.color = '#da2727';
+        console.warn(`[⚠️] Speeddate-aanvraag mislukt: ${err.message || 'Onbekende fout'}`);
+      }
+    } catch (e) {
+      status.textContent = 'Er ging iets mis bij het verzenden!';
+      status.style.color = '#da2727';
+    }
+    setTimeout(() => {
+      status.style.display = 'none';
+      // popup.remove(); // Popup blijft open zodat user direct nieuwe slot kan kiezen
+    }, 1800);
+  };
+}
+
+// Filter en zoek functionaliteit (inclusief favorieten)
+// Nieuwe filterfunctie: multi-select voor locatie, functie, skills, talen + favorieten
+function filterBedrijven({ zoek = '', locaties = [], functies = [], skills = [], talen = [], toonAlleFavorieten = false }) {
+  let gefilterdeBedrijven = bedrijven.filter((b) => {
+    const matchZoek = zoek
+      ? b.naam.toLowerCase().includes(zoek.toLowerCase())
+      : true;
+    const matchLocatie = locaties.length > 0 ? locaties.includes(b.locatie) : true;
+    const matchFunctie = functies.length > 0
+      ? (b.functiesArray || []).some(f => functies.includes(f.naam))
+      : true;
+    const matchSkill = skills.length > 0
+      ? (b.skillsArray || []).some(s => s.type === 0 && skills.includes(s.naam))
+      : true;
+    const matchTaal = talen.length > 0
+      ? (b.skillsArray || []).some(s => s.type === 1 && talen.includes(s.naam))
+      : true;
+    return matchZoek && matchLocatie && matchFunctie && matchSkill && matchTaal;
+  });
+  // Alleen favorieten tonen indien gewenst
+  if (toonAlleFavorieten && currentStudentId) {
+    gefilterdeBedrijven = filterFavoriteCompanies(
+      gefilterdeBedrijven,
+      currentStudentId
+    );
+  }
+  return gefilterdeBedrijven;
+}
+
+// Unieke locaties, functies, skills (type 0), talen (type 1)
+function getUniekeLocaties() {
+  return [...new Set(bedrijven.map((b) => b.locatie).filter(Boolean))];
+}
+function getUniekeFuncties() {
+  return [...new Set(bedrijven.flatMap(b => (b.functiesArray || []).map(f => f.naam)))];
+}
+function getUniekeSkills() {
+  return [...new Set(bedrijven.flatMap(b => (b.skillsArray || []).filter(s => s.type === 0).map(s => s.naam)))];
+}
+function getUniekeTalen() {
+  return [...new Set(bedrijven.flatMap(b => (b.skillsArray || []).filter(s => s.type === 1).map(s => s.naam)))];
+}
+
+// SlimSelect CDN injectie (indien nog niet aanwezig)
+function injectSlimSelectCDN() {
+  if (!document.getElementById('slimselect-css')) {
+    const link = document.createElement('link');
+    link.id = 'slimselect-css';
+    link.rel = 'stylesheet';
+    link.href = 'https://cdn.jsdelivr.net/npm/slim-select@2.8.0/dist/slimselect.css';
+    document.head.appendChild(link);
+  }
+  if (!document.getElementById('slimselect-js')) {
+    const script = document.createElement('script');
+    script.id = 'slimselect-js';
+    script.src = 'https://cdn.jsdelivr.net/npm/slim-select@2.8.0/dist/slimselect.min.js';
+    document.head.appendChild(script);
+  }
+}
+
+// Hoofdfunctie: lijst van bedrijven
+export async function renderBedrijven(rootElement, studentData = {}) {
+  injectSlimSelectCDN();
+  setTimeout(async () => {
+    let huidigeZoek = '';
+    let huidigeLocaties = [];
+    let huidigeFuncties = [];
+    let huidigeSkills = [];
+    let huidigeTalen = [];
+    let toonAlleFavorieten = false;
+    // Probeer eerst studentData uit sessionStorage te halen
+    let actualStudentData = studentData;
+    if (!actualStudentData || (!actualStudentData.id && !actualStudentData.gebruiker_id)) {
+      const storedData = window.sessionStorage.getItem('studentData');
+      if (storedData) {
+        try {
+          actualStudentData = JSON.parse(storedData);
+        } catch (e) {}
+      }
+    }
+    if (!actualStudentData || (!actualStudentData.id && !actualStudentData.gebruiker_id)) {
+      try {
+        actualStudentData = await fetchAndStoreStudentProfile();
+      } catch (error) {
+        actualStudentData = {
+          id: 'anonymous-user',
+          gebruiker_id: 'anonymous-user',
+        };
+      }
+    }
+    currentStudentId = actualStudentData?.id || actualStudentData?.gebruiker_id;
+    // Check if user is authenticated
+    const authToken = window.sessionStorage.getItem('authToken');
+    if (!authToken) {
+      renderLogin(rootElement);
+      return;
+    }
+    // Loading-indicator tijdens data ophalen
+    rootElement.innerHTML = `
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Bedrijven laden...</div>
+      </div>
+    `;
+    // Load companies from API
+    try {
+      const companies = await fetchCompanies();
+      if (!Array.isArray(companies)) {
+        bedrijven = [];
+      } else {
+        bedrijven = await Promise.all(companies.map(async (company) => {
+          let functiesArray = [];
+          let skillsArray = [];
+          try {
+            const functiesResp = await fetch(`https://api.ehb-match.me/bedrijven/${company.gebruiker_id}/functies`, {
+              headers: { Authorization: 'Bearer ' + sessionStorage.getItem('authToken') }
+            });
+            if (functiesResp.ok) functiesArray = await functiesResp.json();
+          } catch {}
+          try {
+            const skillsResp = await fetch(`https://api.ehb-match.me/bedrijven/${company.gebruiker_id}/skills`, {
+              headers: { Authorization: 'Bearer ' + sessionStorage.getItem('authToken') }
+            });
+            if (skillsResp.ok) skillsArray = await skillsResp.json();
+          } catch {}
+          return {
+            naam: company.naam,
+            linkedin: company.linkedin || '',
+            bio: company.bio || '',
+            foto:
+              company.profiel_foto_url && company.profiel_foto_url.trim() !== ''
+                ? company.profiel_foto_url
+                : defaultBedrijfLogo,
+            locatie: company.plaats || '',
+            werkdomein: company.werkdomein || '',
+            contact_email: company.contact_email,
+            gebruiker_id: company.gebruiker_id,
+            functiesArray,
+            skillsArray
+          };
+        }));
+      }
+    } catch (error) {
+      if (error.message.includes('Authentication failed')) {
+        renderLogin(rootElement);
+        return;
+      }
+      bedrijven = [];
+    }
+    // Function to update favorites count display
+    function updateFavoritesCount() {
+      const countElement = document.getElementById('favorites-count');
+      if (countElement && currentStudentId) {
+        const favoriteCompanies = getFavoriteCompanies(currentStudentId);
+        countElement.textContent = `(${favoriteCompanies.length})`;
+      }
+    }
+    function renderList() {
+      const bedrijvenListElement = document.getElementById('bedrijven-list');
+      if (!bedrijvenListElement) return;
+      if (bedrijven.length === 0) {
+        bedrijvenListElement.innerHTML = `<div style="text-align:center;width:100%;color:#888;">Laden van bedrijven...</div>`;
+        return;
+      }
+      const gefilterd = filterBedrijven({
+        zoek: huidigeZoek,
+        locaties: huidigeLocaties,
+        functies: huidigeFuncties,
+        skills: huidigeSkills,
+        talen: huidigeTalen,
+        toonAlleFavorieten: toonAlleFavorieten
+      });
+      bedrijvenListElement.innerHTML = gefilterd.length
+        ? gefilterd
+            .map((bedrijf, idx) => {
+              const isFavoriet = currentStudentId
+                ? isCompanyFavorite(currentStudentId, bedrijf.gebruiker_id)
+                : false;
+              const hartIcon = isFavoriet ? '❤️' : '🤍';
+              return `
+    <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;position:relative;" data-bedrijf-idx="${bedrijven.indexOf(bedrijf)}">
+      <button class="favorite-btn" data-company-id="${bedrijf.gebruiker_id}" title="${isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'}" style="position:absolute;top:10px;right:10px;font-size:1.3rem;background:none;border:none;cursor:pointer;z-index:2;">${hartIcon}</button>
+      <img src="${bedrijf.foto}" alt="Logo ${bedrijf.naam}" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
+      <h3 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h3>
+      <div style="font-size:0.97rem;color:#666;margin-bottom:0.3rem;">${bedrijf.locatie}</div>
+      <div style="font-size:0.97rem;color:#888;margin-bottom:0.3rem;">${bedrijf.werkdomein}</div>
+    </div>
+  `;
+            })
+            .join('')
+        : `<div style="text-align:center;width:100%;color:#888;">Geen bedrijven gevonden.</div>`;
+      document.querySelectorAll('.bedrijf-card').forEach((card) => {
+        card.addEventListener('click', (e) => {
+          if (e.target.classList.contains('favorite-btn')) {
+            return;
+          }
+          const idx = card.getAttribute('data-bedrijf-idx');
+          showBedrijfPopup(
+            bedrijven[idx],
+            actualStudentData.id || actualStudentData.gebruiker_id
+          );
+        });
+      });
+      document.querySelectorAll('.favorite-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const companyId = btn.getAttribute('data-company-id');
+          if (!currentStudentId || !companyId) {
+            return;
+          }
+          const isNowFavorite = toggleFavoriteCompany(
+            currentStudentId,
+            companyId
+          );
+          btn.innerHTML = isNowFavorite ? '❤️' : '🤍';
+          btn.title = isNowFavorite
+            ? 'Verwijder uit favorieten'
+            : 'Voeg toe aan favorieten';
+          const bedrijf = bedrijven.find((b) => b.gebruiker_id == companyId);
+          const bedrijfNaam = bedrijf ? bedrijf.naam : 'Bedrijf';
+          const message = isNowFavorite
+            ? `${bedrijfNaam} toegevoegd aan favorieten!`
+            : `${bedrijfNaam} verwijderd uit favorieten`;
+          showFeedbackNotification(message, isNowFavorite ? 'success' : 'info');
+          btn.classList.add('animating');
+          setTimeout(() => btn.classList.remove('animating'), 400);
+          updateFavoritesCount();
+        });
+      });
+      updateFavoritesCount();
+    }
+    // Initial render with loading state
+    rootElement.innerHTML = `
     <div class="student-profile-container">
       <header class="student-profile-header">
         <div class="logo-section">
@@ -223,6 +572,7 @@ export function renderBedrijven(rootElement, studentData = {}) {
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
         <ul id="burger-dropdown" class="student-profile-dropdown">
+          <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
@@ -230,7 +580,6 @@ export function renderBedrijven(rootElement, studentData = {}) {
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
-            <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
@@ -239,21 +588,27 @@ export function renderBedrijven(rootElement, studentData = {}) {
           </ul>
         </nav>
         <div class="student-profile-content">
-          <div class="student-profile-form-container">
-            <h1 class="student-profile-title">Bedrijven</h1>
-            <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1.2rem;">
-              <input id="bedrijf-zoek" type="text" placeholder="Zoek bedrijf, locatie of domein..." style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;min-width:180px;">
-              <select id="bedrijf-filter-locatie" style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;">
-                <option value="">Alle locaties</option>
-                ${getUniekeLocaties().map(loc => `<option value="${loc}">${loc}</option>`).join('')}
-              </select>
-              <select id="bedrijf-filter-domein" style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;">
-                <option value="">Alle domeinen</option>
-                ${getUniekeDomeinen().map(dom => `<option value="${dom}">${dom}</option>`).join('')}
-              </select>
+          <div class="student-profile-form-container" style="padding:2.5rem 2.2rem 2.2rem 2.2rem; border-radius:18px; background:#fff; box-shadow:0 4px 24px #0001; max-width:1200px; margin:auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.4rem;">
+              <h1 class="student-profile-title" style="margin: 0;">Bedrijven</h1>
+              <button id="filter-favorieten-btn" title="Toon alleen favorieten" style="font-size: 1.5rem; background: none; border: none; cursor: pointer; transition: transform 0.3s ease;" class="${toonAlleFavorieten ? 'animating' : ''}">${toonAlleFavorieten ? '❤️' : '🤍'}</button>
             </div>
+            <div id="bedrijven-filterbar" class="bedrijven-filterbar-grid" style="background:#f8fafc; padding:1.2rem 1.2rem 1.2rem 1.2rem; border-radius:14px; margin-bottom:2.2rem; box-shadow:0 2px 8px #0001; border:1.5px solid #e1e5e9;">
+              <div class="zoek-group">
+                <label for="bedrijf-zoek">Zoeken</label>
+                <input id="bedrijf-zoek" type="text" placeholder="Zoek bedrijf of locatie...">
+              </div>
+              <div id="filter-locaties" class="filter-group"></div>
+              <div id="filter-functies" class="filter-group"></div>
+              <div id="filter-skills" class="filter-group"></div>
+              <div id="filter-talen" class="filter-group"></div>
+              <div class="reset-group">
+                <button id="reset-filters" style="padding:0.6rem 1.2rem;border-radius:8px;border:1.5px solid #e1e5e9;background:#f5f5f5;cursor:pointer;min-width:120px;">Reset filters</button>
+              </div>
+            </div>
+            <div style="height:1px;width:100%;background:#e1e5e9;margin-bottom:2.2rem;"></div>
             <div id="bedrijven-list" class="bedrijven-list" style="display:flex;flex-wrap:wrap;gap:2rem;justify-content:center;">
-              <!-- Cards komen hier dynamisch -->
+              <div style="text-align:center;width:100%;color:#888;">Laden van bedrijven...</div>
             </div>
           </div>
         </div>
@@ -265,95 +620,420 @@ export function renderBedrijven(rootElement, studentData = {}) {
     </div>
   `;
 
-  // Sidebar nav (nu met bedrijven)
-  document.querySelectorAll('.sidebar-link').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      const route = e.currentTarget.getAttribute('data-route');
-      switch (route) {
-        case 'profile':
-          renderStudentProfiel(rootElement, studentData);
-          break;
-        case 'search':
-          renderSearchCriteriaStudent(rootElement, studentData);
-          break;
-        case 'speeddates':
-          renderSpeeddates(rootElement, studentData);
-          break;
-        case 'requests':
-          renderSpeeddatesRequests(rootElement, studentData);
-          break;
-        case 'bedrijven':
-          renderBedrijven(rootElement, studentData);
-          break;
-        case 'qr':
-          renderQRPopup(rootElement, studentData);
-          break;
-      }
+    // Voeg moderne grid CSS toe voor de filterbalk en card
+    const style = document.createElement('style');
+    style.innerHTML = `
+.student-profile-form-container.bedrijven-form-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px #0001;
+  padding: 2.2rem 2.2rem 2.5rem 2.2rem;
+  margin: 2.5rem auto 2.5rem auto;
+  max-width: 1200px;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+}
+.bedrijven-filterbar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.2rem 1.6rem;
+  align-items: end;
+  background: transparent;
+  border-radius: 12px;
+  margin-bottom: 1.2rem;
+  padding: 0;
+  position: relative;
+}
+.bedrijven-filterbar-grid .filter-group,
+.bedrijven-filterbar-grid .zoek-group,
+.bedrijven-filterbar-grid .reset-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  width: 100%;
+}
+.bedrijven-filterbar-grid label {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 0.2rem;
+}
+.bedrijven-filterbar-grid select,
+.bedrijven-filterbar-grid input[type="text"] {
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  border: 1.5px solid #e1e5e9;
+  font-size: 0.95rem;
+  min-height: 42px;
+  height: 42px;
+  box-sizing: border-box;
+  width: 100%;
+}
+.bedrijven-filterbar-grid .ss-main {
+  min-height: 42px !important;
+  height: 42px !important;
+  box-sizing: border-box;
+}
+/* SlimSelect: scrollbare chips bij veel geselecteerde opties */
+.bedrijven-filterbar-grid .ss-main.multi {
+  max-height: 86px !important;
+  overflow-y: auto !important;
+  flex-wrap: wrap !important;
+  align-items: flex-start !important;
+  scrollbar-width: thin;
+}
+.bedrijven-filterbar-grid .ss-main {
+  padding: 0.6rem 0.8rem;
+}
+/* Scrollbar styling voor Chrome */
+.bedrijven-filterbar-grid .ss-main.multi::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.bedrijven-filterbar-grid .ss-main.multi::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 6px;
+}
+.bedrijven-divider {
+  border: none;
+  border-top: 1.5px solid #e1e5e9;
+  margin: 1.2rem 0 2.2rem 0;
+}
+#filter-favorieten-btn.animating {
+  transform: scale(1.3);
+}
+@media (min-width: 1200px) {
+  .bedrijven-filterbar-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .student-profile-form-container.bedrijven-form-card {
+    padding: 2.5rem 3.5rem 2.8rem 3.5rem;
+  }
+}
+`;
+    document.head.appendChild(style);
+
+    // Custom filter UI rendering
+    function renderFilterOptions() {
+      // Locaties (popup trigger ipv select)
+      const locaties = getUniekeLocaties();
+      const locatieDiv = document.getElementById('filter-locaties');
+      locatieDiv.innerHTML = `
+        <label for="locaties-popup-trigger">Locatie</label>
+        <button id="locaties-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
+          ${huidigeLocaties.length ? huidigeLocaties.join(', ') : 'Locatie kiezen...'}
+        </button>
+      `;
+      // Functies (popup trigger ipv select)
+      const functies = getUniekeFuncties();
+      const functieDiv = document.getElementById('filter-functies');
+      functieDiv.innerHTML = `
+        <label for="functies-popup-trigger">Functie</label>
+        <button id="functies-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
+          ${huidigeFuncties.length ? huidigeFuncties.join(', ') : 'Functie kiezen...'}
+        </button>
+      `;
+      // Skills (popup trigger ipv select)
+      const skills = getUniekeSkills();
+      const skillDiv = document.getElementById('filter-skills');
+      skillDiv.innerHTML = `
+        <label for="skills-popup-trigger">Skills</label>
+        <button id="skills-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
+          ${huidigeSkills.length ? huidigeSkills.join(', ') : 'Skills kiezen...'}
+        </button>
+      `;
+      // Talen (popup trigger ipv select)
+      const talen = getUniekeTalen();
+      const taalDiv = document.getElementById('filter-talen');
+      taalDiv.innerHTML = `
+        <label for="talen-popup-trigger">Talen</label>
+        <button id="talen-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
+          ${huidigeTalen.length ? huidigeTalen.join(', ') : 'Talen kiezen...'}
+        </button>
+      `;
+      // Favorietenknop rechtsboven in de filterbalk
+      const filterbar = document.getElementById('bedrijven-filterbar');
+      let favBtn = document.getElementById('filter-favorieten-btn');
+      if (favBtn) favBtn.remove();
+      favBtn = document.createElement('button');
+      favBtn.id = 'filter-favorieten-btn';
+      favBtn.title = 'Toon alleen favorieten';
+      favBtn.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 14px;
+        font-size: 1.4rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        z-index: 5;
+      `;
+      favBtn.innerHTML = toonAlleFavorieten ? '❤️' : '🤍';
+      filterbar.appendChild(favBtn);
+      // Popup triggers voor alle filters
+      document.getElementById('locaties-popup-trigger').addEventListener('click', () => {
+        createPopup({
+          id: 'locaties-filter-popup',
+          title: 'Kies locaties',
+          options: getUniekeLocaties(),
+          selected: huidigeLocaties,
+          onSave: (gekozen) => {
+            huidigeLocaties = gekozen;
+            renderFilterOptions();
+            renderList();
+          }
+        });
+      });
+      document.getElementById('functies-popup-trigger').addEventListener('click', () => {
+        createPopup({
+          id: 'functies-filter-popup',
+          title: 'Kies functies',
+          options: getUniekeFuncties(),
+          selected: huidigeFuncties,
+          onSave: (gekozen) => {
+            huidigeFuncties = gekozen;
+            renderFilterOptions();
+            renderList();
+          }
+        });
+      });
+      document.getElementById('skills-popup-trigger').addEventListener('click', () => {
+        createPopup({
+          id: 'skills-filter-popup',
+          title: 'Kies je skills',
+          options: getUniekeSkills(),
+          selected: huidigeSkills,
+          onSave: (gekozen) => {
+            huidigeSkills = gekozen;
+            renderFilterOptions();
+            renderList();
+          }
+        });
+      });
+      document.getElementById('talen-popup-trigger').addEventListener('click', () => {
+        createPopup({
+          id: 'talen-filter-popup',
+          title: 'Kies je talen',
+          options: getUniekeTalen(),
+          selected: huidigeTalen,
+          onSave: (gekozen) => {
+            huidigeTalen = gekozen;
+            renderFilterOptions();
+            renderList();
+          }
+        });
+      });
+    }
+
+    // Update filters and render list after data is loaded
+    renderFilterOptions();
+    renderList();
+
+    // --- Sidebar navigatie uniform maken ---
+    document.querySelectorAll('.sidebar-link').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const route = e.currentTarget.getAttribute('data-route');
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          switch (route) {
+            // case 'profile': // verwijderd
+            case 'search':
+              Router.navigate('/student/zoek-criteria');
+              break;
+            case 'speeddates':
+              Router.navigate('/student/student-speeddates');
+              break;
+            case 'requests':
+              Router.navigate('/student/student-speeddates-verzoeken');
+              break;
+            case 'bedrijven':
+              Router.navigate('/student/bedrijven');
+              break;
+            case 'qr':
+              Router.navigate('/student/student-qr-popup');
+              break;
+          }
+        });
+      });
     });
-  });
 
-  // Filter & zoek events
-  document.getElementById('bedrijf-zoek').addEventListener('input', (e) => {
-    huidigeZoek = e.target.value;
-    renderList();
-  });
-  document.getElementById('bedrijf-filter-locatie').addEventListener('change', (e) => {
-    huidigeLocatie = e.target.value;
-    renderList();
-  });
-  document.getElementById('bedrijf-filter-domein').addEventListener('change', (e) => {
-    huidigeDomein = e.target.value;
-    renderList();
-  });
-
-  renderList();
-
-  // Burger menu
-  const burger = document.getElementById('burger-menu');
-  const dropdown = document.getElementById('burger-dropdown');
-  if (burger && dropdown) {
-    dropdown.classList.remove('open');
-    burger.addEventListener('click', (event) => {
-      event.stopPropagation();
-      if (!dropdown.classList.contains('open')) {
-        dropdown.classList.add('open');
-      } else {
+    // Hamburger menu Profiel knop
+    const navProfileBtn = document.getElementById('nav-profile');
+    const dropdown = document.getElementById('burger-dropdown');
+    if (navProfileBtn && dropdown) {
+      navProfileBtn.addEventListener('click', () => {
         dropdown.classList.remove('open');
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/student/student-profiel');
+        });
+      });
+    }
+
+    // Filter & zoek events - setup after data is loaded
+    const setupEventListeners = () => {
+      const zoekElement = document.getElementById('bedrijf-zoek');
+      if (zoekElement) {
+        zoekElement.addEventListener('input', (e) => {
+          huidigeZoek = e.target.value;
+          renderList();
+        });
       }
-    });
-    document.addEventListener('click', function(event) {
-      if (
-        dropdown.classList.contains('open') &&
-        !dropdown.contains(event.target) &&
-        event.target !== burger
-      ) {
-        dropdown.classList.remove('open');
+      // Favorieten-toggle event (icon button)
+      const favorietenBtn = document.getElementById('filter-favorieten-btn');
+      if (favorietenBtn) {
+        favorietenBtn.addEventListener('click', () => {
+          toonAlleFavorieten = !toonAlleFavorieten;
+          favorietenBtn.innerHTML = toonAlleFavorieten ? '❤️' : '🤍';
+          favorietenBtn.classList.add('animating');
+          renderList();
+          setTimeout(() => favorietenBtn.classList.remove('animating'), 400);
+        });
+      }
+      // Multi-select events
+      const locatieSelect = document.getElementById('filter-locaties-select');
+      if (locatieSelect) {
+        locatieSelect.addEventListener('change', (e) => {
+          huidigeLocaties = Array.from(e.target.selectedOptions).map(opt => opt.value);
+          renderList();
+        });
+      }
+      const functieSelect = document.getElementById('filter-functies-select');
+      if (functieSelect) {
+        functieSelect.addEventListener('change', (e) => {
+          huidigeFuncties = Array.from(e.target.selectedOptions).map(opt => opt.value);
+          renderList();
+        });
+      }
+      const skillSelect = document.getElementById('filter-skills-select');
+      if (skillSelect) {
+        skillSelect.addEventListener('change', (e) => {
+          huidigeSkills = Array.from(e.target.selectedOptions).map(opt => opt.value);
+          renderList();
+        });
+      }
+      const taalSelect = document.getElementById('filter-talen-select');
+      if (taalSelect) {
+        taalSelect.addEventListener('change', (e) => {
+          huidigeTalen = Array.from(e.target.selectedOptions).map(opt => opt.value);
+          renderList();
+        });
+      }
+      // Reset button
+      document.getElementById('reset-filters').addEventListener('click', () => {
+        huidigeZoek = '';
+        huidigeLocaties = [];
+        huidigeFuncties = [];
+        huidigeSkills = [];
+        huidigeTalen = [];
+        document.getElementById('bedrijf-zoek').value = '';
+        renderFilterOptions();
+        setupEventListeners();
+        renderList();
+      });
+    };
+    setupEventListeners();
+    // Burger menu
+    const burger = document.getElementById('burger-menu');
+    if (burger) {
+      burger.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const dropdown = document.getElementById('burger-dropdown');
+        if (dropdown) {
+          dropdown.classList.toggle('open');
+        }
+      });
+    }
+    document.addEventListener('click', function (event) {
+      const dropdown = document.getElementById('burger-dropdown');
+      if (dropdown && dropdown.classList.contains('open')) {
+        if (!dropdown.contains(event.target) && event.target.id !== 'burger-menu') {
+          dropdown.classList.remove('open');
+        }
       }
     });
     document.getElementById('nav-settings').addEventListener('click', () => {
-      dropdown.classList.remove('open');
-      showSettingsPopup(() => renderBedrijven(rootElement, studentData));
+      const dropdown = document.getElementById('burger-dropdown');
+      if (dropdown) {
+        dropdown.classList.remove('open');
+      }
+      showSettingsPopup(() =>
+        renderBedrijven(rootElement, actualStudentData)
+      );
     });
     document.getElementById('nav-logout').addEventListener('click', () => {
-      dropdown.classList.remove('open');
+      const dropdown = document.getElementById('burger-dropdown');
+      if (dropdown) {
+        dropdown.classList.remove('open');
+      }
       localStorage.setItem('darkmode', 'false');
       document.body.classList.remove('darkmode');
       renderLogin(rootElement);
     });
-  }
 
-  document.getElementById('privacy-policy').addEventListener('click', (e) => {
-    e.preventDefault();
-    import('../../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/privacy');
+    document.getElementById('privacy-policy').addEventListener('click', (e) => {
+      e.preventDefault();
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/privacy');
+      });
     });
-  });
-  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
-    e.preventDefault();
-    import('../../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/contact');
+    document.getElementById('contacteer-ons').addEventListener('click', (e) => {
+      e.preventDefault();
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/contact');
+      });
     });
+  }, 200);
+  return;
+}
+
+function createPopup({ id, title, options = [], selected = [], onSave }) {
+  // Verwijder oude popup
+  const existing = document.getElementById(id);
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = id;
+  overlay.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center;
+    z-index: 3000;
+  `;
+  const popup = document.createElement('div');
+  popup.style.cssText = `
+    background: #fff; padding: 2rem; border-radius: 12px; width: 100%; max-width: 500px;
+    max-height: 80vh; overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  `;
+  popup.innerHTML = `
+    <h2 style="margin-bottom:1rem;">${title}</h2>
+    <div id="${id}-options" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.5rem;"></div>
+    <div style="display:flex;justify-content:flex-end;gap:1rem;">
+      <button id="${id}-cancel" style="padding:0.5rem 1.2rem;border:none;background:#eee;border-radius:6px;cursor:pointer;">Annuleer</button>
+      <button id="${id}-save" style="padding:0.5rem 1.2rem;border:none;background:#007bff;color:white;border-radius:6px;cursor:pointer;">Opslaan</button>
+    </div>
+  `;
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+  // Voeg checkboxen toe
+  const optionsContainer = document.getElementById(`${id}-options`);
+  options.forEach((opt) => {
+    const div = document.createElement('label');
+    div.style.display = 'flex';
+    div.style.alignItems = 'center';
+    div.innerHTML = `
+      <input type="checkbox" value="${opt}" ${selected.includes(opt) ? 'checked' : ''} />
+      <span style="margin-left:0.6rem;">${opt}</span>
+    `;
+    optionsContainer.appendChild(div);
   });
+  // Handlers
+  document.getElementById(`${id}-cancel`).onclick = () => overlay.remove();
+  document.getElementById(`${id}-save`).onclick = () => {
+    const gekozen = Array.from(optionsContainer.querySelectorAll('input:checked')).map(i => i.value);
+    onSave(gekozen);
+    overlay.remove();
+  };
 }

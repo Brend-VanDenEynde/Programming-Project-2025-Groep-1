@@ -1,19 +1,11 @@
-import logoIcon from '../../Icons/favicon-32x32.png';
+import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './student-settings.js';
-
-const defaultAvatar = '/src/Images/default.jpg';
-
-// Utility om correcte foto-URL te krijgen
-function getProfielFotoUrl(profiel_foto) {
-  if (!profiel_foto || profiel_foto === 'null') return '/src/Images/default.jpg';
-  if (profiel_foto.startsWith('http')) return profiel_foto;
-  return 'https://gt0kk4fbet.ufs.sh/f/' + profiel_foto;
-}
+import defaultAvatar from '../../images/default.png';
 
 // src/views/student-qr-popup.js
 
@@ -27,6 +19,7 @@ export function renderQRPopup(rootElement, studentData = {}) {
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
         <ul id="burger-dropdown" class="student-profile-dropdown">
+          <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
@@ -34,7 +27,6 @@ export function renderQRPopup(rootElement, studentData = {}) {
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
-            <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
@@ -49,13 +41,19 @@ export function renderQRPopup(rootElement, studentData = {}) {
               <div class="qr-code-label">Laat deze QR-code scannen door bedrijven of tijdens events</div>
               <img src="${defaultAvatar}" alt="QR code" class="qr-code-img" id="qr-code-img">
             </div>
+          </div>        </div>
+      </div>
+      
+      <footer class="student-profile-footer">
+        <div class="footer-content">
+          <span>&copy; 2025 EhB Career Launch</span>
+          <div class="footer-links">
+            <a href="/privacy" data-route="/privacy">Privacy</a>
+            <a href="/contact" data-route="/contact">Contact</a>
           </div>
         </div>
-      </div>
-      <footer class="student-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
       </footer>
+      
       <div id="qr-modal" class="qr-modal" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;">
         <div id="qr-modal-content" style="position:relative;background:#fff;padding:2rem;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.3);display:flex;flex-direction:column;align-items:center;">
           <img src="${defaultAvatar}" alt="QR code groot" style="width:300px;height:300px;object-fit:contain;" id="qr-modal-img">
@@ -64,30 +62,31 @@ export function renderQRPopup(rootElement, studentData = {}) {
     </div>
   `;
 
-  // Sidebar navigation (consistent with other student pages)
+  // --- Sidebar navigatie uniform maken ---
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
     btn.addEventListener('click', (e) => {
+      e.preventDefault();
       const route = e.currentTarget.getAttribute('data-route');
-      switch (route) {
-        case 'profile':
-          renderStudentProfiel(rootElement, studentData);
-          break;
-        case 'search':
-          renderSearchCriteriaStudent(rootElement, studentData);
-          break;
-        case 'speeddates':
-          renderSpeeddates(rootElement, studentData);
-          break;
-        case 'requests':
-          renderSpeeddatesRequests(rootElement, studentData);
-          break;
-        case 'bedrijven':
-          import('./bedrijven.js').then(m => m.renderBedrijven(rootElement, studentData));
-          break;
-        case 'qr':
-          renderQRPopup(rootElement, studentData);
-          break;
-      }
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        switch (route) {
+          case 'search':
+            Router.navigate('/student/zoek-criteria');
+            break;
+          case 'speeddates':
+            Router.navigate('/student/student-speeddates');
+            break;
+          case 'requests':
+            Router.navigate('/student/student-speeddates-verzoeken');
+            break;
+          case 'bedrijven':
+            Router.navigate('/student/bedrijven');
+            break;
+          case 'qr':
+            Router.navigate('/student/student-qr-popup');
+            break;
+        }
+      });
     });
   });
 
@@ -104,7 +103,7 @@ export function renderQRPopup(rootElement, studentData = {}) {
         dropdown.classList.remove('open');
       }
     });
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
       if (
         dropdown.classList.contains('open') &&
         !dropdown.contains(event.target) &&
@@ -119,10 +118,24 @@ export function renderQRPopup(rootElement, studentData = {}) {
     });
     document.getElementById('nav-logout').addEventListener('click', () => {
       dropdown.classList.remove('open');
+      window.sessionStorage.removeItem('studentData');
+      window.sessionStorage.removeItem('authToken');
+      window.sessionStorage.removeItem('userType');
       localStorage.setItem('darkmode', 'false');
       document.body.classList.remove('darkmode');
       renderLogin(rootElement);
     });
+    // Hamburger menu Profiel knop
+    const navProfileBtn = document.getElementById('nav-profile');
+    if (navProfileBtn) {
+      navProfileBtn.addEventListener('click', () => {
+        dropdown.classList.remove('open');
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/student/student-profiel');
+        });
+      });
+    }
   }
 
   // Footer links (router navigation, consistent)

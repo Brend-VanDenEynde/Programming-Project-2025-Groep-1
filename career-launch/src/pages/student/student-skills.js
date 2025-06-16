@@ -1,81 +1,90 @@
-import './student-register.css';
-import Router from '../router.js';
+import '../../css/consolidated-style.css';
+import Router from '../../router.js';
 
-export function renderStudentSkills(rootElement) {
-    rootElement.innerHTML = `
+// Skills ophalen uit de API
+async function fetchSkills() {
+  const resp = await fetch('https://api.ehb-match.me/skills');
+  if (!resp.ok) throw new Error('Skills ophalen mislukt');
+  return await resp.json(); // [{id: 1, skill: 'JavaScript'}, ...]
+}
+
+export async function renderStudentSkills(rootElement) {
+  // Laad de skills eerst!
+  let skills = [];
+  try {
+    skills = await fetchSkills();
+  } catch (e) {
+    alert('Skills ophalen mislukt: ' + e.message);
+    skills = [];
+  }
+
+  // Maak dynamisch HTML voor je skills (checkboxes)
+  const skillInputs = skills
+    .map(
+      (s) =>
+        `<label><input type="checkbox" name="skills" value="${s.id}"> ${s.skill}</label>`
+    )
+    .join('');
+
+  rootElement.innerHTML = `
     <div style="min-height: 100vh; display: flex; flex-direction: column;">
-    <main class="form-container skills-container">
-      <button class="back-button" id="back-button">← Terug</button>
-
-      <form class="skillsForm" id="skillsForm">
-      <div class="Job-Search">
-      <h3>Ik zoek een</h3>
-        <div class="radio-group">
-          <label><input type="radio" name="job" value="fulltime"> Fultime</label>
-          <label><input type="radio" name="job" value="parttime"> Parttime</label>
-          <label><input type="radio" name="job" value="stage"> Stage</label>
-        </div>
-      </div>
-
-      <div class="Skills-Select">
-      <h3>Mijn Skills</h3>
-        <div class="radio-group">
-          <label><input type="radio" name="skill" value="1"> Cybersecurity</label>
-          <label><input type="radio" name="skill" value="2"> C#</label>
-          <label><input type="radio" name="skill" value="3"> Java</label>
-        </div>
-      </div>
-      <div class="button-row">
-        <button class="skip-button" id="skip-button">SKIP</button>
-        <button class="save-button" id="save-button">SAVE</button>
-      </div>
-      </form>
-    </main>
-
-    <footer class="footer">
-      <a href="#" id="privacy-link">Privacy Policy</a> | <a href="#" id="contact-link">Contacteer Ons</a>
-    </footer>
-  </div>
+      <main class="form-container skills-container">
+        <button class="back-button" id="back-button">← Terug</button>
+        <form class="skillsForm" id="skillsForm">
+          <div class="Job-Search">
+            <h3>Ik zoek een</h3>
+            <div class="radio-group">
+              <label><input type="radio" name="job" value="fulltime"> Fultime</label>
+              <label><input type="radio" name="job" value="parttime"> Parttime</label>
+              <label><input type="radio" name="job" value="stage"> Stage</label>
+            </div>
+          </div>
+          <div class="Skills-Select">
+            <h3>Mijn Skills</h3>
+            <div class="checkbox-group">
+              ${skillInputs}
+            </div>
+          </div>
+          <div class="button-row">
+            <button class="skip-button" id="skip-button">SKIP</button>
+            <button class="save-button" id="save-button">SAVE</button>
+          </div>
+        </form>      </main>
+      <footer class="footer">
+        <a href="/privacy" data-route="/privacy">Privacy Policy</a> | <a href="/contact" data-route="/contact">Contacteer Ons</a>
+      </footer>
+    </div>
   `;
 
-  const form = document.getElementById('skillsForm');
-  form.addEventListener('submit', handleSkillsRegister);
-
-  document.getElementById('back-button').addEventListener('click', () => {
-    Router.navigate('/Student-Opleiding');
-  });
-
-  // Footer links
-  const privacyLink = document.getElementById('privacy-link');
-  privacyLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Privacy Policy pagina nog niet geïmplementeerd');
-  });
-
-  const contactLink = document.getElementById('contact-link');
-  contactLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Contact pagina nog niet geïmplementeerd');
-  });
+  document
+    .getElementById('skillsForm')
+    .addEventListener('submit', handleSkillsRegister);
+  const backBtn = document.getElementById('back-button');
+  if (backBtn) {
+    backBtn.onclick = null;
+    backBtn.addEventListener('click', () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        Router.navigate('/student-opleiding');
+      }
+    });
+  }
 }
 
 function handleSkillsRegister(event) {
   event.preventDefault();
-
   const formData = new FormData(event.target);
-
   const job = formData.get('job');
-  const skill = formData.get('skill');
-
-  
-
+  // Haal alle aangevinkte skills op als array:
+  const selectedSkills = Array.from(
+    document.querySelectorAll('input[name="skills"]:checked')
+  ).map((cb) => Number(cb.value));
   const data = {
-    job: formData.get('job'), // geselecteerde radio
-    skill: formData.get('skill'),
+    job,
+    skills: selectedSkills, // <-- array met ids!
   };
-  
-  // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
-
-    // Navigeren naar de volgende pagina
+  // Hier kun je data naar server sturen...
+  // Router.navigate(...) etc.
 }

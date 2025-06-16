@@ -1,6 +1,6 @@
 import { renderStudentSkills } from './student-skills.js';
-import './student-register.css';
-import Router from '../router.js';
+import Router from '../../router.js';
+import '../../css/consolidated-style.css';
 
 export function renderStudentOpleiding(rootElement) {
   rootElement.innerHTML = `
@@ -26,33 +26,18 @@ export function renderStudentOpleiding(rootElement) {
       </select>
 
       <button class="save-button">SAVE</button>
-      </form>
-    </main>
+      </form>    </main>
 
     <footer class="footer">
-      <a href="#" id="privacy-link">Privacy Policy</a> | <a href="#" id="contact-link">Contacteer Ons</a>
+      <a href="/privacy" data-route="/privacy">Privacy Policy</a> | <a href="/contact" data-route="/contact">Contacteer Ons</a>
     </footer>
   </div>
   `;
 
   const form = document.getElementById('jaarForm');
   form.addEventListener('submit', handleJaarRegister);
-
   document.getElementById('back-button').addEventListener('click', () => {
-    Router.navigate('/Student-Register');
-  });
-
-  // Footer links
-  const privacyLink = document.getElementById('privacy-link');
-  privacyLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Privacy Policy pagina nog niet geïmplementeerd');
-  });
-
-  const contactLink = document.getElementById('contact-link');
-  contactLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Contact pagina nog niet geïmplementeerd');
+    Router.navigate('/registreer');
   });
 }
 
@@ -77,7 +62,7 @@ function handleJaarRegister(event) {
     jaar: formData.get('jaar'), // geselecteerde radio
     opleiding: formData.get('opleiding'), // geselecteerde optie uit select
   };
-  
+
   // Data naar server sturen (voorbeeld)
   console.log('Registratie data:', data);
 
