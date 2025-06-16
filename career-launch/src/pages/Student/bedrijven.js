@@ -174,6 +174,13 @@ function getUniekeDomeinen() {
   return [...new Set(bedrijven.flatMap(b => b.werkdomein.split(',').map(d => d.trim())))];
 }
 
+// Utility om correcte foto-URL te krijgen
+function getProfielFotoUrl(profiel_foto) {
+  if (!profiel_foto || profiel_foto === 'null') return '/src/Images/default.jpg';
+  if (profiel_foto.startsWith('http')) return profiel_foto;
+  return 'https://gt0kk4fbet.ufs.sh/f/' + profiel_foto;
+}
+
 // Hoofdfunctie: lijst van bedrijven
 export function renderBedrijven(rootElement, studentData = {}) {
   let huidigeZoek = '';

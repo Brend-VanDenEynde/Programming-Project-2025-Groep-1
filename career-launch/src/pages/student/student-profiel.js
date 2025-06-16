@@ -14,18 +14,64 @@ const defaultProfile = {
   opleiding_id: null,
 };
 
-export function renderStudentProfiel(rootElement, studentData = {}, readonlyMode = true) {
-  // Direct alle velden uit je backend of fallback naar default:
+function isoToDateString(isoString) {
+  if (!isoString) return '';
+  return isoString.split('T')[0];
+}
+
+// Utility om correcte foto-URL te krijgen
+function getProfielFotoUrl(profiel_foto) {
+  if (!profiel_foto || profiel_foto === 'null') return defaultAvatar;
+  if (profiel_foto.startsWith('http')) return profiel_foto;
+  return 'https://gt0kk4fbet.ufs.sh/f/' + profiel_foto;
+}
+
+export function renderStudentProfiel(
+  rootElement,
+  studentData = {},
+  readonlyMode = true
+) {
+  // Laad uit sessionStorage als leeg
+  if (!studentData || Object.keys(studentData).length === 0) {
+    try {
+      const stored = window.sessionStorage.getItem('studentData');
+      if (stored) studentData = JSON.parse(stored);
+    } catch (e) {}
+  }
+
+  // Gebruik altijd deze variabelen voor API-calls
+  // In deze omgeving zijn studentID en userID gelijk, maar future-proof splitsen
+  const studentID = studentData.id || studentData.gebruiker_id;
+  const userID = studentData.gebruiker_id || studentData.id;
+
+  // Gebruik ENKEL de huidige API velden
   const {
     voornaam = defaultProfile.voornaam,
     achternaam = defaultProfile.achternaam,
     email = defaultProfile.email,
     studiejaar = defaultProfile.studiejaar,
-    profiel_foto = defaultProfile.profiel_foto,
+    profiel_foto: rawProfielFoto = defaultProfile.profiel_foto,
     linkedin = defaultProfile.linkedin,
-    geboortedatum = defaultProfile.geboortedatum,
+    geboortedatum = geboortedatum = defaultProfile.geboortedatum,
     opleiding_id = defaultProfile.opleiding_id,
   } = studentData;
+
+  // Gebruik default als profiel_foto null, leeg of undefined is
+  const profiel_foto = getProfielFotoUrl(rawProfielFoto);
+
+  // Map opleiding name to id if id is missing
+  let resolvedOpleidingId = opleiding_id;
+  if (
+    (!resolvedOpleidingId ||
+      resolvedOpleidingId === null ||
+      typeof resolvedOpleidingId === 'undefined') &&
+    studentData.opleiding
+  ) {
+    const found = opleidingen.find((o) => o.naam === studentData.opleiding);
+    if (found) resolvedOpleidingId = found.id;
+  }
+
+  const opleidingNaam = getOpleidingNaamById(resolvedOpleidingId);
 
   rootElement.innerHTML = `
     <div class="student-profile-container">
