@@ -196,6 +196,7 @@ function setupNavigationLinks() {
       });
     }
   });
-}
 
+
+  
 setupNavigationLinks();
