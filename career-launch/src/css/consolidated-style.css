@@ -1634,16 +1634,6 @@ body.darkmode .speeddates-table .status-badge.badge-other {
   border: 1.5px solid #b0b6c6 !important;
 }
 
-/* Dark mode voor QR code */
-body.darkmode .qr-code-img {
-  background: #181c1f !important;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22) !important;
-}
-
-body.darkmode .qr-code-label {
-  color: var(--accent) !important;
-}
-
 /* =============================================================================
    10. FOOTER
    ============================================================================= */
@@ -2909,53 +2899,159 @@ body.darkmode .student-profile-footer a:hover {
   font-size: 1.1rem;
 }
 
-/* Responsive styling for speeddate modal */
-@media (max-width: 768px) {
-  .speeddates-modal-content {
-    width: 95%;
-    margin: 0 10px;
-  }
-
-  .speeddates-modal-header {
-    padding: 1rem;
-  }
-
-  .speeddates-modal-header h2 {
-    font-size: 1.3rem;
-  }
-
-  .speeddates-modal-body {
-    padding: 1rem;
-  }
-
-  .speeddate-info {
-    gap: 15px;
-  }
-
-  .speeddate-time {
-    min-width: 50px;
-    font-size: 0.9rem;
-  }
-
-  .speeddate-company, /* Adjusted for combined selector */
-  .speeddate-student {
-    font-size: 0.9rem;
-  }
+/* Student avatar in speeddate requests table */
+.student-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: left;
 }
 
-@media (max-width: 480px) {
-  .speeddate-info {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .speeddate-time {
-    min-width: auto;
-  }
+.student-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e1e5e9;
+  background: #fff;
 }
 
-/* Bedrijf Profile Styles */
+/* Loading and error states */
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.loading-state p,
+.error-state p {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.btn-retry {
+  background-color: #0077b5;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-retry:hover {
+  background-color: #005885;
+}
+
+/* Speeddate table action buttons */
+.btn-accept,
+.btn-decline {
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.4rem 1rem;
+  margin: 0 0.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.btn-accept {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-accept:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+}
+
+.btn-decline {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-decline:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+}
+
+.status-final {
+  font-weight: 600;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Status badges updates for new statuses */
+.status.geaccepteerd {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.status.in-afwachting {
+  color: #ffc107;
+  font-weight: 600;
+}
+
+.status.geweigerd {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* Dark mode for new elements */
+body.darkmode .student-avatar {
+  border-color: #333;
+}
+
+body.darkmode .loading-state p,
+body.darkmode .error-state p {
+  color: #e0f7fa;
+}
+
+body.darkmode .btn-retry {
+  background-color: #00e6ef;
+  color: #000;
+}
+
+body.darkmode .btn-retry:hover {
+  background-color: #00acc1;
+}
+
+body.darkmode .btn-accept {
+  background-color: #00ff7f;
+  color: #000;
+}
+
+body.darkmode .btn-accept:hover {
+  background-color: #00e66a;
+}
+
+body.darkmode .btn-decline {
+  background-color: #ff4d4f;
+  color: #fff;
+}
+
+body.darkmode .btn-decline:hover {
+  background-color: #ff3333;
+}
+
+body.darkmode .status-final {
+  color: #b0b6c6;
+}
+
+/* =============================================================================
+   12. BEDRIJF PROFIEL SYSTEEM
+   ============================================================================= */
+
+/* Bedrijf Profile Styles - gebaseerd op student profiel maar met bedrijf specifieke klassen */
 .bedrijf-profile-container {
   display: flex;
   flex-direction: column;
@@ -3009,29 +3105,25 @@ body.darkmode .student-profile-footer a:hover {
   margin: 0;
   border: 1px solid #e1e5e9;
   background: #fff;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   min-width: 160px;
+  z-index: 1000;
+  display: none;
 }
 
-.bedrijf-profile-dropdown li {
-  margin: 0;
-}
-
-.bedrijf-profile-dropdown button {
+.bedrijf-profile-dropdown li button {
   background: none;
   border: none;
-  padding: 0.75rem 1.5rem;
   width: 100%;
   text-align: left;
+  padding: 0.75rem 1rem;
   color: #333;
-  font-size: 0.95rem;
-  cursor: pointer;
   transition: background 0.2s;
+  cursor: pointer;
 }
 
-.bedrijf-profile-dropdown button:hover {
+.bedrijf-profile-dropdown li button:hover {
   background: #f5f5f5;
 }
 
@@ -3041,10 +3133,10 @@ body.darkmode .student-profile-footer a:hover {
 }
 
 .bedrijf-profile-sidebar {
-  width: 220px;
-  background: #fff;
+  width: 260px;
+  background: #f8f9fa;
   border-right: 1px solid #e1e5e9;
-  padding: 0;
+  padding: 2rem 0;
 }
 
 .bedrijf-profile-sidebar ul {
@@ -3054,7 +3146,6 @@ body.darkmode .student-profile-footer a:hover {
 }
 
 .bedrijf-profile-sidebar li {
-  border-bottom: 1px solid #f0f0f0;
   margin-bottom: 0.5rem;
 }
 
@@ -3074,7 +3165,7 @@ body.darkmode .student-profile-footer a:hover {
 .bedrijf-profile-sidebar button.active,
 .bedrijf-profile-sidebar button:hover {
   background: #e1e5e9;
-  border-left: 4px solid #00bcd4;
+  border-left: 4px solid #0077b5;
 }
 
 .bedrijf-profile-content {
@@ -3157,8 +3248,8 @@ body.darkmode .student-profile-footer a:hover {
 .bedrijf-profile-form-group input[type='email']:focus,
 .bedrijf-profile-form-group input[type='url']:focus,
 .bedrijf-profile-form-group textarea:focus {
-  border-color: #00bcd4;
-  background: #fff;
+  border-color: grey;
+  background: #f6fffa;
 }
 
 .bedrijf-profile-form-group input:disabled,
@@ -3210,29 +3301,149 @@ body.darkmode .student-profile-footer a:hover {
 }
 
 .bedrijf-profile-footer {
-  position: fixed;
-  bottom: 0;
-  width: 100vw;
-  background: #f5f6f7;
-  color: #7a7a7a;
+  background: #fff;
   border-top: 1px solid #e1e5e9;
+  padding: 1rem 2rem;
   text-align: center;
-  font-size: 0.95rem;
-  padding: 18px 0 14px 0;
-  margin: 0;
-  box-shadow: none;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  z-index: 100;
+  font-size: 0.9rem;
+  color: #666;
 }
 
 .bedrijf-profile-footer a {
-  color: #7a7a7a;
+  color: #0077b5;
   text-decoration: none;
-  transition: color 0.2s;
+  margin: 0 0.5rem;
 }
 
 .bedrijf-profile-footer a:hover {
-  color: #009ca6;
   text-decoration: underline;
+}
+
+/* Content headers for bedrijf pages */
+.content-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem 0;
+}
+
+.content-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0077b5;
+  margin-bottom: 0.5rem;
+}
+
+.content-header p {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0;
+}
+
+/* Speeddate requests content */
+.speeddates-verzoeken-content {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  margin: 0 auto;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.no-requests {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #666;
+}
+
+.no-requests p {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+/* Table container */
+.speeddates-table-container {
+  overflow-x: auto;
+  margin: -1rem;
+  padding: 1rem;
+}
+
+/* Dark mode support for bedrijf styling */
+body.darkmode .bedrijf-profile-container {
+  background: #121212;
+}
+
+body.darkmode .bedrijf-profile-header {
+  background: #000;
+  border-bottom-color: #333;
+}
+
+body.darkmode .bedrijf-profile-header .logo-section {
+  color: #e0f7fa;
+}
+
+body.darkmode .bedrijf-profile-burger {
+  color: #e0f7fa;
+}
+
+body.darkmode .bedrijf-profile-burger:hover {
+  background: #333;
+}
+
+body.darkmode .bedrijf-profile-dropdown {
+  background: #000;
+  border-color: #333;
+}
+
+body.darkmode .bedrijf-profile-dropdown li button {
+  color: #e0f7fa;
+}
+
+body.darkmode .bedrijf-profile-dropdown li button:hover {
+  background: #333;
+}
+
+body.darkmode .bedrijf-profile-sidebar {
+  background: #000;
+  border-right-color: #333;
+}
+
+body.darkmode .bedrijf-profile-sidebar button {
+  color: #e0f7fa;
+}
+
+body.darkmode .bedrijf-profile-sidebar button.active,
+body.darkmode .bedrijf-profile-sidebar button:hover {
+  background: #181c1f;
+  color: #00e6ef;
+  border-left-color: #00e6ef;
+}
+
+body.darkmode .bedrijf-profile-form-container,
+body.darkmode .speeddates-verzoeken-content {
+  background: #000;
+  color: #e0f7fa;
+  border: 1.5px solid #232323;
+}
+
+body.darkmode .bedrijf-profile-footer {
+  background: #000;
+  border-top-color: #333;
+  color: #b0b6c6;
+}
+
+body.darkmode .bedrijf-profile-footer a {
+  color: #00e6ef;
+}
+
+body.darkmode .content-header h1 {
+  color: #00e6ef;
+}
+
+body.darkmode .content-header p {
+  color: #b0b6c6;
+}
+
+body.darkmode .no-requests {
+  color: #b0b6c6;
 }

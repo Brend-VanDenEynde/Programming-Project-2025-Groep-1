@@ -1,106 +1,171 @@
 import {
   createBedrijfNavbar,
+  closeBedrijfNavbar,
   setupBedrijfNavbarEvents,
 } from '../../utils/bedrijf-navbar.js';
+import { fetchPendingSpeeddates } from '../../utils/data-api.js';
 
-export function renderBedrijfSpeeddatesVerzoeken(
+export async function renderBedrijfSpeeddatesVerzoeken(
   rootElement,
   companyData = {}
 ) {
-  let verzoeken = [
-    {
-      student: 'John Doe',
-      lokaal: 'B102',
-      tijd: '13:30',
-      status: 'Geaccepteerd',
-    },
-    {
-      student: 'Jane Smith',
-      lokaal: 'A201',
-      tijd: '11:00',
-      status: 'In afwachting',
-    },
-    {
-      student: 'Alice Johnson',
-      lokaal: 'C004',
-      tijd: '15:00',
-      status: 'In afwachting',
-    },
-  ];
-
+  // Show loading state
   rootElement.innerHTML = `
     ${createBedrijfNavbar('requests')}
-          <div class="content-header">
-            <h1>Speeddate Verzoeken</h1>
-            <p>Beheer je inkomende speeddate verzoeken</p>
-          </div>
-
-          <div class="speeddates-verzoeken-content">
-            ${
-              verzoeken.length === 0
-                ? `<div class="no-requests">
-                   <p>Nog geen speeddate verzoeken ontvangen.</p>
-                 </div>`
-                : `<div class="speeddates-table-container">
-                   <table class="speeddates-table">
-                     <thead>
-                       <tr>
-                         <th>Student</th>
-                         <th>Lokaal</th>
-                         <th>Tijd</th>
-                         <th>Status</th>
-                         <th>Acties</th>
-                       </tr>
-                     </thead>
-                     <tbody>
-                       ${verzoeken
-                         .map(
-                           (v, index) => `
-                           <tr data-request-id="${index}">
-                             <td>${v.student}</td>
-                             <td>${v.lokaal}</td>
-                             <td>${v.tijd}</td>
-                             <td><span class="status ${v.status
-                               .toLowerCase()
-                               .replace(' ', '-')}">${v.status}</span></td>
-                             <td>
-                               ${
-                                 v.status === 'In afwachting'
-                                   ? `<button class="btn-accept" onclick="acceptRequest(${index})">Accepteren</button>
-                                    <button class="btn-decline" onclick="declineRequest(${index})">Weigeren</button>`
-                                   : `<span class="status-final">${v.status}</span>`
-                               }
-                             </td>
-                           </tr>`
-                         )
-                         .join('')}
-                     </tbody>
-                   </table>
-                 </div>`
-            }
-          </div>        </div>
+      <div class="content-header">
+        <h1>Speeddate Verzoeken</h1>
+        <p>Beheer je inkomende speeddate verzoeken</p>
       </div>
-
-      <footer class="bedrijf-profile-footer">
-        <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
-      </footer>
-    </div>
+      <div class="speeddates-verzoeken-content">
+        <div class="loading-state">
+          <p>Speeddate verzoeken laden...</p>
+        </div>
+      </div>
+    ${closeBedrijfNavbar()}
   `;
 
+  try {
+    // Fetch pending speeddate requests from API
+    const apiVerzoeken = await fetchPendingSpeeddates();
+
+    // Transform API data to match expected format
+    const verzoeken = apiVerzoeken.map((request) => ({
+      id: request.id,
+      student: `${request.voornaam_student} ${request.achternaam_student}`,
+      studentId: request.id_student,
+      profielFoto: request.profiel_foto_student,
+      lokaal: request.lokaal,
+      tijd: new Date(request.begin).toLocaleTimeString('nl-NL', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      datum: new Date(request.begin).toLocaleDateString('nl-NL'),
+      begin: request.begin,
+      einde: request.einde,
+      status: request.akkoord ? 'Geaccepteerd' : 'In afwachting',
+      akkoord: request.akkoord,
+    }));
+
+    // Render the page with fetched data
+    renderPageContent(rootElement, verzoeken, companyData);
+  } catch (error) {
+    console.error('Error fetching speeddate requests:', error);
+    // Show error state
+    rootElement.innerHTML = `
+      ${createBedrijfNavbar('requests')}
+        <div class="content-header">
+          <h1>Speeddate Verzoeken</h1>
+          <p>Beheer je inkomende speeddate verzoeken</p>
+        </div>
+        <div class="speeddates-verzoeken-content">
+          <div class="error-state">
+            <p>Er is een fout opgetreden bij het laden van de speeddate verzoeken.</p>
+            <button onclick="location.reload()" class="btn-retry">Opnieuw proberen</button>
+          </div>
+        </div>
+      ${closeBedrijfNavbar()}
+    `;
+  }
+}
+
+function renderPageContent(rootElement, verzoeken, companyData) {
+  rootElement.innerHTML = `
+    ${createBedrijfNavbar('requests')}
+      <div class="content-header">
+        <h1>Speeddate Verzoeken</h1>
+        <p>Beheer je inkomende speeddate verzoeken</p>
+      </div>
+
+      <div class="speeddates-verzoeken-content">
+        ${
+          verzoeken.length === 0
+            ? `<div class="no-requests">
+               <p>Nog geen speeddate verzoeken ontvangen.</p>
+             </div>`
+            : `<div class="speeddates-table-container">
+               <table class="speeddates-table">
+                 <thead>
+                   <tr>
+                     <th>Student</th>
+                     <th>Datum</th>
+                     <th>Tijd</th>
+                     <th>Lokaal</th>
+                     <th>Status</th>
+                     <th>Acties</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   ${verzoeken
+                     .map(
+                       (v, index) => `
+                       <tr data-request-id="${v.id}">
+                         <td>
+                           <div class="student-info">
+                             ${
+                               v.profielFoto
+                                 ? `<img src="${v.profielFoto}" alt="${v.student}" class="student-avatar">`
+                                 : ''
+                             }
+                             <span>${v.student}</span>
+                           </div>
+                         </td>
+                         <td>${v.datum}</td>
+                         <td>${v.tijd}</td>
+                         <td>${v.lokaal}</td>
+                         <td><span class="status ${v.status
+                           .toLowerCase()
+                           .replace(' ', '-')}">${v.status}</span></td>
+                         <td>
+                           ${
+                             v.status === 'In afwachting'
+                               ? `<button class="btn-accept" onclick="acceptRequest(${v.id}, '${v.student}')">Accepteren</button>
+                                <button class="btn-decline" onclick="declineRequest(${v.id}, '${v.student}')">Weigeren</button>`
+                               : `<span class="status-final">${v.status}</span>`
+                           }
+                         </td>
+                       </tr>`
+                     )
+                     .join('')}
+                 </tbody>
+               </table>
+             </div>`
+        }
+      </div>
+    ${closeBedrijfNavbar()}
+  `;
   // Setup navbar events
-  setupBedrijfNavbarEvents();
+  setTimeout(() => {
+    setupBedrijfNavbarEvents();
+  }, 100);
 
   // Setup request management functions
-  window.acceptRequest = (index) => {
-    verzoeken[index].status = 'Geaccepteerd';
-    renderBedrijfSpeeddatesVerzoeken(rootElement, companyData);
-    alert(`Speeddate verzoek van ${verzoeken[index].student} geaccepteerd!`);
+  window.acceptRequest = async (requestId, studentName) => {
+    try {
+      // TODO: Implement API call to accept speeddate request
+      // const result = await acceptSpeeddateRequest(requestId);
+
+      alert(`Speeddate verzoek van ${studentName} geaccepteerd!`);
+
+      // Refresh the page to show updated data
+      await renderBedrijfSpeeddatesVerzoeken(rootElement, companyData);
+    } catch (error) {
+      console.error('Error accepting request:', error);
+      alert('Er is een fout opgetreden bij het accepteren van het verzoek.');
+    }
   };
 
-  window.declineRequest = (index) => {
-    verzoeken[index].status = 'Geweigerd';
-    renderBedrijfSpeeddatesVerzoeken(rootElement, companyData);
-    alert(`Speeddate verzoek van ${verzoeken[index].student} geweigerd.`);
+  window.declineRequest = async (requestId, studentName) => {
+    try {
+      // TODO: Implement API call to decline speeddate request
+      // const result = await declineSpeeddateRequest(requestId);
+
+      alert(`Speeddate verzoek van ${studentName} geweigerd.`);
+
+      // Refresh the page to show updated data
+      await renderBedrijfSpeeddatesVerzoeken(rootElement, companyData);
+    } catch (error) {
+      console.error('Error declining request:', error);
+      alert('Er is een fout opgetreden bij het weigeren van het verzoek.');
+    }
   };
 }

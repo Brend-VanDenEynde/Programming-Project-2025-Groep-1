@@ -58,16 +58,23 @@ export function closeBedrijfNavbar() {
 }
 
 export function setupBedrijfNavbarEvents() {
+  console.log('Setting up bedrijf navbar events...');
+
   // Sidebar navigation
-  document.querySelectorAll('.sidebar-link').forEach((btn) => {
+  const sidebarLinks = document.querySelectorAll('.sidebar-link');
+  console.log('Found sidebar links:', sidebarLinks.length);
+
+  sidebarLinks.forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       const route = e.currentTarget.getAttribute('data-route');
+      console.log('Clicking route:', route);
 
       import('../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
           case 'profile':
+            console.log('Navigating to bedrijf profile...');
             Router.navigate('/bedrijf/bedrijf-profiel');
             break;
           case 'search-criteria':

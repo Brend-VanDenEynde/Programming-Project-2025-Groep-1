@@ -138,3 +138,21 @@ export async function registerCompany(companyData) {
     throw error;
   }
 }
+
+/**
+ * Fetch pending speeddate requests for the authenticated company
+ * @param {number} companyId - Optional company ID to fetch pending speeddates for. If omitted, uses the authenticated user.
+ * @returns {Promise<Array>} Array of pending speeddate requests
+ */
+export async function fetchPendingSpeeddates(companyId = null) {
+  try {
+    const url = companyId
+      ? `https://api.ehb-match.me/speeddates/pending?id=${companyId}`
+      : 'https://api.ehb-match.me/speeddates/pending';
+
+    const speeddates = await apiGet(url);
+    return speeddates;
+  } catch (error) {
+    throw error;
+  }
+}
