@@ -1,4 +1,3 @@
-
 // src/views/bedrijf-profiel.js
 
 import defaultAvatar from '../../images/default.png';
@@ -7,7 +6,6 @@ import { renderLogin } from '../login.js';
 import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
 import '../../css/consolidated-style.css';
-import { setupNavigationLinks } from './bedrijf-speeddates.js';
 
 export async function fetchAndRenderBedrijfProfiel(rootElement, bedrijfId) {
   const token = sessionStorage.getItem('authToken');
