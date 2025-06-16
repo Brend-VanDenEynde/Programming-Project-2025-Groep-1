@@ -237,9 +237,11 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
 
   const logoutButton = document.getElementById('nav-logout');
   if (logoutButton) {
-    logoutButton.addEventListener('click', () => {
-      performLogout();
-      alert('U bent succesvol uitgelogd.');
+    logoutButton.addEventListener('click', async () => {
+      await performLogout();
+      // Verwijder alle history entries zodat terug niet meer naar profiel kan
+      window.location.replace(window.location.origin + window.location.pathname + '#/login');
+      alert('Je bent succesvol uitgelogd.');
       renderLogin(document.getElementById('app'));
     });
   } else {
@@ -347,21 +349,18 @@ window.addEventListener('DOMContentLoaded', () => {
 
   try {
     const storedCompanyData = sessionStorage.getItem('companyData');
-
-    if (!storedCompanyData) {
-      console.error('Geen bedrijfgegevens gevonden in sessionStorage. Controleer of de data correct wordt opgeslagen.');
+    const token = sessionStorage.getItem('authToken');
+    if (!storedCompanyData || !token) {
+      // Niet ingelogd, direct naar login
+      renderLogin(rootElement);
       return;
     }
-
     const companyData = JSON.parse(storedCompanyData);
-
     const bedrijfId = companyData.gebruiker_id || companyData.id; // Controleer alternatieve velden
-
     if (!bedrijfId) {
-      console.error('Geen geldig bedrijfId gevonden in de opgeslagen gegevens. Controleer de structuur van companyData:', companyData);
+      renderLogin(rootElement);
       return;
     }
-
     if (rootElement) {
       fetchAndRenderBedrijfProfiel(rootElement, bedrijfId);
     } else {

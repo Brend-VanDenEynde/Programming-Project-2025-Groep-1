@@ -63,7 +63,7 @@ export function renderLogin(rootElement) {
 
   document.getElementById('loginForm').addEventListener('submit', (e) => handleLogin(e, rootElement));
   document.getElementById('register-link').addEventListener('click', () => Router.navigate('/registreer'));
-  document.getElementById('back-button').addEventListener('click', () => Router.goBack('/'));
+  document.getElementById('back-button').addEventListener('click', () => Router.navigate('/'));
   document.getElementById('linkedin-btn').addEventListener('click', () => {});
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
