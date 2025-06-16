@@ -2,6 +2,7 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import '../../css/consolidated-style.css';
+import { createBedrijfNavbar, closeBedrijfNavbar, setupBedrijfNavbarEvents } from '../../utils/bedrijf-navbar.js';
 
 export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
   const speeddates = [];
@@ -19,95 +20,50 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
   }
 
   rootElement.innerHTML = `
-    <div class="bedrijf-profile-container">
-      <header class="bedrijf-profile-header">
-        <div class="logo-section">
-          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
-          <span>EhB Career Launch</span>
-        </div>
-        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
-        <ul id="burger-dropdown" class="bedrijf-profile-dropdown" style="display: none;">
-          <li><button id="nav-settings">Instellingen</button></li>
-          <li><button id="nav-logout">Log out</button></li>
-        </ul>
-      </header>
-
-      <div class="bedrijf-profile-main">
-        <nav class="bedrijf-profile-sidebar">
-          <ul>
-            <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
-            <li><button data-route="speeddates" class="sidebar-link active">Speeddates</button></li>
-            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
-            <li><button data-route="settings" class="sidebar-link">Instellingen</button></li>
-            <li><button data-route="contact" class="sidebar-link">Contact</button></li>
-            <li><button data-route="privacy" class="sidebar-link">Privacy Policy</button></li>
-          </ul>
-        </nav>
-
-        <div class="bedrijf-profile-content">
-          <div class="bedrijf-profile-form-container">
-            <h1 class="bedrijf-profile-title" style="text-align:center;width:100%;">Mijn Speeddates</h1>
-            <div>
-              ${
-                speeddates.length === 0
-                  ? `<p style="text-align:center;">U heeft nog geen speeddates ingepland.</p>`
-                  : `
-                    <div class="speeddates-table-container">
-                      <table class="speeddates-table">
-                        <thead>
-                          <tr>
-                            <th>Student</th>
-                            <th>Tijd</th>
-                            <th>Locatie</th>
-                            <th>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          ${speeddates
-                            .map(
-                              (s) => `
-                            <tr>
-                              <td>${s.student}</td>
-                              <td>${s.tijd}</td>
-                              <td>${s.locatie}</td>
-                              <td>${getStatusBadge(s.status)}</td>
-                            </tr>
-                          `
-                            )
-                            .join('')}
-                        </tbody>
-                      </table>
-                    </div>
-                  `
-              }
-            </div>
-          </div>
+    ${createBedrijfNavbar('speeddates')}
+    <div class="bedrijf-profile-content">
+      <div class="bedrijf-profile-form-container">
+        <h1 class="bedrijf-profile-title" style="text-align:center;width:100%;">Mijn Speeddates</h1>
+        <div>
+          ${
+            speeddates.length === 0
+              ? `<p style="text-align:center;">U heeft nog geen speeddates ingepland.</p>`
+              : `
+                <div class="speeddates-table-container">
+                  <table class="speeddates-table">
+                    <thead>
+                      <tr>
+                        <th>Student</th>
+                        <th>Tijd</th>
+                        <th>Locatie</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${speeddates
+                        .map(
+                          (s) => `
+                        <tr>
+                          <td>${s.student}</td>
+                          <td>${s.tijd}</td>
+                          <td>${s.locatie}</td>
+                          <td>${getStatusBadge(s.status)}</td>
+                        </tr>
+                      `
+                        )
+                        .join('')}
+                    </tbody>
+                  </table>
+                </div>
+              `
+          }
         </div>
       </div>
-
-      <footer class="bedrijf-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
-      </footer>
     </div>
+    ${closeBedrijfNavbar()}
   `;
 
-  // Sidebar nav - gebruik de router voor echte URL navigatie
-  document.querySelectorAll('.sidebar-link').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      alert(`Navigeren naar: ${btn.getAttribute('data-route')}`);
-    });
-  });
-
-  // Burger menu functionaliteit
-  const burger = document.getElementById('burger-menu');
-  const dropdown = document.getElementById('burger-dropdown');
-  if (burger && dropdown) {
-    burger.addEventListener('click', () => {
-      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-    });
-  }
+  setupBedrijfNavbarEvents();
 
   // Fetch user info to get gebruiker_id
   const token = sessionStorage.getItem('authToken');

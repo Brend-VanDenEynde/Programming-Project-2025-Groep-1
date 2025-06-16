@@ -8,6 +8,7 @@ import { renderLogin } from '../login.js';
 import { showBedrijfSettingsPopup } from './bedrijf-settings.js';
 import { fetchStudents } from '../../utils/data-api.js';
 import defaultFoto from '../../images/default.png';
+import { createBedrijfNavbar, closeBedrijfNavbar, setupBedrijfNavbarEvents } from '../../utils/bedrijf-navbar.js';
 
 // Globale variabele voor studenten data
 let studenten = [];
@@ -210,53 +211,27 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
   }
   // Initial render with loading state
   rootElement.innerHTML = `
-    <div class="bedrijf-profile-container">
-      <header class="bedrijf-profile-header">
-        <div class="logo-section">
-          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
-          <span>EhB Career Launch</span>
+    ${createBedrijfNavbar('studenten')}
+    <div class="bedrijf-profile-content">
+      <div class="bedrijf-profile-form-container">
+        <h1 class="bedrijf-profile-title">Studenten</h1>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1.2rem;">
+          <input id="student-zoek" type="text" placeholder="Zoek student, locatie of domein..." style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;min-width:180px;">
+          <select id="student-filter-locatie" style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;">
+            <option value="">Alle locaties</option>
+          </select>
+          <select id="student-filter-domein" style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;">
+            <option value="">Alle domeinen</option>
+          </select>
         </div>
-        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
-        <ul id="burger-dropdown" class="bedrijf-profile-dropdown" style="display: none;">
-          <li><button id="nav-settings">Instellingen</button></li>
-          <li><button id="nav-logout">Log out</button></li>
-        </ul>
-      </header>
-      <div class="bedrijf-profile-main">
-        <nav class="bedrijf-profile-sidebar">
-          <ul>
-            <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
-            <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
-            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
-            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="studenten" class="sidebar-link active">Studenten</button></li>
-            <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
-          </ul>
-        </nav>
-        <div class="bedrijf-profile-content">
-          <div class="bedrijf-profile-form-container">
-            <h1 class="bedrijf-profile-title">Studenten</h1>
-            <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;margin-bottom:1.2rem;">
-              <input id="student-zoek" type="text" placeholder="Zoek student, locatie of domein..." style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;min-width:180px;">
-              <select id="student-filter-locatie" style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;">
-                <option value="">Alle locaties</option>
-              </select>
-              <select id="student-filter-domein" style="padding:0.7rem 1rem;border-radius:8px;border:1.5px solid #e1e5e9;">
-                <option value="">Alle domeinen</option>
-              </select>
-            </div>
-            <div id="studenten-list" class="studenten-list" style="display:flex;flex-wrap:wrap;gap:2rem;justify-content:center;">
-              <div style="text-align:center;width:100%;color:#888;">Laden van studenten...</div>
-            </div>
-          </div>
+        <div id="studenten-list" class="studenten-list" style="display:flex;flex-wrap:wrap;gap:2rem;justify-content:center;">
+          <div style="text-align:center;width:100%;color:#888;">Laden van studenten...</div>
         </div>
       </div>
-      <footer class="bedrijf-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
-      </footer>
     </div>
+    ${closeBedrijfNavbar()}
   `;
+  setupBedrijfNavbarEvents();
   function updateFilters() {
     const locatieSelect = document.getElementById('student-filter-locatie');
     const domeinSelect = document.getElementById('student-filter-domein');
@@ -277,31 +252,6 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
   }
   updateFilters();
   renderList();
-  document.querySelectorAll('.sidebar-link').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const route = btn.getAttribute('data-route');
-      switch (route) {
-        case 'profile':
-          import('./bedrijf-profiel.js').then((m) => m.renderBedrijfProfiel(document.getElementById('app'), bedrijfData));
-          break;
-        case 'search':
-          import('./search-criteria-bedrijf.js').then((m) => m.renderSearchCriteriaBedrijf(document.getElementById('app'), bedrijfData));
-          break;
-        case 'speeddates':
-          import('./bedrijf-speeddates.js').then((m) => m.renderBedrijfSpeeddates(document.getElementById('app'), bedrijfData));
-          break;
-        case 'requests':
-          import('./bedrijf-speeddates-verzoeken.js').then((m) => m.renderBedrijfSpeeddatesRequests(document.getElementById('app'), bedrijfData));
-          break;
-        case 'studenten':
-          // Already on studenten, do nothing
-          break;
-        case 'qr':
-          import('./bedrijf-qr-popup.js').then((m) => m.renderBedrijfQRPopup(document.getElementById('app'), bedrijfData));
-          break;
-      }
-    });
-  });
   const setupEventListeners = () => {
     const zoekElement = document.getElementById('student-zoek');
     const locatieElement = document.getElementById('student-filter-locatie');
