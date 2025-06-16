@@ -36,6 +36,7 @@ export async function fetchAndRenderBedrijfProfiel(rootElement, bedrijfId) {
       profiel_foto: bedrijfData.profiel_foto || defaultAvatar,
       linkedin: bedrijfData.linkedin,
       plaats: bedrijfData.plaats, // Assuming "plaats" is used as a description
+      bedrijfId: bedrijfId, // Include bedrijfId for potential future use
     };
 
     renderBedrijfProfiel(rootElement, mappedData);
@@ -165,7 +166,9 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
 
         try {
           const token = sessionStorage.getItem('authToken');
-          const bedrijfId = bedrijfData.id || bedrijfData.gebruiker_id;
+          const storedCompanyData = JSON.parse(sessionStorage.getItem('companyData'));
+          const bedrijfId = storedCompanyData.id || storedCompanyData.gebruiker_id; // ✅ gebruik het expliciet opgeslagen ID
+
 
           const response = await fetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}`, {
             method: 'PUT',
@@ -184,6 +187,7 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
           const result = await response.json();
           alert('Profiel succesvol opgeslagen!');
           renderBedrijfProfiel(rootElement, result, true);
+          location.reload();
         } catch (error) {
           alert(`Er is een fout opgetreden: ${error.message}`);
         }
