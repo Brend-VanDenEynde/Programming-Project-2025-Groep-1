@@ -78,6 +78,7 @@ export function renderBedrijfSpeeddatesRequests(rootElement, companyData = {}) {
 
   renderTable();
   renderSidebar();
+}
 
 // Dummy file for bedrijf-speeddates-verzoeken.js
 export function renderBedrijfSpeeddatesVerzoeken() {
