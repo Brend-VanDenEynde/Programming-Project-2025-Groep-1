@@ -84,7 +84,7 @@ function handleNaamRegister(event) {
   if (linkedinInput && linkedinInput.trim() !== '') {
     linkedinInput = linkedinInput.trim();
     // Remove both 'https://www.linkedin.com' and 'https://linkedin.com' from the start
-    linkedinInput = linkedinInput.replace(/^https:\/\/(www\.)?linkedin\.com/i, '');
+    linkedinInput = linkedinInput.replace(/^(https?:\/\/)?(www\.)?linkedin\.com/i, '');
     // Accept if it starts with '/in/'
     if (linkedinInput.startsWith('/in/')) {
       linkedinValue = linkedinInput;
