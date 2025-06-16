@@ -5,7 +5,7 @@ import { renderBedrijfSpeeddates } from './bedrijf-speeddates.js';
 import { renderBedrijfSpeeddatesRequests } from './bedrijf-speeddates-verzoeken.js';
 import { renderBedrijfQRPopup } from './bedrijf-qr-popup.js';
 import { renderLogin } from '../login.js';
-import { showSettingsPopup } from './bedrijf-settings.js';
+import { showBedrijfSettingsPopup } from './bedrijf-settings.js';
 import { fetchStudents } from '../../utils/data-api.js';
 import defaultFoto from '../../images/default.png';
 
