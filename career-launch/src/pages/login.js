@@ -139,6 +139,10 @@ async function handleLogin(event, rootElement) {
     const infoRes = await fetchUserInfo(loginRes.accessToken);
     const user = infoRes.user;
 
+
+    // Debug: log de volledige user-object
+    console.log('USER OBJECT:', user);
+
     if (!user || !user.type) {
       alert('Geen gebruikersinformatie ontvangen. Neem contact op met support.');
       throw new Error('Authentication failed: No user info');
@@ -146,9 +150,18 @@ async function handleLogin(event, rootElement) {
 
     if (user.type === 2) {
       window.sessionStorage.setItem('userType', 'student');
+
+
       await fetchAndStoreStudentProfile();
+
       Router.navigate('/student/student-profiel');
     } else if (user.type === 3) {
+      // Controleer of id aanwezig is en geldig is
+      if (!user.id || typeof user.id !== 'number') {
+        console.error('Ongeldig of ontbrekend id in companyData:', user);
+        alert('Fout: Ongeldig of ontbrekend id in de bedrijfsgegevens.');
+        return;
+      }
       window.sessionStorage.setItem('companyData', JSON.stringify(user));
       window.sessionStorage.setItem('userType', 'company');
       Router.navigate('/bedrijf/bedrijf-profiel');
@@ -165,6 +178,7 @@ async function handleLogin(event, rootElement) {
     window.sessionStorage.removeItem('studentData');
     window.sessionStorage.removeItem('companyData');
     window.sessionStorage.removeItem('userType');
+
     alert('Inloggen mislukt. Controleer je e-mailadres en wachtwoord.');
   }
 }
