@@ -106,13 +106,17 @@ export function renderSpeeddates(rootElement, studentData = {}) {
                   `
               }
             </div>
-          </div>
-        </div>
+          </div>        </div>
       </div>
 
       <footer class="student-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+        <div class="footer-content">
+          <span>&copy; 2025 EhB Career Launch</span>
+          <div class="footer-links">
+            <a href="/privacy" data-route="/privacy">Privacy</a>
+            <a href="/contact" data-route="/contact">Contact</a>
+          </div>
+        </div>
       </footer>
     </div>
   `;

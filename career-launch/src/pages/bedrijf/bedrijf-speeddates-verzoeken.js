@@ -1,6 +1,12 @@
-import logoIcon from '../../icons/favicon-32x32.png';
+import {
+  createBedrijfNavbar,
+  setupBedrijfNavbarEvents,
+} from '../../utils/bedrijf-navbar.js';
 
-export function renderSpeeddatesRequests(rootElement, companyData = {}) {
+export function renderBedrijfSpeeddatesVerzoeken(
+  rootElement,
+  companyData = {}
+) {
   let verzoeken = [
     {
       student: 'John Doe',
@@ -22,59 +28,79 @@ export function renderSpeeddatesRequests(rootElement, companyData = {}) {
     },
   ];
 
-  function renderTable() {
-    const tableHtml =
-      verzoeken.length === 0
-        ? `<p style="text-align:center;">Nog geen speeddates-verzoeken gevonden.</p>`
-        : `
-        <div class="speeddates-table-container">
-          <table class="speeddates-table">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Lokaal</th>
-                <th>Tijd</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${verzoeken
-                .map(
-                  (v) => `
-                <tr>
-                  <td>${v.student}</td>
-                  <td>${v.lokaal}</td>
-                  <td>${v.tijd}</td>
-                  <td>${v.status}</td>
-                </tr>`
-                )
-                .join('')}
-            </tbody>
-          </table>
-        </div>`;
+  rootElement.innerHTML = `
+    ${createBedrijfNavbar('requests')}
+          <div class="content-header">
+            <h1>Speeddate Verzoeken</h1>
+            <p>Beheer je inkomende speeddate verzoeken</p>
+          </div>
 
-    rootElement.innerHTML = tableHtml;
-  }
+          <div class="speeddates-verzoeken-content">
+            ${
+              verzoeken.length === 0
+                ? `<div class="no-requests">
+                   <p>Nog geen speeddate verzoeken ontvangen.</p>
+                 </div>`
+                : `<div class="speeddates-table-container">
+                   <table class="speeddates-table">
+                     <thead>
+                       <tr>
+                         <th>Student</th>
+                         <th>Lokaal</th>
+                         <th>Tijd</th>
+                         <th>Status</th>
+                         <th>Acties</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       ${verzoeken
+                         .map(
+                           (v, index) => `
+                           <tr data-request-id="${index}">
+                             <td>${v.student}</td>
+                             <td>${v.lokaal}</td>
+                             <td>${v.tijd}</td>
+                             <td><span class="status ${v.status
+                               .toLowerCase()
+                               .replace(' ', '-')}">${v.status}</span></td>
+                             <td>
+                               ${
+                                 v.status === 'In afwachting'
+                                   ? `<button class="btn-accept" onclick="acceptRequest(${index})">Accepteren</button>
+                                    <button class="btn-decline" onclick="declineRequest(${index})">Weigeren</button>`
+                                   : `<span class="status-final">${v.status}</span>`
+                               }
+                             </td>
+                           </tr>`
+                         )
+                         .join('')}
+                     </tbody>
+                   </table>
+                 </div>`
+            }
+          </div>        </div>
+      </div>
 
-  function renderSidebar() {
-    const sidebarHtml = `
-      <nav class="company-profile-sidebar">
-        <ul>
-          <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
-          <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
-          <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-          <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
-        </ul>
-      </nav>`;
+      <footer class="bedrijf-profile-footer">
+        <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
+      </footer>
+    </div>
+  `;
 
-    const sidebarContainer = document.querySelector('.sidebar-container');
-    if (sidebarContainer) {
-      sidebarContainer.innerHTML = sidebarHtml;
-    }
+  // Setup navbar events
+  setupBedrijfNavbarEvents();
 
-    setupNavigationLinks();
-  }
+  // Setup request management functions
+  window.acceptRequest = (index) => {
+    verzoeken[index].status = 'Geaccepteerd';
+    renderBedrijfSpeeddatesVerzoeken(rootElement, companyData);
+    alert(`Speeddate verzoek van ${verzoeken[index].student} geaccepteerd!`);
+  };
 
-  renderTable();
-  renderSidebar();
+  window.declineRequest = (index) => {
+    verzoeken[index].status = 'Geweigerd';
+    renderBedrijfSpeeddatesVerzoeken(rootElement, companyData);
+    alert(`Speeddate verzoek van ${verzoeken[index].student} geweigerd.`);
+  };
 }

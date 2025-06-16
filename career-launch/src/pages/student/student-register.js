@@ -24,10 +24,16 @@ export function renderStudentRegister(rootElement) {
         <button type="submit" class="next-button">Volgende →</button>
       </form>
 
-        </main>
+    </main>
 
     <footer class="footer">
-      <a href="/privacy" data-route="/privacy">Privacy Policy</a> | <a href="/contact" data-route="/contact">Contacteer Ons</a>
+      <div class="footer-content">
+        <span>&copy; 2025 EhB Career Launch</span>
+        <div class="footer-links">
+          <a href="/privacy" data-route="/privacy">Privacy</a>
+          <a href="/contact" data-route="/contact">Contact</a>
+        </div>
+      </div>
     </footer>
   </div>
   `;

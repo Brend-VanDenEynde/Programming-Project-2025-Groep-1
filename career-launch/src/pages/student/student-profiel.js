@@ -6,7 +6,6 @@ import defaultAvatar from '../../images/default.png';
 import { logoutUser } from '../../utils/auth-api.js';
 import { renderBedrijven } from './bedrijven.js';
 
-
 const defaultProfile = {
   voornaam: '',
   achternaam: '',
@@ -54,7 +53,10 @@ export function renderStudentProfiel(
   } = studentData;
 
   // Gebruik default als profiel_foto null, leeg of undefined is
-  const profiel_foto = (!rawProfielFoto || rawProfielFoto === 'null') ? defaultAvatar : rawProfielFoto;
+  const profiel_foto =
+    !rawProfielFoto || rawProfielFoto === 'null'
+      ? defaultAvatar
+      : rawProfielFoto;
 
   // Map opleiding name to id if id is missing
   let resolvedOpleidingId = opleiding_id;
@@ -196,12 +198,17 @@ export function renderStudentProfiel(
                 }
               </div>
             </form>
+          </div>        </div>
+      </div>
+      
+      <footer class="student-profile-footer">
+        <div class="footer-content">
+          <span>&copy; 2025 EhB Career Launch</span>
+          <div class="footer-links">
+            <a href="/privacy" data-route="/privacy">Privacy</a>
+            <a href="/contact" data-route="/contact">Contact</a>
           </div>
         </div>
-      </div>
-      <footer class="student-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
       </footer>
     </div>
   `;
@@ -226,7 +233,7 @@ export function renderStudentProfiel(
             Router.navigate('/student/student-speeddates-verzoeken');
             break;
           case 'bedrijven':
-            Router.navigate('/student/bedrijven')
+            Router.navigate('/student/bedrijven');
             break;
           case 'qr':
             Router.navigate('/student/student-qr-popup');
@@ -262,20 +269,22 @@ export function renderStudentProfiel(
       dropdown.classList.remove('open');
       showSettingsPopup(() => renderStudentProfiel(rootElement, studentData));
     });
-    document.getElementById('nav-logout').addEventListener('click', async () => {
-      dropdown.classList.remove('open');
-      const response = await logoutUser();
-      console.log('Logout API response:', response);
-      window.sessionStorage.removeItem('studentData');
-      window.sessionStorage.removeItem('authToken');
-      window.sessionStorage.removeItem('userType');
-      localStorage.setItem('darkmode', 'false');
-      document.body.classList.remove('darkmode');
-      import('../../router.js').then((module) => {
-        const Router = module.default;
-        Router.navigate('/');
+    document
+      .getElementById('nav-logout')
+      .addEventListener('click', async () => {
+        dropdown.classList.remove('open');
+        const response = await logoutUser();
+        console.log('Logout API response:', response);
+        window.sessionStorage.removeItem('studentData');
+        window.sessionStorage.removeItem('authToken');
+        window.sessionStorage.removeItem('userType');
+        localStorage.setItem('darkmode', 'false');
+        document.body.classList.remove('darkmode');
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/');
+        });
       });
-    });
 
     // Ook de LOG OUT knop in het profiel-formulier zelf (voor desktop)
     const logoutBtn = document.getElementById('logout-btn');
@@ -347,7 +356,10 @@ export function renderStudentProfiel(
           opleiding_id: parseInt(newOpleidingId, 10),
         };
         // Debug: log de payload
-        console.log('Student update payload:', JSON.stringify(updatedStudentData));
+        console.log(
+          'Student update payload:',
+          JSON.stringify(updatedStudentData)
+        );
         const token = sessionStorage.getItem('authToken');
         // Haal altijd de juiste ID’s uit sessionStorage
         // let studentID = studentData.gebruiker_id;
@@ -357,16 +369,32 @@ export function renderStudentProfiel(
           return;
         }
         // Debug: log de gebruikte ID's en token
-        console.log('studentData:', studentData, 'studentID:', studentID, 'userID:', userID, 'token:', token);
+        console.log(
+          'studentData:',
+          studentData,
+          'studentID:',
+          studentID,
+          'userID:',
+          userID,
+          'token:',
+          token
+        );
         // Check geboortedatum niet in de toekomst en minstens 17 jaar oud
         const today = new Date();
-        const minBirthDate = new Date(today.getFullYear() - 17, today.getMonth(), today.getDate());
+        const minBirthDate = new Date(
+          today.getFullYear() - 17,
+          today.getMonth(),
+          today.getDate()
+        );
         const inputBirthDate = new Date(updatedStudentData.date_of_birth);
         // Inline validatie geboortedatum
         const birthDateError = document.getElementById('birthDateError');
         birthDateError.textContent = '';
-        if (updatedStudentData.date_of_birth > today.toISOString().split('T')[0]) {
-          birthDateError.textContent = 'Geboortedatum mag niet in de toekomst liggen.';
+        if (
+          updatedStudentData.date_of_birth > today.toISOString().split('T')[0]
+        ) {
+          birthDateError.textContent =
+            'Geboortedatum mag niet in de toekomst liggen.';
           return;
         }
         if (inputBirthDate > minBirthDate) {
@@ -377,14 +405,17 @@ export function renderStudentProfiel(
           // 1. E-mail gewijzigd? Eerst /user/{userID}
           if (nieuweEmail && nieuweEmail !== oudeEmail) {
             console.debug('PUT /user/' + userID, { email: nieuweEmail });
-            const respUser = await fetch(`https://api.ehb-match.me/user/${userID}`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token,
-              },
-              body: JSON.stringify({ email: nieuweEmail }),
-            });
+            const respUser = await fetch(
+              `https://api.ehb-match.me/user/${userID}`,
+              {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: 'Bearer ' + token,
+                },
+                body: JSON.stringify({ email: nieuweEmail }),
+              }
+            );
             if (!respUser.ok) {
               const errText = await respUser.text();
               console.error('Backend response (user):', errText);
@@ -398,14 +429,17 @@ export function renderStudentProfiel(
           }
           // 2. Overige profielinfo via /studenten/{studentID}
           console.debug('PUT /studenten/' + studentID, updatedStudentData);
-          const respStudent = await fetch(`https://api.ehb-match.me/studenten/${studentID}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + token,
-            },
-            body: JSON.stringify(updatedStudentData),
-          });
+          const respStudent = await fetch(
+            `https://api.ehb-match.me/studenten/${studentID}`,
+            {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
+              },
+              body: JSON.stringify(updatedStudentData),
+            }
+          );
           if (!respStudent.ok) {
             const errText = await respStudent.text();
             console.error('Backend response (student):', errText);
@@ -415,8 +449,14 @@ export function renderStudentProfiel(
           // Backend geeft { message, student } terug
           if (result.student) {
             // Combineer email met nieuwe studentdata voor sessionStorage
-            const nieuweStudentData = { ...result.student, email: studentData.email };
-            sessionStorage.setItem('studentData', JSON.stringify(nieuweStudentData));
+            const nieuweStudentData = {
+              ...result.student,
+              email: studentData.email,
+            };
+            sessionStorage.setItem(
+              'studentData',
+              JSON.stringify(nieuweStudentData)
+            );
             renderStudentProfiel(rootElement, nieuweStudentData, true);
           } else {
             alert('Profiel opgeslagen, maar geen student-object in response!');
@@ -453,7 +493,7 @@ export async function fetchAndStoreStudentProfile() {
   if (!token) throw new Error('Geen authToken gevonden');
   // 1. Haal user-info op (voor email en userID)
   const respUser = await fetch('https://api.ehb-match.me/auth/info', {
-    headers: { 'Authorization': 'Bearer ' + token }
+    headers: { Authorization: 'Bearer ' + token },
   });
   if (!respUser.ok) throw new Error('Kan user-info niet ophalen');
   const userResult = await respUser.json();
@@ -461,11 +501,11 @@ export async function fetchAndStoreStudentProfile() {
   if (!user || !user.id) throw new Error('User info onvolledig');
   // 2. Haal alle studenten op en zoek juiste student
   const respStudents = await fetch('https://api.ehb-match.me/studenten', {
-    headers: { 'Authorization': 'Bearer ' + token }
+    headers: { Authorization: 'Bearer ' + token },
   });
   if (!respStudents.ok) throw new Error('Kan studentenlijst niet ophalen');
   const studenten = await respStudents.json();
-  const student = studenten.find(s => s.gebruiker_id === user.id);
+  const student = studenten.find((s) => s.gebruiker_id === user.id);
   if (!student) throw new Error('Student niet gevonden voor deze gebruiker!');
   // 3. Combineer info (voeg email toe aan studentdata)
   const combined = { ...student, email: user.email, gebruiker_id: user.id };

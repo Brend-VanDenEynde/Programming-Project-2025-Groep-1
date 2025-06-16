@@ -117,14 +117,18 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
         <div class="student-profile-content">
           <div class="student-profile-form-container">
             <h1 class="student-profile-title" style="text-align:center;width:100%;">Speeddates-verzoeken</h1>
-            <div id="speeddates-requests-table"></div>
-          </div>
+            <div id="speeddates-requests-table"></div>        </div>
         </div>
       </div>
 
       <footer class="student-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+        <div class="footer-content">
+          <span>&copy; 2025 EhB Career Launch</span>
+          <div class="footer-links">
+            <a href="/privacy" data-route="/privacy">Privacy</a>
+            <a href="/contact" data-route="/contact">Contact</a>
+          </div>
+        </div>
       </footer>
     </div>
   `;

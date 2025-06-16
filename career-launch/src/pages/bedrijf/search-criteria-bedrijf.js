@@ -1,9 +1,12 @@
 // src/views/search-criteria-bedrijf.js
 
-import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderBedrijfProfiel } from './bedrijf-profiel.js';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
+import {
+  createBedrijfNavbar,
+  setupBedrijfNavbarEvents,
+} from '../../utils/bedrijf-navbar.js';
 
 export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
   if (!bedrijfData.criteria) {
@@ -18,34 +21,12 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
 
   const { zoekType, skills, skillAndere, talen, taalAndere } =
     bedrijfData.criteria;
-
   rootElement.innerHTML = `
-    <header style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid #ccc;">
-      <div style="display: flex; align-items: center;">
-        <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" style="margin-right: 0.5rem;" />
-        <span>EhB Career Launch</span>
-      </div>
-      <button id="burger-menu" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">☰</button>
-      <ul id="burger-dropdown" style="position: absolute; top: 3rem; right: 1rem; list-style: none; padding: 0.5rem; margin: 0; border: 1px solid #ccc; background: white; display: none; z-index: 100;">
-        <li><button id="nav-dashboard" style="background:none; border:none; width:100%; text-align:left; padding:0.25rem 0;">Dashboard</button></li>
-        <li><button id="nav-settings" style="background:none; border:none; width:100%; text-align:left; padding:0.25rem 0;">Instellingen</button></li>
-        <li><button id="nav-delete-account" style="background:none; border:none; width:100%; text-align:left; padding:0.25rem 0;">Verwijder account</button></li>
-        <li><button id="nav-logout" style="background:none; border:none; width:100%; text-align:left; padding:0.25rem 0;">Log out</button></li>
-      </ul>
-    </header>
-
-    <div style="display: flex; margin-top: 0.5rem;">
-      <nav id="sidebar" style="width: 180px; border-right: 1px solid #ccc; padding-right: 1rem;">
-        <ul style="list-style: none; padding: 0; margin: 0;">
-          <li><button data-route="profile" class="sidebar-link" style="background:none; border:none; padding:0.25rem 0; width:100%; text-align:left;">Profiel</button></li>
-          <li><button data-route="search" class="sidebar-link" style="background:none; border:none; padding:0.25rem 0; width:100%; text-align:left;">Zoek-criteria</button></li>
-          <li><button data-route="speeddates" class="sidebar-link" style="background:none; border:none; padding:0.25rem 0; width:100%; text-align:left;">Speeddates</button></li>
-          <li><button data-route="requests" class="sidebar-link" style="background:none; border:none; padding:0.25rem 0; width:100%; text-align:left;">Speeddates-verzoeken</button></li>
-        </ul>
-      </nav>
-
-      <main style="flex: 1; padding: 1rem;">
-        <h1>Zoek-criteria</h1>
+    ${createBedrijfNavbar('search-criteria')}
+          <div class="content-header">
+            <h1>Zoek-criteria</h1>
+            <p>Stel je zoekcriteria in om de juiste studenten te vinden</p>
+          </div>
 
         <div style="background-color: #f0f0f0; padding: 1rem; border-radius: 8px;">
           <fieldset id="fieldset-jobType" style="margin-bottom: 1.5rem; border: none; padding: 0;">
@@ -84,19 +65,21 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
             <input type="checkbox" id="taal-andere" name="talen" value="andere">
             <label for="taal-andere">Andere</label>
             <input type="text" id="taal-andere-text" name="taalAndereText" placeholder="Omschrijf hier" style="margin-left: 0.5rem;">
-          </fieldset>
-
-          <div style="margin-top: 2rem;">
+          </fieldset>          <div style="margin-top: 2rem;">
             <button id="btn-reset" style="margin-right: 1rem;">RESET</button>
             <button id="btn-save">SAVE</button>
-          </div>
-        </div>
-      </main>
-    </div>    <footer style="text-align: center; margin-top: 1rem;">
-      <a href="/privacy" data-route="/privacy">Privacy Policy</a> |
-      <a href="/contact" data-route="/contact">Contacteer ons</a>
-    </footer>
+          </div>        </div>
+      </div>
+
+      <footer class="bedrijf-profile-footer">
+        <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
+      </footer>
+    </div>
   `;
+
+  // Setup navbar events
+  setupBedrijfNavbarEvents();
 
   const restoreCriteria = () => {
     if (zoekType) {
