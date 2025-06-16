@@ -2433,6 +2433,37 @@ body.darkmode .student-profile-footer a:hover {
   justify-content: center;
   border-radius: 50%;
   margin: 0 auto 0.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.uploaded-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: contain;
+  text-align: center;
+}
+
+.delete-overlay {
+  display: none;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  border-width: 0;
+  font-size: 2.2rem;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 2;
+  transition: background 0.2s;
+  pointer-events: auto;
+}
+.upload-icon:hover .delete-overlay {
+  display: flex;
 }
 
 .upload-section label {

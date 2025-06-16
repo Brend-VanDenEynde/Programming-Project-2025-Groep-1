@@ -3,13 +3,19 @@ import '../../css/consolidated-style.css';
 import Router from '../../router.js';
 import { registerCompany } from '../../utils/data-api.js';
 
+let fileKey = null;
+
 export function renderBedrijfRegister(rootElement) {
   rootElement.innerHTML = `
   
   <div style="min-height: 100vh; display: flex; flex-direction: column;">
     <main class="form-container">
-      <button class="back-button" id="back-button">← Terug</button>      <div class="upload-section">
-        <div class="upload-icon">⬆</div>
+      <button class="back-button" id="back-button">← Terug</button>
+      <div class="upload-section">
+        <div class="upload-icon" data-alt="⬆" style="position:relative;">
+          <img src="" alt="⬆" class="uploaded-photo" />
+          <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
+        </div>
         <label for="profielFoto" class="upload-label">Logo</label>
         <div class="file-input-wrapper">
           <input type="file" id="profielFoto" name="profielFoto" accept="image/*" class="file-input" />
@@ -47,17 +53,78 @@ export function renderBedrijfRegister(rootElement) {
   const fileInput = document.getElementById('profielFoto');
   const browseButton = document.querySelector('.browse-button');
   const fileStatus = document.querySelector('.file-status');
+  const uploadIcon = document.querySelector('.upload-icon');
+  const uploadedPhoto = document.querySelector('.uploaded-photo');
+  const deleteOverlay = document.querySelector('.delete-overlay');
 
   browseButton.addEventListener('click', () => {
     fileInput.click();
   });
 
-  fileInput.addEventListener('change', (e) => {
+  let hasUploadedPhoto = false;
+
+  function updateDeleteOverlay() {
+    hasUploadedPhoto = !!fileKey;
+    // Always hide overlay by default
+    deleteOverlay.style.display = 'none';
+  }
+
+  uploadIcon.addEventListener('mouseenter', () => {
+    if (hasUploadedPhoto) {
+      deleteOverlay.style.display = 'flex';
+    }
+  });
+  uploadIcon.addEventListener('mouseleave', () => {
+    deleteOverlay.style.display = 'none';
+  });
+
+  deleteOverlay.addEventListener('click', handlePhotoClick);
+
+  async function handlePhotoClick() {
+    fetch(`https://api.ehb-match.me/profielfotos/${fileKey}`, {
+      method: 'DELETE',
+    }).then((response) => {
+      if (!response.ok) {
+        console.error(`Failed to delete photo: ${response.status}`);
+      }
+      console.log(response);
+    });
+    uploadedPhoto.alt = '⬆';
+    uploadedPhoto.src = '';
+    fileStatus.textContent = 'No file selected.'; // Reset file status
+    uploadedPhoto.removeEventListener('click', handlePhotoClick);
+    fileKey = null; // Reset file key
+    updateDeleteOverlay();
+  }
+
+  fileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (file) {
       fileStatus.textContent = file.name;
+
+      const formData = new FormData();
+
+      formData.append('image', file);
+      const uploadResponse = await fetch('https://api.ehb-match.me/profielfotos', {
+        method: 'POST',
+        body: formData,
+      }).then((response) => {
+        if (!response.ok) {
+          throw new Error(`Upload failed: ${response.status}`);
+        } else {
+          return response.json();
+        }
+      });
+
+      fileKey = uploadResponse.profiel_foto_key || null;
+
+      uploadedPhoto.alt = '';
+      uploadedPhoto.src = uploadResponse.profiel_foto_url || '';
+      updateDeleteOverlay();
+      uploadedPhoto.addEventListener('click', handlePhotoClick);
     } else {
       fileStatus.textContent = 'No file selected.';
+      updateDeleteOverlay();
     }
   });
   const backBtn = document.getElementById('back-button');
@@ -98,16 +165,19 @@ async function handleBedrijfRegister(event) {
   }
 
   // Prepare LinkedIn link
-  const linkedinInput = formData.get('linkedin');
-  const linkedinValue =
-    linkedinInput && linkedinInput.trim() !== '' ? linkedinInput : '';
-
-  // Prepare profile photo
-  const profielFotoFile = formData.get('profielFoto');
-  const profielFoto =
-    profielFotoFile && profielFotoFile.name
-      ? `/company_logo.jpg` // For now, use a default path as per API example
-      : '';
+  let linkedinInput = formData.get('linkedin');
+  let linkedinValue = null;
+  if (linkedinInput && linkedinInput.trim() !== '') {
+    linkedinInput = linkedinInput.trim();
+    // Remove both 'https://www.linkedin.com' and 'https://linkedin.com' from the start
+    linkedinInput = linkedinInput.replace(/^(https?:\/\/)?(www\.)?linkedin\.com/i, '');
+    // Accept if it starts with '/company/'
+    if (linkedinInput.startsWith('/company/')) {
+      linkedinValue = linkedinInput;
+    } else {
+      linkedinValue = null;
+    }
+  }
 
   // Prepare data according to API specification
   const data = {
@@ -117,7 +187,7 @@ async function handleBedrijfRegister(event) {
     plaats: plaats,
     contact_email: contactEmail,
     linkedin: linkedinValue,
-    profiel_foto: profielFoto,
+    profiel_foto: fileKey || null,
   };
   try {
     const result = await registerCompany(data);
