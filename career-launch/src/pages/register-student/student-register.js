@@ -79,15 +79,24 @@ function handleNaamRegister(event) {
   event.preventDefault();
 
   const formData = new FormData(event.target);
-  const linkedinInput = formData.get('linkedin');
+  let linkedinInput = formData.get('linkedin');
+  let linkedinValue = null;
+  if (linkedinInput && linkedinInput.trim() !== '') {
+    linkedinInput = linkedinInput.trim();
+    // Remove both 'https://www.linkedin.com' and 'https://linkedin.com' from the start
+    linkedinInput = linkedinInput.replace(/^(https?:\/\/)?(www\.)?linkedin\.com/i, '');
+    // Accept if it starts with '/in/'
+    if (linkedinInput.startsWith('/in/')) {
+      linkedinValue = linkedinInput;
+    } else {
+      linkedinValue = null;
+    }
+  }
   const currentData = {
     voornaam: formData.get('voornaam'),
     achternaam: formData.get('achternaam'),
     date_of_birth: formData.get('geboortedatum'),
-    linkedin:
-      linkedinInput && linkedinInput.trim() !== ''
-        ? linkedinInput
-        : 'https://www.linkedin.com/',
+    linkedin: linkedinValue,
     profielFoto: formData.get('profielFoto')
       ? formData.get('profielFoto').name
       : null, // Get uploaded file name
