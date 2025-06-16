@@ -88,19 +88,57 @@ async function showBedrijfPopup(bedrijf, studentId) {
   const slotDuur = 10; // minuten
   const slotsPerUur = 6; // 0,10,20,30,40,50
   const datum = '2025-10-01'; // vaste dag in jouw voorbeeld
-  function getSlotsForUur(uur) {
-    return Array.from({ length: slotsPerUur }, (_, i) => {
-      const min = i * slotDuur;
-      const mm = min < 10 ? `0${min}` : `${min}`;
-      return {
-        label: `${uur}u${mm}`,
-        value: `${datum}T${uur < 10 ? '0' : ''}${uur}:${mm}:00Z`,
+  // 1. Haal alle speeddates van student en bedrijf op
+  const [studentDates, companyDates] = await Promise.all([
+    fetch(`https://api.ehb-match.me/speeddates?id=${studentId}`, {
+      headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` },
+    })
+      .then((r) => (r.ok ? r.json() : [])),
+    fetch(`https://api.ehb-match.me/speeddates?id=${bedrijf.gebruiker_id}`, {
+      headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` },
+    })
+      .then((r) => (r.ok ? r.json() : [])),
+  ]);
+
+  // Helper: bouw alle slots met status en kleur (op basis van 'akkoord')
+  function buildTimeSlotOptions({ uren, slotDuur, slotsPerUur, datum, studentDates, companyDates, studentId }) {
+    const allDates = [...studentDates, ...companyDates];
+    const slotStatus = {};
+    allDates.forEach((s) => {
+      if (!s.begin.startsWith(datum)) return;
+      let status = s.akkoord === true ? 'confirmed' : 'pending';
+      slotStatus[s.begin] = {
+        status,
+        by: s.id_student === studentId ? 'student' : 'company',
+        speeddate: s,
       };
     });
+    const slots = [];
+    uren.forEach((uur) => {
+      for (let i = 0; i < slotsPerUur; ++i) {
+        const min = i * slotDuur;
+        const mm = min < 10 ? `0${min}` : `${min}`;
+        const iso = `${datum}T${uur < 10 ? '0' : ''}${uur}:${mm}:00Z`;
+        const slot = slotStatus[iso];
+        let status = 'free', kleur = '#fff', disabled = false, label = `${uur}u${mm}`;
+        if (slot) {
+          if (slot.status === 'pending') {
+            status = 'pending'; kleur = '#fff9d1'; disabled = true; label += ' (in afwachting)';
+          } else if (slot.status === 'confirmed') {
+            status = 'confirmed'; kleur = '#ffe0e0'; disabled = true; label += ' (bevestigd)';
+          }
+        }
+        slots.push({ value: iso, label, kleur, disabled, status });
+      }
+    });
+    return slots;
   }
-  const isFavoriet = currentStudentId
-    ? isCompanyFavorite(currentStudentId, bedrijf.gebruiker_id)
-    : false;
+
+  // Bouw alle slots met status
+  const allSlots = buildTimeSlotOptions({ uren, slotDuur, slotsPerUur, datum, studentDates, companyDates, studentId });
+
+  // Favoriet status bepalen vóór HTML genereren
+  const isFavoriet = isCompanyFavorite(studentId, bedrijf.gebruiker_id);
   const hartIcon = isFavoriet ? '❤️' : '🤍';
 
   popup.innerHTML = `
@@ -143,21 +181,19 @@ async function showBedrijfPopup(bedrijf, studentId) {
           }
         </div>
       </div>
-      <div style="margin-bottom:1rem;width:100%;">
-        <label for="speeddates-uur" style="font-weight:500;">Kies een uur:</label>
-        <select id="speeddates-uur" style="width:100%;margin-top:0.5rem;padding:0.5rem;border-radius:6px;border:1.5px solid #e1e5e9;">
-          <option value="">-- Selecteer een uur --</option>
-          ${uren
-            .map(
-              (uur) => `<option value="${uur}">${uur}:00 - ${uur}:59</option>`
-            )
-            .join('')}
-        </select>
+      <div style="margin-bottom:0.7rem;width:100%;">
+        <div style="margin-bottom:0.4rem;font-size:0.97rem;">
+          <strong>Legenda:</strong>
+          <span style="background:#fff;border:1px solid #ccc;padding:0.1rem 0.5rem;border-radius:5px;margin-left:0.5rem;">Vrij</span>
+          <span style="background:#fff9d1;border:1px solid #ffe9a0;padding:0.1rem 0.5rem;border-radius:5px;margin-left:0.5rem;">Pending</span>
+          <span style="background:#ffe0e0;border:1px solid #ffbdbd;padding:0.1rem 0.5rem;border-radius:5px;margin-left:0.5rem;">Bezet</span>
+        </div>
       </div>
       <div style="margin-bottom:1rem;width:100%;">
-        <label for="speeddates-minuten" style="font-weight:500;">Kies een tijdslot:</label>
-        <select id="speeddates-minuten" style="width:100%;margin-top:0.5rem;padding:0.5rem;border-radius:6px;border:1.5px solid #e1e5e9;" disabled>
+        <label for="speeddates-slot" style="font-weight:500;">Kies een tijdslot:</label>
+        <select id="speeddates-slot" style="width:100%;margin-top:0.5rem;padding:0.5rem;border-radius:6px;border:1.5px solid #e1e5e9;">
           <option value="">-- Selecteer een tijdslot --</option>
+          ${allSlots.map(slot => `<option value="${slot.value}" style="background:${slot.kleur};" ${slot.disabled ? 'disabled' : ''}>${slot.label}</option>`).join('')}
         </select>
       </div>
       <button id="speeddates-aanvraag-btn" style="background:#00bcd4;color:#fff;border:none;padding:0.7rem 1.5rem;border-radius:8px;font-size:1rem;cursor:pointer;" disabled>Confirmeer aanvraag</button>
@@ -216,41 +252,34 @@ async function showBedrijfPopup(bedrijf, studentId) {
     });
   }
 
-  // Dynamische slots vullen na uur-keuze
-  const uurSelect = document.getElementById('speeddates-uur');
-  const minutenSelect = document.getElementById('speeddates-minuten');
+  // Dynamische slots vullen
+  const slotSelect = document.getElementById('speeddates-slot');
   const aanvraagBtn = document.getElementById('speeddates-aanvraag-btn');
   let gekozenDatum = '';
 
-  uurSelect.addEventListener('change', () => {
-    minutenSelect.innerHTML = `<option value="">-- Selecteer een tijdslot --</option>`;
-    minutenSelect.disabled = !uurSelect.value;
-    aanvraagBtn.disabled = true;
-    if (uurSelect.value) {
-      const slots = getSlotsForUur(Number(uurSelect.value));
-      slots.forEach((slot) => {
-        const opt = document.createElement('option');
-        opt.value = slot.value;
-        opt.textContent = slot.label;
-        minutenSelect.appendChild(opt);
-      });
-    }
+  slotSelect.addEventListener('change', () => {
+    aanvraagBtn.disabled = !slotSelect.value;
+    gekozenDatum = slotSelect.value;
   });
 
-  minutenSelect.addEventListener('change', () => {
-    aanvraagBtn.disabled = !minutenSelect.value;
-    gekozenDatum = minutenSelect.value;
-  });
-
-  // Speeddate aanvraag knop (API-call)
   // Speeddate aanvraag knop (API-call)
   aanvraagBtn.onclick = async () => {
     const status = document.getElementById('speeddates-aanvraag-status');
     aanvraagBtn.disabled = true;
-    uurSelect.disabled = true;
-    minutenSelect.disabled = true;
+    slotSelect.disabled = true;
     status.textContent = 'Aanvraag wordt verstuurd...';
     status.style.display = 'block';
+
+    // 🛑 DUBBELE BOEKING PREVENTIE: check of student op dit tijdstip al een speeddate heeft (pending/confirmed)
+    const studentSlot = studentDates.find(s => s.begin === gekozenDatum);
+    if (studentSlot) {
+      status.textContent = 'Je hebt al een speeddate op dit tijdstip! Kies een ander slot.';
+      status.style.color = '#da2727';
+      aanvraagBtn.disabled = false;
+      slotSelect.disabled = false;
+      return;
+    }
+
     try {
       const req = await fetch('https://api.ehb-match.me/speeddate', {
         method: 'POST',
@@ -265,13 +294,31 @@ async function showBedrijfPopup(bedrijf, studentId) {
         }),
       });
       if (req.ok) {
-        status.textContent = `Speeddate aangevraagd voor ${
-          uurSelect.value
-        }u${minutenSelect.selectedOptions[0].textContent.slice(-2)}!`;
+        status.textContent = `Speeddate aangevraagd voor ${gekozenDatum.slice(11,16)}!`;
+        status.style.color = '#2aa97b';
+        console.log(`[✅] Speeddate succesvol aangemaakt met ${bedrijf.naam} om ${gekozenDatum}`);
+        // 🔄 Refresh slots na succesvolle aanvraag
+        // Haal nieuwe speeddates op en update dropdown
+        const [newStudentDates, newCompanyDates] = await Promise.all([
+          fetch(`https://api.ehb-match.me/speeddates?id=${studentId}`, {
+            headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` },
+          }).then((r) => (r.ok ? r.json() : [])),
+          fetch(`https://api.ehb-match.me/speeddates?id=${bedrijf.gebruiker_id}`, {
+            headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` },
+          }).then((r) => (r.ok ? r.json() : [])),
+        ]);
+        const refreshedSlots = buildTimeSlotOptions({ uren, slotDuur, slotsPerUur, datum, studentDates: newStudentDates, companyDates: newCompanyDates, studentId });
+        // Ververs dropdown
+        slotSelect.innerHTML = `<option value="">-- Selecteer een tijdslot --</option>` +
+          refreshedSlots.map(slot => `<option value="${slot.value}" style="background:${slot.kleur};" ${slot.disabled ? 'disabled' : ''}>${slot.label}</option>`).join('');
+        slotSelect.disabled = false;
+        aanvraagBtn.disabled = true;
+        gekozenDatum = '';
       } else {
         const err = await req.json();
         status.textContent = err.message || 'Er ging iets mis!';
         status.style.color = '#da2727';
+        console.warn(`[⚠️] Speeddate-aanvraag mislukt: ${err.message || 'Onbekende fout'}`);
       }
     } catch (e) {
       status.textContent = 'Er ging iets mis bij het verzenden!';
@@ -279,7 +326,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
     }
     setTimeout(() => {
       status.style.display = 'none';
-      popup.remove();
+      // popup.remove(); // Popup blijft open zodat user direct nieuwe slot kan kiezen
     }, 1800);
   };
 }
@@ -525,6 +572,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
         <ul id="burger-dropdown" class="student-profile-dropdown">
+          <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
@@ -532,7 +580,6 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
-            <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
@@ -791,9 +838,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         import('../../router.js').then((module) => {
           const Router = module.default;
           switch (route) {
-            case 'profile':
-              Router.navigate('/student/student-profiel');
-              break;
+            // case 'profile': // verwijderd
             case 'search':
               Router.navigate('/student/zoek-criteria');
               break;
@@ -813,6 +858,19 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         });
       });
     });
+
+    // Hamburger menu Profiel knop
+    const navProfileBtn = document.getElementById('nav-profile');
+    const dropdown = document.getElementById('burger-dropdown');
+    if (navProfileBtn && dropdown) {
+      navProfileBtn.addEventListener('click', () => {
+        dropdown.classList.remove('open');
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/student/student-profiel');
+        });
+      });
+    }
 
     // Filter & zoek events - setup after data is loaded
     const setupEventListeners = () => {
@@ -879,39 +937,41 @@ export async function renderBedrijven(rootElement, studentData = {}) {
     setupEventListeners();
     // Burger menu
     const burger = document.getElementById('burger-menu');
-    const dropdown = document.getElementById('burger-dropdown');
-    if (burger && dropdown) {
-      dropdown.classList.remove('open');
+    if (burger) {
       burger.addEventListener('click', (event) => {
         event.stopPropagation();
-        if (!dropdown.classList.contains('open')) {
-          dropdown.classList.add('open');
-        } else {
-          dropdown.classList.remove('open');
+        const dropdown = document.getElementById('burger-dropdown');
+        if (dropdown) {
+          dropdown.classList.toggle('open');
         }
-      });
-      document.addEventListener('click', function (event) {
-        if (
-          dropdown.classList.contains('open') &&
-          !dropdown.contains(event.target) &&
-          event.target !== burger
-        ) {
-          dropdown.classList.remove('open');
-        }
-      });
-      document.getElementById('nav-settings').addEventListener('click', () => {
-        dropdown.classList.remove('open');
-        showSettingsPopup(() =>
-          renderBedrijven(rootElement, actualStudentData)
-        );
-      });
-      document.getElementById('nav-logout').addEventListener('click', () => {
-        dropdown.classList.remove('open');
-        localStorage.setItem('darkmode', 'false');
-        document.body.classList.remove('darkmode');
-        renderLogin(rootElement);
       });
     }
+    document.addEventListener('click', function (event) {
+      const dropdown = document.getElementById('burger-dropdown');
+      if (dropdown && dropdown.classList.contains('open')) {
+        if (!dropdown.contains(event.target) && event.target.id !== 'burger-menu') {
+          dropdown.classList.remove('open');
+        }
+      }
+    });
+    document.getElementById('nav-settings').addEventListener('click', () => {
+      const dropdown = document.getElementById('burger-dropdown');
+      if (dropdown) {
+        dropdown.classList.remove('open');
+      }
+      showSettingsPopup(() =>
+        renderBedrijven(rootElement, actualStudentData)
+      );
+    });
+    document.getElementById('nav-logout').addEventListener('click', () => {
+      const dropdown = document.getElementById('burger-dropdown');
+      if (dropdown) {
+        dropdown.classList.remove('open');
+      }
+      localStorage.setItem('darkmode', 'false');
+      document.body.classList.remove('darkmode');
+      renderLogin(rootElement);
+    });
 
     document.getElementById('privacy-policy').addEventListener('click', (e) => {
       e.preventDefault();

@@ -3,9 +3,6 @@ import { deleteUser } from '../../utils/data-api.js';
 
 // Main renderfunctie:
 export function showBedrijfSettingsPopup(onClose) {
-
-export function showSettingsPopup(onClose) {
-
   // Voeg popup-styles toe
   if (!document.getElementById('settings-popup-style')) {
     const style = document.createElement('style');
@@ -84,7 +81,6 @@ export function showSettingsPopup(onClose) {
     logoutUser();
     window.location.reload();
   });
-
 
   document.getElementById('delete-account-btn').addEventListener('click', () => {
     if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {

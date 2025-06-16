@@ -1,4 +1,3 @@
-// src/views/student-speeddates-verzoeken.js
 import logoIcon from '../../icons/favicon-32x32.png';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
@@ -154,6 +153,25 @@ async function rejectSpeeddate(id) {
   if (!resp.ok) throw new Error('Weigeren mislukt');
 }
 
+// Nieuw: helper om functies en skills op te halen
+async function fetchFunctiesSkills(bedrijfId) {
+  const token = sessionStorage.getItem('authToken');
+  let functies = [];
+  let skills = [];
+  try {
+    const resFuncties = await fetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`, {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    if (resFuncties.ok) functies = await resFuncties.json();
+  } catch {}
+  try {
+    const resSkills = await fetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`, {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    if (resSkills.ok) skills = await resSkills.json();
+  } catch {}
+  return { functies, skills };
+}
 
 export function renderSpeeddatesRequests(rootElement, studentData = {}) {
   rootElement.innerHTML = `
@@ -165,6 +183,7 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
         <ul id="burger-dropdown" class="student-profile-dropdown">
+          <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
@@ -172,7 +191,6 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
-            <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link active">Speeddates-verzoeken</button></li>
@@ -198,13 +216,35 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     </div>
   `;
 
+  let currentSort = [{ key: 'begin', asc: true }]; // standaard op tijd (begin)
+
   function getSortArrow(key) {
     const found = currentSort.find(s => s.key === key);
     if (!found) return '';
     return found.asc ? ' ▲' : ' ▼';
   }
 
-  let currentSort = [{ key: 'begin', asc: true }];
+  function formatTimeFromBegin(begin) {
+    if (!begin) return '-';
+    const dt = new Date(begin);
+    if (isNaN(dt.getTime())) return '-';
+    return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  }
+
+  function compareValues(a, b, key) {
+    let aVal = a[key];
+    let bVal = b[key];
+    if (key === 'begin') {
+      aVal = aVal ? new Date(aVal).getTime() : Number.POSITIVE_INFINITY;
+      bVal = bVal ? new Date(bVal).getTime() : Number.POSITIVE_INFINITY;
+    } else if (typeof aVal === 'string' && typeof bVal === 'string') {
+      aVal = aVal.toLowerCase();
+      bVal = bVal.toLowerCase();
+    }
+    if (aVal < bVal) return -1;
+    if (aVal > bVal) return 1;
+    return 0;
+  }
 
   function renderTable(verzoeken) {
     if (!verzoeken || verzoeken.length === 0) {
@@ -212,25 +252,21 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
         `<p style="text-align:center;">Nog geen speeddates-verzoeken gevonden.</p>`;
       return;
     }
-    // Sorteren (meerdere kolommen)
+    if (!currentSort.length) currentSort = [{ key: 'begin', asc: true }];
+    // --- SORTEREN ---
     const sorted = [...verzoeken].sort((a, b) => {
       for (const sort of currentSort) {
-        let aVal = a[sort.key];
-        let bVal = b[sort.key];
-        if (sort.key === 'begin') {
-          aVal = aVal ? new Date(aVal).getTime() : 0;
-          bVal = bVal ? new Date(bVal).getTime() : 0;
-        }
-        if (aVal < bVal) return sort.asc ? -1 : 1;
-        if (aVal > bVal) return sort.asc ? 1 : -1;
+        const cmp = compareValues(a, b, sort.key);
+        if (cmp !== 0) return sort.asc ? cmp : -cmp;
       }
       return 0;
     });
+    // --- RENDEREN ---
     const rows = sorted.map(v => `
       <tr>
-        <td>${v.naam_bedrijf}</td>
+        <td><span class="bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(v)}' style="color:#0077cc;cursor:pointer;text-decoration:underline;">${v.naam_bedrijf}</span></td>
         <td>${v.lokaal || '-'}</td>
-        <td>${v.begin ? new Date(v.begin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}</td>
+        <td>${formatTimeFromBegin(v.begin)}</td>
         <td class="status-cell">
           <button class="accept-btn" data-id="${v.id}">Accepteer</button>
           <button class="deny-btn" data-id="${v.id}">Weiger</button>
@@ -252,6 +288,34 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
         </table>
       </div>
     `;
+    // --- EVENTS op de headers voor sortering ---
+    document.querySelectorAll('.sortable').forEach(th => {
+      th.addEventListener('mousedown', (e) => {
+        if (e.shiftKey) e.preventDefault(); // geen text-select bij shift
+      });
+      th.addEventListener('click', (e) => {
+        const key = th.dataset.key;
+        const found = currentSort.find(s => s.key === key);
+        if (!e.shiftKey) {
+          // Gewoon klik: alleen deze kolom (toggle asc/desc)
+          if (found) {
+            found.asc = !found.asc;
+            currentSort = [found];
+          } else {
+            currentSort = [{ key, asc: true }];
+          }
+        } else {
+          // Shift+klik: multi-level toevoegen/toggles
+          if (found) {
+            found.asc = !found.asc;
+          } else {
+            currentSort.push({ key, asc: true });
+          }
+        }
+        renderTable(verzoeken);
+      });
+    });
+    // Knoppen event handlers
     document.querySelectorAll('.accept-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         const id = e.currentTarget.dataset.id;
@@ -276,25 +340,10 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
         }
       });
     });
-    // Sorteerbare kolommen (shift-klik = multi, gewone klik = enkel)
-    document.querySelectorAll('.sortable').forEach(th => {
-      th.addEventListener('mousedown', (e) => {
-        if (e.shiftKey) e.preventDefault(); // voorkomt selectie bij shift-klik
-      });
-      th.addEventListener('click', (e) => {
-        const key = th.dataset.key;
-        if (!e.shiftKey) {
-          currentSort = [{ key, asc: true }];
-        } else {
-          const existing = currentSort.find(s => s.key === key);
-          if (existing) {
-            existing.asc = !existing.asc;
-          } else {
-            currentSort.push({ key, asc: true });
-          }
-        }
-        // Herteken tabel met nieuwe sortering
-        renderTable(verzoeken);
+    document.querySelectorAll('.bedrijf-popup-trigger').forEach((el) => {
+      el.addEventListener('click', async () => {
+        const data = JSON.parse(el.dataset.bedrijf);
+        await createBedrijfPopup(data);
       });
     });
   }
@@ -314,9 +363,7 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
       import('../../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
-          case 'profile':
-            Router.navigate('/student/student-profiel');
-            break;
+          // case 'profile': // verwijderd
           case 'search':
             Router.navigate('/student/zoek-criteria');
             break;
@@ -337,8 +384,20 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     });
   });
 
-  const burger = document.getElementById('burger-menu');
+  // Hamburger menu Profiel knop
+  const navProfileBtn = document.getElementById('nav-profile');
   const dropdown = document.getElementById('burger-dropdown');
+  if (navProfileBtn && dropdown) {
+    navProfileBtn.addEventListener('click', () => {
+      dropdown.classList.remove('open');
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/student/student-profiel');
+      });
+    });
+  }
+
+  const burger = document.getElementById('burger-menu');
   if (burger && dropdown) {
     dropdown.classList.remove('open');
     burger.addEventListener('click', (event) => {
@@ -386,4 +445,58 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
       Router.navigate('/contact');
     });
   });
+
+  // --- Popup met bedrijfsinfo ---
+  async function createBedrijfPopup(s) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;
+      z-index: 3000;
+    `;
+    const popup = document.createElement('div');
+    popup.style.cssText = `
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      max-width: 480px;
+      width: 90%;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      position: relative;
+    `;
+    popup.innerHTML = `
+      <button id=\"popup-close\" style=\"position:absolute;top:10px;right:12px;font-size:1.4rem;background:none;border:none;cursor:pointer;\">×</button>
+      <h2 style=\"margin-top:0;\">${s.naam_bedrijf}</h2>
+      <p><strong>Tijd:</strong> ${s.begin ? new Date(s.begin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Onbekend'}</p>
+      <p><strong>Locatie:</strong> ${s.lokaal || 'Onbekend'}</p>
+      <p><strong>Status:</strong> ${s.akkoord !== undefined ? (s.akkoord ? 'Geaccepteerd' : 'In afwachting') : '-'}</p>
+      <p><strong>LinkedIn:</strong> <a id=\"popup-linkedin\" href=\"#\" target=\"_blank\">Laden...</a></p>
+      <div id=\"popup-skills\"><em>Skills laden...</em></div>
+    `;
+    overlay.appendChild(popup);
+    document.body.appendChild(overlay);
+    document.getElementById('popup-close').onclick = () => overlay.remove();
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.remove();
+    });
+    // Extra data ophalen
+    const bedrijfId = s.id_bedrijf || s.gebruiker_id;
+    if (bedrijfId) {
+      const { functies, skills } = await fetchFunctiesSkills(bedrijfId);
+      const skillsHtml = skills.length
+        ? skills.map(skill =>
+            `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#f1f1f1;font-size:0.85rem;\">${skill.naam}</span>`
+          ).join('')
+        : '<em>Geen skills beschikbaar</em>';
+      document.getElementById('popup-skills').innerHTML = `<strong>Skills:</strong><div style=\"margin-top:0.4rem;\">${skillsHtml}</div>`;
+    }
+    // LinkedIn
+    if (s.linkedin) {
+      document.getElementById('popup-linkedin').textContent = s.linkedin;
+      document.getElementById('popup-linkedin').href = s.linkedin;
+    } else {
+      document.getElementById('popup-linkedin').textContent = 'Niet beschikbaar';
+      document.getElementById('popup-linkedin').removeAttribute('href');
+    }
+  }
 }

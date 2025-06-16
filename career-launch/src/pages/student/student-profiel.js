@@ -88,6 +88,7 @@ export function renderStudentProfiel(
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
         <ul id="burger-dropdown" class="student-profile-dropdown">
+          <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
@@ -95,7 +96,6 @@ export function renderStudentProfiel(
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
-            <li><button data-route="profile" class="sidebar-link active">Profiel</button></li>
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
@@ -196,9 +196,7 @@ export function renderStudentProfiel(
       import('../../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
-          case 'profile':
-            Router.navigate('/student/student-profiel');
-            break;
+          // case 'profile': // verwijderd
           case 'search':
             Router.navigate('/student/zoek-criteria');
             break;
@@ -245,6 +243,17 @@ export function renderStudentProfiel(
       dropdown.classList.remove('open');
       showSettingsPopup(() => renderStudentProfiel(rootElement, studentData));
     });
+    // Profiel knop in hamburger menu
+    const navProfileBtn = document.getElementById('nav-profile');
+    if (navProfileBtn) {
+      navProfileBtn.addEventListener('click', () => {
+        dropdown.classList.remove('open');
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/student/student-profiel');
+        });
+      });
+    }
     document
       .getElementById('nav-logout')
       .addEventListener('click', async () => {
@@ -316,7 +325,7 @@ export function renderStudentProfiel(
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         // Haal token op voor API-calls
-        const token = sessionStorage.getItem('authToken');
+        let token = sessionStorage.getItem('authToken');
         if (!token) {
           alert('Geen inlogsessie gevonden. Log opnieuw in.');
           return;
@@ -342,7 +351,6 @@ export function renderStudentProfiel(
           'Student update payload:',
           JSON.stringify(updatedStudentData)
         );
-        const token = sessionStorage.getItem('authToken');
         // Haal altijd de juiste ID’s uit sessionStorage
         // let studentID = studentData.gebruiker_id;
         // let userID = studentData.gebruiker_id;
@@ -557,4 +565,12 @@ export async function fetchAndStoreStudentProfile() {
   const combined = { ...student, email: user.email, gebruiker_id: user.id };
   sessionStorage.setItem('studentData', JSON.stringify(combined));
   return combined;
+}
+
+// Utility functie om na login direct naar speeddates te gaan
+export function redirectToSpeeddates() {
+  import('../../router.js').then((module) => {
+    const Router = module.default;
+    Router.navigate('/student/student-speeddates');
+  });
 }

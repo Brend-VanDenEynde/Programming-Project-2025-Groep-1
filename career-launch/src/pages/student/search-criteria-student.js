@@ -201,11 +201,19 @@ async function updateFunctiesForStudent(studentId, selectedFunctieIds) {
     );
   }
   // Voeg nieuwe toe
+  if (!Array.isArray(toeTeVoegen)) {
+    console.warn('Toe te voegen is geen array:', toeTeVoegen);
+  }
+  console.log('Type van toeTeVoegen:', Array.isArray(toeTeVoegen), toeTeVoegen);
   if (toeTeVoegen.length > 0) {
-    // Stuur array van ids, niet objecten
-    const functiesBody = toeTeVoegen;
-    console.log('Functies body (POST):', JSON.stringify(functiesBody));
-    await fetch(
+    // Flatten als het een nested array is
+    const functiesBody = { functies: Array.isArray(toeTeVoegen[0]) ? toeTeVoegen[0] : toeTeVoegen };
+    console.log('Functies body =', JSON.stringify(functiesBody));
+    console.log('Verstuur naar API:', {
+      studentId,
+      functiesBody
+    });
+    const resp = await fetch(
       `https://api.ehb-match.me/studenten/${studentId}/functies`,
       {
         method: 'POST',
@@ -213,9 +221,13 @@ async function updateFunctiesForStudent(studentId, selectedFunctieIds) {
           Authorization: 'Bearer ' + token,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(functiesBody), // ✅ alleen ids
+        body: JSON.stringify(functiesBody), // ✅ juiste key
       }
     );
+    const text = await resp.text();
+    console.log('API response:', resp.status, text);
+  } else {
+    console.log('Geen functies om toe te voegen, POST wordt niet uitgevoerd.');
   }
 }
 
@@ -334,6 +346,7 @@ export async function renderSearchCriteriaStudent(
           </div>
           <button id="burger-menu" class="student-profile-burger">☰</button>
           <ul id="burger-dropdown" class="student-profile-dropdown">
+            <li><button id="nav-profile">Profiel</button></li>
             <li><button id="nav-settings">Instellingen</button></li>
             <li><button id="nav-logout">Log out</button></li>
           </ul>
@@ -341,7 +354,6 @@ export async function renderSearchCriteriaStudent(
         <div class="student-profile-main">
           <nav class="student-profile-sidebar">
             <ul>
-              <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
               <li><button data-route="search" class="sidebar-link active">Zoek-criteria</button></li>
               <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
               <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
@@ -605,9 +617,7 @@ export async function renderSearchCriteriaStudent(
         import('../../router.js').then((module) => {
           const Router = module.default;
           switch (route) {
-            case 'profile':
-              Router.navigate('/student/student-profiel');
-              break;
+            // case 'profile': // verwijderd
             case 'search':
               Router.navigate('/student/zoek-criteria');
               break;
@@ -654,20 +664,26 @@ export async function renderSearchCriteriaStudent(
         dropdown.classList.remove('open');
         showSettingsPopup();
       });
-      document
-        .getElementById('nav-logout')
-        .addEventListener('click', async () => {
+      document.getElementById('nav-logout').addEventListener('click', () => {
+        dropdown.classList.remove('open');
+        window.sessionStorage.removeItem('studentData');
+        window.sessionStorage.removeItem('authToken');
+        window.sessionStorage.removeItem('userType');
+        localStorage.setItem('darkmode', 'false');
+        document.body.classList.remove('darkmode');
+        renderLogin(rootElement);
+      });
+      // Hamburger menu Profiel knop
+      const navProfileBtn = document.getElementById('nav-profile');
+      if (navProfileBtn) {
+        navProfileBtn.addEventListener('click', () => {
           dropdown.classList.remove('open');
-          window.sessionStorage.removeItem('studentData');
-          window.sessionStorage.removeItem('authToken');
-          window.sessionStorage.removeItem('userType');
-          localStorage.setItem('darkmode', 'false');
-          document.body.classList.remove('darkmode');
           import('../../router.js').then((module) => {
             const Router = module.default;
-            Router.navigate('/');
+            Router.navigate('/student/student-profiel');
           });
         });
+      }
     }
     // END setTimeout
   }, 200);

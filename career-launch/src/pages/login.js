@@ -152,7 +152,7 @@ async function handleLogin(event, rootElement) {
       window.sessionStorage.setItem('userType', 'student');
 
       await fetchAndStoreStudentProfile();
-      Router.navigate('/student/student-profiel');
+      Router.navigate('/student/student-speeddates');
     } else if (user.type === 3) {
       // Controleer of id aanwezig is en geldig is
       if (!user.id || typeof user.id !== 'number') {

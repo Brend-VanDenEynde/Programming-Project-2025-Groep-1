@@ -542,7 +542,7 @@ a:hover {
 .student-profile-sidebar button.active,
 .student-profile-sidebar button:hover {
   background: #e1e5e9;
-  border-left: 4px solid grey;
+  border-left: 4px solid #0077b5;
 }
 
 .student-profile-content {
@@ -2730,6 +2730,10 @@ body.darkmode .student-profile-footer a:hover {
   padding: 0.3rem 0.7rem;
   font-size: 0.92em;
 
+
+
+
+
   margin: 0 0.2rem 0.2rem 0;
   font-weight: 500;
 }
@@ -3076,10 +3080,11 @@ body.darkmode .status-final {
   margin: 0;
   border: 1px solid #e1e5e9;
   background: #fff;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   min-width: 160px;
+  z-index: 1000;
+  display: none;
 }
 
 .bedrijf-profile-dropdown li {
@@ -3099,289 +3104,6 @@ body.darkmode .status-final {
 }
 
 .bedrijf-profile-dropdown button:hover {
-  background: #f5f5f5;
-}
-
-.bedrijf-profile-main {
-  display: flex;
-  flex: 1;
-}
-
-.bedrijf-profile-sidebar {
-  width: 220px;
-  background: #fff;
-  border-right: 1px solid #e1e5e9;
-  padding: 0;
-}
-
-.bedrijf-profile-sidebar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.bedrijf-profile-sidebar li {
-  border-bottom: 1px solid #f0f0f0;
-  margin-bottom: 0.5rem;
-}
-
-.bedrijf-profile-sidebar button {
-  background: none;
-  border: none;
-  padding: 1rem 2rem;
-  width: 100%;
-  text-align: left;
-  color: #333;
-  font-size: 1rem;
-  border-left: 4px solid transparent;
-  transition: background 0.2s, border-color 0.2s;
-  cursor: pointer;
-}
-
-.bedrijf-profile-sidebar button.active,
-.bedrijf-profile-sidebar button:hover {
-  background: #e1e5e9;
-  border-left: 4px solid #00bcd4;
-}
-
-.bedrijf-profile-content {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  padding: 2rem;
-}
-
-.bedrijf-profile-form-container {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  padding: 3rem 2.5rem 2.5rem 2.5rem;
-  margin: 2.5rem auto 0 auto;
-  max-width: 800px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.bedrijf-profile-title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-  color: #0077b5;
-  text-align: center;
-}
-
-.bedrijf-profile-avatar-section {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.bedrijf-profile-avatar {
-  object-fit: cover;
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  box-shadow: 0 2px 8px #0001;
-  border: 3px solid #e1e5e9;
-  background: #fff;
-}
-
-.bedrijf-profile-form-group {
-  margin-bottom: 1.2rem;
-  width: 100%;
-}
-
-.bedrijf-profile-form-group label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #333;
-  font-size: 1.07rem;
-  letter-spacing: 0.01em;
-}
-
-.bedrijf-profile-form-group input[type='text'],
-.bedrijf-profile-form-group input[type='email'],
-.bedrijf-profile-form-group input[type='url'],
-.bedrijf-profile-form-group textarea {
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  padding: 12px 15px;
-  border: 2px solid #e1e5e9;
-  border-radius: 8px;
-  font-size: 1.07rem;
-  background: #f8f9fa;
-  color: #333;
-  margin-top: 2px;
-  outline: none;
-  transition: border 0.17s;
-  resize: none;
-}
-
-.bedrijf-profile-form-group input[type='text']:focus,
-.bedrijf-profile-form-group input[type='email']:focus,
-.bedrijf-profile-form-group input[type='url']:focus,
-.bedrijf-profile-form-group textarea:focus {
-  border-color: #00bcd4;
-  background: #fff;
-}
-
-.bedrijf-profile-form-group input:disabled,
-.bedrijf-profile-form-group textarea:disabled {
-  background: #f1f1f1;
-  color: #888;
-  cursor: not-allowed;
-}
-
-.bedrijf-profile-buttons {
-  display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
-  justify-content: center;
-  width: 100%;
-}
-
-.bedrijf-profile-btn {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
-  min-width: 120px;
-  transition: all 0.2s ease;
-}
-
-.bedrijf-profile-btn-primary {
-  background-color: #00bcd4;
-  color: white;
-}
-
-.bedrijf-profile-btn-primary:hover {
-  background-color: #00acc1;
-  transform: translateY(-1px);
-}
-
-.bedrijf-profile-btn-secondary {
-  background-color: #f8f9fa;
-  color: #333;
-  border: 2px solid #e1e5e9;
-}
-
-.bedrijf-profile-btn-secondary:hover {
-  background-color: #e9ecef;
-  border-color: #d6dbdf;
-  transform: translateY(-1px);
-}
-
-.bedrijf-profile-footer {
-  position: fixed;
-  bottom: 0;
-  width: 100vw;
-  background: #f5f6f7;
-  color: #7a7a7a;
-  border-top: 1px solid #e1e5e9;
-  text-align: center;
-  font-size: 0.95rem;
-  padding: 18px 0 14px 0;
-  margin: 0;
-  box-shadow: none;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  z-index: 100;
-}
-
-.bedrijf-profile-footer a {
-  color: #7a7a7a;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.bedrijf-profile-footer a:hover {
-  color: #009ca6;
-  text-decoration: underline;
-}
-
-
-/* =============================================================================
-   12. BEDRIJF PROFIEL SYSTEEM
-   ============================================================================= */
-
-/* Bedrijf Profile Styles - gebaseerd op student profiel maar met bedrijf specifieke klassen */
-.bedrijf-profile-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background: #f5f5f5;
-}
-
-.bedrijf-profile-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.2rem 2rem;
-  background: #fff;
-  border-bottom: 1px solid #e1e5e9;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.bedrijf-profile-header .logo-section {
-  display: flex;
-  align-items: center;
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: #333;
-}
-
-.bedrijf-profile-header .logo-section img {
-  margin-right: 0.75rem;
-}
-
-.bedrijf-profile-burger {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #666;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: background 0.2s;
-}
-
-.bedrijf-profile-burger:hover {
-  background: #f0f0f0;
-}
-
-.bedrijf-profile-dropdown {
-  position: absolute;
-  top: 4rem;
-  right: 2rem;
-  list-style: none;
-  padding: 0.5rem 0;
-  margin: 0;
-  border: 1px solid #e1e5e9;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  min-width: 160px;
-  z-index: 1000;
-  display: none;
-}
-
-.bedrijf-profile-dropdown li button {
-  background: none;
-  border: none;
-  width: 100%;
-  text-align: left;
-  padding: 0.75rem 1rem;
-  color: #333;
-  transition: background 0.2s;
-  cursor: pointer;
-}
-
-.bedrijf-profile-dropdown li button:hover {
   background: #f5f5f5;
 }
 
@@ -3705,4 +3427,3 @@ body.darkmode .content-header p {
 body.darkmode .no-requests {
   color: #b0b6c6;
 }
-
