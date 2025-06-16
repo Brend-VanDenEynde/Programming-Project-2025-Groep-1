@@ -52,6 +52,7 @@ const routes = {
     );
     renderBedrijven(rootElement, studentData);
   },
+  '/admin': renderAdmin,
   '/admin-login': renderAdmin,
   '/admin-select-dashboard': renderAdminSelectDashboard,
   '/admin-dashboard': renderAdminSelectDashboard,
@@ -147,7 +148,8 @@ class Router {
         'Speeddate Verzoeken - Career Launch 2025',
       '/student/student-settings': 'Instellingen - Career Launch 2025',
       '/student/bedrijven': 'Bedrijven - Career Launch 2025',
-      '/admin': 'Admin Login - Career Launch 2025',
+      '/admin': 'Admin - Career Launch 2025',
+      '/admin-login': 'Admin Login - Career Launch 2025',
       '/admin-dashboard': 'Admin Dashboard - Career Launch 2025',
       '/contact': 'Contacteer ons - Career Launch 2025',
       '/privacy': 'Privacy Beleid - Career Launch 2025',
