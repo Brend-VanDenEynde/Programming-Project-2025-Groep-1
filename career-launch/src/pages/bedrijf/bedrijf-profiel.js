@@ -121,7 +121,7 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
               </div>
               <div class="bedrijf-profile-form-group">
                 <label for="linkedinInput">LinkedIn-link</label>
-                <input type="url" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/company/..." ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/company/..." ${readonlyMode ? 'disabled' : ''}>
               </div>
               <div class="bedrijf-profile-buttons">
                 ${
@@ -248,10 +248,35 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
     btn.addEventListener('click', () => {
       const route = btn.getAttribute('data-route');
-      if (route === 'speeddates') {
-        import('./bedrijf-speeddates.js').then((module) => {
-          module.renderBedrijfSpeeddates(document.getElementById('app'), bedrijfData);
-        });
+      switch (route) {
+        case 'profile':
+          renderBedrijfProfiel(document.getElementById('app'), bedrijfData);
+          break;
+        case 'search':
+          import('./search-criteria-bedrijf.js').then((m) =>
+            m.renderSearchCriteriaBedrijf(document.getElementById('app'), bedrijfData)
+          );
+          break;
+        case 'speeddates':
+          import('./bedrijf-speeddates.js').then((m) =>
+            m.renderBedrijfSpeeddates(document.getElementById('app'), bedrijfData)
+          );
+          break;
+        case 'requests':
+          import('./bedrijf-speeddates-verzoeken.js').then((m) =>
+            m.renderBedrijfSpeeddatesRequests(document.getElementById('app'), bedrijfData)
+          );
+          break;
+        case 'bedrijven':
+          import('./studenten.js').then((m) =>
+            m.renderStudenten(document.getElementById('app'), bedrijfData)
+          );
+          break;
+        case 'qr':
+          import('./bedrijf-qr-popup.js').then((m) =>
+            m.renderBedrijfQRPopup(document.getElementById('app'), bedrijfData)
+          );
+          break;
       }
     });
   });
