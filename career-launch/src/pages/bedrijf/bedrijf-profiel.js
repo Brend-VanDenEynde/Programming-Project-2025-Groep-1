@@ -1,7 +1,7 @@
 
 // src/views/bedrijf-profiel.js
 
-import defaultAvatar from '../../images/BedrijfDefault.jpg';
+import defaultAvatar from '../../images/default.png';
 import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
