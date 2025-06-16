@@ -1,6 +1,7 @@
 // Admin ingeschreven studenten pagina
 import Router from '../../router.js';
 import { logoutUser } from '../../utils/auth-api.js';
+import ehbLogo from '../../images/EhB-logo-transparant.png';
 
 export async function renderAdminIngeschrevenStudenten(rootElement) {
   // Check if user is logged in
@@ -16,7 +17,7 @@ export async function renderAdminIngeschrevenStudenten(rootElement) {
     <div class="admin-dashboard-clean">
       <header class="admin-header-clean">
         <div class="admin-logo-section">
-          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+          <img src="${ehbLogo}" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
         </div>        <div class="admin-header-right">
           <span class="admin-username">Welkom, ${adminUsername}</span>
@@ -35,10 +36,17 @@ export async function renderAdminIngeschrevenStudenten(rootElement) {
             </ul>
           </nav>
         </aside>
-        
-        <main class="admin-content-clean">
+          <main class="admin-content-clean">
           <div class="admin-section-header">
             <h1 id="section-title">Ingeschreven Studenten</h1>
+            <div class="search-bar-container">
+              <input 
+                type="text" 
+                id="student-search" 
+                placeholder="Zoek op naam van student..." 
+                class="search-input"
+              />
+            </div>
           </div>
           
           <div class="admin-content-area" id="content-area">
@@ -94,9 +102,10 @@ export async function renderAdminIngeschrevenStudenten(rootElement) {
     e.preventDefault();
     Router.navigate('/contact');
   });
-
   // Fetch students data from API
   const accessToken = sessionStorage.getItem('accessToken');
+  let allStudents = []; // Store all students for filtering
+
   try {
     const response = await fetch('https://api.ehb-match.me/studenten/', {
       method: 'GET',
@@ -105,10 +114,22 @@ export async function renderAdminIngeschrevenStudenten(rootElement) {
       },
     });
 
-    const students = await response.json();
+    allStudents = await response.json();
+    renderStudentList(allStudents); // Initial render of all students
+  } catch (error) {
+    console.error('Error fetching students:', error);
+  }
 
+  // Function to render student list
+  function renderStudentList(students) {
     const studentListContainer = document.querySelector('.student-list');
     studentListContainer.innerHTML = ''; // Clear existing content
+
+    if (students.length === 0) {
+      studentListContainer.innerHTML =
+        '<div class="no-results">Geen studenten gevonden.</div>';
+      return;
+    }
 
     students.forEach((student) => {
       const studentItem = document.createElement('div');
@@ -127,8 +148,25 @@ export async function renderAdminIngeschrevenStudenten(rootElement) {
 
       studentListContainer.appendChild(studentItem);
     });
-  } catch (error) {
-    console.error('Error fetching students:', error);
+  }
+
+  // Search functionality
+  const searchInput = document.getElementById('student-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase().trim();
+
+      if (searchTerm === '') {
+        renderStudentList(allStudents); // Show all students if search is empty
+      } else {
+        const filteredStudents = allStudents.filter((student) => {
+          const fullName =
+            `${student.voornaam} ${student.achternaam}`.toLowerCase();
+          return fullName.includes(searchTerm);
+        });
+        renderStudentList(filteredStudents);
+      }
+    });
   }
 
   document.title = 'Ingeschreven Studenten - Admin Dashboard';

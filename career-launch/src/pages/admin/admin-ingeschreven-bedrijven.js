@@ -1,6 +1,7 @@
 // Admin ingeschreven bedrijven pagina
 import Router from '../../router.js';
 import { logoutUser } from '../../utils/auth-api.js';
+import ehbLogo from '../../images/EhB-logo-transparant.png';
 
 export async function renderAdminIngeschrevenBedrijven(rootElement) {
   // Check if user is logged in
@@ -16,7 +17,7 @@ export async function renderAdminIngeschrevenBedrijven(rootElement) {
     <div class="admin-dashboard-clean">
       <header class="admin-header-clean">
         <div class="admin-logo-section">
-          <img src="src/Images/EhB-logo-transparant.png" alt="Logo" width="40" height="40">
+          <img src="${ehbLogo}" alt="Logo" width="40" height="40">
           <span>EhB Career Launch</span>
         </div>        <div class="admin-header-right">
           <span class="admin-username">Welkom, ${adminUsername}</span>
@@ -35,10 +36,17 @@ export async function renderAdminIngeschrevenBedrijven(rootElement) {
             </ul>
           </nav>
         </aside>
-        
-        <main class="admin-content-clean">
+          <main class="admin-content-clean">
           <div class="admin-section-header">
             <h1 id="section-title">Ingeschreven Bedrijven</h1>
+            <div class="search-bar-container">
+              <input 
+                type="text" 
+                id="company-search" 
+                placeholder="Zoek op naam van bedrijf..." 
+                class="search-input"
+              />
+            </div>
           </div>
             <div class="admin-content-area" id="content-area">
             <div class="companies-list company-list">
@@ -94,9 +102,10 @@ export async function renderAdminIngeschrevenBedrijven(rootElement) {
     e.preventDefault();
     Router.navigate('/contact');
   });
-
   // Fetch approved companies from API
   const accessToken = sessionStorage.getItem('accessToken');
+  let allCompanies = []; // Store all companies for filtering
+
   try {
     const response = await fetch(
       'https://api.ehb-match.me/bedrijven/goedgekeurd',
@@ -108,42 +117,58 @@ export async function renderAdminIngeschrevenBedrijven(rootElement) {
       }
     );
 
-    const companies = await response.json();
+    allCompanies = await response.json();
+    renderCompanyList(allCompanies); // Initial render of all companies
+  } catch (error) {
+    console.error('Error fetching approved companies:', error);
+  }
 
+  // Function to render company list
+  function renderCompanyList(companies) {
     const companyListContainer = document.querySelector('.companies-list');
     companyListContainer.innerHTML = ''; // Clear existing content
 
     if (companies.length === 0) {
       companyListContainer.innerHTML =
-        '<p class="no-companies">Geen bedrijven zijn goedgekeurd om naar de Career Launch te komen.</p>';
-    } else {
-      companies.forEach((company) => {
-        const companyItem = document.createElement('div');
-        companyItem.className = 'company-item clickable-company';
-        companyItem.dataset.companyId = company.gebruiker_id;
-
-        companyItem.innerHTML = `
-          <img src="${company.profiel_foto || 'src/Images/default.png'}" alt="${
-          company.naam
-        }" class="company-logo" style="height: 40px; width: auto; margin-right: 10px;">
-          <span class="company-name">${company.naam}</span>
-        `;
-
-        companyListContainer.appendChild(companyItem);
-      });
+        '<div class="no-results">Geen bedrijven gevonden.</div>';
+      return;
     }
-  } catch (error) {
-    console.error('Error fetching approved companies:', error);
+
+    companies.forEach((company) => {
+      const companyItem = document.createElement('div');
+      companyItem.className = 'company-item clickable-company';
+      companyItem.dataset.companyId = company.gebruiker_id;
+      companyItem.innerHTML = `
+        <span class="company-name">${company.naam}</span>
+      `;
+
+      companyItem.addEventListener('click', () => {
+        Router.navigate(
+          `/admin-dashboard/company-detail?id=${company.gebruiker_id}`
+        );
+      });
+
+      companyListContainer.appendChild(companyItem);
+    });
   }
 
-  // Add click handlers for company items
-  const companyItems = document.querySelectorAll('.clickable-company');
-  companyItems.forEach((item) => {
-    item.addEventListener('click', () => {
-      const companyId = item.dataset.companyId;
-      Router.navigate(`/admin-dashboard/company-detail?id=${companyId}`);
+  // Search functionality
+  const searchInput = document.getElementById('company-search');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase().trim();
+
+      if (searchTerm === '') {
+        renderCompanyList(allCompanies); // Show all companies if search is empty
+      } else {
+        const filteredCompanies = allCompanies.filter((company) => {
+          const companyName = company.naam.toLowerCase();
+          return companyName.includes(searchTerm);
+        });
+        renderCompanyList(filteredCompanies);
+      }
     });
-  });
+  }
 
   document.title = 'Ingeschreven Bedrijven - Admin Dashboard';
 }
