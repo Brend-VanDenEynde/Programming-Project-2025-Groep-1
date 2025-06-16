@@ -2433,6 +2433,17 @@ body.darkmode .student-profile-footer a:hover {
   justify-content: center;
   border-radius: 50%;
   margin: 0 auto 0.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.uploaded-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: contain;
+  text-align: center;
 }
 
 .upload-section label {

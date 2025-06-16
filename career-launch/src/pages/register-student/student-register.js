@@ -2,13 +2,16 @@ import { renderStudentOpleiding } from './student-opleiding.js';
 import '../../css/consolidated-style.css';
 import Router from '../../router.js';
 
+let fileKey = null;
+
 export function renderStudentRegister(rootElement) {
   rootElement.innerHTML = `
   
   <div style="min-height: 100vh; display: flex; flex-direction: column;">
     <main class="form-container">
-      <button class="back-button" id="back-button">← Terug</button>      <div class="upload-section">
-        <div class="upload-icon">⬆</div>
+      <button class="back-button" id="back-button">← Terug</button>
+      <div class="upload-section">
+        <div class="upload-icon" data-alt="⬆"><img src="" alt="⬆" class="uploaded-photo" /></div>
         <label for="profielFoto" class="upload-label">Foto</label>
         <div class="file-input-wrapper">
           <input type="file" id="profielFoto" name="profielFoto" accept="image/*" class="file-input" />
@@ -62,10 +65,37 @@ export function renderStudentRegister(rootElement) {
     fileInput.click();
   });
 
-  fileInput.addEventListener('change', (e) => {
+  fileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (file) {
       fileStatus.textContent = file.name;
+
+      const formData = new FormData();
+
+      formData.append('image', file);
+      const uploadResponse = await fetch('https://api.ehb-match.me/profielfotos', {
+        method: 'POST',
+        body: formData,
+      }).then((response) => {
+        if (!response.ok) {
+          throw new Error(`Upload failed: ${response.status}`);
+        } else {
+          return response.json();
+        }
+      });
+
+      fileKey = uploadResponse.profiel_foto_key || null;
+
+      const uploadedPhoto = document.querySelector('.uploaded-photo');
+      uploadedPhoto.alt = '';
+      uploadedPhoto.src = uploadResponse.profiel_foto_url || '';
+
+      document.querySelector('.uploaded-photo').addEventListener('click', () => {
+        uploadedPhoto.alt = '⬆';
+        uploadedPhoto.src = '';
+        fileStatus.textContent = 'No file selected.'; // Reset file status
+        fileKey = null; // Reset file key
+      });
     } else {
       fileStatus.textContent = 'No file selected.';
     }
@@ -97,9 +127,7 @@ function handleNaamRegister(event) {
     achternaam: formData.get('achternaam'),
     date_of_birth: formData.get('geboortedatum'),
     linkedin: linkedinValue,
-    profielFoto: formData.get('profielFoto')
-      ? formData.get('profielFoto').name
-      : null, // Get uploaded file name
+    profielFoto: fileKey,
   };
 
   const errorLabel = document.getElementById('error-label');
