@@ -17,6 +17,8 @@ export function renderLogin(rootElement) {
           <p>Log je in met je school-email</p>
         </div>
         <form id="loginForm">
+        <div class="form-group">
+          <label for="email">E-mailadres</label>
           <input 
             type="email" 
             id="email" 
@@ -25,6 +27,7 @@ export function renderLogin(rootElement) {
             placeholder="Email"
             class="login-input"
           >
+        </div>
           <div class="form-group">
             <label for="passwordInput">Wachtwoord</label>
             <div style="position:relative;display:flex;align-items:center;">
