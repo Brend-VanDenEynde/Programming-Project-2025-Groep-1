@@ -3,7 +3,13 @@
  * Demonstrates how to use the new API utilities for skills-related endpoints
  */
 
-import { apiGet, apiPost, apiPut, apiDelete } from '../utils/api.js';
+import {
+  apiGet,
+  apiPost,
+  apiPut,
+  apiDelete,
+  publicApiPost,
+} from '../utils/api.js';
 
 /**
  * Fetch all available skills from the API
@@ -241,4 +247,21 @@ export async function fetchStudentSpeeddateRequests(studentId = null) {
   } catch (error) {
     throw error;
   }
+}
+
+/**
+ * Send a contact message to the support team
+ */
+export async function sendContactMessage(contactData) {
+  const response = await fetch('https://api.ehb-match.me/contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(contactData),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Contact verzenden mislukt: ${response.status}`);
+  }
+
+  return await response.json();
 }
