@@ -5,6 +5,7 @@ import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
+import { createBedrijfNavbar, closeBedrijfNavbar, setupBedrijfNavbarEvents } from '../../utils/bedrijf-navbar.js';
 import '../../css/consolidated-style.css';
 
 export async function fetchAndRenderBedrijfProfiel(rootElement, bedrijfId) {
@@ -70,76 +71,51 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
   } = bedrijfData;
 
   rootElement.innerHTML = `
-    <div class="bedrijf-profile-container">
-      <header class="bedrijf-profile-header">
-        <div class="logo-section">
-          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
-          <span>EhB Career Launch</span>
-        </div>
-        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
-        <ul id="burger-dropdown" class="bedrijf-profile-dropdown" style="display: none;">
-          <li><button id="nav-settings">Instellingen</button></li>
-          <li><button id="nav-logout">Log out</button></li>
-        </ul>
-      </header>
-      <div class="bedrijf-profile-main">
-        <nav class="bedrijf-profile-sidebar">
-          <ul>
-            <li><button data-route="profile" class="sidebar-link active">Profiel</button></li>
-            <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
-            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
-            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
-            <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
-          </ul>
-        </nav>
-        <div class="bedrijf-profile-content">
-          <div class="bedrijf-profile-form-container">
-            <h1 class="bedrijf-profile-title">Profiel</h1>
-            <form id="profileForm" class="bedrijf-profile-form" autocomplete="off" enctype="multipart/form-data">
-              <div class="bedrijf-profile-avatar-section">
-                <img 
-                  src="${profiel_foto}" 
-                  alt="Profielfoto ${naam}" 
-                  id="avatar-preview"
-                  class="bedrijf-profile-avatar"
-                />
-                <input type="file" accept="image/*" id="photoInput" style="display:${readonlyMode ? 'none' : 'block'};margin-top:10px;">
-              </div>
-              <div class="bedrijf-profile-form-group">
-                <label for="nameInput">Bedrijfsnaam</label>
-                <input type="text" id="nameInput" value="${naam}" placeholder="Bedrijfsnaam" required ${readonlyMode ? 'disabled' : ''}>
-              </div>
-              <div class="bedrijf-profile-form-group">
-                <label for="emailInput">E-mailadres</label>
-                <input type="email" id="emailInput" value="${contact_email}" placeholder="E-mailadres" required ${readonlyMode ? 'disabled' : ''}>
-              </div>
-              <div class="bedrijf-profile-form-group">
-                <label for="descriptionInput">Plaats</label>
-                <input type="text" id="descriptionInput" value="${plaats}" placeholder="Plaats" ${readonlyMode ? 'disabled' : ''}>
-              </div>
-              <div class="bedrijf-profile-form-group">
-                <label for="linkedinInput">LinkedIn-link</label>
-                <input type="text" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/company/..." ${readonlyMode ? 'disabled' : ''}>
-              </div>
-              <div class="bedrijf-profile-buttons">
-                ${
-                  readonlyMode
-                    ? `<button id="btn-edit-profile" type="button" class="bedrijf-profile-btn bedrijf-profile-btn-secondary">EDIT</button>`
-                    : `<button id="btn-save-profile" type="submit" class="bedrijf-profile-btn bedrijf-profile-btn-primary">SAVE</button>
-                       <button id="btn-reset-profile" type="button" class="bedrijf-profile-btn bedrijf-profile-btn-secondary">RESET</button>`
-                }
-              </div>
-            </form>
+    ${createBedrijfNavbar('profile')}
+    <div class="bedrijf-profile-content">
+      <div class="bedrijf-profile-form-container">
+        <h1 class="bedrijf-profile-title">Profiel</h1>
+        <form id="profileForm" class="bedrijf-profile-form" autocomplete="off" enctype="multipart/form-data">
+          <div class="bedrijf-profile-avatar-section">
+            <img 
+              src="${profiel_foto}" 
+              alt="Profielfoto ${naam}" 
+              id="avatar-preview"
+              class="bedrijf-profile-avatar"
+            />
+            <input type="file" accept="image/*" id="photoInput" style="display:${readonlyMode ? 'none' : 'block'};margin-top:10px;">
           </div>
-        </div>
+          <div class="bedrijf-profile-form-group">
+            <label for="nameInput">Bedrijfsnaam</label>
+            <input type="text" id="nameInput" value="${naam}" placeholder="Bedrijfsnaam" required ${readonlyMode ? 'disabled' : ''}>
+          </div>
+          <div class="bedrijf-profile-form-group">
+            <label for="emailInput">E-mailadres</label>
+            <input type="email" id="emailInput" value="${contact_email}" placeholder="E-mailadres" required ${readonlyMode ? 'disabled' : ''}>
+          </div>
+          <div class="bedrijf-profile-form-group">
+            <label for="descriptionInput">Plaats</label>
+            <input type="text" id="descriptionInput" value="${plaats}" placeholder="Plaats" ${readonlyMode ? 'disabled' : ''}>
+          </div>
+          <div class="bedrijf-profile-form-group">
+            <label for="linkedinInput">LinkedIn-link</label>
+            <input type="text" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/company/..." ${readonlyMode ? 'disabled' : ''}>
+          </div>
+          <div class="bedrijf-profile-buttons">
+            ${
+              readonlyMode
+                ? `<button id="btn-edit-profile" type="button" class="bedrijf-profile-btn bedrijf-profile-btn-secondary">EDIT</button>`
+                : `<button id="btn-save-profile" type="submit" class="bedrijf-profile-btn bedrijf-profile-btn-primary">SAVE</button>
+                   <button id="btn-reset-profile" type="button" class="bedrijf-profile-btn bedrijf-profile-btn-secondary">RESET</button>`
+            }
+          </div>
+        </form>
       </div>
-      <footer class="bedrijf-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
-      </footer>
     </div>
+    ${closeBedrijfNavbar()}
   `;
+
+  setupBedrijfNavbarEvents();
 
   const form = document.getElementById('profileForm');
   if (form) {
