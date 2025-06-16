@@ -19,6 +19,7 @@ export function renderQRPopup(rootElement, studentData = {}) {
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
         <ul id="burger-dropdown" class="student-profile-dropdown">
+          <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
@@ -26,7 +27,6 @@ export function renderQRPopup(rootElement, studentData = {}) {
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
-            <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
@@ -41,13 +41,19 @@ export function renderQRPopup(rootElement, studentData = {}) {
               <div class="qr-code-label">Laat deze QR-code scannen door bedrijven of tijdens events</div>
               <img src="${defaultAvatar}" alt="QR code" class="qr-code-img" id="qr-code-img">
             </div>
+          </div>        </div>
+      </div>
+      
+      <footer class="student-profile-footer">
+        <div class="footer-content">
+          <span>&copy; 2025 EhB Career Launch</span>
+          <div class="footer-links">
+            <a href="/privacy" data-route="/privacy">Privacy</a>
+            <a href="/contact" data-route="/contact">Contact</a>
           </div>
         </div>
-      </div>
-      <footer class="student-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
       </footer>
+      
       <div id="qr-modal" class="qr-modal" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;">
         <div id="qr-modal-content" style="position:relative;background:#fff;padding:2rem;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.3);display:flex;flex-direction:column;align-items:center;">
           <img src="${defaultAvatar}" alt="QR code groot" style="width:300px;height:300px;object-fit:contain;" id="qr-modal-img">
@@ -64,9 +70,6 @@ export function renderQRPopup(rootElement, studentData = {}) {
       import('../../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
-          case 'profile':
-            Router.navigate('/student/student-profiel');
-            break;
           case 'search':
             Router.navigate('/student/zoek-criteria');
             break;
@@ -115,10 +118,24 @@ export function renderQRPopup(rootElement, studentData = {}) {
     });
     document.getElementById('nav-logout').addEventListener('click', () => {
       dropdown.classList.remove('open');
+      window.sessionStorage.removeItem('studentData');
+      window.sessionStorage.removeItem('authToken');
+      window.sessionStorage.removeItem('userType');
       localStorage.setItem('darkmode', 'false');
       document.body.classList.remove('darkmode');
       renderLogin(rootElement);
     });
+    // Hamburger menu Profiel knop
+    const navProfileBtn = document.getElementById('nav-profile');
+    if (navProfileBtn) {
+      navProfileBtn.addEventListener('click', () => {
+        dropdown.classList.remove('open');
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/student/student-profiel');
+        });
+      });
+    }
   }
 
   // Footer links (router navigation, consistent)

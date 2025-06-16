@@ -1,4 +1,5 @@
 import Router from '../router.js';
+import { fetchAndStoreStudentProfile } from './student/student-profiel.js';
 
 // Zet altijd light mode bij laden van login
 localStorage.setItem('darkmode', 'false');
@@ -21,7 +22,8 @@ export function renderLogin(rootElement) {
             required 
             placeholder="Email"
             class="login-input"
-          >          <div class="form-group">
+          >
+          <div class="form-group">
             <label for="passwordInput">Wachtwoord</label>
             <div style="position:relative;display:flex;align-items:center;">
               <input type="password" id="passwordInput" name="password" required placeholder="Wachtwoord" style="flex:1;">
@@ -54,19 +56,10 @@ export function renderLogin(rootElement) {
     </div>
   `;
 
-  // Event listeners
-  document
-    .getElementById('loginForm')
-    .addEventListener('submit', (e) => handleLogin(e, rootElement));
-  document
-    .getElementById('register-link')
-    .addEventListener('click', () => Router.navigate('/registreer'));
-  document.getElementById('back-button').addEventListener('click', () => {
-    Router.goBack('/');
-  });
-  document.getElementById('linkedin-btn').addEventListener('click', () => {
-    /* LinkedIn login nog niet geïmplementeerd */
-  });
+  document.getElementById('loginForm').addEventListener('submit', (e) => handleLogin(e, rootElement));
+  document.getElementById('register-link').addEventListener('click', () => Router.navigate('/registreer'));
+  document.getElementById('back-button').addEventListener('click', () => Router.goBack('/'));
+  document.getElementById('linkedin-btn').addEventListener('click', () => {});
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
     Router.navigate('/privacy');
@@ -76,7 +69,6 @@ export function renderLogin(rootElement) {
     Router.navigate('/contact');
   });
 
-  // Password toggle
   const passwordInput = document.getElementById('passwordInput');
   const togglePassword = document.getElementById('togglePassword');
   const togglePasswordIcon = document.getElementById('togglePasswordIcon');
@@ -84,48 +76,32 @@ export function renderLogin(rootElement) {
     togglePassword.addEventListener('click', () => {
       const isVisible = passwordInput.type === 'text';
       passwordInput.type = isVisible ? 'password' : 'text';
-      togglePasswordIcon.src = isVisible
-        ? 'src/Icons/hide.png'
-        : 'src/Icons/eye.png';
-      togglePasswordIcon.alt = isVisible
-        ? 'Toon wachtwoord'
-        : 'Verberg wachtwoord';
+      togglePasswordIcon.src = isVisible ? 'src/Icons/hide.png' : 'src/Icons/eye.png';
+      togglePasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
     });
   }
 }
 
-// --- Login API call ---
 async function loginUser(email, password) {
   const apiUrl = 'https://api.ehb-match.me/auth/login';
   const loginData = { email, password };
 
-  try {
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(loginData),
-    });
+  const response = await fetch(apiUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(loginData),
+  });
 
-    const data = await response.json();
-    // Debug: log alles wat backend terugstuurt
-    console.log('LOGIN API RESPONSE:', data);
-
-    if (!response.ok) {
-      let errorMessage = `HTTP error! Status: ${response.status}`;
-      if (data.message) errorMessage += ` - ${data.message}`;
-      else if (data.error) errorMessage += ` - ${data.error}`;
-      throw new Error(errorMessage);
-    }
-    return data;
-  } catch (error) {
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      throw new Error('Network error: Could not connect to server');
-    }
-    throw error;
+  const data = await response.json();
+  if (!response.ok) {
+    let errorMessage = `HTTP error! Status: ${response.status}`;
+    if (data.message) errorMessage += ` - ${data.message}`;
+    else if (data.error) errorMessage += ` - ${data.error}`;
+    throw new Error(errorMessage);
   }
+  return data;
 }
 
-// --- /auth/info API call ---
 async function fetchUserInfo(token) {
   const infoUrl = 'https://api.ehb-match.me/auth/info';
   const response = await fetch(infoUrl, {
@@ -136,14 +112,10 @@ async function fetchUserInfo(token) {
     },
   });
   const user = await response.json();
-  // Debug: log alles wat backend terugstuurt
-  console.log('USER INFO API RESPONSE:', user);
-
   if (!response.ok) throw new Error('Ophalen gebruikersinfo mislukt');
   return user;
 }
 
-// --- Login handler ---
 async function handleLogin(event, rootElement) {
   event.preventDefault();
 
@@ -161,32 +133,26 @@ async function handleLogin(event, rootElement) {
   }
   try {
     const loginRes = await loginUser(email, password);
-    console.log('LOGIN API RESPONSE:', loginRes);
-
     if (!loginRes.accessToken) throw new Error('Geen accessToken ontvangen');
     window.sessionStorage.setItem('authToken', loginRes.accessToken);
 
-    // Altijd user-info ophalen via aparte call:
     const infoRes = await fetchUserInfo(loginRes.accessToken);
-    console.log('USER INFO API RESPONSE:', infoRes);
-
-    // Pak de user uit infoRes.user!
     const user = infoRes.user;
+
 
     // Debug: log de volledige user-object
     console.log('USER OBJECT:', user);
 
     if (!user || !user.type) {
-      alert(
-        'Geen gebruikersinformatie ontvangen. Neem contact op met support.'
-      );
+      alert('Geen gebruikersinformatie ontvangen. Neem contact op met support.');
       throw new Error('Authentication failed: No user info');
     }
 
     if (user.type === 2) {
-      window.sessionStorage.setItem('studentData', JSON.stringify(user));
       window.sessionStorage.setItem('userType', 'student');
-      Router.navigate('/student/student-profiel');
+
+      await fetchAndStoreStudentProfile();
+      Router.navigate('/student/student-speeddates');
     } else if (user.type === 3) {
       // Controleer of id aanwezig is en geldig is
       if (!user.id || typeof user.id !== 'number') {
@@ -206,7 +172,6 @@ async function handleLogin(event, rootElement) {
     }
   } catch (error) {
     console.error('Login error:', error);
-
     window.sessionStorage.removeItem('authToken');
     window.sessionStorage.removeItem('studentData');
     window.sessionStorage.removeItem('companyData');

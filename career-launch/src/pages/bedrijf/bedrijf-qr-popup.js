@@ -18,30 +18,14 @@ export function renderBedrijfQRPopup(rootElement, companyData = {}) {
         </ul>
       </header>
       <div class="company-profile-main">
-        <nav class="company-profile-sidebar">
-          <ul>
-            <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
-            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
-            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="qr" class="sidebar-link active">QR-code</button></li>
-          </ul>
-        </nav>
-        <div class="company-profile-content">
-          <div class="company-profile-form-container">
-            <h1 class="company-profile-title">Jouw QR-code</h1>
-            <div class="qr-code-section">
-              <div class="qr-code-label">Laat deze QR-code scannen door studenten of tijdens events</div>
-              <img src="${defaultAvatar}" alt="QR code" class="qr-code-img" id="qr-code-img">
-            </div>
-          </div>
-        </div>
+        <!-- Dummy QR content -->
+        <div style="padding:2rem;text-align:center;">QR-code Dummy</div>
       </div>
-      <footer class="company-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
-      </footer>
-    </div>`;
+    </div>
+  `;
 }
+
+export default renderBedrijfQRPopup;
 
 function renderSidebar() {
   const sidebarHtml = `
@@ -58,8 +42,6 @@ function renderSidebar() {
   if (sidebarContainer) {
     sidebarContainer.innerHTML = sidebarHtml;
   }
-
-  setupNavigationLinks();
 }
 
 function setupNavigationLinks(companyData = {}) {
@@ -85,3 +67,4 @@ function setupNavigationLinks(companyData = {}) {
 }
 
 renderSidebar();
+

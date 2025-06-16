@@ -1,3 +1,4 @@
+
 import logoIcon from '../../icons/favicon-32x32.png';
 
 export function renderBedrijfSpeeddatesRequests(rootElement, companyData = {}) {
@@ -77,4 +78,10 @@ export function renderBedrijfSpeeddatesRequests(rootElement, companyData = {}) {
 
   renderTable();
   renderSidebar();
+
+// Dummy file for bedrijf-speeddates-verzoeken.js
+export function renderBedrijfSpeeddatesVerzoeken() {
+  return 'Bedrijf Speeddates Verzoeken Dummy';
+
 }
+export default renderBedrijfSpeeddatesVerzoeken;

@@ -2,7 +2,7 @@ import { logoutUser } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
 
 // Main renderfunctie:
-export function showSettingsPopup(onClose) {
+export function showBedrijfSettingsPopup(onClose) {
   // Voeg popup-styles toe
   if (!document.getElementById('settings-popup-style')) {
     const style = document.createElement('style');
@@ -105,8 +105,7 @@ function renderSidebar() {
   if (sidebarContainer) {
     sidebarContainer.innerHTML = sidebarHtml;
   }
-
-  setupNavigationLinks();
+  // setupNavigationLinks(); // Dummy file: functie bestaat niet, dus niet aanroepen
 }
 
 function setupNavigationLinks(companyData = {}) {
@@ -138,3 +137,4 @@ function setupNavigationLinks(companyData = {}) {
 }
 
 renderSidebar();
+

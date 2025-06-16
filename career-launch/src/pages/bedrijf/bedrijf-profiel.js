@@ -1,3 +1,4 @@
+
 // src/views/bedrijf-profiel.js
 
 import defaultAvatar from '../../images/BedrijfDefault.jpg';
@@ -370,3 +371,10 @@ window.addEventListener('DOMContentLoaded', () => {
     console.error('Fout bij het ophalen van bedrijfgegevens uit sessionStorage:', error);
   }
 });
+
+// Dummy file for bedrijf-profiel.js
+export function renderBedrijfProfiel() {
+  return 'Bedrijf Profiel Dummy';
+}
+export default renderBedrijfProfiel;
+

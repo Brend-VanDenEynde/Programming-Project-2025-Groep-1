@@ -6,7 +6,6 @@ import defaultAvatar from '../../images/default.png';
 import { logoutUser } from '../../utils/auth-api.js';
 import { renderBedrijven } from './bedrijven.js';
 
-
 const defaultProfile = {
   voornaam: '',
   achternaam: '',
@@ -54,7 +53,10 @@ export function renderStudentProfiel(
   } = studentData;
 
   // Gebruik default als profiel_foto null, leeg of undefined is
-  const profiel_foto = (!rawProfielFoto || rawProfielFoto === 'null') ? defaultAvatar : rawProfielFoto;
+  const profiel_foto =
+    !rawProfielFoto || rawProfielFoto === 'null'
+      ? defaultAvatar
+      : rawProfielFoto;
 
   // Map opleiding name to id if id is missing
   let resolvedOpleidingId = opleiding_id;
@@ -86,6 +88,7 @@ export function renderStudentProfiel(
         </div>
         <button id="burger-menu" class="student-profile-burger">☰</button>
         <ul id="burger-dropdown" class="student-profile-dropdown">
+          <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
@@ -93,7 +96,6 @@ export function renderStudentProfiel(
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
-            <li><button data-route="profile" class="sidebar-link active">Profiel</button></li>
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
@@ -118,69 +120,44 @@ export function renderStudentProfiel(
               </div>
               <div class="student-profile-form-group">
                 <label for="firstNameInput">Voornaam</label>
-                <input type="text" id="firstNameInput" value="${voornaam}" placeholder="voornaam" required ${
-    readonlyMode ? 'disabled' : ''
-  }>
+                <input type="text" id="firstNameInput" value="${voornaam}" placeholder="voornaam" required ${readonlyMode ? 'disabled' : ''}>
               </div>
               <div class="student-profile-form-group">
                 <label for="lastNameInput">Achternaam</label>
-                <input type="text" id="lastNameInput" value="${achternaam}" placeholder="achternaam" required ${
-    readonlyMode ? 'disabled' : ''
-  }>
+                <input type="text" id="lastNameInput" value="${achternaam}" placeholder="achternaam" required ${readonlyMode ? 'disabled' : ''}>
               </div>
               <div class="student-profile-form-group">
                 <label for="emailInput">E-mailadres</label>
-                <input type="email" id="emailInput" value="${email}" placeholder="e-mailadres" required ${
-    readonlyMode ? 'disabled' : ''
-  }>
+                <input type="email" id="emailInput" value="${email}" placeholder="e-mailadres" required ${readonlyMode ? 'disabled' : ''}>
               </div>
               <div class="student-profile-form-group">
                 <label for="studyProgramInput">Studieprogramma</label>
-                <input type="text" id="studyProgramInput" value="${opleidingNaam}" placeholder="opleiding" disabled ${
-    !readonlyMode ? 'style="display:none;"' : ''
-  }>
-                ${
-                  !readonlyMode
-                    ? `<select id="opleidingSelect" required>
-                        <option value="">Selecteer opleiding</option>
-                        ${opleidingen
-                          .map(
-                            (o) =>
-                              `<option value="${o.id}" ${
-                                o.id == resolvedOpleidingId ? 'selected' : ''
-                              }>${o.naam}</option>`
-                          )
-                          .join('')}
-                      </select>`
-                    : ''
-                }
+                <select id="opleidingSelect" ${readonlyMode ? 'disabled' : ''}>
+                  <option value="">Selecteer opleiding</option>
+                  ${opleidingen
+                    .map(
+                      (o) =>
+                        `<option value="${o.id}" ${o.id == resolvedOpleidingId ? 'selected' : ''}>${o.naam}</option>`
+                    )
+                    .join('')}
+                </select>
               </div>
               <div class="student-profile-form-group">
                 <label for="yearInput">Opleidingsjaar</label>
                 <select id="yearInput" ${readonlyMode ? 'disabled' : ''}>
-                  <option value="1" ${
-                    studiejaar == '1' ? 'selected' : ''
-                  }>1</option>
-                  <option value="2" ${
-                    studiejaar == '2' ? 'selected' : ''
-                  }>2</option>
-                  <option value="3" ${
-                    studiejaar == '3' ? 'selected' : ''
-                  }>3</option>
+                  <option value="1" ${studiejaar == '1' ? 'selected' : ''}>1</option>
+                  <option value="2" ${studiejaar == '2' ? 'selected' : ''}>2</option>
+                  <option value="3" ${studiejaar == '3' ? 'selected' : ''}>3</option>
                 </select>
               </div>
               <div class="student-profile-form-group">
                 <label for="birthDateInput">Geboortedatum</label>
-                <input type="date" id="birthDateInput" value="${geboortedatum}" placeholder="geboortedatum" ${
-    readonlyMode ? 'disabled' : ''
-  }>
+                <input type="date" id="birthDateInput" value="${geboortedatum}" placeholder="geboortedatum" ${readonlyMode ? 'disabled' : ''}>
                 <div id="birthDateError" style="color: red; font-size: 0.9em; min-height: 1.2em;"></div>
               </div>
               <div class="student-profile-form-group">
                 <label for="linkedinInput">LinkedIn-link</label>
-                <input type="url" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/in/jouwprofiel" ${
-    readonlyMode ? 'disabled' : ''
-  }>
+                <input type="url" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/in/jouwprofiel" ${readonlyMode ? 'disabled' : ''}>
               </div>
               <div class="student-profile-buttons">
                 ${
@@ -192,16 +169,22 @@ export function renderStudentProfiel(
                     : `
                       <button id="btn-save-profile" type="submit" class="student-profile-btn student-profile-btn-primary">SAVE</button>
                       <button id="btn-reset-profile" type="button" class="student-profile-btn student-profile-btn-secondary">RESET</button>
+                      <button id="btn-cancel-profile" type="button" class="student-profile-btn student-profile-btn-secondary">CANCEL</button>
                     `
                 }
               </div>
             </form>
+          </div>        </div>
+      </div>
+      
+      <footer class="student-profile-footer">
+        <div class="footer-content">
+          <span>&copy; 2025 EhB Career Launch</span>
+          <div class="footer-links">
+            <a href="/privacy" data-route="/privacy">Privacy</a>
+            <a href="/contact" data-route="/contact">Contact</a>
           </div>
         </div>
-      </div>
-      <footer class="student-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
       </footer>
     </div>
   `;
@@ -213,9 +196,7 @@ export function renderStudentProfiel(
       import('../../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
-          case 'profile':
-            Router.navigate('/student/student-profiel');
-            break;
+          // case 'profile': // verwijderd
           case 'search':
             Router.navigate('/student/zoek-criteria');
             break;
@@ -226,7 +207,7 @@ export function renderStudentProfiel(
             Router.navigate('/student/student-speeddates-verzoeken');
             break;
           case 'bedrijven':
-            Router.navigate('/student/bedrijven')
+            Router.navigate('/student/bedrijven');
             break;
           case 'qr':
             Router.navigate('/student/student-qr-popup');
@@ -262,6 +243,17 @@ export function renderStudentProfiel(
       dropdown.classList.remove('open');
       showSettingsPopup(() => renderStudentProfiel(rootElement, studentData));
     });
+    // Profiel knop in hamburger menu
+    const navProfileBtn = document.getElementById('nav-profile');
+    if (navProfileBtn) {
+      navProfileBtn.addEventListener('click', () => {
+        dropdown.classList.remove('open');
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/student/student-profiel');
+        });
+      });
+    }
     document.getElementById('nav-logout').addEventListener('click', async () => {
       dropdown.classList.remove('open');
       const response = await logoutUser();
@@ -330,6 +322,12 @@ export function renderStudentProfiel(
     if (saveBtn) {
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
+        // Haal token op voor API-calls
+        let token = sessionStorage.getItem('authToken');
+        if (!token) {
+          alert('Geen inlogsessie gevonden. Log opnieuw in.');
+          return;
+        }
         let newOpleidingId = resolvedOpleidingId;
         if (!readonlyMode) {
           const select = document.getElementById('opleidingSelect');
@@ -347,8 +345,10 @@ export function renderStudentProfiel(
           opleiding_id: parseInt(newOpleidingId, 10),
         };
         // Debug: log de payload
-        console.log('Student update payload:', JSON.stringify(updatedStudentData));
-        const token = sessionStorage.getItem('authToken');
+        console.log(
+          'Student update payload:',
+          JSON.stringify(updatedStudentData)
+        );
         // Haal altijd de juiste ID’s uit sessionStorage
         // let studentID = studentData.gebruiker_id;
         // let userID = studentData.gebruiker_id;
@@ -357,16 +357,33 @@ export function renderStudentProfiel(
           return;
         }
         // Debug: log de gebruikte ID's en token
-        console.log('studentData:', studentData, 'studentID:', studentID, 'userID:', userID, 'token:', token);
+        console.log(
+          'studentData:',
+          studentData,
+          'studentID:',
+          studentID,
+          'userID:',
+          userID,
+          'token:',
+          token
+        );
         // Check geboortedatum niet in de toekomst en minstens 17 jaar oud
         const today = new Date();
-        const minBirthDate = new Date(today.getFullYear() - 17, today.getMonth(), today.getDate());
+        const minBirthDate = new Date(
+          today.getFullYear() - 17,
+          today.getMonth(),
+          today.getDate()
+        );
         const inputBirthDate = new Date(updatedStudentData.date_of_birth);
         // Inline validatie geboortedatum
         const birthDateError = document.getElementById('birthDateError');
         birthDateError.textContent = '';
-        if (updatedStudentData.date_of_birth > today.toISOString().split('T')[0]) {
-          birthDateError.textContent = 'Geboortedatum mag niet in de toekomst liggen.';
+        if (
+          updatedStudentData.date_of_birth > today.toISOString().split('T')[0]
+        ) {
+          birthDateError.textContent =
+            'Geboortedatum mag niet in de toekomst liggen.';
+
           return;
         }
         if (inputBirthDate > minBirthDate) {
@@ -376,36 +393,82 @@ export function renderStudentProfiel(
         try {
           // 1. E-mail gewijzigd? Eerst /user/{userID}
           if (nieuweEmail && nieuweEmail !== oudeEmail) {
+
             console.debug('PUT /user/' + userID, { email: nieuweEmail });
-            const respUser = await fetch(`https://api.ehb-match.me/user/${userID}`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token,
-              },
-              body: JSON.stringify({ email: nieuweEmail }),
-            });
+            const respUser = await fetch(
+              `https://api.ehb-match.me/user/${userID}`,
+              {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: 'Bearer ' + token,
+                },
+                body: JSON.stringify({ email: nieuweEmail }),
+              }
+            );
+
             if (!respUser.ok) {
               const errText = await respUser.text();
               console.error('Backend response (user):', errText);
               throw new Error('E-mail bijwerken mislukt: ' + errText);
             }
             const userResult = await respUser.json();
-            // Update email in sessionStorage studentData
             if (userResult.user && userResult.user.email) {
               studentData.email = userResult.user.email;
             }
           }
-          // 2. Overige profielinfo via /studenten/{studentID}
-          console.debug('PUT /studenten/' + studentID, updatedStudentData);
+
+          // 2. Profielfoto uploaden indien geselecteerd
+          let profielFotoKey = studentData.profiel_foto; // default
+          const photoInput = document.getElementById('photoInput');
+          if (photoInput && photoInput.files && photoInput.files.length > 0) {
+            const file = photoInput.files[0];
+            // Controleer bestandstype en grootte
+            if (!file.type.match(/^image\/(jpeg|png|gif)$/)) {
+              alert('Ongeldig bestandstype. Kies een jpg, png of gif afbeelding.');
+              return;
+            }
+            if (file.size > 2 * 1024 * 1024) {
+              alert('Bestand is te groot. Maximaal 2 MB toegestaan.');
+              return;
+            }
+            // Gebruik altijd 'image' als veldnaam
+            const fileForm = new FormData();
+            fileForm.append('image', file);
+            const uploadResp = await fetch('https://api.ehb-match.me/profielfotos', {
+              method: 'POST',
+              headers: {
+                'Authorization': 'Bearer ' + token,
+              },
+              body: fileForm,
+            });
+            if (!uploadResp.ok) {
+              const errText = await uploadResp.text();
+              console.error('Upload response for key "image":', errText);
+              throw new Error('Foto uploaden mislukt: ' + errText);
+            }
+            const uploadResult = await uploadResp.json();
+            profielFotoKey = uploadResult.profiel_foto_key;
+          }
+          // 3. Overige profielinfo via /studenten/{studentID} (JSON)
+          const payload = {
+            voornaam: document.getElementById('firstNameInput').value,
+            achternaam: document.getElementById('lastNameInput').value,
+            studiejaar: parseInt(document.getElementById('yearInput').value, 10),
+            date_of_birth: birthDateValue,
+            linkedin: document.getElementById('linkedinInput').value,
+            opleiding_id: parseInt(newOpleidingId, 10),
+            profiel_foto: profielFotoKey
+          };
           const respStudent = await fetch(`https://api.ehb-match.me/studenten/${studentID}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer ' + token,
             },
-            body: JSON.stringify(updatedStudentData),
+            body: JSON.stringify(payload),
           });
+
           if (!respStudent.ok) {
             const errText = await respStudent.text();
             console.error('Backend response (student):', errText);
@@ -415,8 +478,14 @@ export function renderStudentProfiel(
           // Backend geeft { message, student } terug
           if (result.student) {
             // Combineer email met nieuwe studentdata voor sessionStorage
-            const nieuweStudentData = { ...result.student, email: studentData.email };
-            sessionStorage.setItem('studentData', JSON.stringify(nieuweStudentData));
+            const nieuweStudentData = {
+              ...result.student,
+              email: studentData.email,
+            };
+            sessionStorage.setItem(
+              'studentData',
+              JSON.stringify(nieuweStudentData)
+            );
             renderStudentProfiel(rootElement, nieuweStudentData, true);
           } else {
             alert('Profiel opgeslagen, maar geen student-object in response!');
@@ -444,6 +513,29 @@ export function renderStudentProfiel(
         renderStudentProfiel(rootElement, resetData, false);
       });
     }
+    // CANCEL knop
+    const cancelBtn = document.getElementById('btn-cancel-profile');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', () => {
+        renderStudentProfiel(rootElement, studentData, true);
+      });
+    }
+
+    // Preview afbeelding direct tonen als gebruiker een bestand kiest
+    const photoInput = document.getElementById('photoInput');
+    if (photoInput) {
+      photoInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (evt) {
+            const avatarPreview = document.getElementById('avatar-preview');
+            if (avatarPreview) avatarPreview.src = evt.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
   }
 }
 
@@ -453,7 +545,7 @@ export async function fetchAndStoreStudentProfile() {
   if (!token) throw new Error('Geen authToken gevonden');
   // 1. Haal user-info op (voor email en userID)
   const respUser = await fetch('https://api.ehb-match.me/auth/info', {
-    headers: { 'Authorization': 'Bearer ' + token }
+    headers: { Authorization: 'Bearer ' + token },
   });
   if (!respUser.ok) throw new Error('Kan user-info niet ophalen');
   const userResult = await respUser.json();
@@ -461,14 +553,22 @@ export async function fetchAndStoreStudentProfile() {
   if (!user || !user.id) throw new Error('User info onvolledig');
   // 2. Haal alle studenten op en zoek juiste student
   const respStudents = await fetch('https://api.ehb-match.me/studenten', {
-    headers: { 'Authorization': 'Bearer ' + token }
+    headers: { Authorization: 'Bearer ' + token },
   });
   if (!respStudents.ok) throw new Error('Kan studentenlijst niet ophalen');
   const studenten = await respStudents.json();
-  const student = studenten.find(s => s.gebruiker_id === user.id);
+  const student = studenten.find((s) => s.gebruiker_id === user.id);
   if (!student) throw new Error('Student niet gevonden voor deze gebruiker!');
   // 3. Combineer info (voeg email toe aan studentdata)
   const combined = { ...student, email: user.email, gebruiker_id: user.id };
   sessionStorage.setItem('studentData', JSON.stringify(combined));
   return combined;
+}
+
+// Utility functie om na login direct naar speeddates te gaan
+export function redirectToSpeeddates() {
+  import('../../router.js').then((module) => {
+    const Router = module.default;
+    Router.navigate('/student/student-speeddates');
+  });
 }

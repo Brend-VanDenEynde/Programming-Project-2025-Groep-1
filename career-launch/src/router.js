@@ -23,6 +23,12 @@ import { showSettingsPopup } from './pages/student/student-settings.js';
 import { renderBedrijfProfiel } from './pages/bedrijf/bedrijf-profiel.js';
 import { renderBedrijfRegister } from './pages/register-bedrijf/bedrijf-register.js';
 import { renderBedrijven } from './pages/student/bedrijven.js';
+import { renderSearchCriteriaBedrijf } from './pages/bedrijf/search-criteria-bedrijf.js';
+import { renderBedrijfSpeeddates } from './pages/bedrijf/bedrijf-speeddates.js';
+import { renderBedrijfSpeeddatesVerzoeken } from './pages/bedrijf/bedrijf-speeddates-verzoeken.js';
+import { renderBedrijfQRPopup } from './pages/bedrijf/bedrijf-qr-popup.js';
+import { showBedrijfSettingsPopup } from './pages/bedrijf/bedrijf-settings.js';
+import { renderBedrijfStudenten } from './pages/bedrijf/bedrijf-studenten.js';
 
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
@@ -52,6 +58,7 @@ const routes = {
     );
     renderBedrijven(rootElement, studentData);
   },
+  '/admin': renderAdmin,
   '/admin-login': renderAdmin,
   '/admin-select-dashboard': renderAdminSelectDashboard,
   '/admin-dashboard': renderAdminSelectDashboard,
@@ -66,6 +73,17 @@ const routes = {
   '/privacy': renderPrivacy,
   '/contact': renderContact,
   '/bedrijf/bedrijf-profiel': renderBedrijfProfiel,
+  '/bedrijf/zoek-criteria': renderSearchCriteriaBedrijf,
+  '/bedrijf/speeddates': renderBedrijfSpeeddates,
+  '/bedrijf/speeddates-verzoeken': renderBedrijfSpeeddatesVerzoeken,
+  '/bedrijf/qr-code': renderBedrijfQRPopup,
+  '/bedrijf/settings': showBedrijfSettingsPopup,
+  '/bedrijf/studenten': (rootElement) => {
+    const bedrijfData = JSON.parse(
+      window.sessionStorage.getItem('bedrijfData')
+    );
+    renderBedrijfStudenten(rootElement, bedrijfData);
+  },
   '/registreer-bedrijf': renderBedrijfRegister,
 };
 
@@ -147,12 +165,20 @@ class Router {
         'Speeddate Verzoeken - Career Launch 2025',
       '/student/student-settings': 'Instellingen - Career Launch 2025',
       '/student/bedrijven': 'Bedrijven - Career Launch 2025',
-      '/admin': 'Admin Login - Career Launch 2025',
+      '/admin': 'Admin - Career Launch 2025',
+      '/admin-login': 'Admin Login - Career Launch 2025',
       '/admin-dashboard': 'Admin Dashboard - Career Launch 2025',
       '/contact': 'Contacteer ons - Career Launch 2025',
       '/privacy': 'Privacy Beleid - Career Launch 2025',
       '/404': 'Pagina niet gevonden - Career Launch 2025',
       '/bedrijf/bedrijf-profiel': 'Bedrijf Profiel - Career Launch 2025',
+      '/bedrijf/zoek-criteria': 'Zoek Criteria - Career Launch 2025',
+      '/bedrijf/speeddates': 'Speeddates - Career Launch 2025',
+      '/bedrijf/speeddates-verzoeken':
+        'Speeddate Verzoeken - Career Launch 2025',
+      '/bedrijf/qr-code': 'QR Code - Career Launch 2025',
+      '/bedrijf/settings': 'Instellingen - Career Launch 2025',
+      '/bedrijf/studenten': 'Studenten - Career Launch 2025',
       '/registreer-bedrijf': 'Bedrijf Registreren - Career Launch 2025',
     };
     document.title = titles[path] || 'Career Launch 2025';
