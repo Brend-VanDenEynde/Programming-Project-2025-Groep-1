@@ -5,6 +5,9 @@ import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
+import '../../css/consolidated-style.css';
+import { setupNavigationLinks } from './bedrijf-speeddates.js';
+
 export async function fetchAndRenderBedrijfProfiel(rootElement, bedrijfId) {
   const token = sessionStorage.getItem('authToken');
   if (!token) {
@@ -74,7 +77,7 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
           <span>EhB Career Launch</span>
         </div>
         <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
-        <ul id="burger-dropdown" class="bedrijf-profile-dropdown">
+        <ul id="burger-dropdown" class="bedrijf-profile-dropdown" style="display: none;">
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
@@ -84,6 +87,10 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
           <ul>
             <li><button data-route="profile" class="sidebar-link active">Profiel</button></li>
             <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
+            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
+            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
+            <li><button data-route="bedrijven" class="sidebar-link">Bedrijven</button></li>
+            <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
           </ul>
         </nav>
         <div class="bedrijf-profile-content">
@@ -222,7 +229,50 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
   } else {
     console.error('Contact link niet gevonden in de DOM.');
   }
+
+  const logoutButton = document.getElementById('nav-logout');
+  if (logoutButton) {
+    logoutButton.addEventListener('click', () => {
+      performLogout();
+      alert('U bent succesvol uitgelogd.');
+      renderLogin(document.getElementById('app'));
+    });
+  } else {
+    console.error('Log out knop niet gevonden in de DOM.');
+  }
+
+  document.querySelectorAll('.sidebar-link').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const route = btn.getAttribute('data-route');
+      if (route === 'speeddates') {
+        import('./bedrijf-speeddates.js').then((module) => {
+          module.renderBedrijfSpeeddates(document.getElementById('app'), bedrijfData);
+        });
+      }
+    });
+  });
 }
+
+function renderSidebar() {
+  const sidebarHtml = `
+    <nav class="company-profile-sidebar">
+      <ul>
+        <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
+        <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
+        <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
+        <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
+      </ul>
+    </nav>`;
+
+  const sidebarContainer = document.querySelector('.sidebar-container');
+  if (sidebarContainer) {
+    sidebarContainer.innerHTML = sidebarHtml;
+  }
+
+  setupNavigationLinks();
+}
+
+renderSidebar();
 
 // Testaanroep om het juiste bedrijfId dynamisch op te halen
 window.addEventListener('DOMContentLoaded', () => {

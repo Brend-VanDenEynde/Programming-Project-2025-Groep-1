@@ -61,6 +61,10 @@ const routes = {
   '/student/bedrijven': renderBedrijven,
   '/bedrijf/bedrijf-profiel': renderBedrijfProfiel,
   '/registreer-bedrijf': renderBedrijfRegister,
+  '/bedrijf/bedrijf-speeddates': renderSpeeddates,
+  '/bedrijf/bedrijf-speeddates-verzoeken': renderSpeeddatesRequests,
+  '/bedrijf/bedrijf-settings': showSettingsPopup,
+  '/bedrijf/bedrijf-qr-popup': renderQRPopup,
 };
 
 const router = new Router(routes);
