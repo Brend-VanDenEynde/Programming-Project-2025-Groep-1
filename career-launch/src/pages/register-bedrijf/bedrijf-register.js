@@ -14,7 +14,7 @@ export function renderBedrijfRegister(rootElement) {
       <div class="upload-section">
         <div class="upload-icon" data-alt="⬆" style="position:relative;">
           <img src="" alt="⬆" class="uploaded-photo" />
-          <span class="delete-overlay" style="display:none;">&#10006;</span>
+          <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
         </div>
         <label for="profielFoto" class="upload-label">Logo</label>
         <div class="file-input-wrapper">
