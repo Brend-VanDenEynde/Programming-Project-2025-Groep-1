@@ -105,11 +105,8 @@ function renderSidebar() {
   if (sidebarContainer) {
     sidebarContainer.innerHTML = sidebarHtml;
   }
-
-  setupNavigationLinks();
+  // setupNavigationLinks(); // Dummy file: functie bestaat niet, dus niet aanroepen
 }
 
 renderSidebar();
-
-export { showSettingsPopup as showBedrijfSettingsPopup };
 
