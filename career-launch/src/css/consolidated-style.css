@@ -2446,6 +2446,25 @@ body.darkmode .student-profile-footer a:hover {
   text-align: center;
 }
 
+.delete-overlay {
+  display: none;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  font-size: 2.2rem;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 2;
+  transition: background 0.2s;
+  pointer-events: auto;
+}
+.upload-icon:hover .delete-overlay {
+  display: flex;
+}
+
 .upload-section label {
   display: block;
   font-weight: bold;

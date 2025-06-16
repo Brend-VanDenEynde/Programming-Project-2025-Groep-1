@@ -11,7 +11,10 @@ export function renderStudentRegister(rootElement) {
     <main class="form-container">
       <button class="back-button" id="back-button">← Terug</button>
       <div class="upload-section">
-        <div class="upload-icon" data-alt="⬆"><img src="" alt="⬆" class="uploaded-photo" /></div>
+        <div class="upload-icon" data-alt="⬆" style="position:relative;">
+          <img src="" alt="⬆" class="uploaded-photo" />
+          <span class="delete-overlay" style="display:none;">&#10006;</span>
+        </div>
         <label for="profielFoto" class="upload-label">Foto</label>
         <div class="file-input-wrapper">
           <input type="file" id="profielFoto" name="profielFoto" accept="image/*" class="file-input" />
@@ -60,10 +63,53 @@ export function renderStudentRegister(rootElement) {
   const fileInput = document.getElementById('profielFoto');
   const browseButton = document.querySelector('.browse-button');
   const fileStatus = document.querySelector('.file-status');
+  const uploadIcon = document.querySelector('.upload-icon');
+  const uploadedPhoto = document.querySelector('.uploaded-photo');
+  const deleteOverlay = document.querySelector('.delete-overlay');
 
   browseButton.addEventListener('click', () => {
     fileInput.click();
   });
+
+  let overlayEnabled = false;
+
+  function updateDeleteOverlay() {
+    // Only enable overlay if an image is uploaded (src is not empty, not default, and not a data-alt fallback)
+    overlayEnabled = uploadedPhoto.src &&
+      uploadedPhoto.src !== window.location.href &&
+      uploadedPhoto.src !== '' &&
+      uploadedPhoto.src !== undefined &&
+      !uploadedPhoto.src.endsWith('/');
+    // Always hide overlay by default
+    deleteOverlay.style.display = 'none';
+  }
+
+  uploadIcon.addEventListener('mouseenter', () => {
+    if (overlayEnabled) {
+      deleteOverlay.style.display = 'flex';
+    }
+  });
+  uploadIcon.addEventListener('mouseleave', () => {
+    deleteOverlay.style.display = 'none';
+  });
+
+  deleteOverlay.addEventListener('click', handlePhotoClick);
+
+  async function handlePhotoClick() {
+    const deleteResponse = await fetch(`https://api.ehb-match.me/profielfotos/${fileKey}`, {
+      method: 'DELETE',
+    });
+    if (!deleteResponse.ok) {
+      console.error(`Failed to delete photo: ${deleteResponse.status}`);
+    }
+    console.log(deleteResponse);
+    uploadedPhoto.alt = '⬆';
+    uploadedPhoto.src = '';
+    fileStatus.textContent = 'No file selected.'; // Reset file status
+    fileKey = null; // Reset file key
+    updateDeleteOverlay();
+    uploadedPhoto.removeEventListener('click', handlePhotoClick);
+  }
 
   fileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
@@ -86,18 +132,13 @@ export function renderStudentRegister(rootElement) {
 
       fileKey = uploadResponse.profiel_foto_key || null;
 
-      const uploadedPhoto = document.querySelector('.uploaded-photo');
       uploadedPhoto.alt = '';
       uploadedPhoto.src = uploadResponse.profiel_foto_url || '';
-
-      document.querySelector('.uploaded-photo').addEventListener('click', () => {
-        uploadedPhoto.alt = '⬆';
-        uploadedPhoto.src = '';
-        fileStatus.textContent = 'No file selected.'; // Reset file status
-        fileKey = null; // Reset file key
-      });
+      updateDeleteOverlay();
+      uploadedPhoto.addEventListener('click', handlePhotoClick);
     } else {
       fileStatus.textContent = 'No file selected.';
+      updateDeleteOverlay();
     }
   });
   document.getElementById('back-button').addEventListener('click', () => {
