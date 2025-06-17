@@ -39,7 +39,7 @@ export function renderStudentProfiel(
     try {
       const stored = window.sessionStorage.getItem('studentData');
       if (stored) studentData = JSON.parse(stored);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // Gebruik altijd deze variabelen voor API-calls
@@ -76,9 +76,9 @@ export function renderStudentProfiel(
 
   const geboortedatum = isoToDateString(
     studentData.geboortedatum ||
-      studentData.birthdate ||
-      studentData.date_of_birth ||
-      defaultProfile.date_of_birth
+    studentData.birthdate ||
+    studentData.date_of_birth ||
+    defaultProfile.date_of_birth
   );
 
   const opleidingNaam = getOpleidingNaamById(resolvedOpleidingId);
@@ -118,9 +118,8 @@ export function renderStudentProfiel(
                   id="avatar-preview"
                   class="student-profile-avatar"
                 />
-                <input type="file" accept="image/*" id="photoInput" style="display:${
-                  readonlyMode ? 'none' : 'block'
-                };margin-top:10px;">
+                <input type="file" accept="image/*" id="photoInput" style="display:${readonlyMode ? 'none' : 'block'
+    };margin-top:10px;">
               </div>
               <div class="student-profile-form-group">
                 <label for="firstNameInput">Voornaam</label>
@@ -139,11 +138,11 @@ export function renderStudentProfiel(
                 <select id="opleidingSelect" ${readonlyMode ? 'disabled' : ''}>
                   <option value="">Selecteer opleiding</option>
                   ${opleidingen
-                    .map(
-                      (o) =>
-                        `<option value="${o.id}" ${o.id == resolvedOpleidingId ? 'selected' : ''}>${o.naam}</option>`
-                    )
-                    .join('')}
+      .map(
+        (o) =>
+          `<option value="${o.id}" ${o.id == resolvedOpleidingId ? 'selected' : ''}>${o.naam}</option>`
+      )
+      .join('')}
                 </select>
               </div>
               <div class="student-profile-form-group">
@@ -164,18 +163,17 @@ export function renderStudentProfiel(
                 <input type="url" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/in/jouwprofiel" ${readonlyMode ? 'disabled' : ''}>
               </div>
               <div class="student-profile-buttons">
-                ${
-                  readonlyMode
-                    ? `
+                ${readonlyMode
+      ? `
                       <button id="btn-edit-profile" type="button" class="student-profile-btn student-profile-btn-secondary">EDIT</button>
                       <button id="logout-btn" type="button" class="student-profile-btn student-profile-btn-secondary">LOG OUT</button>
                     `
-                    : `
+      : `
                       <button id="btn-save-profile" type="submit" class="student-profile-btn student-profile-btn-primary">SAVE</button>
                       <button id="btn-reset-profile" type="button" class="student-profile-btn student-profile-btn-secondary">RESET</button>
                       <button id="btn-cancel-profile" type="button" class="student-profile-btn student-profile-btn-secondary">CANCEL</button>
                     `
-                }
+    }
               </div>
             </form>
           </div>        </div>
@@ -288,7 +286,7 @@ export function renderStudentProfiel(
   }
 
   ;
-  
+
 
   // Originele data voor reset
   const originalData = { ...studentData };
@@ -300,7 +298,7 @@ export function renderStudentProfiel(
     const editBtn = document.getElementById('btn-edit-profile');
     if (editBtn) {
       editBtn.addEventListener('click', () => {
-        console.log("EDIT clicked", {readonlyMode, studentData});
+        console.log("EDIT clicked", { readonlyMode, studentData });
         renderStudentProfiel(rootElement, studentData, false);
       });
     }
@@ -324,12 +322,25 @@ export function renderStudentProfiel(
         // Verzamel nieuwe waarden, alleen geldige velden en types
         const nieuweEmail = document.getElementById('emailInput').value;
         const oudeEmail = studentData.email;
+        let linkedinInput = formData.get('linkedin');
+        let linkedinValue = null;
+        if (linkedinInput && linkedinInput.trim() !== '') {
+          linkedinInput = linkedinInput.trim();
+          // Remove both 'https://www.linkedin.com' and 'https://linkedin.com' from the start
+          linkedinInput = linkedinInput.replace(/^(https?:\/\/)?(www\.)?linkedin\.com/i, '');
+          // Accept if it starts with '/in/'
+          if (linkedinInput.startsWith('/in/')) {
+            linkedinValue = linkedinInput;
+          } else {
+            linkedinValue = null;
+          }
+        }
         const updatedStudentData = {
           voornaam: document.getElementById('firstNameInput').value,
           achternaam: document.getElementById('lastNameInput').value,
           studiejaar: parseInt(document.getElementById('yearInput').value, 10),
           date_of_birth: document.getElementById('birthDateInput').value,
-          linkedin: document.getElementById('linkedinInput').value,
+          linkedin: linkedinValue,
           opleiding_id: parseInt(newOpleidingId, 10),
         };
         // Debug: log de payload
