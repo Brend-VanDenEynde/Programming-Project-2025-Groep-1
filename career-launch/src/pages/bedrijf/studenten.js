@@ -1,7 +1,10 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import defaultStudentAvatar from '../../images/default.png';
 import { logoutUser, fetchUserInfo } from '../../utils/auth-api.js';
-import { fetchDiscoverStudenten } from '../../utils/data-api.js';
+import {
+  fetchDiscoverStudenten,
+  createSpeeddate,
+} from '../../utils/data-api.js';
 import Router from '../../router.js';
 
 // Global variables for students data
@@ -179,12 +182,10 @@ async function showStudentPopup(student) {
         <div style="display:flex;justify-content:space-between;">
           <span>Skill matches:</span>
           <span>${student.skill_matches || 0}</span>
-        </div>
-      </div>
+        </div>      </div>
 
-      <div style="display:flex;gap:1rem;margin-top:1rem;">
-        <button id="contact-student-btn" style="padding:0.8rem 1.5rem;background:#007bff;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:500;">Contact Student</button>
-        <button id="request-speeddate-btn" style="padding:0.8rem 1.5rem;background:#28a745;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:500;">Speeddate Aanvragen</button>
+      <div style="display:flex;justify-content:center;margin-top:1rem;">
+        <button id="request-speeddate-btn" style="padding:0.8rem 2rem;background:#28a745;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:500;">Speeddate Aanvragen</button>
       </div>
     </div>
   `;
@@ -197,15 +198,358 @@ async function showStudentPopup(student) {
     if (e.target === popup) popup.remove();
   });
 
-  document.getElementById('contact-student-btn').onclick = () => {
-    window.open(`mailto:${student.contact_email}`, '_blank');
-  };
-
   document.getElementById('request-speeddate-btn').onclick = () => {
     // You can implement speeddate request functionality here
-    alert('Speeddate aanvraag functionaliteit komt binnenkort beschikbaar.');
+    showSpeeddateRequestPopup(student, currentBedrijfId);
     popup.remove();
   };
+}
+
+// Function to show speeddate request popup
+async function showSpeeddateRequestPopup(student, bedrijfId) {
+  // Remove any existing popup
+  const existing = document.getElementById('speeddate-request-modal');
+  if (existing) existing.remove();
+
+  const popup = document.createElement('div');
+  popup.id = 'speeddate-request-modal';
+  popup.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10001;
+  `;
+
+  const fullName = `${student.voornaam} ${student.achternaam}`;
+  const studentId = student.gebruiker_id || student.id;
+  const studentPhoto = getStudentPhotoUrl(
+    student.profiel_foto_key,
+    student.profiel_foto_url
+  );
+
+  // Fixed date for speeddate event
+  const speeddateDate = '2025-10-01'; // Fixed date as per requirement
+  const formattedDate = new Date(speeddateDate).toLocaleDateString('nl-NL', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  // Time slot configuration  // Time slot configuration
+  const uren = [12, 13, 14, 15, 16, 17];
+  const slotDuur = 10; // minutes
+  const slotsPerUur = 6; // 0,10,20,30,40,50
+
+  try {
+    // Fetch unavailable time slots and pending requests for both student and company
+    const token = sessionStorage.getItem('authToken');
+    const [
+      studentUnavailable,
+      companyUnavailable,
+      studentPending,
+      companyPending,
+    ] = await Promise.all([
+      fetch(
+        `https://api.ehb-match.me/speeddates/user/${studentId}/unavailable`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      ).then((r) => (r.ok ? r.json() : [])),
+      fetch(
+        `https://api.ehb-match.me/speeddates/user/${bedrijfId}/unavailable`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      ).then((r) => (r.ok ? r.json() : [])),
+      fetch(`https://api.ehb-match.me/speeddates/pending?id=${studentId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((r) => (r.ok ? r.json() : [])),
+      fetch(`https://api.ehb-match.me/speeddates/pending?id=${bedrijfId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }).then((r) => (r.ok ? r.json() : [])),
+    ]);
+
+    // Combine all unavailable slots from both student and company
+    const allUnavailable = [...studentUnavailable, ...companyUnavailable];
+    // Combine all pending requests from both student and company
+    const allPending = [...studentPending, ...companyPending]; // Status function - check if time slot is unavailable or pending
+    function getStatusForTijd(tijd, unavailableSlots, pendingSlots) {
+      // Check if this time slot matches any unavailable slot
+      const isUnavailable = unavailableSlots.some((slot) => {
+        if (!slot.begin || !slot.einde) return false;
+
+        const slotBegin = new Date(slot.begin);
+
+        // Convert tijd (HH:MM) to comparable format
+        const [hours, minutes] = tijd.split(':').map(Number);
+        const slotHours = slotBegin.getHours();
+        const slotMinutes = slotBegin.getMinutes();
+
+        // Check if the time matches
+        return slotHours === hours && slotMinutes === minutes;
+      });
+
+      // Check if this time slot matches any pending slot
+      const isPending = pendingSlots.some((slot) => {
+        if (!slot.begin || !slot.einde) return false;
+
+        const slotBegin = new Date(slot.begin);
+
+        // Convert tijd (HH:MM) to comparable format
+        const [hours, minutes] = tijd.split(':').map(Number);
+        const slotHours = slotBegin.getHours();
+        const slotMinutes = slotBegin.getMinutes();
+
+        // Check if the time matches
+        return slotHours === hours && slotMinutes === minutes;
+      });
+
+      if (isUnavailable) return 'unavailable';
+      if (isPending) return 'pending';
+      return 'free';
+    }
+
+    // Build time slots
+    function buildTimeSlotOptions({
+      uren,
+      slotDuur,
+      slotsPerUur,
+      unavailableSlots,
+      pendingSlots,
+    }) {
+      const slots = [];
+      uren.forEach((uur) => {
+        for (let i = 0; i < slotsPerUur; ++i) {
+          const min = i * slotDuur;
+          const mm = min < 10 ? `0${min}` : `${min}`;
+          const tijd = `${uur < 10 ? '0' : ''}${uur}:${mm}`;
+          const status = getStatusForTijd(tijd, unavailableSlots, pendingSlots);
+          let kleur = '#fff',
+            disabled = false,
+            label = `${uur}u${mm}`;
+
+          if (status === 'unavailable') {
+            kleur = '#ffe0e0';
+            disabled = true;
+            label += ' (bezet)';
+          } else if (status === 'pending') {
+            kleur = '#fff3cd';
+            disabled = true;
+            label += ' (pending)';
+          }
+
+          slots.push({ value: tijd, label, kleur, disabled, status });
+        }
+      });
+      return slots;
+    }
+
+    const allSlots = buildTimeSlotOptions({
+      uren,
+      slotDuur,
+      slotsPerUur,
+      unavailableSlots: allUnavailable,
+      pendingSlots: allPending,
+    });
+
+    popup.innerHTML = `
+      <div style="background:#fff;padding:2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:600px;width:90vw;min-width:400px;position:relative;">
+        <button id="speeddate-popup-close" style="position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#666;">×</button>
+        
+        <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:1.5rem;">
+          <img src="${studentPhoto}" alt="Foto ${fullName}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:1rem;" onerror="this.src='${defaultStudentAvatar}'">
+          <h2 style="margin-bottom:0.5rem;text-align:center;color:#333;">Speeddate Aanvragen</h2>
+          <p style="margin-bottom:0.5rem;text-align:center;color:#666;">Vraag een speeddate aan met <strong>${fullName}</strong></p>
+          <p style="margin-bottom:0;text-align:center;color:#888;font-size:0.9rem;">Datum: ${formattedDate}</p>
+        </div>
+          <div style="margin-bottom:1rem;">
+          <div style="margin-bottom:0.5rem;font-size:0.95rem;text-align:center;">
+            <strong>Legenda:</strong>
+            <span style="background:#fff;border:1px solid #ccc;padding:0.2rem 0.5rem;border-radius:5px;margin-left:0.5rem;font-size:0.85rem;">Vrij</span>
+            <span style="background:#fff3cd;border:1px solid #ffeaa7;padding:0.2rem 0.5rem;border-radius:5px;margin-left:0.5rem;font-size:0.85rem;">Pending</span>
+            <span style="background:#ffe0e0;border:1px solid #ffbdbd;padding:0.2rem 0.5rem;border-radius:5px;margin-left:0.5rem;font-size:0.85rem;">Bezet</span>
+          </div>
+        </div>
+        
+        <div id="uren-lijst" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;justify-content:center;"></div>
+        <div id="slots-lijst" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem;justify-content:center;min-height:60px;"></div>
+        
+        <div style="display:flex;gap:1rem;margin-top:1rem;">
+          <button type="button" id="cancel-speeddate" style="flex:1;padding:0.8rem;background:#6b7280;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:500;">Annuleren</button>
+          <button type="button" id="submit-speeddate" style="flex:1;padding:0.8rem;background:#28a745;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:500;" disabled>Aanvragen</button>
+        </div>
+        
+        <div id="speeddate-status" style="margin-top:1rem;text-align:center;font-size:0.9rem;display:none;"></div>
+      </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    // Initialize variables
+    const urenLijst = document.getElementById('uren-lijst');
+    const slotsLijst = document.getElementById('slots-lijst');
+    const submitBtn = document.getElementById('submit-speeddate');
+    const statusDiv = document.getElementById('speeddate-status');
+    let geselecteerdUur = null;
+    let gekozenTijd = '';
+
+    // Create hour selection buttons
+    uren.forEach((uur) => {
+      const slotsForHour = allSlots.filter((slot) => {
+        const slotHour = parseInt(slot.value.split(':')[0], 10);
+        return slotHour === uur;
+      });
+      const vrijeSlots = slotsForHour.filter(
+        (slot) => slot.status === 'free'
+      ).length;
+
+      const btn = document.createElement('button');
+      btn.innerHTML = `${uur}u <span style="background:#fff;border-radius:8px;padding:0.1rem 0.7rem;font-size:0.85em;margin-left:0.5em;border:1px solid #b7b7ff;color:#4e7bfa;">${vrijeSlots}</span>`;
+      btn.style.cssText = `
+        background:#eef1fa;
+        border:1.5px solid #b7b7ff;
+        border-radius:8px;
+        padding:0.5rem 1rem;
+        font-size:0.95rem;
+        cursor:pointer;
+        margin:0;
+        transition:box-shadow .2s;
+        display:flex;align-items:center;gap:0.4em;
+      `;
+      btn.addEventListener('click', () => {
+        geselecteerdUur = uur;
+        urenLijst
+          .querySelectorAll('button')
+          .forEach((b) => (b.style.boxShadow = ''));
+        btn.style.boxShadow = '0 0 0 2.5px #4e7bfa';
+        renderSlotsForHour(uur);
+      });
+      urenLijst.appendChild(btn);
+    });
+
+    // Render slots for selected hour
+    function renderSlotsForHour(uur) {
+      const slotsForHour = allSlots.filter((slot) => {
+        const slotHour = parseInt(slot.value.split(':')[0], 10);
+        return slotHour === uur;
+      });
+
+      slotsLijst.innerHTML = slotsForHour
+        .map(
+          (slot) => `
+        <button 
+          class="slot-btn"
+          data-slot="${slot.value}" 
+          style="background:${
+            slot.kleur
+          };border:1.5px solid #e1e5e9;border-radius:8px;padding:0.5rem 1rem;min-width:80px;cursor:${
+            slot.disabled ? 'not-allowed' : 'pointer'
+          };opacity:${slot.disabled ? '0.65' : '1'};font-weight:${
+            slot.status === 'unavailable' ? 'bold' : 'normal'
+          };font-size:0.9rem;"
+          ${slot.disabled ? 'disabled' : ''}
+          title="${slot.label}"
+        >${slot.label.split(' ')[0]}</button>
+      `
+        )
+        .join('');
+
+      gekozenTijd = '';
+      submitBtn.disabled = true;
+
+      slotsLijst.querySelectorAll('.slot-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (btn.disabled) return;
+          slotsLijst
+            .querySelectorAll('.slot-btn')
+            .forEach((b) => (b.style.outline = ''));
+          btn.style.outline = '2.5px solid #007bff';
+          gekozenTijd = btn.getAttribute('data-slot');
+          submitBtn.disabled = false;
+        });
+      });
+    }
+
+    // Auto-select first hour
+    if (uren.length) {
+      urenLijst.querySelector('button').click();
+    }
+
+    // Event listeners
+    document.getElementById('speeddate-popup-close').onclick = () =>
+      popup.remove();
+    document.getElementById('cancel-speeddate').onclick = () => popup.remove();
+
+    popup.addEventListener('click', (e) => {
+      if (e.target === popup) popup.remove();
+    });
+
+    // Submit speeddate request
+    submitBtn.addEventListener('click', async () => {
+      if (!gekozenTijd) {
+        alert('Selecteer een tijdslot');
+        return;
+      }
+
+      const datetime = `${speeddateDate} ${gekozenTijd}:00`;
+
+      try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Aanvragen...';
+        statusDiv.style.display = 'block';
+        statusDiv.style.color = '#666';
+        statusDiv.textContent = 'Speeddate aanvraag wordt verstuurd...';
+
+        const response = await createSpeeddate(studentId, bedrijfId, datetime);
+
+        statusDiv.style.color = '#28a745';
+        statusDiv.textContent = `Speeddate aanvraag succesvol verstuurd naar ${fullName}!`;
+
+        setTimeout(() => {
+          popup.remove();
+        }, 2000);
+      } catch (error) {
+        console.error('Error creating speeddate:', error);
+        statusDiv.style.color = '#dc3545';
+        statusDiv.textContent =
+          'Er is een fout opgetreden bij het aanvragen van de speeddate. Probeer het opnieuw.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Aanvragen';
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching speeddate data:', error);
+
+    // Fallback popup without slot checking
+    popup.innerHTML = `
+      <div style="background:#fff;padding:2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:500px;width:90vw;min-width:300px;position:relative;">
+        <button id="speeddate-popup-close" style="position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#666;">×</button>
+        
+        <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:1.5rem;">
+          <img src="${studentPhoto}" alt="Foto ${fullName}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:1rem;" onerror="this.src='${defaultStudentAvatar}'">
+          <h2 style="margin-bottom:0.5rem;text-align:center;color:#333;">Speeddate Aanvragen</h2>
+          <p style="margin-bottom:0.5rem;text-align:center;color:#666;">Vraag een speeddate aan met <strong>${fullName}</strong></p>
+        </div>
+        
+        <p style="color:#dc3545;text-align:center;margin-bottom:1rem;">Kon beschikbaarheid niet laden. Probeer het later opnieuw.</p>
+        
+        <div style="display:flex;gap:1rem;">
+          <button type="button" id="cancel-speeddate" style="flex:1;padding:0.8rem;background:#6b7280;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:500;">Sluiten</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(popup);
+    document.getElementById('speeddate-popup-close').onclick = () =>
+      popup.remove();
+    document.getElementById('cancel-speeddate').onclick = () => popup.remove();
+    popup.addEventListener('click', (e) => {
+      if (e.target === popup) popup.remove();
+    });
+  }
 }
 
 export async function renderStudenten(rootElement, bedrijfData = {}) {
