@@ -220,9 +220,7 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
         try {
           await acceptSpeeddate(id);
           const updated = await fetchPendingSpeeddates();
-          const stored = JSON.parse(sessionStorage.getItem('user') || '{}');
-          const studentId = studentData?.id || studentData?.gebruiker_id || stored.id || stored.gebruiker_id;
-          const bedrijfVerzoeken = updated.filter(v => v.asked_by !== studentId);
+          const bedrijfVerzoeken = updated.filter(v => String(v.asked_by) === String(v.id_bedrijf));
           renderTable(bedrijfVerzoeken);
         } catch (err) { alert('Fout bij accepteren: ' + err.message); }
       });
@@ -233,9 +231,7 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
         try {
           await rejectSpeeddate(id);
           const updated = await fetchPendingSpeeddates();
-          const stored = JSON.parse(sessionStorage.getItem('user') || '{}');
-          const studentId = studentData?.id || studentData?.gebruiker_id || stored.id || stored.gebruiker_id;
-          const bedrijfVerzoeken = updated.filter(v => v.asked_by !== studentId);
+          const bedrijfVerzoeken = updated.filter(v => String(v.asked_by) === String(v.id_bedrijf));
           renderTable(bedrijfVerzoeken);
         } catch (err) { alert('Fout bij weigeren: ' + err.message); }
       });
@@ -250,10 +246,8 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
 
   fetchPendingSpeeddates()
     .then(verzoeken => {
-      const stored = JSON.parse(sessionStorage.getItem('user') || '{}');
-      const studentId = studentData?.id || studentData?.gebruiker_id || stored.id || stored.gebruiker_id;
-      // Alleen bedrijf-aanvragen tonen:
-      const bedrijfVerzoeken = verzoeken.filter(v => v.asked_by !== studentId);
+      // Toon alleen verzoeken gestart door bedrijven:
+      const bedrijfVerzoeken = verzoeken.filter(v => String(v.asked_by) === String(v.id_bedrijf));
       renderTable(bedrijfVerzoeken);
     })
     .catch(err => {
