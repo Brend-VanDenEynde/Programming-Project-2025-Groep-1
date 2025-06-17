@@ -205,13 +205,16 @@ async function deleteSpeeddate(afspraakId) {
   }
 
   try {
-    const response = await fetch(`https://api.ehb-match.me/speeddates/reject/${afspraakId}`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
+    const response = await fetch(
+      `https://api.ehb-match.me/speeddates/reject/${afspraakId}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       }
-    });
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -222,7 +225,6 @@ async function deleteSpeeddate(afspraakId) {
     // Herlaad de data na succesvolle afwijzing
     await loadPendingSpeeddateData();
     alert('Speeddate succesvol verwijderd!');
-
   } catch (error) {
     console.error('Fout bij afwijzen van speeddate:', error);
     alert('Er is een fout opgetreden bij het afwijzen van de speeddate.');
@@ -369,9 +371,11 @@ export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
     });
 
     document.addEventListener('click', (event) => {
-      if (dropdown.classList.contains('open') &&
-          !dropdown.contains(event.target) && 
-          event.target !== burger) {
+      if (
+        dropdown.classList.contains('open') &&
+        !dropdown.contains(event.target) &&
+        event.target !== burger
+      ) {
         dropdown.classList.remove('open');
       }
     });

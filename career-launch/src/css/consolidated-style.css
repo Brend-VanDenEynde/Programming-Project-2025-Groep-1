@@ -2449,8 +2449,11 @@ body.darkmode .student-profile-footer a:hover {
 .delete-overlay {
   display: none;
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.45);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
   color: #fff;
   border-width: 0;
   font-size: 2.2rem;
@@ -3407,7 +3410,7 @@ body.darkmode .status-final {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .speeddate-item.goedgekeurd {
@@ -3426,7 +3429,8 @@ body.darkmode .status-final {
   flex-wrap: wrap;
 }
 
-.bedrijf-info, .student-info {
+.bedrijf-info,
+.student-info {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -3442,7 +3446,8 @@ body.darkmode .status-final {
   border: 2px solid #ddd;
 }
 
-.bedrijf-details h4, .student-details h4 {
+.bedrijf-details h4,
+.student-details h4 {
   margin: 0 0 4px 0;
   font-size: 1rem;
   color: #333;
@@ -3512,12 +3517,14 @@ body.darkmode .status-final {
   background: #218838;
 }
 
-.cancel-btn, .delete-btn {
+.cancel-btn,
+.delete-btn {
   background: #dc3545;
   color: white;
 }
 
-.cancel-btn:hover, .delete-btn:hover {
+.cancel-btn:hover,
+.delete-btn:hover {
   background: #c82333;
 }
 
@@ -3534,11 +3541,13 @@ body.darkmode .status-final {
     align-items: stretch;
     gap: 15px;
   }
-  
-  .bedrijf-info, .student-info, .afspraak-details {
+
+  .bedrijf-info,
+  .student-info,
+  .afspraak-details {
     min-width: auto;
   }
-  
+
   .speeddate-actions {
     justify-content: center;
   }

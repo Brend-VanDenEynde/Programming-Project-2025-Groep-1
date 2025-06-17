@@ -87,9 +87,11 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
     });
 
     document.addEventListener('click', (event) => {
-      if (dropdown.classList.contains('open') &&
-          !dropdown.contains(event.target) && 
-          event.target !== burger) {
+      if (
+        dropdown.classList.contains('open') &&
+        !dropdown.contains(event.target) &&
+        event.target !== burger
+      ) {
         dropdown.classList.remove('open');
       }
     });
