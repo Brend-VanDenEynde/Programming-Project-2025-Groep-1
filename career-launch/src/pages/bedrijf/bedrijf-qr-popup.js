@@ -40,6 +40,26 @@ export function renderBedrijfQRPopup(rootElement, companyData = {}) {
       e.stopPropagation();
     });
   }
+
+  // Footer links: gebruik alleen Router.navigate, geen hash of import
+  const privacyLink = document.getElementById('privacy-policy');
+  if (privacyLink) {
+    privacyLink.setAttribute('href', '#');
+    privacyLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      Router.navigate('/privacy');
+    });
+  }
+  const contactLink = document.getElementById('contacteer-ons');
+  if (contactLink) {
+    contactLink.setAttribute('href', '#');
+    contactLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      Router.navigate('/contact');
+    });
+  }
 }
 
 export default renderBedrijfQRPopup;

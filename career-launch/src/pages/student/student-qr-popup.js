@@ -6,6 +6,7 @@ import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './student-settings.js';
 import defaultAvatar from '../../images/default.png';
+import Router from '../../router.js';
 
 // src/views/student-qr-popup.js
 
@@ -128,20 +129,24 @@ export function renderQRPopup(rootElement, studentData = {}) {
   }
 
   // Footer links (router navigation, consistent)
-  document.getElementById('privacy-policy').addEventListener('click', (e) => {
-    e.preventDefault();
-    import('../../router.js').then((module) => {
-      const Router = module.default;
+  const privacyLink = document.querySelector('a[href="/privacy"]');
+  if (privacyLink) {
+    privacyLink.setAttribute('href', '#');
+    privacyLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
       Router.navigate('/privacy');
     });
-  });
-  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
-    e.preventDefault();
-    import('../../router.js').then((module) => {
-      const Router = module.default;
+  }
+  const contactLink = document.querySelector('a[href="/contact"]');
+  if (contactLink) {
+    contactLink.setAttribute('href', '#');
+    contactLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
       Router.navigate('/contact');
     });
-  });
+  }
 
   // QR-code popup functionaliteit (zonder sluitknop, sluit bij klik buiten popup)
   const qrImg = document.getElementById('qr-code-img');

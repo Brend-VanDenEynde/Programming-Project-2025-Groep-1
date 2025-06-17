@@ -16,10 +16,10 @@ export function renderStudentRegister(rootElement) {
 
       <form class="naamForm" id="naamForm">
         <div class="name-row">
-          <input type="voornaam" id="voornaam" name="voornaam" required placeholder="Voornaam" class="input-half" />
-          <input type="achternaam" id="achternaam" name="achternaam" required placeholder="Achternaam" class="input-half" />
+          <input type="text" id="voornaam" name="voornaam" required placeholder="Voornaam" class="input-half" />
+          <input type="text" id="achternaam" name="achternaam" required placeholder="Achternaam" class="input-half" />
         </div>
-        <input type="linkedin" id="linkedin" name"linkedin" placeholder="LinkedIn-link" class="input-full" />
+        <input type="text" id="linkedin" name="linkedin" placeholder="LinkedIn-link" class="input-full" />
 
         <button type="submit" class="next-button">Volgende →</button>
       </form>
@@ -50,6 +50,26 @@ export function renderStudentRegister(rootElement) {
       } else {
         Router.navigate('/registreer');
       }
+    });
+  }
+
+  // Footer links: gebruik alleen Router.navigate, geen hash of import
+  const privacyLink = document.querySelector('a[href="/privacy"]');
+  if (privacyLink) {
+    privacyLink.setAttribute('href', '#');
+    privacyLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      Router.navigate('/privacy');
+    });
+  }
+  const contactLink = document.querySelector('a[href="/contact"]');
+  if (contactLink) {
+    contactLink.setAttribute('href', '#');
+    contactLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      Router.navigate('/contact');
     });
   }
 }

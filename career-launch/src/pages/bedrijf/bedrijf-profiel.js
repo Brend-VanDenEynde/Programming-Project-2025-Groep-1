@@ -6,6 +6,7 @@ import { renderLogin } from '../login.js';
 import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
 import { createBedrijfNavbar, closeBedrijfNavbar, setupBedrijfNavbarEvents } from '../../utils/bedrijf-navbar.js';
+import Router from '../../router.js';
 import '../../css/consolidated-style.css';
 
 export async function fetchAndRenderBedrijfProfiel(rootElement, bedrijfId) {
@@ -189,33 +190,33 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
     console.error('Burger-menu of dropdown niet gevonden in de DOM.');
   }
 
-  const privacyPolicyLink = document.getElementById('privacy-policy');
-  if (privacyPolicyLink) {
-    privacyPolicyLink.addEventListener('click', (e) => {
+  // Footer links: gebruik alleen Router.navigate, geen hash of import
+  const privacyLink = document.getElementById('privacy-policy');
+  if (privacyLink) {
+    privacyLink.setAttribute('href', '#');
+    privacyLink.addEventListener('click', (e) => {
       e.preventDefault();
-      window.location.hash = '#/privacy';
-      import('../privacy.js').then((m) => m.renderPrivacy(document.getElementById('app')));
+      e.stopImmediatePropagation();
+      Router.navigate('/privacy');
     });
-  } else {
-    console.error('Privacy Policy link niet gevonden in de DOM.');
   }
-
   const contactLink = document.getElementById('contacteer-ons');
   if (contactLink) {
+    contactLink.setAttribute('href', '#');
     contactLink.addEventListener('click', (e) => {
       e.preventDefault();
-      window.location.hash = '#/contact';
-      import('../contact.js').then((m) => m.renderContact(document.getElementById('app')));
+      e.stopImmediatePropagation();
+      Router.navigate('/contact');
     });
-  } else {
-    console.error('Contact link niet gevonden in de DOM.');
   }
 
   const logoutButton = document.getElementById('nav-logout');
   if (logoutButton) {
-    logoutButton.addEventListener('click', () => {
-      performLogout();
-      alert('U bent succesvol uitgelogd.');
+    logoutButton.addEventListener('click', async () => {
+      await performLogout();
+      // Verwijder alle history entries zodat terug niet meer naar profiel kan
+      window.location.replace(window.location.origin + window.location.pathname + '#/login');
+      alert('Je bent succesvol uitgelogd.');
       renderLogin(document.getElementById('app'));
     });
   } else {
@@ -323,21 +324,18 @@ window.addEventListener('DOMContentLoaded', () => {
 
   try {
     const storedCompanyData = sessionStorage.getItem('companyData');
-
-    if (!storedCompanyData) {
-      console.error('Geen bedrijfgegevens gevonden in sessionStorage. Controleer of de data correct wordt opgeslagen.');
+    const token = sessionStorage.getItem('authToken');
+    if (!storedCompanyData || !token) {
+      // Niet ingelogd, direct naar login
+      renderLogin(rootElement);
       return;
     }
-
     const companyData = JSON.parse(storedCompanyData);
-
     const bedrijfId = companyData.gebruiker_id || companyData.id; // Controleer alternatieve velden
-
     if (!bedrijfId) {
-      console.error('Geen geldig bedrijfId gevonden in de opgeslagen gegevens. Controleer de structuur van companyData:', companyData);
+      renderLogin(rootElement);
       return;
     }
-
     if (rootElement) {
       fetchAndRenderBedrijfProfiel(rootElement, bedrijfId);
     } else {
