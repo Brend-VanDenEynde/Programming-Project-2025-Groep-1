@@ -142,6 +142,8 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
   try {
     speeddates = await fetchSpeeddatesWithStatus(rootElement, currentStatusFilter, studentId);
     console.log('Alle opgehaalde speeddates:', speeddates);
+    // Alleen verzoeken door bedrijven (niet deze student)
+    speeddates = speeddates.filter(s => s.asked_by !== studentId);
   } catch (e) {
     if (e.message.includes('401')) {
       renderLogin(rootElement);

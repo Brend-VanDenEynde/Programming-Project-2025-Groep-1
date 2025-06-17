@@ -816,8 +816,8 @@ body.darkmode .student-profile-content {
 body.darkmode .student-profile-btn,
 body.darkmode .student-profile-btn-primary,
 body.darkmode .student-profile-btn-secondary {
-  background-color: #232323 !important;
-  color: #00e6ef !important;
+  background-color: #2a2929 !important;
+  color: lightgray !important;
   border-radius: 8px !important;
   border: none !important;
   box-shadow: 0 2px 8px rgba(0,230,239,0.10) !important;
@@ -826,7 +826,7 @@ body.darkmode .student-profile-btn:hover,
 body.darkmode .student-profile-btn-primary:hover,
 body.darkmode .student-profile-btn-secondary:hover {
   background-color: #181c1f !important;
-  color: #00e6ef !important;
+  color: lightgray !important;
   box-shadow: 0 4px 16px rgba(0,230,239,0.13) !important;
   transform: translateY(-2px) !important;
 }
@@ -834,743 +834,156 @@ body.darkmode .student-profile-btn:active,
 body.darkmode .student-profile-btn-primary:active,
 body.darkmode .student-profile-btn-secondary:active {
   background-color: grey !important;
-  color: #fff !important;
-  box-shadow: 0 2px 4px rgba(0,230,239,0.10) !important;
-  transform: translateY(0) !important;
 }
 
-/* --- Zoekcriteria Form --- */
-.criteria-form {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.search-fieldset {
-  border: none;
-  margin-bottom: 1.5rem;
-  background: #f8f9fa;
-  border-radius: 10px;
-  padding: 1.2rem 1rem 1rem 1rem;
-  box-shadow: 0 1px 8px 0 rgba(44, 44, 44, 0.04);
-}
-
-.search-fieldset legend {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  color: #0077b5;
-  padding-bottom: 3px;
-  border-bottom: none;
-  display: block;
-  letter-spacing: 0.03em;
-}
-
-.checkbox-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem 1.2rem;
-  margin-bottom: 0.5rem;
-}
-
-.checkbox-option {
-  font-weight: 600;
-  color: #333;
-  background: #fff;
-  border-radius: 8px;
-  padding: 10px 22px 10px 14px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-width: 120px;
-  border: 2px solid #e1e5e9;
-  cursor: pointer;
-  font-size: 1.08rem;
-  box-shadow: 0 2px 8px 0 rgba(44, 44, 44, 0.04);
-  margin-bottom: 0;
-  transition: border 0.15s, background 0.15s, color 0.15s;
-  user-select: none;
-}
-
-.checkbox-option input[type="checkbox"],
-.checkbox-option input[type="radio"] {
-  accent-color: grey;
-  width: 20px;
-  height: 20px;
-  margin: 0 6px 0 0;
-  border-radius: 6px;
-}
-
-.checkbox-option input[type="checkbox"]:checked + span,
-.checkbox-option input[type="checkbox"]:checked {
-  color: grey !important;
-  border-color: grey;
-}
-
-.add-custom-wrapper {
-  display: flex;
-  gap: 10px;
-  margin: 9px 0 0 0;
-  align-items: center;
-}
-
-.form-input,
-.add-btn {
-  font-size: 1.08rem;
-  padding: 10px 13px;
-  border-radius: 8px;
-  border: 2px solid #e1e5e9;
-  outline: none;
-  background: #fff;
-  transition: border .16s;
-}
-
-.form-input:focus {
-  border-color: grey;
-  background: #f6fffa;
-}
-
-.add-btn {
-  background: lightgrey;
-  color: #fff;
-  border: none;
-  font-weight: 700;
-  padding: 10px 20px;
-  cursor: pointer;
-  transition: background .18s, color .18s, box-shadow .18s;
-  min-width: 92px;
-  box-shadow: 0 2px 6px 0 rgba(44, 44, 44, 0.05);
-}
-
-.add-btn:hover,
-.add-btn:active {
-  background: #00acc1;
-  color: #fff;
-  box-shadow: 0 3px 16px 0 rgba(0, 188, 212, 0.13);
-}
-
-/* --- SETTINGS POPUP (LOGIN/REGISTER STIJL) --- */
-.settings-modal-root {
-  position: fixed;
-  inset: 0;
-  z-index: 3000;
-  background: rgba(30, 34, 54, 0.38);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: fadeIn 0.22s;
-}
-
-.settings-popup-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.10);
-  padding: 2.2rem 1.5rem 1.7rem 1.5rem;
-  min-width: 320px;
-  max-width: 420px;
-  display: flex;
-  flex-direction: column;
-  gap: 1.3rem;
-  align-items: center;
-}
-
-.settings-popup-close {
-  font-size: 2rem;
-  color: #0077b5;
-  top: 12px;
-  right: 12px;
-}
-
-.settings-title {
-  color: #0077b5;
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin-bottom: 1.1rem;
-}
-
-.settings-row {
-  gap: 0.7rem;
-  width: 100%;
-}
-
-.settings-action-btn {
-  width: 100%;
-  background: #1de9b6;
-  color: #181c1f;
-  border: none;
-  padding: 12px;
-  font-size: 15px;
-  font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-}
-
-.settings-action-btn:hover {
-  background: grey;
-  color: #fff;
-}
-
+/* --- UNIFORME BUTTON STIJL VOOR LOGOUT EN DELETE IN SETTINGS --- */
 .settings-action-btn.logout {
-  background: linear-gradient(90deg, #e4eafd 0%, #cfd7ea 100%);
-  color: #222;
-  border: none;
-  border-radius: 20px;
-  font-weight: 800;
-  font-size: 1.09rem;
-  padding: 13px 0;
-  min-width: 140px;
-  cursor: pointer;
-  box-shadow: 0 2px 10px 0 rgba(44,44,44,0.06);
-  letter-spacing: .04em;
-  transition: background .17s, color .17s, box-shadow .17s;
-  margin: 0;
-}
-.settings-action-btn.logout:hover {
-  background: linear-gradient(90deg, #cfd7ea 0%, #e4eafd 100%);
-  color: #fff;
-  filter: brightness(1.07) drop-shadow(0 0 12px #3dd68625);
-}
-
-/* --- UNIFORME BUTTON-STIJL VOOR PROFIELACTIEKNOPPEN (login/register look) --- */
-.student-profile-btn,
-.student-profile-btn-primary {
-  background-color: grey !important;
+  background: grey !important;
   color: #fff !important;
   border: none !important;
   border-radius: 8px !important;
-  padding: 12px 28px !important;
-  font-size: 1.08rem !important;
   font-weight: 600 !important;
-  cursor: pointer !important;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
-  box-shadow: 0 2px 8px rgba(0,188,212,0.08) !important;
-  outline: none !important;
+  font-size: 1.08rem !important;
+  padding: 12px 28px !important;
   min-width: 120px !important;
   display: inline-block !important;
-}
-.student-profile-btn-secondary {
-  background-color: #e1e5e9 !important;
-  color: #333 !important;
-  border: none !important;
-  border-radius: 8px !important;
-  padding: 12px 28px !important;
-  font-size: 1.08rem !important;
-  font-weight: 600 !important;
-  cursor: pointer !important;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
   box-shadow: 0 2px 8px rgba(0,188,212,0.08) !important;
-  outline: none !important;
-  min-width: 120px !important;
-  display: inline-block !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
 }
-.student-profile-btn:hover,
-.student-profile-btn-primary:hover {
-  background-color: #00acc1 !important;
+.settings-action-btn.logout:hover,
+.settings-action-btn.logout:focus {
+  background: #00acc1 !important;
   color: #fff !important;
   box-shadow: 0 4px 16px rgba(0,188,212,0.13) !important;
   transform: translateY(-2px) !important;
 }
-.student-profile-btn-secondary:hover {
-  background-color: #00acc1 !important;
-  color: #fff !important;
-  box-shadow: 0 4px 16px rgba(0,188,212,0.13) !important;
-  transform: translateY(-2px) !important;
-}
-.student-profile-btn:active,
-.student-profile-btn_primary:active {
-  background-color: #009ca6 !important;
-  color: #fff !important;
-  box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
-  transform: translateY(0) !important;
-}
-.student-profile-btn-secondary:active {
-  background-color: #009ca6 !important;
+.settings-action-btn.logout:active {
+  background: #009ca6 !important;
   color: #fff !important;
   box-shadow: 0 2px 4px rgba(0,188,212,0.10) !important;
   transform: translateY(0) !important;
 }
 
-/* DARKMODE: profielactieknoppen */
-body.darkmode .student-profile-btn,
-body.darkmode .student-profile-btn-primary,
-body.darkmode .student-profile-btn-secondary {
-  background-color: #232323 !important;
-  color: #00e6ef !important;
-  border-radius: 8px !important;
+/* DELETE BUTTON: zelfde stijl, maar rood */
+.settings-action-btn.delete {
+  background: #fa626a !important;
+  color: #fff !important;
   border: none !important;
-  box-shadow: 0 2px 8px rgba(0,230,239,0.10) !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 1.08rem !important;
+  padding: 12px 28px !important;
+  min-width: 120px !important;
+  display: inline-block !important;
+  box-shadow: 0 2px 8px rgba(250, 98, 106, 0.10) !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s !important;
 }
-body.darkmode .student-profile-btn:hover,
-body.darkmode .student-profile-btn-primary:hover,
-body.darkmode .student-profile-btn-secondary:hover {
-  background-color: #181c1f !important;
-  color: #00e6ef !important;
-  box-shadow: 0 4px 16px rgba(0,230,239,0.13) !important;
+.settings-action-btn.delete:hover,
+.settings-action-btn.delete:focus {
+  background: #c82333 !important; /* dieprood */
+  color: #fff !important;
+  box-shadow: 0 4px 16px rgba(250, 98, 106, 0.18) !important;
   transform: translateY(-2px) !important;
 }
-body.darkmode .student-profile-btn:active,
-body.darkmode .student-profile-btn-primary:active,
-body.darkmode .student-profile-btn-secondary:active {
-  background-color: grey !important;
+.settings-action-btn.delete:active {
+  background: #b00020 !important;
   color: #fff !important;
-  box-shadow: 0 2px 4px rgba(0,230,239,0.10) !important;
+  box-shadow: 0 2px 4px rgba(250, 98, 106, 0.14) !important;
   transform: translateY(0) !important;
 }
 
-/* --- Zoekcriteria Form --- */
-.criteria-form {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
+body.darkmode #burger-menu:hover{
+  background-color: lightgray !important;
 }
 
-.search-fieldset {
-  border: none;
-  margin-bottom: 1.5rem;
-  background: #f8f9fa;
-  border-radius: 10px;
-  padding: 1.2rem 1rem 1rem 1rem;
-  box-shadow: 0 1px 8px 0 rgba(44, 44, 44, 0.04);
+.student-profile-dropdown {
+  display: none;
 }
-
-.search-fieldset legend {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  color: #0077b5;
-  padding-bottom: 3px;
-  border-bottom: none;
+.student-profile-dropdown.open {
   display: block;
-  letter-spacing: 0.03em;
 }
 
-.checkbox-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem 1.2rem;
-  margin-bottom: 0.5rem;
-}
-
-.checkbox-option {
-  font-weight: 600;
-  color: #333;
-  background: #fff;
-  border-radius: 8px;
-  padding: 10px 22px 10px 14px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-width: 120px;
-  border: 2px solid #e1e5e9;
-  cursor: pointer;
-  font-size: 1.08rem;
-  box-shadow: 0 2px 8px 0 rgba(44, 44, 44, 0.04);
-  margin-bottom: 0;
-  transition: border 0.15s, background 0.15s, color 0.15s;
-  user-select: none;
-}
-
-.checkbox-option input[type="checkbox"],
-.checkbox-option input[type="radio"] {
-  accent-color: grey;
-  width: 20px;
-  height: 20px;
-  margin: 0 6px 0 0;
-  border-radius: 6px;
-}
-
-.checkbox-option input[type="checkbox"]:checked + span,
-.checkbox-option input[type="checkbox"]:checked {
-  color: grey !important;
-  border-color: grey;
-}
-
-.add-custom-wrapper {
-  display: flex;
-  gap: 10px;
-  margin: 9px 0 0 0;
-  align-items: center;
-}
-
-.form-input,
-.add-btn {
-  font-size: 1.08rem;
-  padding: 10px 13px;
-  border-radius: 8px;
-  border: 2px solid #e1e5e9;
-  outline: none;
-  background: #fff;
-  transition: border .16s;
-}
-
-.form-input:focus {
-  border-color: grey;
-  background: #f6fffa;
-}
-
-.add-btn {
-  background: grey;
-  color: #fff;
-  border: none;
-  font-weight: 700;
-  padding: 10px 20px;
-  cursor: pointer;
-  transition: background .18s, color .18s, box-shadow .18s;
-  min-width: 92px;
-  box-shadow: 0 2px 6px 0 rgba(44, 44, 44, 0.05);
-}
-
-.add-btn:hover,
-.add-btn:active {
-  background: #00acc1;
-  color: #fff;
-  box-shadow: 0 3px 16px 0 rgba(0, 188, 212, 0.13);
-}
-
-/* --- SETTINGS POPUP (LOGIN/REGISTER STIJL) --- */
-.settings-modal-root {
+.student-profile-footer {
   position: fixed;
-  inset: 0;
-  z-index: 3000;
-  background: rgba(30, 34, 54, 0.38);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: fadeIn 0.22s;
-}
-
-.settings-popup-card {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.10);
-  padding: 2.2rem 1.5rem 1.7rem 1.5rem;
-  min-width: 320px;
-  max-width: 420px;
+  border-top: 1px solid #e1e5e9;
+  text-align: center;
+  padding: 12px 0 10px 0;
+  z-index: 100;
+  text-decoration: none;
+}
+
+
+
+/* Algemene link-stijlen */
+a {
+  color: #0077b5;
+  transition: color 0.18s;
+}
+a:hover {
+  color: #28bb8a;
+}
+body.darkmode a {
+  color: #00e6ef;
+  transition: color 0.18s;
+}
+body.darkmode a:hover {
+  color: #3dd686;
+}
+
+
+/* Links in .student-profile-footer zijn standaard niet onderlijnd, maar wel bij hover. Dit geldt voor zowel light als darkmode. */
+.student-profile-footer a {
+  color: #232846;
+  text-decoration: none;
+  transition: color 0.18s;
+}
+.student-profile-footer a:hover {
+  color: #28bb8a;
+  text-decoration: underline;
+}
+body.darkmode .student-profile-footer a {
+  color: #00e6ef;
+  text-decoration: none;
+}
+body.darkmode .student-profile-footer a:hover {
+  color: #3dd686;
+  text-decoration: underline;
+}
+
+/* Skills button styling - ENKELSTE VERSIE */
+.skills-btn {
   display: flex;
-  flex-direction: column;
-  gap: 1.3rem;
   align-items: center;
-}
-
-.settings-popup-close {
-  font-size: 2rem;
-  color: #0077b5;
-  top: 12px;
-  right: 12px;
-}
-
-.settings-title {
-  color: #0077b5;
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin-bottom: 1.1rem;
-}
-
-.settings-row {
-  gap: 0.7rem;
-  width: 100%;
-}
-
-.settings-action-btn {
-  width: 100%;
-  background: #1de9b6;
-  color: #181c1f;
-  border: none;
-  padding: 12px;
-  font-size: 15px;
+  gap: 0.65em;
+  background: #f1f5fb;
+  color: #2364aa;
   font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-}
-
-.settings-action-btn:hover {
-  background: grey;
-  color: #fff;
-}
-
-.settings-action-btn.logout {
-  background: linear-gradient(90deg, #e4eafd 0%, #cfd7ea 100%);
-  color: #222;
+  font-size: 1.11em;
+  padding: 0.65em 1.7em;
   border: none;
-  border-radius: 20px;
-  font-weight: 800;
-  font-size: 1.09rem;
-  padding: 13px 0;
-  min-width: 140px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0001;
   cursor: pointer;
-  box-shadow: 0 2px 10px 0 rgba(44,44,44,0.06);
-  letter-spacing: .04em;
-  transition: background .17s, color .17s, box-shadow .17s;
-  margin: 0;
-}
-.settings-action-btn.logout:hover {
-  background: linear-gradient(90deg, #cfd7ea 0%, #e4eafd 100%);
-  color: #fff;
-  filter: brightness(1.07) drop-shadow(0 0 12px #3dd68625);
+  transition: background 0.16s, box-shadow 0.16s, color 0.16s, transform 0.13s;
+  outline: none;
 }
 
-
-body.darkmode {
-  font-family: 'Arial', sans-serif;
-  background-color: #000 !important;
-  color: #f8fafd !important;
-  line-height: 1.6;
-}
-body.darkmode .home-container {
-  background-color: #000 !important;
-}
-body.darkmode .btn {
-  background-color: #232323 !important;
-  color: #00e6ef !important;
-  border-radius: 8px;
-}
-body.darkmode .btn:hover {
-  background-color: #181c1f !important;
-  color: #00e6ef !important;
-}
-body.darkmode .register-container,
-body.darkmode .login-container {
-  background-color: #000 !important;
-}
-body.darkmode .register-card,
-body.darkmode .login-card {
-  background: #181c1f !important;
-  color: #e0f7fa !important;
-  border-radius: 14px;
-  box-shadow: 0 4px 24px 0 rgba(0,230,239,0.10), 0 1.5px 0 0 #232323;
-}
-body.darkmode .register-header h1,
-body.darkmode .login-header h1 {
-  color: #00e6ef !important;
-}
-body.darkmode .register-header p,
-body.darkmode .login-header p {
-  color: #b0b6c6 !important;
-}
-body.darkmode .register-input,
-body.darkmode .login-input {
-  background: #181c1f !important;
-  color: #e0f7fa !important;
-  border: 2px solid #00e6ef !important;
-}
-body.darkmode .register-input:focus,
-body.darkmode .login-input:focus {
-  border-color: #00e6ef !important;
-  background: #181c1f !important;
-}
-body.darkmode .footer-links {
-  background: #181c1f !important;
-  border-top: 1px solid #232323 !important;
-  color: #b0b6c6 !important;
-}
-body.darkmode .student-profile-header,
-body.darkmode .student-profile-sidebar {
-  background: #000 !important;
-  color: #00e6ef !important;
-  border-color: #232323 !important;
-}
-body.darkmode .student-profile-header .logo-section span {
-  color: #00e6ef !important;
-}
-body.darkmode .student-profile-header .logo-section img {
-  content: var(--header-logo);
-  filter: none !important;
-}
-body.darkmode .student-profile-sidebar button {
-  color: #e0f7fa !important;
-  background: #000 !important;
-  border-left: 4px solid transparent !important;
-  font-weight: 500;
-}
-body.darkmode .student-profile-sidebar button.active,
-body.darkmode .student-profile-sidebar button:hover {
-  background: #181c1f !important;
-  color: #00e6ef !important;
-  border-left: 4px solid #00e6ef !important;
-  font-weight: 700;
-}
-body.darkmode .student-profile-content {
-  background: #000 !important;
-}
-body.darkmode .student-profile-form-container,
-body.darkmode .criteria-form,
-body.darkmode .content-card,
-body.darkmode .settings-popup-card {
-  background: #000 !important;
-  color: #e0f7fa !important;
-  border-radius: 14px;
-  border: 1.5px solid #232323;
-  box-shadow: 0 4px 24px 0 rgba(0,230,239,0.10), 0 1.5px 0 0 #232323;
-}
-body.darkmode .student-profile-form-group label,
-body.darkmode .checkbox-option span {
-  color: #e0f7fa !important;
-  font-weight: 600;
-}
-body.darkmode .form-input,
-body.darkmode input,
-body.darkmode select,
-body.darkmode textarea {
-  background: #181c1f !important;
-  color: #e0f7fa !important;
-  border: 2px solid #00e6ef !important;
-  border-radius: 8px;
-  font-size: 1.08rem;
-  margin-bottom: 8px;
-}
-body.darkmode .form-input:focus,
-body.darkmode input:focus,
-body.darkmode select:focus,
-body.darkmode textarea:focus {
-  border-color: lightgrey !important;
-  background: #181c1f !important;
-}
-body.darkmode .form-input::placeholder,
-body.darkmode input::placeholder,
-body.darkmode textarea::placeholder {
-  color: #7defff !important;
-  opacity: 1;
-}
-body.darkmode .checkbox-option {
-  background: #181c1f !important;
-  border: 2px solid #00e6ef !important;
-  color: #e0f7fa !important;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
-}
-body.darkmode .checkbox-option input[type="checkbox"],
-body.darkmode .checkbox-option input[type="radio"] {
-  accent-color: #00e6ef !important;
-}
-body.darkmode .speeddates-table {
-  background: #000 !important;
-  border-radius: 12px;
-  border: 1.5px solid #232323;
-  box-shadow: 0 2px 12px rgba(0,230,239,0.07);
-}
-body.darkmode .speeddates-table th {
-  background: #101214 !important;
-  color: #00e6ef !important;
-  border-bottom: 1.5px solid #232323 !important;
-  text-align: center;
+.skills-btn svg {
+  display: inline-block;
   vertical-align: middle;
 }
-body.darkmode .speeddates-table td {
-  background: #000 !important;
-  color: #e0f7fa !important;
-  border-bottom: 1px solid #232323 !important;
-  text-align: center;
-  vertical-align: middle;
-}
-body.darkmode .speeddates-table tr:nth-child(even) td {
-  background: #181c1f !important;
-}
-body.darkmode .speeddates-table tr:last-child td {
-  border-bottom: none !important;
-}
 
-/* --- DARKMODE: UNIFORME TURQUOISE ACCENT, OVERZICHTELIJKE UI, ALLES BLIJFT WERKEN --- */
-body.darkmode {
-  --accent: lightgrey;
-  --accent-contrast: #181c1f;
-  --header-logo: url('/src/Images/EhB-logo-transparant-558-DarkMode.png');
-  background: #000 !important;
-  color: #f8fafd !important;
+.skills-btn:hover, .skills-btn:focus {
+  background: #e0e7f6;
+  color: #1853b4;
+  box-shadow: 0 4px 16px #2364aa22;
+  transform: translateY(-2px) scale(1.04);
 }
-
-/* --- DARKMODE: CONTAINER STYLES --- */
-body.darkmode .student-profile-form-container,
-body.darkmode .criteria-form,
-body.darkmode .content-card,
-body.darkmode .settings-popup-card {
-  background: #000 !important;
-  color: #e0f7fa !important;
-  border-radius: 14px;
-  border: 1.5px solid #232323;
-  box-shadow: 0 4px 24px 0 rgba(0,230,239,0.10), 0 1.5px 0 0 #232323;
-}
-
-body.darkmode .student-profile-header,
-body.darkmode .student-profile-sidebar {
-  background: #000 !important;
-  color: var(--accent) !important;
-  border-color: #232323 !important;
-}
-body.darkmode .student-profile-header .logo-section span {
-  color: var(--accent) !important;
-}
-body.darkmode .student-profile-header .logo-section img {
-  content: var(--header-logo);
-  filter: none !important;
-}
-
-body.darkmode .student-profile-sidebar ul {
-  background: transparent !important;
-}
-body.darkmode .student-profile-sidebar button {
-  color: #e0f7fa !important;
-  background: #000 !important;
-  border-left: 4px solid transparent !important;
-  font-weight: 500;
-  transition: background 0.18s, color 0.18s, border-color 0.18s;
-}
-body.darkmode .student-profile-sidebar button.active,
-body.darkmode .student-profile-sidebar button:hover {
-  background: #181c1f !important;
-  color: var(--accent) !important;
-  border-left: 4px solid var(--accent) !important;
-  font-weight: 700;
-}
-
-
-/* Burger menu popup in darkmode */
-body.darkmode .student-profile-dropdown {
-  background: #000 !important;
-  border-color: #333 !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.22) !important;
-}
-body.darkmode .student-profile-dropdown li button {
-  color: #e0f7fa !important;
-}
-body.darkmode .student-profile-dropdown li button:hover {
-  background: #181c1f !important;
-  color: var(--accent) !important;
-}
-
-/* --- DARKMODE: TABLES --- */
-body.darkmode .speeddates-table {
-  background: #000 !important;
-  border-radius: 12px;
-  border: 1.5px solid #232323;
-  box-shadow: 0 2px 12px rgba(0,230,239,0.07);
-}
-body.darkmode .speeddates-table th {
-  background: #101214 !important;
-  color: #00e6ef !important;
-  border-bottom: 1.5px solid #232323 !important;
-  text-align: center;
-  vertical-align: middle;
-}
-body.darkmode .speeddates-table td {
-  background: #000 !important;
-  color: #e0f7fa !important;
-  border-bottom: 1px solid #232323 !important;
-  text-align: center;
-  vertical-align: middle;
-}
-body.darkmode .speeddates-table tr:nth-child(even) td {
-  background: #181c1f !important;
-}
-body.darkmode .speeddates-table tr:last-child td {
-  border-bottom: none !important;
-}
-
 
 /* --- MODERN TABLES: LIGHT & DARK MODE --- */
 .speeddates-table {
@@ -1998,9 +1411,10 @@ body.darkmode .student-profile-btn-secondary:hover {
 body.darkmode .student-profile-btn:active,
 body.darkmode .student-profile-btn-primary:active,
 body.darkmode .student-profile-btn-secondary:active {
-  background-color: grey !important;}
+  background-color: grey !important;
+}
 
-  /* --- UNIFORME BUTTON STIJL VOOR LOGOUT EN DELETE IN SETTINGS --- */
+/* --- UNIFORME BUTTON STIJL VOOR LOGOUT EN DELETE IN SETTINGS --- */
 .settings-action-btn.logout {
   background: grey !important;
   color: #fff !important;
@@ -2118,3 +1532,126 @@ body.darkmode .student-profile-footer a:hover {
   color: #3dd686;
   text-decoration: underline;
 }
+
+/* --- MODERN TABLES: LIGHT & DARK MODE --- */
+.speeddates-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  overflow: hidden;
+  margin-bottom: 2rem;
+  font-size: 1.07rem;
+}
+.speeddates-table th {
+  background: #f5f6f7;
+  color: #0077b5;
+  font-weight: 700;
+  padding: 1.1rem 1rem;
+  border-bottom: 2px solid #e1e5e9;
+  text-align: center;
+  vertical-align: middle;
+  letter-spacing: 0.01em;
+}
+.speeddates-table td {
+  background: #fff;
+  color: #222;
+  padding: 1rem 1rem;
+  border-bottom: 1px solid #e1e5e9;
+  vertical-align: middle;
+  text-align: center;
+}
+.speeddates-table tr:last-child td {
+  border-bottom: none;
+}
+.speeddates-table tr:nth-child(even) td {
+  background: #f8f9fa;
+}
+
+/* QR code image smaller and square */
+.qr-code-img {
+  display: block;
+  margin: 0 auto 1.2rem auto;
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+}
+body.darkmode .qr-code-img {
+  background: #181c1f !important;
+}
+
+/* QR code popup text color same as sidebar accent */
+.qr-code-label,
+.qr-code-description {
+  color: var(--accent) !important;
+  text-align: center;
+}
+
+/* Popups (settings, modals, etc) */
+body.darkmode .settings-popup-card,
+body.darkmode .modal-content,
+body.darkmode .content-card {
+  background: #000 !important;
+  color: #e0f7fa !important;
+  box-shadow: 0 4px 24px 0 rgba(0,230,239,0.13);
+}
+body.darkmode .settings-title,
+body.darkmode .modal-header h1,
+body.darkmode .modal-header h2 {
+  color: var(--accent) !important;
+}
+body.darkmode .settings-popup-close {
+  color: var(--accent) !important;
+}
+
+/* Forms: overzichtelijk, turquoise accenten */
+body.darkmode .criteria-form,
+body.darkmode .student-profile-form-container,
+body.darkmode .search-fieldset {
+  background: #000 !important;
+  color: #e0f7fa !important;
+  border-radius: 12px;
+  box-shadow: 0 1px 8px 0 rgba(0,230,239,0.08);
+}
+body.darkmode .search-fieldset legend {
+  color: var(--accent) !important;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+body.darkmode .student-profile-form-group label,
+body.darkmode .checkbox-option span {
+  color: #e0f7fa !important;
+  font-weight: 600;
+}
+body.darkmode .form-input,
+body.darkmode input,
+body.darkmode select,
+body.darkmode textarea {
+  background: #181c1f !important;
+  color: #e0f7fa !important;
+  border: 2px solid var(--accent) !important;
+  border-radius: 8px;
+  font-size: 1.08rem;
+  margin-bottom: 8px;
+}
+body.darkmode .form-input:focus,
+body.darkmode input:focus,
+body.darkmode select:focus,
+body.darkmode textarea:focus {
+  border-color: var(--accent) !important;
+  background: #181c1f !important;
+}
+body.darkmode .form-input::placeholder,
+body.darkmode input::placeholder,
+body.darkmode textarea::placeholder {
+  color: grey !important;
+  opacity: 1;
+}
+body.darkmode .checkbox-option {
+  background: #181c1f !important;
+  border: 2px

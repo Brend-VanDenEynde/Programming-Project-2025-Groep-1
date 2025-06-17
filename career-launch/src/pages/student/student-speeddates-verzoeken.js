@@ -220,7 +220,10 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
         try {
           await acceptSpeeddate(id);
           const updated = await fetchPendingSpeeddates();
-          renderTable(updated);
+          const stored = JSON.parse(sessionStorage.getItem('user') || '{}');
+          const studentId = studentData?.id || studentData?.gebruiker_id || stored.id || stored.gebruiker_id;
+          const bedrijfVerzoeken = updated.filter(v => v.asked_by !== studentId);
+          renderTable(bedrijfVerzoeken);
         } catch (err) { alert('Fout bij accepteren: ' + err.message); }
       });
     });
@@ -230,7 +233,10 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
         try {
           await rejectSpeeddate(id);
           const updated = await fetchPendingSpeeddates();
-          renderTable(updated);
+          const stored = JSON.parse(sessionStorage.getItem('user') || '{}');
+          const studentId = studentData?.id || studentData?.gebruiker_id || stored.id || stored.gebruiker_id;
+          const bedrijfVerzoeken = updated.filter(v => v.asked_by !== studentId);
+          renderTable(bedrijfVerzoeken);
         } catch (err) { alert('Fout bij weigeren: ' + err.message); }
       });
     });
@@ -243,7 +249,13 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
   }
 
   fetchPendingSpeeddates()
-    .then(verzoeken => renderTable(verzoeken))
+    .then(verzoeken => {
+      const stored = JSON.parse(sessionStorage.getItem('user') || '{}');
+      const studentId = studentData?.id || studentData?.gebruiker_id || stored.id || stored.gebruiker_id;
+      // Alleen bedrijf-aanvragen tonen:
+      const bedrijfVerzoeken = verzoeken.filter(v => v.asked_by !== studentId);
+      renderTable(bedrijfVerzoeken);
+    })
     .catch(err => {
       document.getElementById('speeddates-requests-table').innerHTML = `<p style="color:red;">Fout: ${err.message}</p>`;
     });

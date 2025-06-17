@@ -107,7 +107,14 @@ export function renderStudentProfiel(
           </ul>
         </nav>
         <div class="student-profile-content">
-          <div class="student-profile-form-container">
+          <div class="student-profile-form-container" style="position:relative;">
+            <button id="btn-search-criteria" type="button" class="skills-btn" style="position:absolute;top:0;right:0;margin:0.2em 0.2em 0 0;z-index:2;">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <circle cx="9" cy="9" r="7" stroke="#2364aa" stroke-width="2"/>
+                <line x1="14.2" y1="14.2" x2="18" y2="18" stroke="#2364aa" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <span>Mijn skills en voorkeuren</span>
+            </button>
             <h1 class="student-profile-title">Profiel</h1>
             <form id="profileForm" class="student-profile-form" autocomplete="off" enctype="multipart/form-data">
               <div class="student-profile-avatar-section">
@@ -306,6 +313,16 @@ export function renderStudentProfiel(
 
   // Event handlers voor profiel bewerken
   const form = document.getElementById('profileForm');
+  // Knop naar zoekcriteria (skills/voorkeuren)
+  const searchCriteriaBtn = document.getElementById('btn-search-criteria');
+  if (searchCriteriaBtn) {
+    searchCriteriaBtn.addEventListener('click', () => {
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/student/zoek-criteria');
+      });
+    });
+  }
   if (form) {
     // EDIT knop
     const editBtn = document.getElementById('btn-edit-profile');
@@ -538,6 +555,17 @@ export function renderStudentProfiel(
           };
           reader.readAsDataURL(file);
         }
+      });
+    }
+
+    // Navigatie naar zoekcriteria/student-skills pagina
+    const searchCriteriaBtn = document.getElementById('btn-search-criteria');
+    if (searchCriteriaBtn) {
+      searchCriteriaBtn.addEventListener('click', () => {
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/student/zoek-criteria');
+        });
       });
     }
   }

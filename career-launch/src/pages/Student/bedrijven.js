@@ -341,7 +341,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
     status.style.display = 'block';
     // 🛑 DUBBELE BOEKING PREVENTIE: check of student op dit tijdstip al een speeddate heeft (pending/confirmed)
     const tijd = gekozenDatum; // nu alleen HH:MM
-    const alreadyBooked = [...studentDates, ...companyDates].some(s => {
+    const alreadyBooked = [...acceptedStudentDates, ...pendingStudentDates, ...acceptedCompanyDates, ...pendingCompanyDates].some(s => {
       if (!s.begin) return false;
       const dt = new Date(s.begin);
       const slotTijd = `${dt.getUTCHours().toString().padStart(2, '0')}:${dt.getUTCMinutes().toString().padStart(2, '0')}`;
