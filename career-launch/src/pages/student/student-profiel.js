@@ -7,12 +7,16 @@ import { logoutUser } from '../../utils/auth-api.js';
 import { renderBedrijven } from './bedrijven.js';
 import Router from '../../router.js';
 
+const BASE_AVATAR_URL = 'https://gt0kk4fbet.ufs.sh/f/';
+const DEFAULT_AVATAR_KEY = '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
+const DEFAULT_AVATAR_URL = BASE_AVATAR_URL + DEFAULT_AVATAR_KEY;
+
 const defaultProfile = {
   voornaam: '',
   achternaam: '',
   email: '',
   studiejaar: '1',
-  profiel_foto: '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4',
+  profiel_foto: DEFAULT_AVATAR_KEY,
   linkedin: '',
   date_of_birth: '',
   opleiding_id: null,
@@ -24,9 +28,9 @@ function isoToDateString(isoString) {
 }
 
 function getProfielFotoUrl(profiel_foto) {
-  if (!profiel_foto || profiel_foto === 'null') return 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
+  if (!profiel_foto || profiel_foto === 'null') return DEFAULT_AVATAR_URL;
   if (profiel_foto.startsWith('http')) return profiel_foto;
-  return 'https://gt0kk4fbet.ufs.sh/f/' + profiel_foto;
+  return BASE_AVATAR_URL + profiel_foto;
 }
 
 export function renderStudentProfiel(
@@ -316,7 +320,7 @@ export function renderStudentProfiel(
     let savedProfilePicture = profiel_foto; // Bewaar de originele profielfoto URL
 
     profileAvatar.addEventListener('mouseenter', () => {
-      if (!readonlyMode && !deleteProfilePicture && studentAvatar.src !== 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4') {
+      if (!readonlyMode && !deleteProfilePicture && studentAvatar.src !== `https://gt0kk4fbet.ufs.sh/f/${DEFAULT_AVATAR_KEY}`) {
         deleteOverlay.style.display = 'flex';
       }
     });
@@ -325,9 +329,9 @@ export function renderStudentProfiel(
     });
 
     deleteOverlay.addEventListener('click', async (e) => {
-      if (!readonlyMode && studentAvatar.src !== 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4') {
+      if (!readonlyMode && studentAvatar.src !== `https://gt0kk4fbet.ufs.sh/f/${DEFAULT_AVATAR_KEY}`) {
         photoInput.files = null; // Reset file input
-        studentAvatar.src = 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'; // Reset to default avatar
+        studentAvatar.src = `https://gt0kk4fbet.ufs.sh/f/${DEFAULT_AVATAR_KEY}`; // Reset to default avatar
         deleteProfilePicture = true; // Set flag to delete profile picture
       }
     });
@@ -457,9 +461,9 @@ export function renderStudentProfiel(
               profielFotoKey = studentData.profiel_foto;
             }
           }
-          if (deleteProfilePicture) {
+          if (deleteProfilePicture && savedProfilePicture && savedProfilePicture !== DEFAULT_AVATAR_URL) {
             // remove https://gt0kk4fbet.ufs.sh/f/ prefix if present
-            profielFotoKey = savedProfilePicture.replace('https://gt0kk4fbet.ufs.sh/f/', '');
+            profielFotoKey = savedProfilePicture.replace(BASE_AVATAR_URL, '');
             const deleteResp = await fetch(`https://api.ehb-match.me/profielfotos/${profielFotoKey}`, {
               method: 'DELETE',
               headers: {
@@ -467,7 +471,7 @@ export function renderStudentProfiel(
               },
             });
             console.log('Profielfoto verwijderd:', deleteResp);
-            profielFotoKey = null; // Verwijder profielfoto
+            profielFotoKey = DEFAULT_AVATAR_KEY; // Reset key na verwijderen
           }
           const photoInput = document.getElementById('photoInput');
           if (photoInput && photoInput.files && photoInput.files.length > 0) {
@@ -506,9 +510,9 @@ export function renderStudentProfiel(
             achternaam: document.getElementById('lastNameInput').value,
             studiejaar: parseInt(document.getElementById('yearInput').value, 10),
             date_of_birth: document.getElementById('birthDateInput').value, // <-- correct!
-            linkedin: document.getElementById('linkedinInput').value,
+            linkedin: linkedinValue,
             opleiding_id: parseInt(newOpleidingId, 10),
-            profiel_foto: profielFotoKey ? profielFotoKey : '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4', // Gebruik alleen de key, nooit de URL of null
+            profiel_foto: profielFotoKey ? profielFotoKey : DEFAULT_AVATAR_KEY, // Gebruik alleen de key, nooit de URL of null
           };
           console.log("Payload met profielfoto key:", payload);
           const respStudent = await fetch(`https://api.ehb-match.me/studenten/${studentID}`, {
