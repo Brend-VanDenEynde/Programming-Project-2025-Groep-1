@@ -1,6 +1,6 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import defaultLogo from '../../images/defaultlogo.webp';
-import { logoutUser } from '../../utils/auth-api.js';
+import { logoutUser, fetchUserInfo } from '../../utils/auth-api.js';
 import Router from '../../router.js';
 
 // Default bedrijf profiel data
@@ -19,7 +19,7 @@ function getBedrijfLogoUrl(foto) {
   return 'https://gt0kk4fbet.ufs.sh/f/' + foto;
 }
 
-export function renderBedrijfProfiel(
+export async function renderBedrijfProfiel(
   rootElement,
   bedrijfData = {},
   readonlyMode = true
@@ -31,16 +31,63 @@ export function renderBedrijfProfiel(
       if (stored) bedrijfData = JSON.parse(stored);
     } catch (e) {}
   }
-  // Gebruik dummy data als geen echte data beschikbaar is
+
+  // Probeer echte data van de API op te halen als geen data beschikbaar is
   if (!bedrijfData || Object.keys(bedrijfData).length === 0) {
-    bedrijfData = {
-      email: 'info@techcorp.be',
-      bedrijfsnaam: 'TechCorp Belgium',
-      foto: defaultLogo,
-      plaats: 'Brussel',
-      linkedin: 'https://www.linkedin.com/company/techcorp-belgium',
-      sector: 'IT & Technology',
-    };
+    try {
+      const userInfoResult = await fetchUserInfo();
+      if (userInfoResult.success && userInfoResult.user) {
+        const apiUser = userInfoResult.user;
+        // Log de ruwe API data voor debugging
+        console.log('Raw API user data:', apiUser);
+
+        // Map API data naar bedrijf profiel velden
+        bedrijfData = {
+          email: apiUser.contact_email || apiUser.email || '',
+          bedrijfsnaam:
+            apiUser.bedrijfsnaam ||
+            apiUser.company_name ||
+            apiUser.naam ||
+            apiUser.voornaam + ' ' + apiUser.achternaam ||
+            'Mijn Bedrijf',
+          foto: apiUser.profiel_foto_url || apiUser.logo_url || defaultLogo,
+          plaats: apiUser.plaats || apiUser.locatie || apiUser.location || '',
+          linkedin: apiUser.linkedin || '',
+          sector: apiUser.sector || '',
+        };
+
+        // Log de gemapte bedrijf data voor debugging
+        console.log('Mapped bedrijf data:', bedrijfData);
+
+        // Sla de gegevens op in sessionStorage voor toekomstig gebruik
+        window.sessionStorage.setItem(
+          'bedrijfData',
+          JSON.stringify(bedrijfData)
+        );
+      } else {
+        console.warn('Could not fetch user info from API, using dummy data');
+        // Fallback naar dummy data
+        bedrijfData = {
+          email: 'info@techcorp.be',
+          bedrijfsnaam: 'TechCorp Belgium',
+          foto: defaultLogo,
+          plaats: 'Brussel',
+          linkedin: 'https://www.linkedin.com/company/techcorp-belgium',
+          sector: 'IT & Technology',
+        };
+      }
+    } catch (error) {
+      console.error('Error fetching user info from API:', error);
+      // Fallback naar dummy data
+      bedrijfData = {
+        email: 'info@techcorp.be',
+        bedrijfsnaam: 'TechCorp Belgium',
+        foto: defaultLogo,
+        plaats: 'Brussel',
+        linkedin: 'https://www.linkedin.com/company/techcorp-belgium',
+        sector: 'IT & Technology',
+      };
+    }
   }
   // Gebruik ENKEL de huidige API velden
   const {
