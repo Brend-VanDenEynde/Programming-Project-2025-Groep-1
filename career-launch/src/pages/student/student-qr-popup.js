@@ -11,6 +11,15 @@ import Router from '../../router.js';
 // src/views/student-qr-popup.js
 
 export function renderQRPopup(rootElement, studentData = {}) {
+  // AUTH CHECK: blokkeer toegang zonder geldige login
+  const token = window.sessionStorage.getItem('authToken');
+  if (!token) {
+    import('../login.js').then((module) => {
+      module.renderLogin(rootElement);
+    });
+    return;
+  }
+
   rootElement.innerHTML = `
     <div class="student-profile-container">
       <header class="student-profile-header">

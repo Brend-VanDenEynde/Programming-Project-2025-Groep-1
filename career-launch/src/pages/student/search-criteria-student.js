@@ -255,6 +255,15 @@ export async function renderSearchCriteriaStudent(
   studentData = {},
   readonlyMode = true
 ) {
+  // AUTH CHECK: blokkeer toegang zonder geldige login
+  const token = window.sessionStorage.getItem('authToken');
+  if (!token) {
+    import('../login.js').then((module) => {
+      module.renderLogin(rootElement);
+    });
+    return;
+  }
+
   // Patch: Altijd proberen de studentData te laden uit sessionStorage
   if (!studentData || (!studentData.id && !studentData.gebruiker_id)) {
     const stored = sessionStorage.getItem('studentData');
