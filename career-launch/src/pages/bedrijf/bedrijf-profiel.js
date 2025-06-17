@@ -11,14 +11,17 @@ import Router from '../../router.js';
 const defaultBedrijfProfile = {
   contact_email: '',
   naam: '',
-  profiel_foto_url: defaultLogo,
+  profiel_foto_key: '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4',
+  profiel_foto_url: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4',
   plaats: '',
   linkedin: '',
   sector_bedrijf: '',
 };
 
+const token = window.sessionStorage.getItem('authToken');
+
 function getBedrijfLogoUrl(foto) {
-  if (!foto || foto === 'null') return defaultLogo;
+  if (!foto || foto === 'null') return 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
   if (foto.startsWith('http')) return foto;
   return 'https://gt0kk4fbet.ufs.sh/f/' + foto;
 }
@@ -40,10 +43,10 @@ export async function renderBedrijfProfiel(
   if (!bedrijfData || Object.keys(bedrijfData).length === 0) {
     try {
       const userInfoResult = await fetchUserInfo();
-      if (userInfoResult.success && userInfoResult.user) {
+      if (userInfoResult.success) {
         const apiUser = userInfoResult.user;
         // Log de ruwe API data voor debugging
-        console.log('Raw API user data:', apiUser);
+        console.log('Raw API user data:', userInfoResult);
         console.log('USER OBJECT:', apiUser); // Map API data naar bedrijf profiel velden (gebruik API veldnamen)
         bedrijfData = {
           id: apiUser.id || apiUser.gebruiker_id,
@@ -75,7 +78,8 @@ export async function renderBedrijfProfiel(
         bedrijfData = {
           contact_email: 'info@techcorp.be',
           naam: 'TechCorp Belgium',
-          profiel_foto_url: defaultLogo,
+          profiel_foto_key: '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4',
+          profiel_foto_url: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4',
           plaats: 'Brussel',
           linkedin: 'https://www.linkedin.com/company/techcorp-belgium',
           sector_bedrijf: 'IT & Technology',
@@ -87,7 +91,8 @@ export async function renderBedrijfProfiel(
       bedrijfData = {
         contact_email: 'info@techcorp.be',
         naam: 'TechCorp Belgium',
-        profiel_foto_url: defaultLogo,
+        profiel_foto_key: '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4',
+        profiel_foto_url: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4',
         plaats: 'Brussel',
         linkedin: 'https://www.linkedin.com/company/techcorp-belgium',
         sector_bedrijf: 'IT & Technology',
@@ -133,13 +138,17 @@ export async function renderBedrijfProfiel(
         <div class="bedrijf-profile-content">
           <div class="bedrijf-profile-form-container">
             <h1 class="bedrijf-profile-title">Bedrijf Profiel</h1>
-            <form id="bedrijfProfileForm" class="bedrijf-profile-form" autocomplete="off" enctype="multipart/form-data">              <div class="bedrijf-profile-avatar-section">
-                <img 
-                  src="${foto}" 
-                  alt="Logo ${naam}" 
-                  id="logo-preview"
-                  class="bedrijf-profile-avatar"
-                />
+            <form id="bedrijfProfileForm" class="bedrijf-profile-form" autocomplete="off" enctype="multipart/form-data">
+              <div class="bedrijf-profile-avatar-section">
+                <div class="bedrijf-profile-avatar-div" style="position:relative;">
+                  <img
+                    src="${foto}"
+                    alt="Logo ${naam}"
+                    id="logo-preview"
+                    class="bedrijf-profile-avatar"
+                  />
+                  <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
+                </div>
                 <input type="file" accept="image/*" id="logoInput" style="display:${
                   readonlyMode ? 'none' : 'block'
                 };margin-top:10px;">
@@ -168,7 +177,7 @@ export async function renderBedrijfProfiel(
               
               <div class="bedrijf-profile-form-group">
                 <label for="linkedinInput">LinkedIn</label>
-                <input type="url" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/company/bedrijf" ${
+                <input type="url" id="linkedinInput" value="${linkedin ? linkedin : ''}" placeholder="https://www.linkedin.com/company/bedrijf" ${
     readonlyMode ? 'disabled' : ''
   }>
               </div>
@@ -272,6 +281,33 @@ export async function renderBedrijfProfiel(
       renderBedrijfProfiel(rootElement, bedrijfData, false);
     });
   }
+
+  // Delete overlay voor profielfoto
+    const profileAvatar = document.querySelector('.bedrijf-profile-avatar-div');
+    const photoInput = document.getElementById('logoInput');
+    const deleteOverlay = document.querySelector('.delete-overlay');
+    const bedrijfAvatar = document.getElementById('logo-preview');
+
+    let deleteProfilePicture = false;
+    let savedProfilePicture = bedrijfData.profiel_foto_url; // Bewaar de originele profielfoto URL
+
+    profileAvatar.addEventListener('mouseenter', () => {
+      if (!readonlyMode && !deleteProfilePicture && bedrijfAvatar.src !== 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4') {
+        deleteOverlay.style.display = 'flex';
+      }
+    });
+    profileAvatar.addEventListener('mouseleave', () => {
+      deleteOverlay.style.display = 'none';
+    });
+
+    deleteOverlay.addEventListener('click', async (e) => {
+      if (!readonlyMode && bedrijfAvatar.src !== 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4') {
+        photoInput.files = null; // Reset file input
+        bedrijfAvatar.src = 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'; // Reset to default avatar
+        deleteProfilePicture = true; // Set flag to delete profile picture
+      }
+    });
+
   // SAVE knop
   const saveBtn = document.getElementById('btn-save-bedrijf');
   if (saveBtn) {
@@ -280,11 +316,24 @@ export async function renderBedrijfProfiel(
 
       try {
         // Verzamel form data met API veldnamen (alleen velden die de API accepteert)
+        let linkedinInput = document.getElementById('linkedinInput').value;
+        let linkedinValue = null;
+        if (linkedinInput && linkedinInput.trim() !== '') {
+          linkedinInput = linkedinInput.trim();
+          // Remove both 'https://www.linkedin.com' and 'https://linkedin.com' from the start
+          linkedinInput = linkedinInput.replace(/^(https?:\/\/)?(www\.)?linkedin\.com/i, '');
+          // Accept if it starts with '/company/'
+          if (linkedinInput.startsWith('/company/')) {
+            linkedinValue = linkedinInput;
+          } else {
+            linkedinValue = null;
+          }
+        }
         const updateData = {
           naam: document.getElementById('bedrijfsnaamInput').value,
           contact_email: document.getElementById('emailInput').value,
           plaats: document.getElementById('plaatsInput').value,
-          linkedin: document.getElementById('linkedinInput').value,
+          linkedin: linkedinValue,
           // sector_bedrijf wordt niet geaccepteerd door de API, dus weggelaten
         }; // Haal het bedrijf ID op uit de huidige data
         const bedrijfID = bedrijfData.id || bedrijfData.gebruiker_id;
@@ -307,8 +356,67 @@ export async function renderBedrijfProfiel(
           updateData
         );
 
+        // Voeg de profiel foto toe als deze is gewijzigd
+        let profielFotoKey = null;
+          if (bedrijfData.profiel_foto_url && typeof bedrijfData.profiel_foto_url === 'string' && !deleteProfilePicture) {
+            if (bedrijfData.profiel_foto_url.startsWith('http')) {
+              const parts = bedrijfData.profiel_foto_url.split('/');
+              profielFotoKey = parts[parts.length - 1];
+            } else if (bedrijfData.profiel_foto_url !== 'null') {
+              profielFotoKey = bedrijfData.profiel_foto_url;
+            }
+          }
+          if (deleteProfilePicture) {
+            // remove https://gt0kk4fbet.ufs.sh/f/ prefix if present
+            profielFotoKey = savedProfilePicture.replace('https://gt0kk4fbet.ufs.sh/f/', '');
+            const deleteResp = await fetch(`https://api.ehb-match.me/profielfotos/${profielFotoKey}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': 'Bearer ' + token,
+              },
+            });
+            console.log('Profielfoto verwijderd:', deleteResp);
+            profielFotoKey = '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'; // Verwijder profielfoto
+            bedrijfAvatar.src = 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'; // Reset naar default avatar
+          }
+          const photoInput = document.getElementById('logoInput');
+          if (photoInput && photoInput.files && photoInput.files.length > 0) {
+            const file = photoInput.files[0];
+            // Controleer bestandstype en grootte
+            if (!file.type.match(/^image\/(jpeg|png|gif)$/)) {
+              alert('Ongeldig bestandstype. Kies een jpg, png of gif afbeelding.');
+              return;
+            }
+            if (file.size > 2 * 1024 * 1024) {
+              alert('Bestand is te groot. Maximaal 2 MB toegestaan.');
+              return;
+            }
+            // Gebruik altijd 'image' als veldnaam
+            const fileForm = new FormData();
+            fileForm.append('image', file);
+            const uploadResp = await fetch('https://api.ehb-match.me/profielfotos', {
+              method: 'POST',
+              headers: {
+                'Authorization': 'Bearer ' + token,
+              },
+              body: fileForm,
+            });
+            if (!uploadResp.ok) {
+              const errText = await uploadResp.text();
+              console.error('Upload response for key "image":', errText);
+              throw new Error('Foto uploaden mislukt: ' + errText);
+            }
+            const uploadResult = await uploadResp.json();
+            profielFotoKey = uploadResult.profiel_foto_key;
+          }
+          console.log('Stuur profielfoto key:', profielFotoKey);
+
+          updateData.profiel_foto = profielFotoKey || null; // Voeg de profielfoto key toe als deze bestaat
+          console.log('Final update data:', updateData);
+
         // Roep de API aan om het bedrijf bij te werken
         const result = await updateBedrijfProfile(bedrijfID, updateData);
+
 
         if (result.success) {
           alert('Bedrijfsprofiel succesvol opgeslagen!');

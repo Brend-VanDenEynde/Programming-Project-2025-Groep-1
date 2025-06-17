@@ -3231,6 +3231,14 @@ body.darkmode .status-final {
   background: #fff;
 }
 
+.bedrijf-profile-avatar-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  height: fit-content;
+}
+
 .bedrijf-profile-form-group {
   margin-bottom: 1.2rem;
   width: 100%;
