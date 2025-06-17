@@ -30,13 +30,9 @@ export function createBedrijfNavbar(activeRoute = '') {
             }">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link ${
               activeRoute === 'requests' ? 'active' : ''
-            }">Speeddates-verzoeken</button></li>
-            <li><button data-route="studenten" class="sidebar-link ${
-              activeRoute === 'studenten' ? 'active' : ''
-            }">Studenten</button></li>
-            <li><button data-route="qr" class="sidebar-link ${
-              activeRoute === 'qr' ? 'active' : ''
-            }">QR-code</button></li>
+            }">Speeddates-verzoeken</button></li>            <li><button data-route="studenten" class="sidebar-link ${
+    activeRoute === 'studenten' ? 'active' : ''
+  }">Studenten</button></li>
           </ul>
         </nav>
 
@@ -88,9 +84,6 @@ export function setupBedrijfNavbarEvents() {
             break;
           case 'studenten':
             Router.navigate('/bedrijf/studenten');
-            break;
-          case 'qr':
-            Router.navigate('/bedrijf/qr-code');
             break;
         }
       });
