@@ -142,19 +142,22 @@ async function acceptSpeeddate(afspraakId) {
   if (!token) {
     alert('Geen geldige authenticatie. Log opnieuw in.');
     return;
-  }
-
-  try {
+  }  try {
+    // Voor bedrijven die student verzoeken accepteren
     const response = await fetch(`https://api.ehb-match.me/speeddates/accept/${afspraakId}`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify({
+        akkoord: true
+      })
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text();
+      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
     }
 
     // Navigeer naar de speeddates pagina na succesvolle acceptatie
@@ -172,9 +175,9 @@ async function acceptSpeeddate(afspraakId) {
   }
 }
 
-// Functie om een speeddate te verwijderen
+// Functie om een speeddate te verwijderen/afwijzen
 async function deleteSpeeddate(afspraakId) {
-  if (!confirm('Weet je zeker dat je deze speeddate wilt verwijderen?')) {
+  if (!confirm('Weet je zeker dat je deze speeddate wilt afwijzen?')) {
     return;
   }
 
@@ -186,25 +189,31 @@ async function deleteSpeeddate(afspraakId) {
   }
 
   try {
-    const response = await fetch(`https://api.ehb-match.me/speeddates/reject/${afspraakId}`, {
-      method: 'POST',
+    // Gebruik PUT met reject status
+    const response = await fetch(`https://api.ehb-match.me/speeddates/${afspraakId}`, {
+      method: 'PUT',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify({
+        akkoord: false
+      })
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text();
+      console.error('API Error Response:', errorText);
+      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
     }
 
-    // Herlaad de data na succesvolle verwijdering
+    // Herlaad de data na succesvolle afwijzing
     await loadPendingSpeeddateData();
-    alert('Speeddate succesvol verwijderd!');
+    alert('Speeddate succesvol afgewezen!');
 
   } catch (error) {
-    console.error('Fout bij verwijderen van speeddate:', error);
-    alert('Er is een fout opgetreden bij het verwijderen van de speeddate.');
+    console.error('Fout bij afwijzen van speeddate:', error);
+    alert('Er is een fout opgetreden bij het afwijzen van de speeddate.');
   }
 }
 
