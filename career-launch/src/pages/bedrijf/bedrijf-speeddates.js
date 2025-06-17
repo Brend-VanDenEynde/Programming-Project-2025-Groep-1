@@ -243,7 +243,7 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
           <span>EhB Career Launch</span>
         </div>
         <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
-        <ul id="burger-dropdown" class="bedrijf-profile-dropdown" style="display: none;">
+        <ul id="burger-dropdown" class="bedrijf-profile-dropdown">
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
@@ -311,31 +311,35 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
       });
     });
   });
-
   // Burger menu and other functionality
   const burger = document.getElementById('burger-menu');
   const dropdown = document.getElementById('burger-dropdown');
   if (burger && dropdown) {
+    dropdown.classList.remove('open');
     burger.addEventListener('click', (event) => {
       event.stopPropagation();
-      dropdown.style.display =
-        dropdown.style.display === 'block' ? 'none' : 'block';
+      if (!dropdown.classList.contains('open')) {
+        dropdown.classList.add('open');
+      } else {
+        dropdown.classList.remove('open');
+      }
     });
 
     document.addEventListener('click', (event) => {
-      if (!dropdown.contains(event.target) && event.target !== burger) {
-        dropdown.style.display = 'none';
+      if (dropdown.classList.contains('open') &&
+          !dropdown.contains(event.target) && 
+          event.target !== burger) {
+        dropdown.classList.remove('open');
       }
     });
   }
-
   document.getElementById('nav-settings')?.addEventListener('click', () => {
-    dropdown.style.display = 'none';
+    dropdown.classList.remove('open');
     alert('Instellingen komen binnenkort');
   });
 
   document.getElementById('nav-logout')?.addEventListener('click', () => {
-    dropdown.style.display = 'none';
+    dropdown.classList.remove('open');
     import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/');

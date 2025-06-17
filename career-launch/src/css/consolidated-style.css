@@ -3112,6 +3112,10 @@ body.darkmode .status-final {
   display: none;
 }
 
+.bedrijf-profile-dropdown.open {
+  display: block;
+}
+
 .bedrijf-profile-dropdown li {
   margin: 0;
 }
