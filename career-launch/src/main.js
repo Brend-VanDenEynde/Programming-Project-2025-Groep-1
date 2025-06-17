@@ -84,14 +84,14 @@ function setupFooterLinks() {
   if (privacyLink) {
     privacyLink.onclick = (e) => {
       e.preventDefault();
-      window.appRouter.navigate('/privacy', { replace: true });
+      window.appRouter.navigate('/privacy');
     };
   }
   const contactLink = document.getElementById('contacteer-ons');
   if (contactLink) {
     contactLink.onclick = (e) => {
       e.preventDefault();
-      window.appRouter.navigate('/contact', { replace: true });
+      window.appRouter.navigate('/contact');
     };
   }
 }

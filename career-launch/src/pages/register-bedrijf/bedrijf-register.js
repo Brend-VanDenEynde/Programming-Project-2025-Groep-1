@@ -133,6 +133,26 @@ export function renderBedrijfRegister(rootElement) {
       Router.goBack('/registreer');
     });
   }
+
+  // Footer links: gebruik alleen Router.navigate, geen hash of import
+  const privacyLink = document.querySelector('a[href="/privacy"]');
+  if (privacyLink) {
+    privacyLink.setAttribute('href', '#');
+    privacyLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      Router.navigate('/privacy');
+    });
+  }
+  const contactLink = document.querySelector('a[href="/contact"]');
+  if (contactLink) {
+    contactLink.setAttribute('href', '#');
+    contactLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      Router.navigate('/contact');
+    });
+  }
 }
 
 async function handleBedrijfRegister(event) {

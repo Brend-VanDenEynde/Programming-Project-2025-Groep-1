@@ -58,8 +58,25 @@ export function renderStudentOpleiding(rootElement) {
       Router.goBack('/registreer');
     });
   }
-  // Footer links
-  // Privacy and Contact pages are now properly routed via data-route attributes
+  // Footer links: gebruik alleen Router.navigate, geen hash of import, en selecteer alleen de lokale footer links
+  const privacyLink = document.querySelector('.footer-links a[data-route="/privacy"]');
+  if (privacyLink) {
+    privacyLink.setAttribute('href', '#');
+    privacyLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      Router.navigate('/privacy');
+    });
+  }
+  const contactLink = document.querySelector('.footer-links a[data-route="/contact"]');
+  if (contactLink) {
+    contactLink.setAttribute('href', '#');
+    contactLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      Router.navigate('/contact');
+    });
+  }
 
   // Fetch opleidingen from API and populate dropdown
   loadOpleidingen();

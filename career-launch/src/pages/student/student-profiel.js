@@ -34,6 +34,15 @@ export function renderStudentProfiel(
   studentData = {},
   readonlyMode = true
 ) {
+  // AUTH CHECK: blokkeer toegang zonder geldige login
+  const token = window.sessionStorage.getItem('authToken');
+  if (!token) {
+    import('../login.js').then((module) => {
+      module.renderLogin(rootElement);
+    });
+    return;
+  }
+
   // Laad uit sessionStorage als leeg
   if (!studentData || Object.keys(studentData).length === 0) {
     try {

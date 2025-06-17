@@ -53,8 +53,8 @@ export function renderStudentRegister(rootElement) {
     });
   }
 
-  // Footer links: gebruik alleen Router.navigate, geen hash of import
-  const privacyLink = document.querySelector('a[href="/privacy"]');
+  // Footer links: gebruik alleen Router.navigate, geen hash of import, en selecteer alleen de lokale footer links
+  const privacyLink = document.querySelector('.footer-links a[data-route="/privacy"]');
   if (privacyLink) {
     privacyLink.setAttribute('href', '#');
     privacyLink.addEventListener('click', (e) => {
@@ -63,7 +63,7 @@ export function renderStudentRegister(rootElement) {
       Router.navigate('/privacy');
     });
   }
-  const contactLink = document.querySelector('a[href="/contact"]');
+  const contactLink = document.querySelector('.footer-links a[data-route="/contact"]');
   if (contactLink) {
     contactLink.setAttribute('href', '#');
     contactLink.addEventListener('click', (e) => {
