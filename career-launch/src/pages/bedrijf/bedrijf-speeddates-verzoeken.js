@@ -1,88 +1,126 @@
 import logoIcon from '../../icons/favicon-32x32.png';
-import { setupNavigationLinks } from './bedrijf-speeddates.js';
 
-export function renderBedrijfSpeeddatesRequests(rootElement, companyData = {}) {
-  let verzoeken = [
-    {
-      student: 'John Doe',
-      lokaal: 'B102',
-      tijd: '13:30',
-      status: 'Geaccepteerd',
-    },
-    {
-      student: 'Jane Smith',
-      lokaal: 'A201',
-      tijd: '11:00',
-      status: 'In afwachting',
-    },
-    {
-      student: 'Alice Johnson',
-      lokaal: 'C004',
-      tijd: '15:00',
-      status: 'In afwachting',
-    },
-  ];
-
-  function renderTable() {
-    const tableHtml =
-      verzoeken.length === 0
-        ? `<p style="text-align:center;">Nog geen speeddates-verzoeken gevonden.</p>`
-        : `
-        <div class="speeddates-table-container">
-          <table class="speeddates-table">
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Lokaal</th>
-                <th>Tijd</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${verzoeken
-                .map(
-                  (v) => `
-                <tr>
-                  <td>${v.student}</td>
-                  <td>${v.lokaal}</td>
-                  <td>${v.tijd}</td>
-                  <td>${v.status}</td>
-                </tr>`
-                )
-                .join('')}
-            </tbody>
-          </table>
-        </div>`;
-
-    rootElement.innerHTML = tableHtml;
-  }
-
-  function renderSidebar() {
-    const sidebarHtml = `
-      <nav class="company-profile-sidebar">
-        <ul>
-          <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
-          <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
-          <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-          <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
+export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
+  rootElement.innerHTML = `
+    <div class="bedrijf-profile-container">
+      <header class="bedrijf-profile-header">
+        <div class="logo-section">
+          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
+          <span>EhB Career Launch</span>
+        </div>
+        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
+        <ul id="burger-dropdown" class="bedrijf-profile-dropdown" style="display: none;">
+          <li><button id="nav-settings">Instellingen</button></li>
+          <li><button id="nav-logout">Log out</button></li>
         </ul>
-      </nav>`;
+      </header>
+      
+      <div class="bedrijf-profile-main">
+        <nav class="bedrijf-profile-sidebar">
+          <ul>
+            <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
+            <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
+            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
+            <li><button data-route="requests" class="sidebar-link active">Speeddates-verzoeken</button></li>
+            <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
+            <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
+          </ul>
+        </nav>
+        
+        <div class="bedrijf-profile-content">
+          <div class="bedrijf-profile-form-container">
+            <h1 class="bedrijf-profile-title">Speeddates-verzoeken</h1>
+            <p>Dit is de speeddates-verzoeken pagina. Hier komen de inkomende speeddates verzoeken.</p>
+          </div>
+        </div>
+      </div>
+      
+      <footer class="bedrijf-profile-footer">
+        <div class="footer-content">
+          <span>&copy; 2025 EhB Career Launch</span>
+          <div class="footer-links">
+            <a href="/privacy" id="privacy-policy">Privacy</a>
+            <a href="/contact" id="contacteer-ons">Contact</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  `;
 
-    const sidebarContainer = document.querySelector('.sidebar-container');
-    if (sidebarContainer) {
-      sidebarContainer.innerHTML = sidebarHtml;
-    }
+  // Sidebar navigation
+  document.querySelectorAll('.sidebar-link').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const route = e.currentTarget.getAttribute('data-route');
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        switch (route) {
+          case 'profile':
+            Router.navigate('/bedrijf/bedrijf-profiel');
+            break;
+          case 'search-criteria':
+            Router.navigate('/bedrijf/zoek-criteria');
+            break;
+          case 'speeddates':
+            Router.navigate('/bedrijf/speeddates');
+            break;
+          case 'requests':
+            Router.navigate('/bedrijf/speeddates-verzoeken');
+            break;
+          case 'studenten':
+            Router.navigate('/bedrijf/studenten');
+            break;
+          case 'qr':
+            Router.navigate('/bedrijf/qr-code');
+            break;
+        }
+      });
+    });
+  });
 
-    setupNavigationLinks();
+  // Burger menu and other functionality
+  const burger = document.getElementById('burger-menu');
+  const dropdown = document.getElementById('burger-dropdown');
+  if (burger && dropdown) {
+    burger.addEventListener('click', (event) => {
+      event.stopPropagation();
+      dropdown.style.display =
+        dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!dropdown.contains(event.target) && event.target !== burger) {
+        dropdown.style.display = 'none';
+      }
+    });
   }
 
-  renderTable();
-  renderSidebar();
-}
+  document.getElementById('nav-settings')?.addEventListener('click', () => {
+    dropdown.style.display = 'none';
+    alert('Instellingen komen binnenkort');
+  });
 
-// Dummy file for bedrijf-speeddates-verzoeken.js
-export function renderBedrijfSpeeddatesVerzoeken() {
-  return 'Bedrijf Speeddates Verzoeken Dummy';
+  document.getElementById('nav-logout')?.addEventListener('click', () => {
+    dropdown.style.display = 'none';
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/');
+    });
+  });
 
+  document.getElementById('privacy-policy')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/privacy');
+    });
+  });
+
+  document.getElementById('contacteer-ons')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/contact');
+    });
+  });
 }
-export default renderBedrijfSpeeddatesVerzoeken;

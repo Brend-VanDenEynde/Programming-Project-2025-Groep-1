@@ -1,23 +1,6 @@
-// src/views/bedrijf-speeddates.js
 import logoIcon from '../../icons/favicon-32x32.png';
-import { renderLogin } from '../login.js';
-import '../../css/consolidated-style.css';
 
 export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
-  const speeddates = [];
-
-  function getStatusBadge(status) {
-    if (status === 'Bevestigd') {
-      return `<span class="status-badge badge-accepted">Bevestigd</span>`;
-    } else if (status === 'In afwachting') {
-      return `<span class="status-badge badge-waiting">In afwachting</span>`;
-    } else if (status === 'Geweigerd') {
-      return `<span class="status-badge badge-denied">Geweigerd</span>`;
-    } else {
-      return `<span class="status-badge badge-other">${status}</span>`;
-    }
-  }
-
   rootElement.innerHTML = `
     <div class="bedrijf-profile-container">
       <header class="bedrijf-profile-header">
@@ -31,202 +14,113 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
           <li><button id="nav-logout">Log out</button></li>
         </ul>
       </header>
-
+      
       <div class="bedrijf-profile-main">
         <nav class="bedrijf-profile-sidebar">
           <ul>
             <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
+            <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link active">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
+            <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
             <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
-            <li><button data-route="settings" class="sidebar-link">Instellingen</button></li>
-            <li><button data-route="contact" class="sidebar-link">Contact</button></li>
-            <li><button data-route="privacy" class="sidebar-link">Privacy Policy</button></li>
           </ul>
         </nav>
-
+        
         <div class="bedrijf-profile-content">
           <div class="bedrijf-profile-form-container">
-            <h1 class="bedrijf-profile-title" style="text-align:center;width:100%;">Mijn Speeddates</h1>
-            <div>
-              ${
-                speeddates.length === 0
-                  ? `<p style="text-align:center;">U heeft nog geen speeddates ingepland.</p>`
-                  : `
-                    <div class="speeddates-table-container">
-                      <table class="speeddates-table">
-                        <thead>
-                          <tr>
-                            <th>Student</th>
-                            <th>Tijd</th>
-                            <th>Locatie</th>
-                            <th>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          ${speeddates
-                            .map(
-                              (s) => `
-                            <tr>
-                              <td>${s.student}</td>
-                              <td>${s.tijd}</td>
-                              <td>${s.locatie}</td>
-                              <td>${getStatusBadge(s.status)}</td>
-                            </tr>
-                          `
-                            )
-                            .join('')}
-                        </tbody>
-                      </table>
-                    </div>
-                  `
-              }
-            </div>
+            <h1 class="bedrijf-profile-title">Speeddates</h1>
+            <p>Dit is de speeddates pagina. Hier komen de geplande speeddates.</p>
           </div>
         </div>
       </div>
-
+      
       <footer class="bedrijf-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+        <div class="footer-content">
+          <span>&copy; 2025 EhB Career Launch</span>
+          <div class="footer-links">
+            <a href="/privacy" id="privacy-policy">Privacy</a>
+            <a href="/contact" id="contacteer-ons">Contact</a>
+          </div>
+        </div>
       </footer>
     </div>
   `;
 
-  // Sidebar nav - gebruik de router voor echte URL navigatie
+  // Sidebar navigation
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      alert(`Navigeren naar: ${btn.getAttribute('data-route')}`);
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const route = e.currentTarget.getAttribute('data-route');
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        switch (route) {
+          case 'profile':
+            Router.navigate('/bedrijf/bedrijf-profiel');
+            break;
+          case 'search-criteria':
+            Router.navigate('/bedrijf/zoek-criteria');
+            break;
+          case 'speeddates':
+            Router.navigate('/bedrijf/speeddates');
+            break;
+          case 'requests':
+            Router.navigate('/bedrijf/speeddates-verzoeken');
+            break;
+          case 'studenten':
+            Router.navigate('/bedrijf/studenten');
+            break;
+          case 'qr':
+            Router.navigate('/bedrijf/qr-code');
+            break;
+        }
+      });
     });
   });
 
-  // Burger menu functionaliteit
+  // Burger menu and other functionality
   const burger = document.getElementById('burger-menu');
   const dropdown = document.getElementById('burger-dropdown');
   if (burger && dropdown) {
-    burger.addEventListener('click', () => {
-      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    burger.addEventListener('click', (event) => {
+      event.stopPropagation();
+      dropdown.style.display =
+        dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!dropdown.contains(event.target) && event.target !== burger) {
+        dropdown.style.display = 'none';
+      }
     });
   }
 
-  // Fetch user info to get gebruiker_id
-  const token = sessionStorage.getItem('authToken');
+  document.getElementById('nav-settings')?.addEventListener('click', () => {
+    dropdown.style.display = 'none';
+    alert('Instellingen komen binnenkort');
+  });
 
-  if (!token) {
-    console.error('Geen geldig token gevonden in sessionStorage.');
-    alert('Uw sessie is verlopen. Log opnieuw in om verder te gaan.');
-    window.location.href = '/login';
-    return;
-  }
-
-  // Fetch user info to get gebruiker_id
-  fetch('https://api.ehb-match.me/auth/info', {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-  })
-    .then((response) => {
-      if (!response.ok) {
-        console.error('Fout bij ophalen van gebruikersinformatie:', response.status);
-        return response.text().then((text) => {
-          console.error('Response text:', text);
-          throw new Error('Fout bij ophalen van gebruikersinformatie');
-        });
-      }
-      return response.json();
-    })
-    .then((userInfo) => {
-      const gebruikerId = userInfo.user.id;
-
-      if (!gebruikerId) {
-        console.error('Gebruiker ID ontbreekt in de API-respons:', userInfo);
-        alert('Er is een probleem met het ophalen van uw gebruikersinformatie. Neem contact op met de beheerder.');
-        return;
-      }
-
-      // Fetch speeddates using gebruiker_id
-      fetch(`https://api.ehb-match.me/speeddates/accepted?id=${gebruikerId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      })
-        .then((response) => {
-          if (!response.ok) {
-            console.error('Response status:', response.status);
-            return response.text().then((text) => {
-              console.error('Response text:', text);
-              throw new Error('Fout bij ophalen van speeddates');
-            });
-          }
-          return response.json();
-        })
-        .then((data) => {
-          console.log('API Response Data:', data);
-          if (!Array.isArray(data)) {
-            console.warn('API response is not an array. Wrapping it in an array for processing.');
-            data = [data];
-          }
-
-          const speeddatesHtml = data.map((speeddate) => `
-            <tr>
-              <td>${speeddate.voornaam_student} ${speeddate.achternaam_student}</td>
-              <td>${new Date(speeddate.begin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(speeddate.einde).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
-              <td>${speeddate.lokaal}</td>
-              <td>${speeddate.akkoord ? 'Akkoord' : 'Niet akkoord'}</td>
-            </tr>
-          `).join('');
-
-          rootElement.querySelector('.bedrijf-profile-content').innerHTML = `
-            <div class="bedrijf-profile-form-container">
-              <h1 class="bedrijf-profile-title" style="text-align:center;width:100%;">Mijn Speeddates</h1>
-              <div class="speeddates-table-container">
-                <table class="speeddates-table">
-                  <thead>
-                    <tr>
-                      <th>Student</th>
-                      <th>Tijd</th>
-                      <th>Locatie</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${speeddatesHtml}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          `;
-        })
-        .catch((error) => {
-          console.error('Fout bij ophalen van speeddates:', error);
-          alert('Er is een fout opgetreden bij het ophalen van speeddates. Controleer de console voor meer details.');
-        });
-    })
-    .catch((error) => {
-      console.error('Fout bij ophalen van gebruikersinformatie:', error);
-      alert('Er is een fout opgetreden bij het ophalen van gebruikersinformatie. Controleer de console voor meer details.');
+  document.getElementById('nav-logout')?.addEventListener('click', () => {
+    dropdown.style.display = 'none';
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/');
     });
-}
+  });
 
-export function setupNavigationLinks() {
-  const links = {
-    profile: '/bedrijf-profiel',
-    speeddates: '/bedrijf-speeddates',
-    requests: '/bedrijf-speeddates-verzoeken',
-    settings: '/bedrijf-settings',
-    qr: '/bedrijf-qr-popup',
-  };
+  document.getElementById('privacy-policy')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/privacy');
+    });
+  });
 
-  document.querySelectorAll('.sidebar-link').forEach((link) => {
-    const route = link.getAttribute('data-route');
-    if (links[route]) {
-      link.addEventListener('click', () => {
-        window.location.href = links[route];
-      });
-    }
+  document.getElementById('contacteer-ons')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/contact');
+    });
   });
 }
-
-setupNavigationLinks();
