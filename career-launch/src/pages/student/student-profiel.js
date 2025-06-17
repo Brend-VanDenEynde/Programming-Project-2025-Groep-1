@@ -12,7 +12,7 @@ const defaultProfile = {
   achternaam: '',
   email: '',
   studiejaar: '1',
-  profiel_foto: defaultAvatar,
+  profiel_foto: '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4',
   linkedin: '',
   date_of_birth: '',
   opleiding_id: null,
@@ -24,7 +24,7 @@ function isoToDateString(isoString) {
 }
 
 function getProfielFotoUrl(profiel_foto) {
-  if (!profiel_foto || profiel_foto === 'null') return defaultAvatar;
+  if (!profiel_foto || profiel_foto === 'null') return 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
   if (profiel_foto.startsWith('http')) return profiel_foto;
   return 'https://gt0kk4fbet.ufs.sh/f/' + profiel_foto;
 }
@@ -112,12 +112,15 @@ export function renderStudentProfiel(
             <h1 class="student-profile-title">Profiel</h1>
             <form id="profileForm" class="student-profile-form" autocomplete="off" enctype="multipart/form-data">
               <div class="student-profile-avatar-section">
-                <img 
-                  src="${profiel_foto}" 
-                  alt="Profielfoto ${voornaam} ${achternaam}" 
-                  id="avatar-preview"
-                  class="student-profile-avatar"
-                />
+                <div class="student-profile-avatar-div" style="position:relative;">
+                  <img 
+                    src="${profiel_foto}" 
+                    alt="Profielfoto ${voornaam} ${achternaam}" 
+                    id="avatar-preview"
+                    class="student-profile-avatar"
+                  />
+                  <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
+                </div>
                 <input type="file" accept="image/*" id="photoInput" style="display:${readonlyMode ? 'none' : 'block'
     };margin-top:10px;">
               </div>
@@ -303,6 +306,32 @@ export function renderStudentProfiel(
       });
     }
 
+    // Delete overlay voor profielfoto
+    const profileAvatar = document.querySelector('.student-profile-avatar-div');
+    const photoInput = document.getElementById('photoInput');
+    const deleteOverlay = document.querySelector('.delete-overlay');
+    const studentAvatar = document.getElementById('avatar-preview');
+
+    let deleteProfilePicture = false;
+    let savedProfilePicture = profiel_foto; // Bewaar de originele profielfoto URL
+
+    profileAvatar.addEventListener('mouseenter', () => {
+      if (!readonlyMode && !deleteProfilePicture && studentAvatar.src !== 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4') {
+        deleteOverlay.style.display = 'flex';
+      }
+    });
+    profileAvatar.addEventListener('mouseleave', () => {
+      deleteOverlay.style.display = 'none';
+    });
+
+    deleteOverlay.addEventListener('click', async (e) => {
+      if (!readonlyMode && studentAvatar.src !== 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4') {
+        photoInput.files = null; // Reset file input
+        studentAvatar.src = 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'; // Reset to default avatar
+        deleteProfilePicture = true; // Set flag to delete profile picture
+      }
+    });
+
     // SAVE knop
     const saveBtn = document.getElementById('btn-save-profile');
     if (saveBtn) {
@@ -322,7 +351,7 @@ export function renderStudentProfiel(
         // Verzamel nieuwe waarden, alleen geldige velden en types
         const nieuweEmail = document.getElementById('emailInput').value;
         const oudeEmail = studentData.email;
-        let linkedinInput = formData.get('linkedin');
+        let linkedinInput = document.getElementById('linkedinInput').value;
         let linkedinValue = null;
         if (linkedinInput && linkedinInput.trim() !== '') {
           linkedinInput = linkedinInput.trim();
@@ -420,13 +449,25 @@ export function renderStudentProfiel(
           // 2. Profielfoto uploaden indien geselecteerd
           // Altijd alleen de key, nooit de URL of null!
           let profielFotoKey = null;
-          if (studentData.profiel_foto && typeof studentData.profiel_foto === 'string') {
+          if (studentData.profiel_foto && typeof studentData.profiel_foto === 'string' && !deleteProfilePicture) {
             if (studentData.profiel_foto.startsWith('http')) {
               const parts = studentData.profiel_foto.split('/');
               profielFotoKey = parts[parts.length - 1];
             } else if (studentData.profiel_foto !== 'null') {
               profielFotoKey = studentData.profiel_foto;
             }
+          }
+          if (deleteProfilePicture) {
+            // remove https://gt0kk4fbet.ufs.sh/f/ prefix if present
+            profielFotoKey = savedProfilePicture.replace('https://gt0kk4fbet.ufs.sh/f/', '');
+            const deleteResp = await fetch(`https://api.ehb-match.me/profielfotos/${profielFotoKey}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': 'Bearer ' + token,
+              },
+            });
+            console.log('Profielfoto verwijderd:', deleteResp);
+            profielFotoKey = null; // Verwijder profielfoto
           }
           const photoInput = document.getElementById('photoInput');
           if (photoInput && photoInput.files && photoInput.files.length > 0) {
@@ -467,7 +508,7 @@ export function renderStudentProfiel(
             date_of_birth: document.getElementById('birthDateInput').value, // <-- correct!
             linkedin: document.getElementById('linkedinInput').value,
             opleiding_id: parseInt(newOpleidingId, 10),
-            profiel_foto: profielFotoKey
+            profiel_foto: profielFotoKey ? profielFotoKey : '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4', // Gebruik alleen de key, nooit de URL of null
           };
           console.log("Payload met profielfoto key:", payload);
           const respStudent = await fetch(`https://api.ehb-match.me/studenten/${studentID}`, {
@@ -514,6 +555,7 @@ export function renderStudentProfiel(
           id: originalData.id, // altijd id behouden
           opleiding_id: '', // forceer selectie
         };
+        deleteProfilePicture = false; // Reset delete flag
         renderStudentProfiel(rootElement, resetData, false);
       });
     }
@@ -521,12 +563,13 @@ export function renderStudentProfiel(
     const cancelBtn = document.getElementById('btn-cancel-profile');
     if (cancelBtn) {
       cancelBtn.addEventListener('click', () => {
+        studentAvatar.src = savedProfilePicture; // Reset naar originele profielfoto
+        deleteProfilePicture = false; // Reset delete flag
         renderStudentProfiel(rootElement, studentData, true);
       });
     }
 
     // Preview afbeelding direct tonen als gebruiker een bestand kiest
-    const photoInput = document.getElementById('photoInput');
     if (photoInput) {
       photoInput.addEventListener('change', (e) => {
         const file = e.target.files && e.target.files[0];
