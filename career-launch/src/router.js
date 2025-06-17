@@ -71,7 +71,12 @@ const routes = {
     renderAdminProcessingCompanyDetail,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
-  '/bedrijf/bedrijf-profiel': renderBedrijfProfiel,
+  '/bedrijf/bedrijf-profiel': async (rootElement) => {
+    const bedrijfData = JSON.parse(
+      window.sessionStorage.getItem('bedrijfData') || '{}'
+    );
+    await renderBedrijfProfiel(rootElement, bedrijfData, true);
+  },
   '/bedrijf/zoek-criteria': renderSearchCriteriaBedrijf,
   '/bedrijf/speeddates': renderBedrijfSpeeddates,
   '/bedrijf/speeddates-verzoeken': renderBedrijfSpeeddatesRequests,
@@ -135,7 +140,6 @@ class Router {
     // Fallback naar de opgegeven route
     this.navigate(fallbackPath);
   }
-
   handleRouteChange() {
     let path = window.location.pathname;
     if (!path.startsWith('/')) path = '/' + path;
@@ -145,8 +149,15 @@ class Router {
     const route = this.routes[path] || this.routes['/404'];
     if (route) {
       this.rootElement.innerHTML = '';
-      // Optioneel: je kan extra data meegeven als je wil
-      route(this.rootElement);
+      // Handle both sync and async route functions
+      const result = route(this.rootElement);
+      if (result && typeof result.then === 'function') {
+        // It's a promise, handle async
+        result.catch((error) => {
+          console.error('Route error:', error);
+          this.rootElement.innerHTML = '<div>Error loading page</div>';
+        });
+      }
       this.updateTitle(path);
     }
   }
