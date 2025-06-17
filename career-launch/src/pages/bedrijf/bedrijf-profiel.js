@@ -60,7 +60,7 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
     try {
       const stored = window.sessionStorage.getItem('companyData');
       if (stored) bedrijfData = JSON.parse(stored);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const {
@@ -78,12 +78,15 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
         <h1 class="bedrijf-profile-title">Profiel</h1>
         <form id="profileForm" class="bedrijf-profile-form" autocomplete="off" enctype="multipart/form-data">
           <div class="bedrijf-profile-avatar-section">
-            <img 
-              src="${profiel_foto}" 
-              alt="Profielfoto ${naam}" 
-              id="avatar-preview"
-              class="bedrijf-profile-avatar"
-            />
+            <div class="student-profile-avatar-div" style="position:relative;">
+              <img 
+                src="${profiel_foto}" 
+                alt="Profielfoto ${naam}" 
+                id="avatar-preview"
+                class="bedrijf-profile-avatar"
+              />
+              <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
+            </div>
             <input type="file" accept="image/*" id="photoInput" style="display:${readonlyMode ? 'none' : 'block'};margin-top:10px;">
           </div>
           <div class="bedrijf-profile-form-group">
@@ -103,12 +106,11 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
             <input type="text" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/company/..." ${readonlyMode ? 'disabled' : ''}>
           </div>
           <div class="bedrijf-profile-buttons">
-            ${
-              readonlyMode
-                ? `<button id="btn-edit-profile" type="button" class="bedrijf-profile-btn bedrijf-profile-btn-secondary">EDIT</button>`
-                : `<button id="btn-save-profile" type="submit" class="bedrijf-profile-btn bedrijf-profile-btn-primary">SAVE</button>
+            ${readonlyMode
+      ? `<button id="btn-edit-profile" type="button" class="bedrijf-profile-btn bedrijf-profile-btn-secondary">EDIT</button>`
+      : `<button id="btn-save-profile" type="submit" class="bedrijf-profile-btn bedrijf-profile-btn-primary">SAVE</button>
                    <button id="btn-reset-profile" type="button" class="bedrijf-profile-btn bedrijf-profile-btn-secondary">RESET</button>`
-            }
+    }
           </div>
         </form>
       </div>
