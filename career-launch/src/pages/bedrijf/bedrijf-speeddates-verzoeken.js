@@ -186,8 +186,8 @@ async function deleteSpeeddate(afspraakId) {
   }
 
   try {
-    const response = await fetch(`https://api.ehb-match.me/speeddates/${afspraakId}`, {
-      method: 'DELETE',
+    const response = await fetch(`https://api.ehb-match.me/speeddates/reject/${afspraakId}`, {
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
