@@ -1,236 +1,126 @@
-import {
-  createBedrijfNavbar,
-  closeBedrijfNavbar,
-  setupBedrijfNavbarEvents,
-} from '../../utils/bedrijf-navbar.js';
-import {
-  fetchPendingSpeeddates,
-  acceptSpeeddateRequest,
-  rejectSpeeddateRequest,
-} from '../../utils/data-api.js';
+import logoIcon from '../../icons/favicon-32x32.png';
 
-export async function renderBedrijfSpeeddatesVerzoeken(
-  rootElement,
-  companyData = {}
-) {
-  // Show loading state
+export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
   rootElement.innerHTML = `
-    ${createBedrijfNavbar('requests')}
-      <div class="content-header">
-        <h1>Speeddate Verzoeken</h1>
-        <p>Beheer je inkomende speeddate verzoeken</p>
-      </div>
-      <div class="speeddates-verzoeken-content">
-        <div class="loading-state">
-          <p>Speeddate verzoeken laden...</p>
+    <div class="bedrijf-profile-container">
+      <header class="bedrijf-profile-header">
+        <div class="logo-section">
+          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
+          <span>EhB Career Launch</span>
         </div>
-      </div>
-    ${closeBedrijfNavbar()}
-  `;
-
-  try {
-    // Fetch pending speeddate requests from API
-    const apiVerzoeken = await fetchPendingSpeeddates(); // Transform API data to match expected format
-    const verzoeken = apiVerzoeken.map((request) => ({
-      id: request.id,
-      student: `${request.voornaam_student} ${request.achternaam_student}`,
-      studentId: request.id_student,
-      profielFoto: request.profiel_foto_student,
-      lokaal: request.lokaal,
-      tijd: new Date(request.begin).toLocaleTimeString('nl-NL', {
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-      datum: new Date(request.begin).toLocaleDateString('nl-NL'),
-      begin: request.begin,
-      einde: request.einde,
-      status:
-        request.akkoord === true
-          ? 'Geaccepteerd'
-          : request.akkoord === false
-          ? 'Geweigerd'
-          : 'In afwachting',
-      akkoord: request.akkoord,
-    }));
-
-    // Render the page with fetched data
-    renderPageContent(rootElement, verzoeken, companyData);
-  } catch (error) {
-    console.error('Error fetching speeddate requests:', error);
-    // Show error state
-    rootElement.innerHTML = `
-      ${createBedrijfNavbar('requests')}
-        <div class="content-header">
-          <h1>Speeddate Verzoeken</h1>
-          <p>Beheer je inkomende speeddate verzoeken</p>
-        </div>
-        <div class="speeddates-verzoeken-content">
-          <div class="error-state">
-            <p>Er is een fout opgetreden bij het laden van de speeddate verzoeken.</p>
-            <button onclick="location.reload()" class="btn-retry">Opnieuw proberen</button>
+        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
+        <ul id="burger-dropdown" class="bedrijf-profile-dropdown" style="display: none;">
+          <li><button id="nav-settings">Instellingen</button></li>
+          <li><button id="nav-logout">Log out</button></li>
+        </ul>
+      </header>
+      
+      <div class="bedrijf-profile-main">
+        <nav class="bedrijf-profile-sidebar">
+          <ul>
+            <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
+            <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
+            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
+            <li><button data-route="requests" class="sidebar-link active">Speeddates-verzoeken</button></li>
+            <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
+            <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
+          </ul>
+        </nav>
+        
+        <div class="bedrijf-profile-content">
+          <div class="bedrijf-profile-form-container">
+            <h1 class="bedrijf-profile-title">Speeddates-verzoeken</h1>
+            <p>Dit is de speeddates-verzoeken pagina. Hier komen de inkomende speeddates verzoeken.</p>
           </div>
         </div>
-      ${closeBedrijfNavbar()}
-    `;
-  }
-}
-
-function renderPageContent(rootElement, verzoeken, companyData) {
-  rootElement.innerHTML = `
-    ${createBedrijfNavbar('requests')}
-      <div class="content-header">
-        <h1>Speeddate Verzoeken</h1>
-        <p>Beheer je inkomende speeddate verzoeken</p>
       </div>
-
-      <div class="speeddates-verzoeken-content">
-        ${
-          verzoeken.length === 0
-            ? `<div class="no-requests">
-               <p>Nog geen speeddate verzoeken ontvangen.</p>
-             </div>`
-            : `<div class="speeddates-table-container">
-               <table class="speeddates-table">
-                 <thead>
-                   <tr>
-                     <th>Student</th>
-                     <th>Datum</th>
-                     <th>Tijd</th>
-                     <th>Lokaal</th>
-                     <th>Status</th>
-                     <th>Acties</th>
-                   </tr>
-                 </thead>
-                 <tbody>
-                   ${verzoeken
-                     .map(
-                       (v, index) => `
-                       <tr data-request-id="${v.id}">
-                         <td>
-                           <div class="student-info">
-                             ${
-                               v.profielFoto
-                                 ? `<img src="${v.profielFoto}" alt="${v.student}" class="student-avatar">`
-                                 : ''
-                             }
-                             <span>${v.student}</span>
-                           </div>
-                         </td>
-                         <td>${v.datum}</td>
-                         <td>${v.tijd}</td>
-                         <td>${v.lokaal}</td>
-                         <td><span class="status ${v.status
-                           .toLowerCase()
-                           .replace(' ', '-')}">${v.status}</span></td>
-                         <td>
-                           ${
-                             v.status === 'In afwachting'
-                               ? `<button class="btn-accept" onclick="acceptRequest(${v.id}, '${v.student}')">Accepteren</button>
-                                <button class="btn-decline" onclick="declineRequest(${v.id}, '${v.student}')">Weigeren</button>`
-                               : `<span class="status-final">${v.status}</span>`
-                           }
-                         </td>
-                       </tr>`
-                     )
-                     .join('')}
-                 </tbody>
-               </table>
-             </div>`
-        }
-      </div>
-    ${closeBedrijfNavbar()}
+      
+      <footer class="bedrijf-profile-footer">
+        <div class="footer-content">
+          <span>&copy; 2025 EhB Career Launch</span>
+          <div class="footer-links">
+            <a href="/privacy" id="privacy-policy">Privacy</a>
+            <a href="/contact" id="contacteer-ons">Contact</a>
+          </div>
+        </div>
+      </footer>
+    </div>
   `;
-  // Setup navbar events
-  setTimeout(() => {
-    setupBedrijfNavbarEvents();
-  }, 100);
-  // Setup request management functions
-  window.acceptRequest = async (requestId, studentName) => {
-    try {
-      // Show loading state
-      const buttonElement = document.querySelector(
-        `[onclick="acceptRequest(${requestId}, '${studentName}')"]`
-      );
-      if (buttonElement) {
-        buttonElement.disabled = true;
-        buttonElement.textContent = 'Accepteren...';
-      } // Call API to accept speeddate request
-      const result = await acceptSpeeddateRequest(requestId);
 
-      // Show success message with information about where to find the speeddate
-      alert(
-        `Speeddate verzoek van ${studentName} geaccepteerd!\n\nDe speeddate is nu toegevoegd aan je speeddates overzicht en is zichtbaar voor de student.`
-      );
+  // Sidebar navigation
+  document.querySelectorAll('.sidebar-link').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const route = e.currentTarget.getAttribute('data-route');
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        switch (route) {
+          case 'profile':
+            Router.navigate('/bedrijf/bedrijf-profiel');
+            break;
+          case 'search-criteria':
+            Router.navigate('/bedrijf/zoek-criteria');
+            break;
+          case 'speeddates':
+            Router.navigate('/bedrijf/speeddates');
+            break;
+          case 'requests':
+            Router.navigate('/bedrijf/speeddates-verzoeken');
+            break;
+          case 'studenten':
+            Router.navigate('/bedrijf/studenten');
+            break;
+          case 'qr':
+            Router.navigate('/bedrijf/qr-code');
+            break;
+        }
+      });
+    });
+  });
 
-      // Refresh the page to show updated data
-      await renderBedrijfSpeeddatesVerzoeken(rootElement, companyData);
-    } catch (error) {
-      console.error('Error accepting request:', error);
-      alert('Er is een fout opgetreden bij het accepteren van het verzoek.');
+  // Burger menu and other functionality
+  const burger = document.getElementById('burger-menu');
+  const dropdown = document.getElementById('burger-dropdown');
+  if (burger && dropdown) {
+    burger.addEventListener('click', (event) => {
+      event.stopPropagation();
+      dropdown.style.display =
+        dropdown.style.display === 'block' ? 'none' : 'block';
+    });
 
-      // Re-enable button on error
-      const buttonElement = document.querySelector(
-        `[onclick="acceptRequest(${requestId}, '${studentName}')"]`
-      );
-      if (buttonElement) {
-        buttonElement.disabled = false;
-        buttonElement.textContent = 'Accepteren';
+    document.addEventListener('click', (event) => {
+      if (!dropdown.contains(event.target) && event.target !== burger) {
+        dropdown.style.display = 'none';
       }
-    }
-  };
-  window.declineRequest = async (requestId, studentName) => {
-    try {
-      // Show loading state
-      const buttonElement = document.querySelector(
-        `[onclick="declineRequest(${requestId}, '${studentName}')"]`
-      );
-      if (buttonElement) {
-        buttonElement.disabled = true;
-        buttonElement.textContent = 'Weigeren...';
-      }
-
-      // Call API to reject speeddate request
-      const result = await rejectSpeeddateRequest(requestId);
-
-      // Show success message
-      alert(
-        `Speeddate verzoek van ${studentName} geweigerd.\n\nHet verzoek is afgewezen en de student is hiervan op de hoogte gesteld.`
-      );
-
-      // Refresh the page to show updated data
-      await renderBedrijfSpeeddatesVerzoeken(rootElement, companyData);
-    } catch (error) {
-      console.error('Error declining request:', error);
-      alert('Er is een fout opgetreden bij het weigeren van het verzoek.');
-
-      // Re-enable button on error
-      const buttonElement = document.querySelector(
-        `[onclick="declineRequest(${requestId}, '${studentName}')"]`
-      );
-      if (buttonElement) {
-        buttonElement.disabled = false;
-        buttonElement.textContent = 'Weigeren';
-      }
-    }
+    });
   }
 
-  // Footer links: gebruik alleen Router.navigate, geen hash of import
-  const privacyLink = document.getElementById('privacy-policy');
-  if (privacyLink) {
-    privacyLink.setAttribute('href', '#');
-    privacyLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopImmediatePropagation();
+  document.getElementById('nav-settings')?.addEventListener('click', () => {
+    dropdown.style.display = 'none';
+    alert('Instellingen komen binnenkort');
+  });
+
+  document.getElementById('nav-logout')?.addEventListener('click', () => {
+    dropdown.style.display = 'none';
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/');
+    });
+  });
+
+  document.getElementById('privacy-policy')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../../router.js').then((module) => {
+      const Router = module.default;
       Router.navigate('/privacy');
     });
-  }
-  const contactLink = document.getElementById('contacteer-ons');
-  if (contactLink) {
-    contactLink.setAttribute('href', '#');
-    contactLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopImmediatePropagation();
+  });
+
+  document.getElementById('contacteer-ons')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../../router.js').then((module) => {
+      const Router = module.default;
       Router.navigate('/contact');
     });
-  }
+  });
 }
