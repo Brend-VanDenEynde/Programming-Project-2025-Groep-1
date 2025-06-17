@@ -22,7 +22,7 @@ const defaultBedrijfProfile = {
   sector_bedrijf: '',
 };
 
-const token = window.sessionStorage.getItem('authToken');
+// Haal de token altijd dynamisch op binnen event handlers of functies waar nodig
 
 function getBedrijfLogoUrl(foto) {
   if (!foto || foto === 'null') return DEFAULT_AVATAR_URL;
@@ -375,10 +375,11 @@ export async function renderBedrijfProfiel(
           if (deleteProfilePicture && savedProfilePicture && savedProfilePicture !== DEFAULT_AVATAR_URL) {
             // remove https://gt0kk4fbet.ufs.sh/f/ prefix if present
             profielFotoKey = savedProfilePicture.replace(BASE_AVATAR_URL, '');
+            const currentToken = window.sessionStorage.getItem('authToken');
             const deleteResp = await fetch(`https://api.ehb-match.me/profielfotos/${profielFotoKey}`, {
               method: 'DELETE',
               headers: {
-                'Authorization': 'Bearer ' + token,
+                'Authorization': 'Bearer ' + currentToken,
               },
             });
             console.log('Profielfoto verwijderd:', deleteResp);
@@ -399,10 +400,11 @@ export async function renderBedrijfProfiel(
             // Gebruik altijd 'image' als veldnaam
             const fileForm = new FormData();
             fileForm.append('image', file);
+            const currentToken = window.sessionStorage.getItem('authToken');
             const uploadResp = await fetch('https://api.ehb-match.me/profielfotos', {
               method: 'POST',
               headers: {
-                'Authorization': 'Bearer ' + token,
+                'Authorization': 'Bearer ' + currentToken,
               },
               body: fileForm,
             });

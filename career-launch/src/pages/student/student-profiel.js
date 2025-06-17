@@ -319,22 +319,24 @@ export function renderStudentProfiel(
     let deleteProfilePicture = false;
     let savedProfilePicture = profiel_foto; // Bewaar de originele profielfoto URL
 
-    profileAvatar.addEventListener('mouseenter', () => {
-      if (!readonlyMode && !deleteProfilePicture && studentAvatar.src !== `https://gt0kk4fbet.ufs.sh/f/${DEFAULT_AVATAR_KEY}`) {
-        deleteOverlay.style.display = 'flex';
-      }
-    });
-    profileAvatar.addEventListener('mouseleave', () => {
-      deleteOverlay.style.display = 'none';
-    });
+    if (profileAvatar && deleteOverlay) {
+      profileAvatar.addEventListener('mouseenter', () => {
+        if (!readonlyMode && !deleteProfilePicture && studentAvatar.src !== `https://gt0kk4fbet.ufs.sh/f/${DEFAULT_AVATAR_KEY}`) {
+          deleteOverlay.style.display = 'flex';
+        }
+      });
+      profileAvatar.addEventListener('mouseleave', () => {
+        deleteOverlay.style.display = 'none';
+      });
 
-    deleteOverlay.addEventListener('click', async (e) => {
-      if (!readonlyMode && studentAvatar.src !== `https://gt0kk4fbet.ufs.sh/f/${DEFAULT_AVATAR_KEY}`) {
-        photoInput.value = ''; // Reset file input
-        studentAvatar.src = `https://gt0kk4fbet.ufs.sh/f/${DEFAULT_AVATAR_KEY}`; // Reset to default avatar
-        deleteProfilePicture = true; // Set flag to delete profile picture
-      }
-    });
+      deleteOverlay.addEventListener('click', async (e) => {
+        if (!readonlyMode && studentAvatar.src !== `https://gt0kk4fbet.ufs.sh/f/${DEFAULT_AVATAR_KEY}`) {
+          photoInput.value = ''; // Reset file input
+          studentAvatar.src = `https://gt0kk4fbet.ufs.sh/f/${DEFAULT_AVATAR_KEY}`; // Reset to default avatar
+          deleteProfilePicture = true; // Set flag to delete profile picture
+        }
+      });
+    }
 
     // SAVE knop
     const saveBtn = document.getElementById('btn-save-profile');
