@@ -324,3 +324,56 @@ export async function createSpeeddate(studentId, bedrijfId, datum) {
     throw error;
   }
 }
+
+/**
+ * Fetch bedrijf functions
+ * @param {number} bedrijfId - The company ID
+ * @returns {Promise<Array>} Array of functions
+ */
+export async function fetchBedrijfFuncties(bedrijfId) {
+  try {
+    const functies = await apiGet(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`
+    );
+    return functies;
+  } catch (error) {
+    console.error('Error fetching bedrijf functies:', error);
+    return [];
+  }
+}
+
+/**
+ * Fetch bedrijf skills
+ * @param {number} bedrijfId - The company ID
+ * @returns {Promise<Array>} Array of skills
+ */
+export async function fetchBedrijfSkills(bedrijfId) {
+  try {
+    const skills = await apiGet(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`
+    );
+    return skills;
+  } catch (error) {
+    console.error('Error fetching bedrijf skills:', error);
+    return [];
+  }
+}
+
+/**
+ * Fetch both functions and skills for a company
+ * @param {number} bedrijfId - The company ID
+ * @returns {Promise<Object>} Object with functies and skills arrays
+ */
+export async function fetchBedrijfFunctiesAndSkills(bedrijfId) {
+  try {
+    const [functies, skills] = await Promise.all([
+      fetchBedrijfFuncties(bedrijfId),
+      fetchBedrijfSkills(bedrijfId),
+    ]);
+
+    return { functies, skills };
+  } catch (error) {
+    console.error('Error fetching bedrijf functies and skills:', error);
+    return { functies: [], skills: [] };
+  }
+}

@@ -1,5 +1,7 @@
 // Admin login pagina
 import Router from '../../router.js';
+import { initializeAuthSession } from '../../utils/auth-api.js';
+import { apiPost, apiGet } from '../../utils/api.js';
 
 export function renderAdmin(rootElement) {
   rootElement.innerHTML = `
@@ -40,65 +42,50 @@ export function renderAdmin(rootElement) {
       email: email,
       password: password,
     };
-
     try {
-      // Make API call
-      const response = await fetch('https://api.ehb-match.me/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(loginData),
-      });
-
-      // Parse JSON response
-      const responseData = await response.json();
-
-      // Debugging: Log API responses
-      console.log('Login Response:', responseData); // Display the message from the API response in the label
-      
-      errorMessage.textContent =
-        responseData.message || 'Er is een fout opgetreden.';
-      errorMessage.style.display = 'block';
-      errorMessage.style.backgroundColor = 'transparent'; // Remove background styling
-
-      if (response.ok) {
-        // Store important information in session storage
-        sessionStorage.setItem('authToken', responseData.accessToken);
-        sessionStorage.setItem('accessToken', responseData.accessToken);
-        sessionStorage.setItem(
+      // Make API call using new authentication system
+      const responseData = await apiPost(
+        'https://api.ehb-match.me/auth/login',
+        loginData
+      ); // Initialize authentication session with automatic token refresh
+      // For admin login, we store the accessToken
+      window.sessionStorage.setItem('accessToken', responseData.accessToken);
+      window.sessionStorage.setItem('authToken', responseData.accessToken);
+      if (responseData.accessTokenExpiresAt) {
+        window.sessionStorage.setItem(
           'accessTokenExpiresAt',
           responseData.accessTokenExpiresAt
         );
-        // Set adminLoggedIn session variable
-        sessionStorage.setItem('adminLoggedIn', 'true');
+      }
 
-        // Make GET request to fetch additional info
-        const infoResponse = await fetch('https://api.ehb-match.me/auth/info', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${responseData.accessToken}`,
-          },
-        });
+      // Set adminLoggedIn session variable
+      sessionStorage.setItem('adminLoggedIn', 'true');
 
-        const infoData = await infoResponse.json();
+      // Initialize automatic token refresh monitoring
+      initializeAuthSession(); // Make GET request to fetch additional info using new API utilities
+      const infoData = await apiGet('https://api.ehb-match.me/auth/info');
 
-        // Debugging: Log user type
-        console.log('User Type:', infoData.user.type);
+      // Debugging: Log user type
+      console.log('User Type:', infoData.user.type);
 
-        // Check user type
-        if (infoData.user.type === 1) {
-          // User is an admin, proceed to dashboard
-          Router.navigate('/admin-dashboard');
-        } else {
-          // User is not an admin, display error message
-          errorMessage.textContent = 'Je bent geen admin!';
-          errorMessage.style.display = 'block';
+      // Check user type
+      if (infoData.user.type === 1) {
+        // Store admin username if available
+        if (infoData.user.email) {
+          sessionStorage.setItem('adminUsername', infoData.user.email);
         }
+
+        // User is an admin, proceed to dashboard
+        Router.navigate('/admin-dashboard');
+      } else {
+        // User is not an admin, display error message
+        errorMessage.textContent = 'Je bent geen admin!';
+        errorMessage.style.display = 'block';
       }
     } catch (error) {
       // Handle errors
       errorMessage.textContent =
+        error.message ||
         'Er is een fout opgetreden bij het maken van de API-aanroep.';
       errorMessage.style.display = 'block';
       errorMessage.style.backgroundColor = 'transparent'; // Remove background styling

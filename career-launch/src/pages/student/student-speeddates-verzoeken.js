@@ -1,65 +1,61 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
+import { apiGet, apiPost } from '../../utils/api.js';
+import { fetchBedrijfFunctiesAndSkills } from '../../utils/data-api.js';
 import Router from '../../router.js';
 
-// API helpers
+// API helpers with automatic token refresh
 async function fetchPendingSpeeddates() {
-  const token = sessionStorage.getItem('authToken');
-  if (!token) {
-    renderLogin(document.body);
-    return [];
+  try {
+    return await apiGet('https://api.ehb-match.me/speeddates/pending');
+  } catch (error) {
+    console.error('Error fetching pending speeddates:', error);
+    if (error.message.includes('Authentication failed')) {
+      renderLogin(document.body);
+      return [];
+    }
+    throw new Error(`Fout bij ophalen: ${error.message}`);
   }
-  const resp = await fetch('https://api.ehb-match.me/speeddates/pending', {
-    headers: { Authorization: 'Bearer ' + token }
-  });
-  if (!resp.ok) throw new Error(`Fout bij ophalen: ${resp.status}`);
-  return await resp.json();
 }
+
 async function acceptSpeeddate(id) {
-  const token = sessionStorage.getItem('authToken');
-  const resp = await fetch(`https://api.ehb-match.me/speeddates/accept/${id}`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!resp.ok) throw new Error('Accepteren mislukt');
+  try {
+    await apiPost(`https://api.ehb-match.me/speeddates/accept/${id}`);
+  } catch (error) {
+    console.error('Error accepting speeddate:', error);
+    throw new Error('Accepteren mislukt');
+  }
 }
+
 async function rejectSpeeddate(id) {
-  const token = sessionStorage.getItem('authToken');
-  const resp = await fetch(`https://api.ehb-match.me/speeddates/reject/${id}`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if (!resp.ok) throw new Error('Weigeren mislukt');
+  try {
+    await apiPost(`https://api.ehb-match.me/speeddates/reject/${id}`);
+  } catch (error) {
+    console.error('Error rejecting speeddate:', error);
+    throw new Error('Afwijzen mislukt');
+  }
 }
+
 async function fetchFunctiesSkills(bedrijfId) {
-  const token = sessionStorage.getItem('authToken');
-  let functies = [];
-  let skills = [];
-  try {
-    const resFuncties = await fetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`, {
-      headers: { Authorization: 'Bearer ' + token }
-    });
-    if (resFuncties.ok) functies = await resFuncties.json();
-  } catch {}
-  try {
-    const resSkills = await fetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`, {
-      headers: { Authorization: 'Bearer ' + token }
-    });
-    if (resSkills.ok) skills = await resSkills.json();
-  } catch {}
-  return { functies, skills };
+  return await fetchBedrijfFunctiesAndSkills(bedrijfId);
 }
 
 function getSortArrow(key, currentSort) {
-  const found = currentSort.find(s => s.key === key);
+  const found = currentSort.find((s) => s.key === key);
   // Altijd ruimte voor de sorteerdriehoek
-  return `<span class="sort-arrow">${found ? (found.asc ? '▲' : '▼') : ''}</span>`;
+  return `<span class="sort-arrow">${
+    found ? (found.asc ? '▲' : '▼') : ''
+  }</span>`;
 }
 function formatTime(dtString) {
   if (!dtString) return '-';
   const dt = new Date(dtString);
-  return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  return dt.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
 }
 function formatUTCTime(isoString) {
   const d = new Date(isoString);
@@ -122,16 +118,22 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
   `;
 
   function getSortArrow(key) {
-    const found = currentSort.find(s => s.key === key);
+    const found = currentSort.find((s) => s.key === key);
     // Altijd ruimte voor de sorteerdriehoek
-    return `<span class="sort-arrow">${found ? (found.asc ? '▲' : '▼') : ''}</span>`;
+    return `<span class="sort-arrow">${
+      found ? (found.asc ? '▲' : '▼') : ''
+    }</span>`;
   }
 
   function formatTimeFromBegin(begin) {
     if (!begin) return '-';
     const dt = new Date(begin);
     if (isNaN(dt.getTime())) return '-';
-    return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+    return dt.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
   }
 
   function compareValues(a, b, key) {
@@ -157,7 +159,9 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
 
   function renderTable(verzoeken) {
     if (!verzoeken || verzoeken.length === 0) {
-      document.getElementById('speeddates-requests-table').innerHTML = `<p style="text-align:center;">Nog geen speeddates-verzoeken gevonden.</p>`;
+      document.getElementById(
+        'speeddates-requests-table'
+      ).innerHTML = `<p style="text-align:center;">Nog geen speeddates-verzoeken gevonden.</p>`;
       return;
     }
     if (!currentSort.length) currentSort = [{ key: 'begin', asc: true }];
@@ -170,9 +174,15 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
       return 0;
     });
     // --- RENDEREN ---
-    const rows = sorted.map(v => `
+    const rows = sorted
+      .map(
+        (v) => `
       <tr>
-        <td><span class="bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(v)}' style="color:#0077cc;cursor:pointer;text-decoration:underline;">${v.naam_bedrijf}</span></td>
+        <td><span class="bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(
+          v
+        )}' style="color:#0077cc;cursor:pointer;text-decoration:underline;">${
+          v.naam_bedrijf
+        }</span></td>
         <td>${v.lokaal || '-'}</td>
         <td>${formatUTCTime(v.begin)}</td>
         <td class="status-cell">
@@ -180,15 +190,26 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
           <button class="deny-btn" data-id="${v.id}">Weiger</button>
         </td>
       </tr>
-    `).join('');
+    `
+      )
+      .join('');
     document.getElementById('speeddates-requests-table').innerHTML = `
       <div class="speeddates-table-container">
         <table class="speeddates-table">
           <thead>
             <tr>
-              <th class="sortable" data-key="naam_bedrijf">Bedrijf${getSortArrow('naam_bedrijf', currentSort)}</th>
-              <th class="sortable" data-key="lokaal">Lokaal${getSortArrow('lokaal', currentSort)}</th>
-              <th class="sortable" data-key="begin">Tijd${getSortArrow('begin', currentSort)}</th>
+              <th class="sortable" data-key="naam_bedrijf">Bedrijf${getSortArrow(
+                'naam_bedrijf',
+                currentSort
+              )}</th>
+              <th class="sortable" data-key="lokaal">Lokaal${getSortArrow(
+                'lokaal',
+                currentSort
+              )}</th>
+              <th class="sortable" data-key="begin">Tijd${getSortArrow(
+                'begin',
+                currentSort
+              )}</th>
               <th>Status</th>
             </tr>
           </thead>
@@ -197,13 +218,13 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
       </div>
     `;
     // --- EVENTS op de headers voor sortering ---
-    document.querySelectorAll('.sortable').forEach(th => {
+    document.querySelectorAll('.sortable').forEach((th) => {
       th.addEventListener('mousedown', (e) => {
         if (e.shiftKey) e.preventDefault(); // geen text-select bij shift
       });
       th.addEventListener('click', (e) => {
         const key = th.dataset.key;
-        const found = currentSort.find(s => s.key === key);
+        const found = currentSort.find((s) => s.key === key);
         if (!e.shiftKey) {
           // Gewoon klik: alleen deze kolom (toggle asc/desc)
           if (found) {
@@ -224,24 +245,28 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
       });
     });
     // Knoppen event handlers
-    document.querySelectorAll('.accept-btn').forEach(btn => {
+    document.querySelectorAll('.accept-btn').forEach((btn) => {
       btn.addEventListener('click', async (e) => {
         const id = e.currentTarget.dataset.id;
         try {
           await acceptSpeeddate(id);
           const updated = await fetchPendingSpeeddates();
           renderTable(updated);
-        } catch (err) { alert('Fout bij accepteren: ' + err.message); }
+        } catch (err) {
+          alert('Fout bij accepteren: ' + err.message);
+        }
       });
     });
-    document.querySelectorAll('.deny-btn').forEach(btn => {
+    document.querySelectorAll('.deny-btn').forEach((btn) => {
       btn.addEventListener('click', async (e) => {
         const id = e.currentTarget.dataset.id;
         try {
           await rejectSpeeddate(id);
           const updated = await fetchPendingSpeeddates();
           renderTable(updated);
-        } catch (err) { alert('Fout bij weigeren: ' + err.message); }
+        } catch (err) {
+          alert('Fout bij weigeren: ' + err.message);
+        }
       });
     });
     document.querySelectorAll('.bedrijf-popup-trigger').forEach((el) => {
@@ -253,9 +278,11 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
   }
 
   fetchPendingSpeeddates()
-    .then(verzoeken => renderTable(verzoeken))
-    .catch(err => {
-      document.getElementById('speeddates-requests-table').innerHTML = `<p style="color:red;">Fout: ${err.message}</p>`;
+    .then((verzoeken) => renderTable(verzoeken))
+    .catch((err) => {
+      document.getElementById(
+        'speeddates-requests-table'
+      ).innerHTML = `<p style="color:red;">Fout: ${err.message}</p>`;
     });
 
   // --- Sidebar navigatie uniform maken ---
@@ -374,9 +401,22 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     popup.innerHTML = `
       <button id=\"popup-close\" style=\"position:absolute;top:10px;right:12px;font-size:1.4rem;background:none;border:none;cursor:pointer;\">×</button>
       <h2 style=\"margin-top:0;\">${s.naam_bedrijf}</h2>
-      <p><strong>Tijd:</strong> ${s.begin ? new Date(s.begin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Onbekend'}</p>
+      <p><strong>Tijd:</strong> ${
+        s.begin
+          ? new Date(s.begin).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })
+          : 'Onbekend'
+      }</p>
       <p><strong>Locatie:</strong> ${s.lokaal || 'Onbekend'}</p>
-      <p><strong>Status:</strong> ${s.akkoord !== undefined ? (s.akkoord ? 'Geaccepteerd' : 'In afwachting') : '-'}</p>
+      <p><strong>Status:</strong> ${
+        s.akkoord !== undefined
+          ? s.akkoord
+            ? 'Geaccepteerd'
+            : 'In afwachting'
+          : '-'
+      }</p>
       <p><strong>LinkedIn:</strong> <a id="popup-linkedin" href="#" target="_blank">Laden...</a></p>
       <div id="popup-skills"><em>Skills laden...</em></div>
     `;
@@ -391,18 +431,24 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     if (bedrijfId) {
       const { functies, skills } = await fetchFunctiesSkills(bedrijfId);
       const skillsHtml = skills.length
-        ? skills.map(skill =>
-            `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#f1f1f1;font-size:0.85rem;\">${skill.naam}</span>`
-          ).join('')
+        ? skills
+            .map(
+              (skill) =>
+                `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#f1f1f1;font-size:0.85rem;\">${skill.naam}</span>`
+            )
+            .join('')
         : '<em>Geen skills beschikbaar</em>';
-      document.getElementById('popup-skills').innerHTML = `<strong>Skills:</strong><div style=\"margin-top:0.4rem;\">${skillsHtml}</div>`;
+      document.getElementById(
+        'popup-skills'
+      ).innerHTML = `<strong>Skills:</strong><div style=\"margin-top:0.4rem;\">${skillsHtml}</div>`;
     }
     // LinkedIn
     if (s.linkedin) {
       document.getElementById('popup-linkedin').textContent = s.linkedin;
       document.getElementById('popup-linkedin').href = s.linkedin;
     } else {
-      document.getElementById('popup-linkedin').textContent = 'Niet beschikbaar';
+      document.getElementById('popup-linkedin').textContent =
+        'Niet beschikbaar';
       document.getElementById('popup-linkedin').removeAttribute('href');
     }
   }

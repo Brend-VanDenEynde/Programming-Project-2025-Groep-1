@@ -1,26 +1,21 @@
 import logoIcon from '../../icons/favicon-32x32.png';
+import { apiGet, apiPost } from '../../utils/api.js';
+import { renderLogin } from '../login.js';
 
-// Functie om pending speeddate data op te halen van de API
-async function fetchPendingSpeeddateData(bedrijfId, token) {
+// Functie om pending speeddate data op te halen van de API met automatische token refresh
+async function fetchPendingSpeeddateData(bedrijfId) {
   const url = `https://api.ehb-match.me/speeddates/pending?id=${bedrijfId}`;
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  };
 
   try {
-    const response = await fetch(url, { headers });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
+    const data = await apiGet(url);
     // Structureer de data voor eenvoudige rendering
     return formatPendingSpeeddateData(data);
   } catch (error) {
     console.error('Fout bij ophalen van pending speeddate data:', error);
+    if (error.message.includes('Authentication failed')) {
+      renderLogin(document.body);
+      return [];
+    }
     throw error;
   }
 }
@@ -153,29 +148,8 @@ function renderPendingSpeeddatesList(speeddates) {
 
 // Functie om een speeddate te accepteren
 async function acceptSpeeddate(afspraakId) {
-  const token = window.sessionStorage.getItem('authToken');
-
-  if (!token) {
-    alert('Geen geldige authenticatie. Log opnieuw in.');
-    return;
-  }
-
   try {
-    const response = await fetch(
-      `https://api.ehb-match.me/speeddates/accept/${afspraakId}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
-    }
+    await apiPost(`https://api.ehb-match.me/speeddates/accept/${afspraakId}`);
 
     // Navigeer naar de speeddates pagina na succesvolle acceptatie
     alert('Speeddate succesvol geaccepteerd!');
@@ -187,6 +161,10 @@ async function acceptSpeeddate(afspraakId) {
     });
   } catch (error) {
     console.error('Fout bij accepteren van speeddate:', error);
+    if (error.message.includes('Authentication failed')) {
+      renderLogin(document.body);
+      return;
+    }
     alert('Er is een fout opgetreden bij het accepteren van de speeddate.');
   }
 }
@@ -197,36 +175,18 @@ async function deleteSpeeddate(afspraakId) {
     return;
   }
 
-  const token = window.sessionStorage.getItem('authToken');
-
-  if (!token) {
-    alert('Geen geldige authenticatie. Log opnieuw in.');
-    return;
-  }
-
   try {
-    const response = await fetch(
-      `https://api.ehb-match.me/speeddates/reject/${afspraakId}`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('API Error Response:', errorText);
-      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
-    }
+    await apiPost(`https://api.ehb-match.me/speeddates/reject/${afspraakId}`);
 
     // Herlaad de data na succesvolle afwijzing
     await loadPendingSpeeddateData();
     alert('Speeddate succesvol verwijderd!');
   } catch (error) {
     console.error('Fout bij afwijzen van speeddate:', error);
+    if (error.message.includes('Authentication failed')) {
+      renderLogin(document.body);
+      return;
+    }
     alert('Er is een fout opgetreden bij het afwijzen van de speeddate.');
   }
 }
@@ -242,15 +202,6 @@ async function loadPendingSpeeddateData() {
   if (!contentDiv) return;
 
   try {
-    // Haal authToken uit sessionStorage
-    const token = window.sessionStorage.getItem('authToken');
-
-    if (!token) {
-      contentDiv.innerHTML =
-        '<p class="error">Geen authenticatie token gevonden. <a href="#login">Log opnieuw in</a>.</p>';
-      return;
-    }
-
     // Haal companyData uit sessionStorage voor bedrijf ID
     const companyDataString = window.sessionStorage.getItem('companyData');
     let bedrijfId;
@@ -273,12 +224,16 @@ async function loadPendingSpeeddateData() {
     }
 
     // Haal pending speeddate data op
-    const speeddates = await fetchPendingSpeeddateData(bedrijfId, token);
+    const speeddates = await fetchPendingSpeeddateData(bedrijfId);
 
     // Render de pending speeddate lijst
     contentDiv.innerHTML = renderPendingSpeeddatesList(speeddates);
   } catch (error) {
     console.error('Fout bij laden van pending speeddate data:', error);
+    if (error.message.includes('Authentication failed')) {
+      renderLogin(document.body);
+      return;
+    }
     contentDiv.innerHTML =
       '<p class="error">Er is een fout opgetreden: ' + error.message + '</p>';
   }

@@ -1,5 +1,7 @@
 // Admin login pagina
 import Router from '../../router.js';
+import { initializeAuthSession } from '../../utils/auth-api.js';
+import { apiPost, apiGet } from '../../utils/api.js';
 
 export function renderAdmin(rootElement) {
   rootElement.innerHTML = `

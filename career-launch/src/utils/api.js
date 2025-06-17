@@ -7,7 +7,9 @@ import {
   refreshToken,
   isTokenExpiredError,
   retryWithTokenRefresh,
+  clearAuthData,
 } from './auth-api.js';
+import Router from '../router.js';
 
 /**
  * Makes an authenticated API call with automatic token refresh on 401 errors
@@ -66,12 +68,22 @@ export async function authenticatedFetch(url, options = {}) {
         const retryResponse = await fetch(url, {
           ...requestOptions,
           headers: newHeaders,
-        });
-
-        return retryResponse;
+        });        return retryResponse;
       } else {
         console.error('Token refresh failed:', refreshResult.error);
-        throw new Error('Authentication failed - please log in again');
+        
+        // Clear authentication data since refresh failed
+        clearAuthData();
+        
+        // Determine appropriate login page based on current route
+        const currentPath = window.location.pathname;
+        const isAdminRoute = currentPath.includes('/admin');
+        const loginPath = isAdminRoute ? '/admin-login' : '/login';
+        
+        console.log(`Redirecting to ${loginPath} due to authentication failure`);
+        Router.navigate(loginPath);
+        
+        throw new Error('Authentication failed - redirecting to login');
       }
     }
 

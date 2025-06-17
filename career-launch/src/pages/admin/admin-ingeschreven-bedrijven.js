@@ -1,6 +1,7 @@
 // Admin ingeschreven bedrijven pagina
 import Router from '../../router.js';
 import { logoutUser } from '../../utils/auth-api.js';
+import { apiGet } from '../../utils/api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 
 export async function renderAdminIngeschrevenBedrijven(rootElement) {
@@ -102,22 +103,14 @@ export async function renderAdminIngeschrevenBedrijven(rootElement) {
     e.preventDefault();
     Router.navigate('/contact');
   });
-  // Fetch approved companies from API
-  const accessToken = sessionStorage.getItem('accessToken');
+
+  // Fetch approved companies from API using new API utilities
   let allCompanies = []; // Store all companies for filtering
 
   try {
-    const response = await fetch(
-      'https://api.ehb-match.me/bedrijven/goedgekeurd',
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
+    allCompanies = await apiGet(
+      'https://api.ehb-match.me/bedrijven/goedgekeurd'
     );
-
-    allCompanies = await response.json();
     renderCompanyList(allCompanies); // Initial render of all companies
   } catch (error) {
     console.error('Error fetching approved companies:', error);

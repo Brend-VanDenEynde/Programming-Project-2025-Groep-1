@@ -3,6 +3,7 @@ import Router from '../../router.js';
 import defaultAvatar from '../../images/default.png';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
+import { apiGet } from '../../utils/api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 
 export async function renderAdminStudentDetail(rootElement) {
@@ -94,29 +95,12 @@ export async function renderAdminStudentDetail(rootElement) {
       const route = btn.dataset.route;
       Router.navigate(route);
     });
-  });
-
-  // Fetch student data from API
-  const accessToken = sessionStorage.getItem('accessToken');
+  }); // Fetch student data from API using new API utilities
   try {
     // Fetch fresh data from the API
-    const response = await fetch(
-      `https://api.ehb-match.me/studenten/${studentId}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        // Disable caching to always get fresh data
-        cache: 'no-store',
-      }
+    const studentData = await apiGet(
+      `https://api.ehb-match.me/studenten/${studentId}`
     );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const studentData = await response.json();
 
     // Render the full page with the fetched data
     renderFullDetailPage(rootElement, studentData, adminUsername);

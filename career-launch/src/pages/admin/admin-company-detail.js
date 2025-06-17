@@ -3,6 +3,7 @@ import Router from '../../router.js';
 import defaultCompanyLogo from '../../images/defaultlogo.webp';
 import { logoutUser } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
+import { apiGet } from '../../utils/api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 
 export async function renderAdminCompanyDetail(rootElement) {
@@ -94,29 +95,12 @@ export async function renderAdminCompanyDetail(rootElement) {
       const route = btn.dataset.route;
       Router.navigate(route);
     });
-  });
-
-  // Fetch company data from API
-  const accessToken = sessionStorage.getItem('accessToken');
+  }); // Fetch company data from API using new API utilities
   try {
     // Fetch fresh data from the API
-    const response = await fetch(
-      `https://api.ehb-match.me/bedrijven/${companyId}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        // Disable caching to always get fresh data
-        cache: 'no-store',
-      }
+    const companyData = await apiGet(
+      `https://api.ehb-match.me/bedrijven/${companyId}`
     );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const companyData = await response.json();
 
     // Render the full page with the fetched data
     renderFullDetailPage(rootElement, companyData, adminUsername);
@@ -378,26 +362,11 @@ async function openSpeedDatesModal() {
 
   // Clear existing content
   speedDatesList.innerHTML = '';
-
   try {
-    // Fetch speeddates data from API with company ID
-    const accessToken = sessionStorage.getItem('accessToken');
-    const response = await fetch(
-      `https://api.ehb-match.me/speeddates?id=${companyId}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        cache: 'no-store',
-      }
+    // Fetch speeddates data from API with company ID using new API utilities
+    const speeddates = await apiGet(
+      `https://api.ehb-match.me/speeddates?id=${companyId}`
     );
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch speeddates data');
-    }
-
-    const speeddates = await response.json();
 
     if (speeddates.length === 0) {
       speedDatesList.innerHTML =

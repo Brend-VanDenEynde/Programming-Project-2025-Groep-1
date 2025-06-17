@@ -1,6 +1,7 @@
 // Admin ingeschreven studenten pagina
 import Router from '../../router.js';
 import { logoutUser } from '../../utils/auth-api.js';
+import { apiGet } from '../../utils/api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 
 export async function renderAdminIngeschrevenStudenten(rootElement) {
@@ -97,24 +98,16 @@ export async function renderAdminIngeschrevenStudenten(rootElement) {
     e.preventDefault();
     Router.navigate('/privacy');
   });
-
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
     Router.navigate('/contact');
   });
-  // Fetch students data from API
-  const accessToken = sessionStorage.getItem('accessToken');
+
+  // Fetch students data from API using new API utilities
   let allStudents = []; // Store all students for filtering
 
   try {
-    const response = await fetch('https://api.ehb-match.me/studenten/', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    allStudents = await response.json();
+    allStudents = await apiGet('https://api.ehb-match.me/studenten/');
     renderStudentList(allStudents); // Initial render of all students
   } catch (error) {
     console.error('Error fetching students:', error);

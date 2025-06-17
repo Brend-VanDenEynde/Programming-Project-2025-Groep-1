@@ -3,6 +3,13 @@
  * This file contains functions for login, logout, and authentication management
  */
 
+// Token refresh interval (check every 5 minutes)
+const TOKEN_REFRESH_INTERVAL = 5 * 60 * 1000;
+// Refresh token when it expires in the next 2 minutes
+const TOKEN_REFRESH_THRESHOLD = 2 * 60 * 1000;
+
+let tokenRefreshInterval = null;
+
 /**
  * Calls the logout endpoint to log the user out
  * @returns {Promise<Object>} API response
@@ -67,19 +74,36 @@ export async function refreshToken() {
         }),
       },
       credentials: 'include', // Include cookies in the request (for refresh token)
-    });
-
-    if (!response.ok) {
-      throw new Error(`Token refresh failed with status ${response.status}`);
+    });    if (!response.ok) {
+      let errorMessage = `Token refresh failed with status ${response.status}`;
+      
+      if (response.status === 401) {
+        errorMessage = 'Refresh token expired or invalid - login required';
+      }
+      
+      // Try to get error details from response
+      try {
+        const errorData = await response.json();
+        if (errorData.message) {
+          errorMessage += `: ${errorData.message}`;
+        }
+      } catch (e) {
+        // Ignore JSON parsing errors
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
-    console.log('Token refresh successful:', data);
-
-    // Update the stored auth token if a new one was provided
+    console.log('Token refresh successful:', data); // Update the stored auth token if a new one was provided
     if (data.accessToken) {
       window.sessionStorage.setItem('authToken', data.accessToken);
       console.log('Auth token updated in session storage');
+    }
+
+    // Store token expiry time for proactive refresh
+    if (data.accessTokenExpiresAt) {
+      setTokenExpiryTime(data.accessTokenExpiresAt);
     }
 
     return {
@@ -89,13 +113,22 @@ export async function refreshToken() {
       accessToken: data.accessToken,
       accessTokenExpiresAt: data.accessTokenExpiresAt,
       refreshTokenExpiresAt: data.refreshTokenExpiresAt,
-    };
-  } catch (error) {
+    };  } catch (error) {
     console.error('Token refresh error:', error);
+    
+    // Additional logging for common issues
+    if (error.message.includes('401')) {
+      console.warn('Token refresh failed with 401 - this usually means:');
+      console.warn('1. Refresh token has expired');
+      console.warn('2. Refresh token cookie is missing or invalid');
+      console.warn('3. User needs to log in again');
+    }
+    
     return {
       success: false,
       message: 'Failed to refresh token',
       error: error.message,
+      requiresLogin: error.message.includes('401'),
     };
   }
 }
@@ -104,13 +137,18 @@ export async function refreshToken() {
  * Clears all authentication-related data from session storage
  */
 export function clearAuthData() {
+  // Stop token refresh monitoring
+  stopTokenRefreshMonitoring();
+
   // Remove all authentication-related data
   window.sessionStorage.removeItem('authToken');
+  window.sessionStorage.removeItem('tokenExpiresAt');
   window.sessionStorage.removeItem('studentData');
   window.sessionStorage.removeItem('companyData');
   window.sessionStorage.removeItem('userType');
   window.sessionStorage.removeItem('adminLoggedIn');
   window.sessionStorage.removeItem('adminUsername');
+  window.sessionStorage.removeItem('accessToken');
 
   console.log('Authentication data cleared');
 }
@@ -349,4 +387,122 @@ export async function updateBedrijfProfile(bedrijfID, updateData) {
       error: error.message,
     };
   }
+}
+
+/**
+ * Starts the automatic token refresh monitoring
+ * This will periodically check if the token needs refreshing and do it proactively
+ */
+export function startTokenRefreshMonitoring() {
+  if (tokenRefreshInterval) {
+    clearInterval(tokenRefreshInterval);
+  }
+
+  tokenRefreshInterval = setInterval(async () => {
+    if (isAuthenticated() && shouldRefreshToken()) {
+      console.log('Proactively refreshing token before expiry...');
+      try {
+        await refreshToken();
+        console.log('Proactive token refresh successful');
+      } catch (error) {
+        console.error('Proactive token refresh failed:', error);
+        // Don't log out automatically on proactive refresh failure
+        // Let the actual API calls handle expired tokens
+      }
+    }
+  }, TOKEN_REFRESH_INTERVAL);
+
+  console.log('Token refresh monitoring started');
+}
+
+/**
+ * Stops the automatic token refresh monitoring
+ */
+export function stopTokenRefreshMonitoring() {
+  if (tokenRefreshInterval) {
+    clearInterval(tokenRefreshInterval);
+    tokenRefreshInterval = null;
+    console.log('Token refresh monitoring stopped');
+  }
+}
+
+/**
+ * Checks if the token should be refreshed based on expiry time
+ * @returns {boolean} True if token should be refreshed
+ */
+export function shouldRefreshToken() {
+  const expiryTime = getTokenExpiryTime();
+  if (!expiryTime) return false;
+
+  const now = Date.now();
+  const timeUntilExpiry = expiryTime - now;
+
+  return timeUntilExpiry <= TOKEN_REFRESH_THRESHOLD;
+}
+
+/**
+ * Gets the token expiry time from session storage
+ * @returns {number|null} Expiry time in milliseconds or null if not available
+ */
+export function getTokenExpiryTime() {
+  const expiryString = window.sessionStorage.getItem('tokenExpiresAt');
+  if (!expiryString) return null;
+
+  const expiryTime = parseInt(expiryString, 10);
+  return isNaN(expiryTime) ? null : expiryTime;
+}
+
+/**
+ * Sets the token expiry time in session storage
+ * @param {string|number} expiryTime - Token expiry time (ISO string or timestamp)
+ */
+export function setTokenExpiryTime(expiryTime) {
+  if (!expiryTime) return;
+
+  let timestamp;
+  if (typeof expiryTime === 'string') {
+    timestamp = new Date(expiryTime).getTime();
+  } else {
+    timestamp = expiryTime;
+  }
+
+  if (!isNaN(timestamp)) {
+    window.sessionStorage.setItem('tokenExpiresAt', timestamp.toString());
+    console.log('Token expiry time stored:', new Date(timestamp).toISOString());
+  }
+}
+
+/**
+ * Initializes authentication data and starts token monitoring
+ * Call this function after a successful login to set up automatic token refresh
+ * @param {string} token - The access token
+ * @param {string|number} expiresAt - Token expiry time
+ * @param {Object} userData - User data to store
+ * @param {string} userType - Type of user ('student', 'company', 'admin')
+ */
+export function initializeAuthSession(token, expiresAt, userData, userType) {
+  // Store authentication data
+  window.sessionStorage.setItem('authToken', token);
+  if (expiresAt) {
+    setTokenExpiryTime(expiresAt);
+  }
+
+  if (userData) {
+    if (userType === 'student') {
+      window.sessionStorage.setItem('studentData', JSON.stringify(userData));
+    } else if (userType === 'company') {
+      window.sessionStorage.setItem('companyData', JSON.stringify(userData));
+    }
+  }
+
+  if (userType) {
+    window.sessionStorage.setItem('userType', userType);
+  }
+
+  // Start proactive token refresh monitoring
+  startTokenRefreshMonitoring();
+
+  console.log(
+    'Authentication session initialized with automatic token refresh'
+  );
 }

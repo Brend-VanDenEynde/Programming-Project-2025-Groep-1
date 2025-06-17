@@ -1,5 +1,6 @@
 import Router from '../router.js';
 import { fetchAndStoreStudentProfile } from './student/student-profiel.js';
+import { initializeAuthSession } from '../utils/auth-api.js';
 import hideIcon from '../icons/hide.png';
 import eyeIcon from '../icons/eye.png';
 
@@ -61,9 +62,15 @@ export function renderLogin(rootElement) {
     </div>
   `;
 
-  document.getElementById('loginForm').addEventListener('submit', (e) => handleLogin(e, rootElement));
-  document.getElementById('register-link').addEventListener('click', () => Router.navigate('/registreer'));
-  document.getElementById('back-button').addEventListener('click', () => Router.navigate('/'));
+  document
+    .getElementById('loginForm')
+    .addEventListener('submit', (e) => handleLogin(e, rootElement));
+  document
+    .getElementById('register-link')
+    .addEventListener('click', () => Router.navigate('/registreer'));
+  document
+    .getElementById('back-button')
+    .addEventListener('click', () => Router.navigate('/'));
   document.getElementById('linkedin-btn').addEventListener('click', () => {});
 
   // Footer links: gebruik alleen Router.navigate, geen hash of import
@@ -94,7 +101,9 @@ export function renderLogin(rootElement) {
       const isVisible = passwordInput.type === 'text';
       passwordInput.type = isVisible ? 'password' : 'text';
       togglePasswordIcon.src = isVisible ? `${hideIcon}` : `${eyeIcon}`;
-      togglePasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
+      togglePasswordIcon.alt = isVisible
+        ? 'Toon wachtwoord'
+        : 'Verberg wachtwoord';
     });
   }
 }
@@ -156,17 +165,23 @@ async function handleLogin(event, rootElement) {
     const infoRes = await fetchUserInfo(loginRes.accessToken);
     const user = infoRes.user;
 
-
     // Debug: log de volledige user-object
     console.log('USER OBJECT:', user);
 
     if (!user || !user.type) {
-      alert('Geen gebruikersinformatie ontvangen. Neem contact op met support.');
+      alert(
+        'Geen gebruikersinformatie ontvangen. Neem contact op met support.'
+      );
       throw new Error('Authentication failed: No user info');
     }
-
     if (user.type === 2) {
-      window.sessionStorage.setItem('userType', 'student');
+      // Initialize authentication session with automatic token monitoring
+      initializeAuthSession(
+        loginRes.accessToken,
+        loginRes.accessTokenExpiresAt,
+        user,
+        'student'
+      );
 
       await fetchAndStoreStudentProfile();
       Router.navigate('/student/student-profiel');
@@ -177,12 +192,25 @@ async function handleLogin(event, rootElement) {
         alert('Fout: Ongeldig of ontbrekend id in de bedrijfsgegevens.');
         return;
       }
-      window.sessionStorage.setItem('companyData', JSON.stringify(user));
-      window.sessionStorage.setItem('userType', 'company');
+
+      // Initialize authentication session with automatic token monitoring
+      initializeAuthSession(
+        loginRes.accessToken,
+        loginRes.accessTokenExpiresAt,
+        user,
+        'company'
+      );
+
       Router.navigate('/bedrijf/bedrijf-profiel');
     } else if (user.type === 1) {
-      window.sessionStorage.setItem('adminData', JSON.stringify(user));
-      window.sessionStorage.setItem('userType', 'admin');
+      // Initialize authentication session with automatic token monitoring
+      initializeAuthSession(
+        loginRes.accessToken,
+        loginRes.accessTokenExpiresAt,
+        user,
+        'admin'
+      );
+
       Router.navigate('/admin-dashboard');
     } else {
       alert('Onbekend of niet ondersteund gebruikerstype.');

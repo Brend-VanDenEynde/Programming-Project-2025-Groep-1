@@ -1,26 +1,21 @@
 import logoIcon from '../../icons/favicon-32x32.png';
+import { apiGet } from '../../utils/api.js';
+import { renderLogin } from '../login.js';
 
-// Functie om speeddate data op te halen van de API
-async function fetchSpeeddateData(bedrijfId, token) {
+// Functie om speeddate data op te halen van de API met automatische token refresh
+async function fetchSpeeddateData(bedrijfId) {
   const url = `https://api.ehb-match.me/speeddates/accepted?id=${bedrijfId}`;
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  };
 
   try {
-    const response = await fetch(url, { headers });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
+    const data = await apiGet(url);
     // Structureer de data voor eenvoudige rendering
     return formatSpeeddateData(data);
   } catch (error) {
     console.error('Fout bij ophalen van speeddate data:', error);
+    if (error.message.includes('Authentication failed')) {
+      renderLogin(document.body);
+      return [];
+    }
     throw error;
   }
 }
@@ -186,15 +181,6 @@ async function loadSpeeddateData() {
   const contentDiv = document.getElementById('speeddates-content');
 
   try {
-    // Haal authToken uit sessionStorage (niet localStorage!)
-    const token = window.sessionStorage.getItem('authToken');
-
-    if (!token) {
-      contentDiv.innerHTML =
-        '<p class="error">Geen authenticatie token gevonden. <a href="#login">Log opnieuw in</a>.</p>';
-      return;
-    }
-
     // Haal companyData uit sessionStorage
     const companyDataString = window.sessionStorage.getItem('companyData');
     let bedrijfId;
@@ -217,18 +203,19 @@ async function loadSpeeddateData() {
       bedrijfId = '24'; // Test ID uit je API voorbeeld
     }
 
-    console.log('Gebruikte credentials:', {
-      token: token ? 'Token beschikbaar' : 'Geen token',
-      bedrijfId: bedrijfId,
-    });
+    console.log('Gebruikte bedrijf ID:', bedrijfId);
 
     // Haal speeddate data op
-    const speeddates = await fetchSpeeddateData(bedrijfId, token);
+    const speeddates = await fetchSpeeddateData(bedrijfId);
 
     // Render de speeddate lijst
     contentDiv.innerHTML = renderSpeeddatesList(speeddates);
   } catch (error) {
     console.error('Fout bij laden van speeddate data:', error);
+    if (error.message.includes('Authentication failed')) {
+      renderLogin(document.body);
+      return;
+    }
     contentDiv.innerHTML =
       '<p class="error">Er is een fout opgetreden: ' + error.message + '</p>';
   }
