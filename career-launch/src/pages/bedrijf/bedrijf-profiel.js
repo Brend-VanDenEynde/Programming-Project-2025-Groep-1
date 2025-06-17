@@ -1,16 +1,20 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import defaultLogo from '../../images/defaultlogo.webp';
-import { logoutUser, fetchUserInfo } from '../../utils/auth-api.js';
+import {
+  logoutUser,
+  fetchUserInfo,
+  updateBedrijfProfile,
+} from '../../utils/auth-api.js';
 import Router from '../../router.js';
 
-// Default bedrijf profiel data
+// Default bedrijf profiel data (using API field names)
 const defaultBedrijfProfile = {
-  email: '',
-  bedrijfsnaam: '',
-  foto: defaultLogo,
+  contact_email: '',
+  naam: '',
+  profiel_foto_url: defaultLogo,
   plaats: '',
   linkedin: '',
-  sector: '',
+  sector_bedrijf: '',
 };
 
 function getBedrijfLogoUrl(foto) {
@@ -40,24 +44,25 @@ export async function renderBedrijfProfiel(
         const apiUser = userInfoResult.user;
         // Log de ruwe API data voor debugging
         console.log('Raw API user data:', apiUser);
-
-        // Map API data naar bedrijf profiel velden
+        console.log('USER OBJECT:', apiUser); // Map API data naar bedrijf profiel velden (gebruik API veldnamen)
         bedrijfData = {
-          email: apiUser.contact_email || apiUser.email || '',
-          bedrijfsnaam:
+          id: apiUser.id || apiUser.gebruiker_id,
+          contact_email: apiUser.contact_email || apiUser.email || '',
+          naam:
+            apiUser.naam ||
             apiUser.bedrijfsnaam ||
             apiUser.company_name ||
-            apiUser.naam ||
-            apiUser.voornaam + ' ' + apiUser.achternaam ||
             'Mijn Bedrijf',
-          foto: apiUser.profiel_foto_url || apiUser.logo_url || defaultLogo,
+          profiel_foto_url:
+            apiUser.profiel_foto_url || apiUser.logo_url || defaultLogo,
           plaats: apiUser.plaats || apiUser.locatie || apiUser.location || '',
           linkedin: apiUser.linkedin || '',
-          sector: apiUser.sector || '',
+          sector_bedrijf: apiUser.sector_bedrijf || apiUser.sector || '',
         };
 
         // Log de gemapte bedrijf data voor debugging
         console.log('Mapped bedrijf data:', bedrijfData);
+        console.log('Bedrijf ID voor API call:', bedrijfData.id);
 
         // Sla de gegevens op in sessionStorage voor toekomstig gebruik
         window.sessionStorage.setItem(
@@ -68,35 +73,34 @@ export async function renderBedrijfProfiel(
         console.warn('Could not fetch user info from API, using dummy data');
         // Fallback naar dummy data
         bedrijfData = {
-          email: 'info@techcorp.be',
-          bedrijfsnaam: 'TechCorp Belgium',
-          foto: defaultLogo,
+          contact_email: 'info@techcorp.be',
+          naam: 'TechCorp Belgium',
+          profiel_foto_url: defaultLogo,
           plaats: 'Brussel',
           linkedin: 'https://www.linkedin.com/company/techcorp-belgium',
-          sector: 'IT & Technology',
+          sector_bedrijf: 'IT & Technology',
         };
       }
     } catch (error) {
       console.error('Error fetching user info from API:', error);
       // Fallback naar dummy data
       bedrijfData = {
-        email: 'info@techcorp.be',
-        bedrijfsnaam: 'TechCorp Belgium',
-        foto: defaultLogo,
+        contact_email: 'info@techcorp.be',
+        naam: 'TechCorp Belgium',
+        profiel_foto_url: defaultLogo,
         plaats: 'Brussel',
         linkedin: 'https://www.linkedin.com/company/techcorp-belgium',
-        sector: 'IT & Technology',
+        sector_bedrijf: 'IT & Technology',
       };
     }
-  }
-  // Gebruik ENKEL de huidige API velden
+  } // Gebruik ENKEL de huidige API velden
   const {
-    email = defaultBedrijfProfile.email,
-    bedrijfsnaam = defaultBedrijfProfile.bedrijfsnaam,
-    foto: rawFoto = defaultBedrijfProfile.foto,
+    contact_email = defaultBedrijfProfile.contact_email,
+    naam = defaultBedrijfProfile.naam,
+    profiel_foto_url: rawFoto = defaultBedrijfProfile.profiel_foto_url,
     plaats = defaultBedrijfProfile.plaats,
     linkedin = defaultBedrijfProfile.linkedin,
-    sector = defaultBedrijfProfile.sector,
+    sector_bedrijf = defaultBedrijfProfile.sector_bedrijf,
   } = bedrijfData;
 
   // Gebruik default als foto null, leeg of undefined is
@@ -131,11 +135,10 @@ export async function renderBedrijfProfiel(
         <div class="bedrijf-profile-content">
           <div class="bedrijf-profile-form-container">
             <h1 class="bedrijf-profile-title">Bedrijf Profiel</h1>
-            <form id="bedrijfProfileForm" class="bedrijf-profile-form" autocomplete="off" enctype="multipart/form-data">
-              <div class="bedrijf-profile-avatar-section">
+            <form id="bedrijfProfileForm" class="bedrijf-profile-form" autocomplete="off" enctype="multipart/form-data">              <div class="bedrijf-profile-avatar-section">
                 <img 
                   src="${foto}" 
-                  alt="Logo ${bedrijfsnaam}" 
+                  alt="Logo ${naam}" 
                   id="logo-preview"
                   class="bedrijf-profile-avatar"
                 />
@@ -143,16 +146,17 @@ export async function renderBedrijfProfiel(
                   readonlyMode ? 'none' : 'block'
                 };margin-top:10px;">
               </div>
-                <div class="bedrijf-profile-form-group">
+              
+              <div class="bedrijf-profile-form-group">
                 <label for="bedrijfsnaamInput">Bedrijfsnaam</label>
-                <input type="text" id="bedrijfsnaamInput" value="${bedrijfsnaam}" placeholder="Bedrijfsnaam" required ${
+                <input type="text" id="bedrijfsnaamInput" value="${naam}" placeholder="Bedrijfsnaam" required ${
     readonlyMode ? 'disabled' : ''
   }>
               </div>
               
               <div class="bedrijf-profile-form-group">
                 <label for="emailInput">E-mailadres</label>
-                <input type="email" id="emailInput" value="${email}" placeholder="contact@bedrijf.be" required ${
+                <input type="email" id="emailInput" value="${contact_email}" placeholder="contact@bedrijf.be" required ${
     readonlyMode ? 'disabled' : ''
   }>
               </div>
@@ -173,7 +177,7 @@ export async function renderBedrijfProfiel(
               
               <div class="bedrijf-profile-form-group">
                 <label for="sectorInput">Sector</label>
-                <input type="text" id="sectorInput" value="${sector}" placeholder="IT & Technology" ${
+                <input type="text" id="sectorInput" value="${sector_bedrijf}" placeholder="IT & Technology" ${
     readonlyMode ? 'disabled' : ''
   }>
               </div>
@@ -270,44 +274,82 @@ export async function renderBedrijfProfiel(
       renderBedrijfProfiel(rootElement, bedrijfData, false);
     });
   }
-
   // SAVE knop
   const saveBtn = document.getElementById('btn-save-bedrijf');
   if (saveBtn) {
     saveBtn.addEventListener('click', async (e) => {
       e.preventDefault();
-      // Hier zou normaal API call komen, nu tonen we alleen bericht
-      const updatedData = {
-        ...bedrijfData,
-        bedrijfsnaam: document.getElementById('bedrijfsnaamInput').value,
-        email: document.getElementById('emailInput').value,
-        plaats: document.getElementById('plaatsInput').value,
-        linkedin: document.getElementById('linkedinInput').value,
-        sector: document.getElementById('sectorInput').value,
-      };
 
-      alert('Bedrijfsprofiel opgeslagen! (Dit is dummy data)');
+      try {
+        // Verzamel form data met API veldnamen (alleen velden die de API accepteert)
+        const updateData = {
+          naam: document.getElementById('bedrijfsnaamInput').value,
+          contact_email: document.getElementById('emailInput').value,
+          plaats: document.getElementById('plaatsInput').value,
+          linkedin: document.getElementById('linkedinInput').value,
+          // sector_bedrijf wordt niet geaccepteerd door de API, dus weggelaten
+        }; // Haal het bedrijf ID op uit de huidige data
+        const bedrijfID = bedrijfData.id || bedrijfData.gebruiker_id;
 
-      // Opslaan in sessionStorage voor demo
-      window.sessionStorage.setItem('bedrijfData', JSON.stringify(updatedData));
+        console.log('Debug bedrijf ID lookup:');
+        console.log('bedrijfData:', bedrijfData);
+        console.log('bedrijfData.id:', bedrijfData.id);
+        console.log('bedrijfData.gebruiker_id:', bedrijfData.gebruiker_id);
+        console.log('Final bedrijfID:', bedrijfID);
 
-      renderBedrijfProfiel(rootElement, updatedData, true);
+        if (!bedrijfID) {
+          alert('Kon bedrijf ID niet vinden. Probeer opnieuw in te loggen.');
+          return;
+        }
+
+        console.log(
+          'Updating bedrijf with ID:',
+          bedrijfID,
+          'Data:',
+          updateData
+        );
+
+        // Roep de API aan om het bedrijf bij te werken
+        const result = await updateBedrijfProfile(bedrijfID, updateData);
+
+        if (result.success) {
+          alert('Bedrijfsprofiel succesvol opgeslagen!');
+          // Update local data met de nieuwe gegevens
+          const updatedBedrijfData = {
+            ...bedrijfData,
+            ...updateData,
+            // Behoud sector_bedrijf omdat dit niet via API wordt geüpdatet
+            sector_bedrijf: document.getElementById('sectorInput').value,
+            profiel_foto_url:
+              result.bedrijf?.profiel_foto_url || bedrijfData.profiel_foto_url,
+          };
+
+          // Opslaan in sessionStorage
+          window.sessionStorage.setItem(
+            'bedrijfData',
+            JSON.stringify(updatedBedrijfData)
+          );
+
+          // Render de pagina opnieuw in readonly mode
+          renderBedrijfProfiel(rootElement, updatedBedrijfData, true);
+        } else {
+          alert(`Fout bij opslaan: ${result.message}`);
+        }
+      } catch (error) {
+        console.error('Error updating bedrijf profile:', error);
+        alert('Er is een fout opgetreden bij het opslaan. Probeer opnieuw.');
+      }
     });
-  }
-
-  // RESET knop
+  } // RESET knop
   const resetBtn = document.getElementById('btn-reset-bedrijf');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
-      const resetData = {
-        ...defaultBedrijfProfile,
-        bedrijfsnaam: 'Nieuw Bedrijf',
-        email: 'contact@nieuwbedrijf.be',
-        plaats: '',
-        linkedin: '',
-        sector: '',
-      };
-      renderBedrijfProfiel(rootElement, resetData, false);
+      // Reset naar de huidige opgeslagen gegevens (niet naar lege waarden)
+      document.getElementById('bedrijfsnaamInput').value = naam;
+      document.getElementById('emailInput').value = contact_email;
+      document.getElementById('plaatsInput').value = plaats;
+      document.getElementById('linkedinInput').value = linkedin;
+      document.getElementById('sectorInput').value = sector_bedrijf;
     });
   }
 

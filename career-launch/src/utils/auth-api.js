@@ -298,3 +298,55 @@ export async function fetchUserInfo() {
     };
   }
 }
+
+/**
+ * Updates a company profile via API
+ * @param {number} bedrijfID - The company ID
+ * @param {Object} updateData - The data to update
+ * @returns {Promise<Object>} API response
+ */
+export async function updateBedrijfProfile(bedrijfID, updateData) {
+  const apiUrl = `https://api.ehb-match.me/bedrijven/${bedrijfID}`;
+  const token =
+    window.sessionStorage.getItem('authToken') ||
+    window.sessionStorage.getItem('accessToken');
+
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || `Failed to update company: ${response.status}`
+      );
+    }
+
+    const data = await response.json();
+    console.log('Company updated successfully:', data);
+
+    return {
+      success: true,
+      message: data.message,
+      bedrijf: data.bedrijf,
+      data: data,
+    };
+  } catch (error) {
+    console.error('Update company error:', error);
+    return {
+      success: false,
+      message: error.message || 'Failed to update company information',
+      error: error.message,
+    };
+  }
+}
