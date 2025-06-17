@@ -145,8 +145,8 @@ async function acceptSpeeddate(afspraakId) {
   }
 
   try {
-    const response = await fetch(`https://api.ehb-match.me/speeddates/${afspraakId}/accept`, {
-      method: 'PUT',
+    const response = await fetch(`https://api.ehb-match.me/speeddates/accept/${afspraakId}`, {
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -157,9 +157,14 @@ async function acceptSpeeddate(afspraakId) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    // Herlaad de data na succesvolle acceptatie
-    await loadPendingSpeeddateData();
+    // Navigeer naar de speeddates pagina na succesvolle acceptatie
     alert('Speeddate succesvol geaccepteerd!');
+    
+    // Import router en navigeer naar speeddates pagina
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/bedrijf/speeddates');
+    });
 
   } catch (error) {
     console.error('Fout bij accepteren van speeddate:', error);
