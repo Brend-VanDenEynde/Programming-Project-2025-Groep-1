@@ -6,6 +6,7 @@ import { renderLogin } from '../login.js';
 import { renderSearchCriteriaBedrijf } from './search-criteria-bedrijf.js';
 import { performLogout, logoutUser } from '../../utils/auth-api.js';
 import { createBedrijfNavbar, closeBedrijfNavbar, setupBedrijfNavbarEvents } from '../../utils/bedrijf-navbar.js';
+import Router from '../../router.js';
 import '../../css/consolidated-style.css';
 
 export async function fetchAndRenderBedrijfProfiel(rootElement, bedrijfId) {
@@ -189,26 +190,24 @@ export function renderBedrijfProfiel(rootElement, bedrijfData = {}, readonlyMode
     console.error('Burger-menu of dropdown niet gevonden in de DOM.');
   }
 
-  const privacyPolicyLink = document.getElementById('privacy-policy');
-  if (privacyPolicyLink) {
-    privacyPolicyLink.addEventListener('click', (e) => {
+  // Footer links: gebruik alleen Router.navigate, geen hash of import
+  const privacyLink = document.getElementById('privacy-policy');
+  if (privacyLink) {
+    privacyLink.setAttribute('href', '#');
+    privacyLink.addEventListener('click', (e) => {
       e.preventDefault();
-      window.location.hash = '#/privacy';
-      import('../privacy.js').then((m) => m.renderPrivacy(document.getElementById('app')));
+      e.stopImmediatePropagation();
+      Router.navigate('/privacy');
     });
-  } else {
-    console.error('Privacy Policy link niet gevonden in de DOM.');
   }
-
   const contactLink = document.getElementById('contacteer-ons');
   if (contactLink) {
+    contactLink.setAttribute('href', '#');
     contactLink.addEventListener('click', (e) => {
       e.preventDefault();
-      window.location.hash = '#/contact';
-      import('../contact.js').then((m) => m.renderContact(document.getElementById('app')));
+      e.stopImmediatePropagation();
+      Router.navigate('/contact');
     });
-  } else {
-    console.error('Contact link niet gevonden in de DOM.');
   }
 
   const logoutButton = document.getElementById('nav-logout');

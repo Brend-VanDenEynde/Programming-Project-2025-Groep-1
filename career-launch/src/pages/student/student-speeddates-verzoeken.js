@@ -1,6 +1,7 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
+import Router from '../../router.js';
 
 // API helpers
 async function fetchPendingSpeeddates() {
@@ -317,20 +318,24 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     });
   }
 
-  document.getElementById('privacy-policy').addEventListener('click', (e) => {
-    e.preventDefault();
-    import('../../router.js').then((module) => {
-      const Router = module.default;
+  const privacyLink = document.querySelector('a[href="/privacy"]');
+  if (privacyLink) {
+    privacyLink.setAttribute('href', '#');
+    privacyLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
       Router.navigate('/privacy');
     });
-  });
-  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
-    e.preventDefault();
-    import('../../router.js').then((module) => {
-      const Router = module.default;
+  }
+  const contactLink = document.querySelector('a[href="/contact"]');
+  if (contactLink) {
+    contactLink.setAttribute('href', '#');
+    contactLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
       Router.navigate('/contact');
     });
-  });
+  }
 
   // --- Popup met bedrijfsinfo ---
   async function createBedrijfPopup(s) {

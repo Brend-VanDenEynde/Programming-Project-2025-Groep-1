@@ -133,4 +133,20 @@ function initializeContactPage() {
       alert('Fout bij verzenden: ' + error.message);
     }
   }
+
+  // Footer links: gebruik alleen Router.navigate, geen hash of import
+  const privacyLink = document.querySelector('a[href="/privacy"]');
+  if (privacyLink) {
+    privacyLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      Router.navigate('/privacy');
+    });
+  }
+  const contactLink = document.querySelector('a[href="/contact"]');
+  if (contactLink) {
+    contactLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      Router.navigate('/contact');
+    });
+  }
 }

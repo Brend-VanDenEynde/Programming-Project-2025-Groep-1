@@ -5,6 +5,7 @@ import { getOpleidingNaamById, opleidingen } from './student-opleidingen.js';
 import defaultAvatar from '../../images/default.png';
 import { logoutUser } from '../../utils/auth-api.js';
 import { renderBedrijven } from './bedrijven.js';
+import Router from '../../router.js';
 
 const defaultProfile = {
   voornaam: '',
@@ -288,20 +289,8 @@ export function renderStudentProfiel(
     }
   }
 
-  document.getElementById('privacy-policy').addEventListener('click', (e) => {
-    e.preventDefault();
-    import('../../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/privacy');
-    });
-  });
-  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
-    e.preventDefault();
-    import('../../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/contact');
-    });
-  });
+  ;
+  
 
   // Originele data voor reset
   const originalData = { ...studentData };
@@ -536,6 +525,26 @@ export function renderStudentProfiel(
         }
       });
     }
+  }
+
+  // Footer links: gebruik alleen Router.navigate, geen hash of import
+  const privacyLink = document.querySelector('a[href="/privacy"]');
+  if (privacyLink) {
+    privacyLink.setAttribute('href', '#');
+    privacyLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      Router.navigate('/privacy');
+    });
+  }
+  const contactLink = document.querySelector('a[href="/contact"]');
+  if (contactLink) {
+    contactLink.setAttribute('href', '#');
+    contactLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      Router.navigate('/contact');
+    });
   }
 }
 

@@ -9,6 +9,7 @@ import { showBedrijfSettingsPopup } from './bedrijf-settings.js';
 import { fetchStudents } from '../../utils/data-api.js';
 import defaultFoto from '../../images/default.png';
 import { createBedrijfNavbar, closeBedrijfNavbar, setupBedrijfNavbarEvents } from '../../utils/bedrijf-navbar.js';
+import Router from '../../router.js';
 
 // Globale variabele voor studenten data
 let studenten = [];
@@ -295,18 +296,23 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
       renderLogin(rootElement);
     });
   }
-  document.getElementById('privacy-policy').addEventListener('click', (e) => {
-    e.preventDefault();
-    import('../../router.js').then((module) => {
-      const Router = module.default;
+  // Footer links: gebruik alleen Router.navigate, geen hash of import
+  const privacyLink = document.getElementById('privacy-policy');
+  if (privacyLink) {
+    privacyLink.setAttribute('href', '#');
+    privacyLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
       Router.navigate('/privacy');
     });
-  });
-  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
-    e.preventDefault();
-    import('../../router.js').then((module) => {
-      const Router = module.default;
+  }
+  const contactLink = document.getElementById('contacteer-ons');
+  if (contactLink) {
+    contactLink.setAttribute('href', '#');
+    contactLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
       Router.navigate('/contact');
     });
-  });
+  }
 }
