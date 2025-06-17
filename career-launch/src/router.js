@@ -25,10 +25,9 @@ import { renderBedrijfRegister } from './pages/register-bedrijf/bedrijf-register
 import { renderBedrijven } from './pages/student/bedrijven.js';
 import { renderSearchCriteriaBedrijf } from './pages/bedrijf/search-criteria-bedrijf.js';
 import { renderBedrijfSpeeddates } from './pages/bedrijf/bedrijf-speeddates.js';
-import { renderBedrijfSpeeddatesVerzoeken } from './pages/bedrijf/bedrijf-speeddates-verzoeken.js';
+import { renderBedrijfSpeeddatesRequests } from './pages/bedrijf/bedrijf-speeddates-verzoeken.js';
 import { renderBedrijfQRPopup } from './pages/bedrijf/bedrijf-qr-popup.js';
-import { showBedrijfSettingsPopup } from './pages/bedrijf/bedrijf-settings.js';
-import { renderBedrijfStudenten } from './pages/bedrijf/bedrijf-studenten.js';
+import { renderStudenten } from './pages/bedrijf/studenten.js';
 
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
@@ -75,14 +74,13 @@ const routes = {
   '/bedrijf/bedrijf-profiel': renderBedrijfProfiel,
   '/bedrijf/zoek-criteria': renderSearchCriteriaBedrijf,
   '/bedrijf/speeddates': renderBedrijfSpeeddates,
-  '/bedrijf/speeddates-verzoeken': renderBedrijfSpeeddatesVerzoeken,
+  '/bedrijf/speeddates-verzoeken': renderBedrijfSpeeddatesRequests,
   '/bedrijf/qr-code': renderBedrijfQRPopup,
-  '/bedrijf/settings': showBedrijfSettingsPopup,
   '/bedrijf/studenten': (rootElement) => {
     const bedrijfData = JSON.parse(
-      window.sessionStorage.getItem('bedrijfData')
+      window.sessionStorage.getItem('bedrijfData') || '{}'
     );
-    renderBedrijfStudenten(rootElement, bedrijfData);
+    renderStudenten(rootElement, bedrijfData);
   },
   '/registreer-bedrijf': renderBedrijfRegister,
 };
