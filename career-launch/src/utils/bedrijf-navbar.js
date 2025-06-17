@@ -10,17 +10,14 @@ export function createBedrijfNavbar(activeRoute = '') {
           <span>EhB Career Launch</span>
         </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
         <ul id="burger-dropdown" class="bedrijf-profile-dropdown">
+          <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
       </header>
 
-      <div class="bedrijf-profile-main">
-        <nav class="bedrijf-profile-sidebar">
+      <div class="bedrijf-profile-main">        <nav class="bedrijf-profile-sidebar">
           <ul>
-            <li><button data-route="profile" class="sidebar-link ${
-              activeRoute === 'profile' ? 'active' : ''
-            }">Profiel</button></li>
             <li><button data-route="search-criteria" class="sidebar-link ${
               activeRoute === 'search-criteria' ? 'active' : ''
             }">Zoek-criteria</button></li>
@@ -68,10 +65,6 @@ export function setupBedrijfNavbarEvents() {
       import('../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
-          case 'profile':
-            console.log('Navigating to bedrijf profile...');
-            Router.navigate('/bedrijf/bedrijf-profiel');
-            break;
           case 'search-criteria':
             Router.navigate('/bedrijf/zoek-criteria');
             break;
@@ -113,6 +106,19 @@ export function setupBedrijfNavbarEvents() {
       }
     });
   }
+
+  // Profile button
+  const profileButton = document.getElementById('nav-profile');
+  if (profileButton) {
+    profileButton.addEventListener('click', () => {
+      dropdown.classList.remove('open');
+      import('../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/bedrijf/bedrijf-profiel');
+      });
+    });
+  }
+
   // Settings button
   const settingsButton = document.getElementById('nav-settings');
   if (settingsButton) {

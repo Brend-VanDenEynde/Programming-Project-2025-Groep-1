@@ -112,18 +112,16 @@ export async function renderBedrijfProfiel(
         <div class="logo-section">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
-        </div>
-        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
+        </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
         <ul id="burger-dropdown" class="bedrijf-profile-dropdown">
+          <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
       </header>
       
-      <div class="bedrijf-profile-main">
-        <nav class="bedrijf-profile-sidebar">
+      <div class="bedrijf-profile-main">        <nav class="bedrijf-profile-sidebar">
           <ul>
-            <li><button data-route="profile" class="sidebar-link active">Profiel</button></li>
             <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
             <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
@@ -231,6 +229,13 @@ export async function renderBedrijfProfiel(
       }
     });
   }
+
+  // Profile button
+  document.getElementById('nav-profile')?.addEventListener('click', () => {
+    dropdown.classList.remove('open');
+    Router.navigate('/bedrijf/bedrijf-profiel');
+  });
+
   // Settings en logout
   document.getElementById('nav-settings')?.addEventListener('click', () => {
     dropdown.classList.remove('open');
@@ -366,9 +371,6 @@ export async function renderBedrijfProfiel(
       e.preventDefault();
       const route = e.currentTarget.getAttribute('data-route');
       switch (route) {
-        case 'profile':
-          Router.navigate('/bedrijf/bedrijf-profiel');
-          break;
         case 'search-criteria':
           Router.navigate('/bedrijf/zoek-criteria');
           break;
