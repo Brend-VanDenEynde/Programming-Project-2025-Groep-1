@@ -26,7 +26,6 @@ import { renderBedrijven } from './pages/student/bedrijven.js';
 import { renderSearchCriteriaBedrijf } from './pages/bedrijf/search-criteria-bedrijf.js';
 import { renderBedrijfSpeeddates } from './pages/bedrijf/bedrijf-speeddates.js';
 import { renderBedrijfSpeeddatesRequests } from './pages/bedrijf/bedrijf-speeddates-verzoeken.js';
-import { renderBedrijfQRPopup } from './pages/bedrijf/bedrijf-qr-popup.js';
 import { renderStudenten } from './pages/bedrijf/studenten.js';
 
 function renderNotFound(rootElement) {
@@ -80,7 +79,6 @@ const routes = {
   '/bedrijf/zoek-criteria': renderSearchCriteriaBedrijf,
   '/bedrijf/speeddates': renderBedrijfSpeeddates,
   '/bedrijf/speeddates-verzoeken': renderBedrijfSpeeddatesRequests,
-  '/bedrijf/qr-code': renderBedrijfQRPopup,
   '/bedrijf/studenten': (rootElement) => {
     const bedrijfData = JSON.parse(
       window.sessionStorage.getItem('bedrijfData') || '{}'
@@ -185,7 +183,6 @@ class Router {
       '/bedrijf/speeddates': 'Speeddates - Career Launch 2025',
       '/bedrijf/speeddates-verzoeken':
         'Speeddate Verzoeken - Career Launch 2025',
-      '/bedrijf/qr-code': 'QR Code - Career Launch 2025',
       '/bedrijf/settings': 'Instellingen - Career Launch 2025',
       '/bedrijf/studenten': 'Studenten - Career Launch 2025',
       '/registreer-bedrijf': 'Bedrijf Registreren - Career Launch 2025',

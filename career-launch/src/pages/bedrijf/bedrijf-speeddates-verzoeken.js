@@ -5,22 +5,22 @@ async function fetchPendingSpeeddateData(bedrijfId, token) {
   const url = `https://api.ehb-match.me/speeddates/pending?id=${bedrijfId}`;
   const headers = {
     Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   };
 
   try {
     const response = await fetch(url, { headers });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    
+
     // Structureer de data voor eenvoudige rendering
     return formatPendingSpeeddateData(data);
   } catch (error) {
-    console.error("Fout bij ophalen van pending speeddate data:", error);
+    console.error('Fout bij ophalen van pending speeddate data:', error);
     throw error;
   }
 }
@@ -31,26 +31,26 @@ function formatPendingSpeeddateData(rawData) {
     return [];
   }
 
-  return rawData.map(afspraak => ({
+  return rawData.map((afspraak) => ({
     id: afspraak.id,
     bedrijf: {
       id: afspraak.id_bedrijf,
       naam: afspraak.naam_bedrijf,
       profielfoto: afspraak.profiel_foto_bedrijf,
-      sector: afspraak.sector_bedrijf
+      sector: afspraak.sector_bedrijf,
     },
     student: {
       id: afspraak.id_student,
       naam: `${afspraak.voornaam_student} ${afspraak.achternaam_student}`,
-      profielfoto: afspraak.profiel_foto_student
+      profielfoto: afspraak.profiel_foto_student,
     },
     tijdslot: {
       begin: new Date(afspraak.begin),
       einde: new Date(afspraak.einde),
-      geformatteerd: formatTijdslot(afspraak.begin, afspraak.einde)
+      geformatteerd: formatTijdslot(afspraak.begin, afspraak.einde),
     },
     lokaal: afspraak.lokaal,
-    akkoord: afspraak.akkoord
+    akkoord: afspraak.akkoord,
   }));
 }
 
@@ -58,21 +58,21 @@ function formatPendingSpeeddateData(rawData) {
 function formatTijdslot(beginISO, eindeISO) {
   const begin = new Date(beginISO);
   const einde = new Date(eindeISO);
-  
+
   const opties = {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   };
-  
+
   const beginFormatted = begin.toLocaleDateString('nl-NL', opties);
-  const eindeFormatted = einde.toLocaleTimeString('nl-NL', { 
-    hour: '2-digit', 
-    minute: '2-digit' 
+  const eindeFormatted = einde.toLocaleTimeString('nl-NL', {
+    hour: '2-digit',
+    minute: '2-digit',
   });
-  
+
   return `${beginFormatted} - ${eindeFormatted}`;
 }
 
@@ -88,11 +88,15 @@ function renderPendingSpeeddatesList(speeddates) {
         <h2>Pending Speeddates-verzoeken (${speeddates.length})</h2>
       </div>
       <div class="speeddates-table">
-        ${speeddates.map(afspraak => `
+        ${speeddates
+          .map(
+            (afspraak) => `
           <div class="speeddate-item pending">
             <div class="speeddate-info">
               <div class="bedrijf-info">
-                <img src="${afspraak.bedrijf.profielfoto || '/images/defaultlogo.webp'}" 
+                <img src="${
+                  afspraak.bedrijf.profielfoto || '/images/defaultlogo.webp'
+                }" 
                      alt="${afspraak.bedrijf.naam}" 
                      class="profiel-foto bedrijf-foto" 
                      onerror="this.src='/images/defaultlogo.webp'" />
@@ -103,7 +107,9 @@ function renderPendingSpeeddatesList(speeddates) {
               </div>
               
               <div class="student-info">
-                <img src="${afspraak.student.profielfoto || '/images/default.png'}" 
+                <img src="${
+                  afspraak.student.profielfoto || '/images/default.png'
+                }" 
                      alt="${afspraak.student.naam}" 
                      class="profiel-foto student-foto"
                      onerror="this.src='/images/default.png'" />
@@ -114,22 +120,32 @@ function renderPendingSpeeddatesList(speeddates) {
               
               <div class="afspraak-details">
                 <div class="tijd-lokaal">
-                  <p class="tijdslot"><strong>Tijd:</strong> ${afspraak.tijdslot.geformatteerd}</p>
-                  <p class="lokaal"><strong>Lokaal:</strong> ${afspraak.lokaal}</p>
+                  <p class="tijdslot"><strong>Tijd:</strong> ${
+                    afspraak.tijdslot.geformatteerd
+                  }</p>
+                  <p class="lokaal"><strong>Lokaal:</strong> ${
+                    afspraak.lokaal
+                  }</p>
                 </div>
               </div>
               
               <div class="speeddate-actions">
-                <button class="action-btn accept-btn" onclick="acceptSpeeddate(${afspraak.id})">
+                <button class="action-btn accept-btn" onclick="acceptSpeeddate(${
+                  afspraak.id
+                })">
                   Accepteren
                 </button>
-                <button class="action-btn delete-btn" onclick="deleteSpeeddate(${afspraak.id})">
+                <button class="action-btn delete-btn" onclick="deleteSpeeddate(${
+                  afspraak.id
+                })">
                   Verwijderen
                 </button>
               </div>
             </div>
           </div>
-        `).join('')}
+        `
+          )
+          .join('')}
       </div>
     </div>
   `;
@@ -138,20 +154,23 @@ function renderPendingSpeeddatesList(speeddates) {
 // Functie om een speeddate te accepteren
 async function acceptSpeeddate(afspraakId) {
   const token = window.sessionStorage.getItem('authToken');
-  
+
   if (!token) {
     alert('Geen geldige authenticatie. Log opnieuw in.');
     return;
   }
 
   try {
-    const response = await fetch(`https://api.ehb-match.me/speeddates/accept/${afspraakId}`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
+    const response = await fetch(
+      `https://api.ehb-match.me/speeddates/accept/${afspraakId}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       }
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -159,13 +178,12 @@ async function acceptSpeeddate(afspraakId) {
 
     // Navigeer naar de speeddates pagina na succesvolle acceptatie
     alert('Speeddate succesvol geaccepteerd!');
-    
+
     // Import router en navigeer naar speeddates pagina
     import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/bedrijf/speeddates');
     });
-
   } catch (error) {
     console.error('Fout bij accepteren van speeddate:', error);
     alert('Er is een fout opgetreden bij het accepteren van de speeddate.');
@@ -179,20 +197,23 @@ async function deleteSpeeddate(afspraakId) {
   }
 
   const token = window.sessionStorage.getItem('authToken');
-  
+
   if (!token) {
     alert('Geen geldige authenticatie. Log opnieuw in.');
     return;
   }
 
   try {
-    const response = await fetch(`https://api.ehb-match.me/speeddates/reject/${afspraakId}`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
+    const response = await fetch(
+      `https://api.ehb-match.me/speeddates/reject/${afspraakId}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       }
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -201,7 +222,6 @@ async function deleteSpeeddate(afspraakId) {
     // Herlaad de data na succesvolle verwijdering
     await loadPendingSpeeddateData();
     alert('Speeddate succesvol verwijderd!');
-
   } catch (error) {
     console.error('Fout bij verwijderen van speeddate:', error);
     alert('Er is een fout opgetreden bij het verwijderen van de speeddate.');
@@ -215,22 +235,23 @@ window.deleteSpeeddate = deleteSpeeddate;
 // Functie om pending speeddate data te laden en weer te geven
 async function loadPendingSpeeddateData() {
   const contentDiv = document.getElementById('pending-speeddates-content');
-  
+
   if (!contentDiv) return;
-  
+
   try {
     // Haal authToken uit sessionStorage
     const token = window.sessionStorage.getItem('authToken');
-    
+
     if (!token) {
-      contentDiv.innerHTML = '<p class="error">Geen authenticatie token gevonden. <a href="#login">Log opnieuw in</a>.</p>';
+      contentDiv.innerHTML =
+        '<p class="error">Geen authenticatie token gevonden. <a href="#login">Log opnieuw in</a>.</p>';
       return;
     }
-    
+
     // Haal companyData uit sessionStorage voor bedrijf ID
     const companyDataString = window.sessionStorage.getItem('companyData');
     let bedrijfId;
-    
+
     if (companyDataString) {
       try {
         const companyData = JSON.parse(companyDataString);
@@ -239,22 +260,24 @@ async function loadPendingSpeeddateData() {
         console.error('Fout bij parsen companyData:', parseError);
       }
     }
-    
+
     // Fallback naar test ID als geen bedrijfId gevonden
     if (!bedrijfId) {
-      console.warn('Geen bedrijf ID gevonden in companyData, gebruik test ID 24');
+      console.warn(
+        'Geen bedrijf ID gevonden in companyData, gebruik test ID 24'
+      );
       bedrijfId = '24'; // Test ID
     }
-    
+
     // Haal pending speeddate data op
     const speeddates = await fetchPendingSpeeddateData(bedrijfId, token);
-    
+
     // Render de pending speeddate lijst
     contentDiv.innerHTML = renderPendingSpeeddatesList(speeddates);
-    
   } catch (error) {
     console.error('Fout bij laden van pending speeddate data:', error);
-    contentDiv.innerHTML = '<p class="error">Er is een fout opgetreden: ' + error.message + '</p>';
+    contentDiv.innerHTML =
+      '<p class="error">Er is een fout opgetreden: ' + error.message + '</p>';
   }
 }
 
@@ -278,10 +301,8 @@ export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
           <ul>
             <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
             <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
-            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
-            <li><button data-route="requests" class="sidebar-link active">Speeddates-verzoeken</button></li>
+            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>            <li><button data-route="requests" class="sidebar-link active">Speeddates-verzoeken</button></li>
             <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
-            <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
           </ul>
         </nav>
           <div class="bedrijf-profile-content">
@@ -328,9 +349,6 @@ export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
             break;
           case 'studenten':
             Router.navigate('/bedrijf/studenten');
-            break;
-          case 'qr':
-            Router.navigate('/bedrijf/qr-code');
             break;
         }
       });
