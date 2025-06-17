@@ -574,6 +574,9 @@ a:hover {
 }
 
 .student-profile-avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
   margin-bottom: 1.5rem;
 }
@@ -586,6 +589,14 @@ a:hover {
   box-shadow: 0 2px 8px #0001;
   border: 3px solid #e1e5e9;
   background: #fff;
+}
+
+.student-profile-avatar-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  height: fit-content;
 }
 
 .student-profile-form-group {
@@ -3209,6 +3220,10 @@ body.darkmode .status-final {
 }
 
 .bedrijf-profile-avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   margin-bottom: 1.5rem;
 }
@@ -3221,6 +3236,14 @@ body.darkmode .status-final {
   box-shadow: 0 2px 8px #0001;
   border: 3px solid #e1e5e9;
   background: #fff;
+}
+
+.bedrijf-profile-avatar-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  height: fit-content;
 }
 
 .bedrijf-profile-form-group {
