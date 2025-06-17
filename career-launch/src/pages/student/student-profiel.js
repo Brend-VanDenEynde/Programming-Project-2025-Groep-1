@@ -330,7 +330,7 @@ export function renderStudentProfiel(
 
     deleteOverlay.addEventListener('click', async (e) => {
       if (!readonlyMode && studentAvatar.src !== `https://gt0kk4fbet.ufs.sh/f/${DEFAULT_AVATAR_KEY}`) {
-        photoInput.files = null; // Reset file input
+        photoInput.value = ''; // Reset file input
         studentAvatar.src = `https://gt0kk4fbet.ufs.sh/f/${DEFAULT_AVATAR_KEY}`; // Reset to default avatar
         deleteProfilePicture = true; // Set flag to delete profile picture
       }

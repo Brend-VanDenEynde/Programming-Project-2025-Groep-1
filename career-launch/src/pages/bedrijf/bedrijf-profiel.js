@@ -308,7 +308,7 @@ export async function renderBedrijfProfiel(
 
     deleteOverlay.addEventListener('click', async (e) => {
       if (!readonlyMode && bedrijfAvatar.src !== DEFAULT_AVATAR_URL) {
-        photoInput.files = null; // Reset file input
+        photoInput.value = ''; // Reset file input
         bedrijfAvatar.src = DEFAULT_AVATAR_URL; // Reset to default avatar
         deleteProfilePicture = true; // Set flag to delete profile picture
       }
