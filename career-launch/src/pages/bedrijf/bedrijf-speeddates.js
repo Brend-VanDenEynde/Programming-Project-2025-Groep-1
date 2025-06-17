@@ -337,7 +337,9 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
   }
   document.getElementById('nav-settings')?.addEventListener('click', () => {
     dropdown.classList.remove('open');
-    alert('Instellingen komen binnenkort');
+    import('./bedrijf-settings.js').then((module) => {
+      module.showBedrijfSettingsPopup();
+    });
   });
 
   document.getElementById('nav-logout')?.addEventListener('click', () => {

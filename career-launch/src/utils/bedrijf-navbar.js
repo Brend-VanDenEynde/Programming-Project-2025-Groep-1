@@ -113,13 +113,13 @@ export function setupBedrijfNavbarEvents() {
       }
     });
   }
-
   // Settings button
   const settingsButton = document.getElementById('nav-settings');
   if (settingsButton) {
     settingsButton.addEventListener('click', () => {
+      dropdown.classList.remove('open');
       import('../pages/bedrijf/bedrijf-settings.js').then((module) => {
-        module.showSettingsPopup();
+        module.showBedrijfSettingsPopup();
       });
     });
   }
