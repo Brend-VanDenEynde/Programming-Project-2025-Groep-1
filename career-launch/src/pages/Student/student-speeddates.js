@@ -101,6 +101,13 @@ async function fetchSpeeddatesWithStatus(rootElement, status = null, studentId =
   return await resp.json();
 }
 
+function formatUTCTime(isoString) {
+  const d = new Date(isoString);
+  let hh = d.getUTCHours().toString().padStart(2, '0');
+  let mm = d.getUTCMinutes().toString().padStart(2, '0');
+  return `${hh}:${mm}`;
+}
+
 export async function renderSpeeddates(rootElement, studentData = {}) {
   // Sorteervolgorde behouden als er al gesorteerd is, anders default op tijd
   if (!currentSort || !Array.isArray(currentSort) || currentSort.length === 0) {
@@ -170,7 +177,7 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       (s) => `
     <tr>
       <td><span class="bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(s)}' style="color:#222;cursor:pointer;">${s.naam_bedrijf}</span></td>
-      <td>${s.begin ? new Date(s.begin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}</td>
+      <td>${s.begin ? formatUTCTime(s.begin) : ''}</td>
       <td>${s.lokaal || ''}</td>
       <td>${getStatusBadge(s.akkoord)}</td>
     </tr>

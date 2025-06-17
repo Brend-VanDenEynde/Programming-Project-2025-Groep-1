@@ -84,101 +84,108 @@ async function showBedrijfPopup(bedrijf, studentId) {
   popup.style.zIndex = '2000';
 
   // Uren en slots genereren
-  const uren = [10, 11, 12, 13, 14, 15];
+  const uren = [12, 13, 14, 15, 16, 17];
   const slotDuur = 10; // minuten
   const slotsPerUur = 6; // 0,10,20,30,40,50
   const datum = '2025-10-01'; // vaste dag in jouw voorbeeld
-  // 1. Haal alle speeddates van student en bedrijf op
-  const [studentDates, companyDates] = await Promise.all([
-    fetch(`https://api.ehb-match.me/speeddates?id=${studentId}`, {
-      headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` },
-    })
-      .then((r) => (r.ok ? r.json() : [])),
-    fetch(`https://api.ehb-match.me/speeddates?id=${bedrijf.gebruiker_id}`, {
-      headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` },
-    })
-      .then((r) => (r.ok ? r.json() : [])),
+  // 1. Haal alle accepted en pending speeddates op voor student en bedrijf
+  const [
+    acceptedStudentDates,
+    pendingStudentDates,
+    acceptedCompanyDates,
+    pendingCompanyDates
+  ] = await Promise.all([
+    fetch(`https://api.ehb-match.me/speeddates/accepted?id=${studentId}`, { headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` } }).then(r => r.ok ? r.json() : []),
+    fetch(`https://api.ehb-match.me/speeddates/pending?id=${studentId}`, { headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` } }).then(r => r.ok ? r.json() : []),
+    fetch(`https://api.ehb-match.me/speeddates/accepted?id=${bedrijf.gebruiker_id}`, { headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` } }).then(r => r.ok ? r.json() : []),
+    fetch(`https://api.ehb-match.me/speeddates/pending?id=${bedrijf.gebruiker_id}`, { headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` } }).then(r => r.ok ? r.json() : []),
   ]);
+  const allAccepted = [...acceptedStudentDates, ...acceptedCompanyDates];
+  const allPending  = [...pendingStudentDates, ...pendingCompanyDates];
 
-  // Helper: bouw alle slots met status en kleur (op basis van 'akkoord')
-  function buildTimeSlotOptions({ uren, slotDuur, slotsPerUur, datum, studentDates, companyDates, studentId }) {
-    const allDates = [...studentDates, ...companyDates];
-    const slotStatus = {};
-    allDates.forEach((s) => {
-      if (!s.begin.startsWith(datum)) return;
-      let status = s.akkoord === true ? 'confirmed' : 'pending';
-      slotStatus[s.begin] = {
-        status,
-        by: s.id_student === studentId ? 'student' : 'company',
-        speeddate: s,
-      };
+  // Status functie
+  function getStatusForTijd(tijd, allAccepted, allPending) {
+    const isConfirmed = allAccepted.some(s => {
+      if (!s.begin) return false;
+      const dt = new Date(s.begin);
+      return `${dt.getUTCHours().toString().padStart(2, '0')}:${dt.getUTCMinutes().toString().padStart(2, '0')}` === tijd;
     });
+    if (isConfirmed) return 'confirmed';
+    const isPending = allPending.some(s => {
+      if (!s.begin) return false;
+      const dt = new Date(s.begin);
+      return `${dt.getUTCHours().toString().padStart(2, '0')}:${dt.getUTCMinutes().toString().padStart(2, '0')}` === tijd;
+    });
+    if (isPending) return 'pending';
+    return 'free';
+  }
+
+  // Bouw de slots:
+  function buildTimeSlotOptions({ uren, slotDuur, slotsPerUur, allAccepted, allPending }) {
     const slots = [];
-    uren.forEach((uur) => {
+    uren.forEach(uur => {
       for (let i = 0; i < slotsPerUur; ++i) {
         const min = i * slotDuur;
         const mm = min < 10 ? `0${min}` : `${min}`;
-        const iso = `${datum}T${uur < 10 ? '0' : ''}${uur}:${mm}:00Z`;
-        const slot = slotStatus[iso];
-        let status = 'free', kleur = '#fff', disabled = false, label = `${uur}u${mm}`;
-        if (slot) {
-          if (slot.status === 'pending') {
-            status = 'pending'; kleur = '#fff9d1'; disabled = true; label += ' (in afwachting)';
-          } else if (slot.status === 'confirmed') {
-            status = 'confirmed'; kleur = '#ffe0e0'; disabled = true; label += ' (bevestigd)';
-          }
+        const tijd = `${uur < 10 ? '0' : ''}${uur}:${mm}`;
+        const status = getStatusForTijd(tijd, allAccepted, allPending);
+        let kleur = '#fff', disabled = false, label = `${uur}u${mm}`;
+        if (status === 'pending') {
+          kleur = '#fff9d1'; disabled = true; label += ' (in afwachting)';
+        } else if (status === 'confirmed') {
+          kleur = '#ffe0e0'; disabled = true; label += ' (bevestigd)';
         }
-        slots.push({ value: iso, label, kleur, disabled, status });
+        slots.push({ value: tijd, label, kleur, disabled, status });
       }
     });
     return slots;
   }
 
   // Bouw alle slots met status
-  const allSlots = buildTimeSlotOptions({ uren, slotDuur, slotsPerUur, datum, studentDates, companyDates, studentId });
+  const allSlots = buildTimeSlotOptions({ uren, slotDuur, slotsPerUur, allAccepted, allPending });
 
   // Favoriet status bepalen vóór HTML genereren
   const isFavoriet = isCompanyFavorite(studentId, bedrijf.gebruiker_id);
   const hartIcon = isFavoriet ? '❤️' : '🤍';
 
   popup.innerHTML = `
-    <div id="bedrijf-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:420px;width:95vw;position:relative;display:flex;flex-direction:column;align-items:center;">
+    <div id="bedrijf-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:600px;width:98vw;min-width:340px;position:relative;display:flex;flex-direction:column;align-items:center;">
       <button id="bedrijf-popup-close" style="position:absolute;top:10px;right:14px;font-size:1.7rem;background:none;border:none;cursor:pointer;color:#888;">&times;</button>
       <button id="popup-favorite-btn" class="popup-favorite-btn" title="${isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'}">${hartIcon}</button>
-      <img src="${bedrijf.foto}" alt="Logo ${
-    bedrijf.naam
-  }" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
+      <img src="${bedrijf.foto}" alt="Logo ${bedrijf.naam}" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
       <h2 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h2>
       <div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${bedrijf.locatie}</div>
       <div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${bedrijf.werkdomein}</div>
       <a href="${bedrijf.linkedin}" target="_blank" style="color:#0077b5;margin-bottom:1rem;">LinkedIn</a>
-      <p style="text-align:center;margin-bottom:1.2rem;">${bedrijf.bio}</p>
+      <p style="text-align:center;margin-bottom:1.2rem;max-height:3.2em;overflow:hidden;">${bedrijf.bio}</p>
       <div style="font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;">
         <a href="mailto:${bedrijf.contact_email}" style="color:#444;">${bedrijf.contact_email}</a>
       </div>
-      <div style="margin-bottom:1rem;text-align:left;width:100%;">
-        <strong>Openstaande functies:</strong>
-        <div style="margin-top:0.3rem;">
-          ${
-            functies.length
-              ? functies.map((f) => `<span class="functie-badge">${f.naam}</span>`).join(' ')
-              : '<span style="color:#aaa;">Geen functies bekend</span>'
-          }
+      <div style="margin-bottom:0.7rem;width:100%;display:flex;flex-direction:row;gap:1.5rem;justify-content:center;">
+        <div style="text-align:left;">
+          <strong>Functies:</strong>
+          <div style="margin-top:0.3rem;max-width:220px;white-space:normal;">
+            ${
+              functies.length
+                ? functies.map((f) => `<span class="functie-badge">${f.naam}</span>`).join(' ')
+                : '<span style="color:#aaa;">Geen functies bekend</span>'
+            }
+          </div>
         </div>
-      </div>
-      <div style="margin-bottom:1rem;text-align:left;width:100%;">
-        <strong>Gevraagde skills:</strong>
-        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.4rem;">
-          ${
-            skills.length
-              ? skills
-                  .map(
-                    (s) =>
-                      `<span style="background:#eee;border-radius:6px;padding:0.3rem 0.7rem;font-size:0.85rem;">${s.naam}</span>`
-                  )
-                  .join('')
-              : '<span style="color:#aaa;">Geen skills opgegeven</span>'
-          }
+        <div style="text-align:left;">
+          <strong>Skills:</strong>
+          <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.4rem;max-width:220px;white-space:normal;">
+            ${
+              skills.length
+                ? skills
+                    .map(
+                      (s) =>
+                        `<span style="background:#eee;border-radius:6px;padding:0.3rem 0.7rem;font-size:0.85rem;">${s.naam}</span>`
+                    )
+                    .join('')
+                : '<span style="color:#aaa;">Geen skills opgegeven</span>'
+            }
+          </div>
         </div>
       </div>
       <div style="margin-bottom:0.7rem;width:100%;">
@@ -189,18 +196,95 @@ async function showBedrijfPopup(bedrijf, studentId) {
           <span style="background:#ffe0e0;border:1px solid #ffbdbd;padding:0.1rem 0.5rem;border-radius:5px;margin-left:0.5rem;">Bezet</span>
         </div>
       </div>
-      <div style="margin-bottom:1rem;width:100%;">
-        <label for="speeddates-slot" style="font-weight:500;">Kies een tijdslot:</label>
-        <select id="speeddates-slot" style="width:100%;margin-top:0.5rem;padding:0.5rem;border-radius:6px;border:1.5px solid #e1e5e9;">
-          <option value="">-- Selecteer een tijdslot --</option>
-          ${allSlots.map(slot => `<option value="${slot.value}" style="background:${slot.kleur};" ${slot.disabled ? 'disabled' : ''}>${slot.label}</option>`).join('')}
-        </select>
-      </div>
+      <div id="slots-list" style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;justify-content:center;"></div>
       <button id="speeddates-aanvraag-btn" style="background:#00bcd4;color:#fff;border:none;padding:0.7rem 1.5rem;border-radius:8px;font-size:1rem;cursor:pointer;" disabled>Confirmeer aanvraag</button>
       <div id="speeddates-aanvraag-status" style="margin-top:1rem;font-size:1rem;color:#2aa97b;display:none;">Speeddate aangevraagd!</div>
     </div>
   `;
   document.body.appendChild(popup);
+
+  // Initialiseer variabelen en check op bestaan
+  const slotsList = popup.querySelector('#slots-list');
+  const aanvraagBtn = popup.querySelector('#speeddates-aanvraag-btn');
+  if (!slotsList || !aanvraagBtn) {
+    console.error('Kan slotsList of aanvraagBtn niet vinden!');
+    return;
+  }
+  let gekozenDatum = '';
+  let geselecteerdUur = null;
+  aanvraagBtn.disabled = true;
+
+  // DEBUG
+  console.log('allSlots', allSlots);
+  console.log('slotsList', slotsList);
+
+  // Compacte urenbalk boven de slots
+  const urenLijst = document.createElement('div');
+  urenLijst.id = 'uren-list';
+  urenLijst.style.cssText = 'display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;justify-content:center;';
+  uren.forEach(uur => {
+    // Bereken aantal vrije slots voor dit uur
+    const slotsForHour = allSlots.filter(slot => {
+      const slotHour = parseInt(slot.value.split(':')[0], 10);
+      return slotHour === uur;
+    });
+    const vrijeSlots = slotsForHour.filter(slot => slot.status === 'free').length;
+    const btn = document.createElement('button');
+    btn.innerHTML = `${uur}u <span style="background:#fff;border-radius:8px;padding:0.1rem 0.7rem;font-size:0.92em;margin-left:0.5em;border:1px solid #b7b7ff;color:#4e7bfa;">${vrijeSlots}</span>`;
+    btn.style.cssText = `
+      background:#eef1fa;
+      border:1.5px solid #b7b7ff;
+      border-radius:8px;
+      padding:0.5rem 1.2rem;
+      font-size:1.05rem;
+      cursor:pointer;
+      margin:0;
+      transition:box-shadow .2s;
+      display:flex;align-items:center;gap:0.4em;
+    `;
+    btn.addEventListener('click', () => {
+      geselecteerdUur = uur;
+      urenLijst.querySelectorAll('button').forEach(b => b.style.boxShadow = '');
+      btn.style.boxShadow = '0 0 0 2.5px #4e7bfa';
+      renderSlotsForHour(uur);
+    });
+    urenLijst.appendChild(btn);
+  });
+  popup.querySelector('#bedrijf-popup-content').insertBefore(urenLijst, slotsList);
+
+  // Render alleen slots van geselecteerd uur
+  function renderSlotsForHour(uur) {
+    const slotsForHour = allSlots.filter(slot => {
+      const slotHour = parseInt(slot.value.split(':')[0], 10);
+      return slotHour === uur;
+    });
+    // console.log(slotsForHour); // Debug
+    slotsList.innerHTML = slotsForHour.map(slot => `
+      <button 
+        class="slot-btn"
+        data-slot="${slot.value}" 
+        style="background:${slot.kleur};border:1.5px solid #e1e5e9;border-radius:8px;padding:0.5rem 1rem;min-width:75px;cursor:${slot.disabled ? 'not-allowed' : 'pointer'};opacity:${slot.disabled ? '0.65' : '1'};font-weight:${slot.status === 'confirmed' ? 'bold' : 'normal'};font-size:0.97rem;"
+        ${slot.disabled ? 'disabled' : ''}
+        title="${slot.label}"
+      >${slot.label.split(' ')[0]}</button>
+    `).join('');
+    aanvraagBtn.disabled = true;
+    gekozenDatum = '';
+    slotsList.querySelectorAll('.slot-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        slotsList.querySelectorAll('.slot-btn').forEach(b => b.style.outline = '');
+        btn.style.outline = '2.5px solid #007bff';
+        gekozenDatum = btn.getAttribute('data-slot');
+        aanvraagBtn.disabled = false;
+      });
+    });
+  }
+  // Automatisch eerste uur tonen
+  if (uren.length) {
+    urenLijst.querySelector('button').click();
+  }
+
   // Sluiten popup
   document.getElementById('bedrijf-popup-close').onclick = () => popup.remove();
   popup.addEventListener('click', (e) => {
@@ -212,12 +296,10 @@ async function showBedrijfPopup(bedrijf, studentId) {
   if (popupFavoriteBtn && currentStudentId) {
     popupFavoriteBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-
       const isNowFavorite = toggleFavoriteCompany(
         currentStudentId,
         bedrijf.gebruiker_id
       );
-
       // Update de button icon en tooltip
       popupFavoriteBtn.innerHTML = isNowFavorite ? '❤️' : '🤍';
       popupFavoriteBtn.title = isNowFavorite
@@ -233,7 +315,6 @@ async function showBedrijfPopup(bedrijf, studentId) {
           ? 'Verwijder uit favorieten'
           : 'Voeg toe aan favorieten';
       }
-
       // Toon feedback notificatie
       const message = isNowFavorite
         ? `${bedrijf.naam} toegevoegd aan favorieten!`
@@ -242,7 +323,6 @@ async function showBedrijfPopup(bedrijf, studentId) {
       // Voeg animatie toe aan de button
       popupFavoriteBtn.classList.add('animating');
       setTimeout(() => popupFavoriteBtn.classList.remove('animating'), 400);
-
       // Update favorites count
       const countElement = document.getElementById('favorites-count');
       if (countElement) {
@@ -252,82 +332,63 @@ async function showBedrijfPopup(bedrijf, studentId) {
     });
   }
 
-  // Dynamische slots vullen
-  const slotSelect = document.getElementById('speeddates-slot');
-  const aanvraagBtn = document.getElementById('speeddates-aanvraag-btn');
-  let gekozenDatum = '';
-
-  slotSelect.addEventListener('change', () => {
-    aanvraagBtn.disabled = !slotSelect.value;
-    gekozenDatum = slotSelect.value;
-  });
-
   // Speeddate aanvraag knop (API-call)
   aanvraagBtn.onclick = async () => {
     const status = document.getElementById('speeddates-aanvraag-status');
     aanvraagBtn.disabled = true;
-    slotSelect.disabled = true;
+    slotsList.disabled = true;
     status.textContent = 'Aanvraag wordt verstuurd...';
     status.style.display = 'block';
-
     // 🛑 DUBBELE BOEKING PREVENTIE: check of student op dit tijdstip al een speeddate heeft (pending/confirmed)
-    const studentSlot = studentDates.find(s => s.begin === gekozenDatum);
-    if (studentSlot) {
+    const tijd = gekozenDatum; // nu alleen HH:MM
+    const alreadyBooked = [...studentDates, ...companyDates].some(s => {
+      if (!s.begin) return false;
+      const dt = new Date(s.begin);
+      const slotTijd = `${dt.getUTCHours().toString().padStart(2, '0')}:${dt.getUTCMinutes().toString().padStart(2, '0')}`;
+      return slotTijd === tijd;
+    });
+    if (alreadyBooked) {
       status.textContent = 'Je hebt al een speeddate op dit tijdstip! Kies een ander slot.';
       status.style.color = '#da2727';
       aanvraagBtn.disabled = false;
-      slotSelect.disabled = false;
+      slotsList.disabled = false;
       return;
     }
-
     try {
-      const req = await fetch('https://api.ehb-match.me/speeddate', {
+      // Combineer datum + tijd voor de API
+      const apiDatum = `${datum} ${tijd}:00`;
+      const req = await fetch('https://api.ehb-match.me/speeddates', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${window.sessionStorage.getItem('authToken')}`,
         },
         body: JSON.stringify({
-          id_student: studentId,
-          id_bedrijf: bedrijf.gebruiker_id,
-          datum: gekozenDatum,
+          id_student: Number(studentId),
+          id_bedrijf: Number(bedrijf.gebruiker_id),
+          datum: apiDatum, // LET OP: spatie, geen T
         }),
       });
-      if (req.ok) {
-        status.textContent = `Speeddate aangevraagd voor ${gekozenDatum.slice(11,16)}!`;
+      if (req.status === 201) {
+        status.textContent = `✅ Speeddate succesvol aangevraagd voor ${tijd}!`;
         status.style.color = '#2aa97b';
-        console.log(`[✅] Speeddate succesvol aangemaakt met ${bedrijf.naam} om ${gekozenDatum}`);
-        // 🔄 Refresh slots na succesvolle aanvraag
-        // Haal nieuwe speeddates op en update dropdown
-        const [newStudentDates, newCompanyDates] = await Promise.all([
-          fetch(`https://api.ehb-match.me/speeddates?id=${studentId}`, {
-            headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` },
-          }).then((r) => (r.ok ? r.json() : [])),
-          fetch(`https://api.ehb-match.me/speeddates?id=${bedrijf.gebruiker_id}`, {
-            headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` },
-          }).then((r) => (r.ok ? r.json() : [])),
-        ]);
-        const refreshedSlots = buildTimeSlotOptions({ uren, slotDuur, slotsPerUur, datum, studentDates: newStudentDates, companyDates: newCompanyDates, studentId });
-        // Ververs dropdown
-        slotSelect.innerHTML = `<option value="">-- Selecteer een tijdslot --</option>` +
-          refreshedSlots.map(slot => `<option value="${slot.value}" style="background:${slot.kleur};" ${slot.disabled ? 'disabled' : ''}>${slot.label}</option>`).join('');
-        slotSelect.disabled = false;
-        aanvraagBtn.disabled = true;
-        gekozenDatum = '';
+        setTimeout(() => {
+          const popup = document.getElementById('bedrijf-popup-modal');
+          if (popup) popup.remove();
+        }, 1300);
       } else {
         const err = await req.json();
         status.textContent = err.message || 'Er ging iets mis!';
         status.style.color = '#da2727';
-        console.warn(`[⚠️] Speeddate-aanvraag mislukt: ${err.message || 'Onbekende fout'}`);
+        aanvraagBtn.disabled = false;
+        slotsList.disabled = false;
       }
     } catch (e) {
       status.textContent = 'Er ging iets mis bij het verzenden!';
       status.style.color = '#da2727';
+      aanvraagBtn.disabled = false;
+      slotsList.disabled = false;
     }
-    setTimeout(() => {
-      status.style.display = 'none';
-      // popup.remove(); // Popup blijft open zodat user direct nieuwe slot kan kiezen
-    }, 1800);
   };
 }
 
@@ -1036,4 +1097,9 @@ function createPopup({ id, title, options = [], selected = [], onSave }) {
     onSave(gekozen);
     overlay.remove();
   };
+}
+
+// Helper: ISO naar API datum formaat
+function isoToAPIDate(iso) {
+  return iso.replace('T', ' ').replace('Z', '');
 }

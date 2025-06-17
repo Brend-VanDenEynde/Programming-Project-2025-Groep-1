@@ -60,6 +60,12 @@ function formatTime(dtString) {
   const dt = new Date(dtString);
   return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 }
+function formatUTCTime(isoString) {
+  const d = new Date(isoString);
+  let hh = d.getUTCHours().toString().padStart(2, '0');
+  let mm = d.getUTCMinutes().toString().padStart(2, '0');
+  return `${hh}:${mm}`;
+}
 
 // export function renderSpeeddatesRequests(rootElement, studentData = {}) {
 export function renderSpeeddatesRequests(rootElement, studentData = {}) {
@@ -158,7 +164,7 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
       <tr>
         <td><span class="bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(v)}' style="color:#0077cc;cursor:pointer;text-decoration:underline;">${v.naam_bedrijf}</span></td>
         <td>${v.lokaal || '-'}</td>
-        <td>${formatTimeFromBegin(v.begin)}</td>
+        <td>${formatUTCTime(v.begin)}</td>
         <td class="status-cell">
           <button class="accept-btn" data-id="${v.id}">Accepteer</button>
           <button class="deny-btn" data-id="${v.id}">Weiger</button>

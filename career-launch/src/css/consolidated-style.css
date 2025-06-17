@@ -3468,7 +3468,7 @@ body.darkmode .no-requests {
   cursor: not-allowed !important;
 }
 .slot-btn[disabled] {
-  opacity: 0.7;
+  opacity: 1;
   pointer-events: none;
 }
 

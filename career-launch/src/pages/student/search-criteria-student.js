@@ -279,7 +279,7 @@ export async function renderSearchCriteriaStudent(
       </div>
     `;
 
-    // Declare these at the top of the function scope
+    // --- VERVANGEN BLOK: actuele data uit API halen ---
     let allSkills = [],
       allTalen = [],
       alleFuncties = [
@@ -292,10 +292,15 @@ export async function renderSearchCriteriaStudent(
       const all = await fetchAllSkills();
       allSkills = all.filter((s) => s.type === 0); // Skills
       allTalen = all.filter((s) => s.type === 1); // Talen
+
       // Functies ophalen van student
-      console.log('studentId voor fetchStudentFuncties:', studentId);
-      console.log('token voor fetchStudentFuncties:', sessionStorage.getItem('authToken'));
-      studentFunctieIds = (await fetchStudentFuncties(studentId)).map(f => f.id);
+      const studentFuncties = await fetchStudentFuncties(studentId);
+      studentFunctieIds = studentFuncties.map(f => f.id);
+
+      // Skills/talen van student ophalen & in studentData zetten
+      const studentSkillsAll = await fetchStudentSkills(studentId);
+      studentData.skills = studentSkillsAll.filter(s => s.type === 0).map(s => s.id);
+      studentData.talen = studentSkillsAll.filter(s => s.type === 1).map(s => s.id);
     } catch (e) {
       rootElement.innerHTML = `<div style="color:red">Fout bij ophalen skills/talen/functies: ${e.message}</div>`;
       return;
