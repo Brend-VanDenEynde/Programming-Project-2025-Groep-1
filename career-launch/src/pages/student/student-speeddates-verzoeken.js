@@ -53,13 +53,19 @@ async function fetchFunctiesSkills(bedrijfId) {
 
 function getSortArrow(key, currentSort) {
   const found = currentSort.find(s => s.key === key);
-  if (!found) return '';
-  return found.asc ? ' ▲' : ' ▼';
+  // Altijd ruimte voor de sorteerdriehoek
+  return `<span class="sort-arrow">${found ? (found.asc ? '▲' : '▼') : ''}</span>`;
 }
 function formatTime(dtString) {
   if (!dtString) return '-';
   const dt = new Date(dtString);
   return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+function formatUTCTime(isoString) {
+  const d = new Date(isoString);
+  let hh = d.getUTCHours().toString().padStart(2, '0');
+  let mm = d.getUTCMinutes().toString().padStart(2, '0');
+  return `${hh}:${mm}`;
 }
 
 // export function renderSpeeddatesRequests(rootElement, studentData = {}) {
@@ -100,21 +106,16 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
         </div>
       </div>
       <footer class="student-profile-footer">
-        <div class="footer-content">
-          <span>&copy; 2025 EhB Career Launch</span>
-          <div class="footer-links">
-            <a href="/privacy" data-route="/privacy">Privacy</a>
-            <a href="/contact" data-route="/contact">Contact</a>
-          </div>
-        </div>
+        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
       </footer>
     </div>
   `;
 
   function getSortArrow(key) {
     const found = currentSort.find(s => s.key === key);
-    if (!found) return '';
-    return found.asc ? ' ▲' : ' ▼';
+    // Altijd ruimte voor de sorteerdriehoek
+    return `<span class="sort-arrow">${found ? (found.asc ? '▲' : '▼') : ''}</span>`;
   }
 
   function formatTimeFromBegin(begin) {
@@ -130,6 +131,12 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     if (key === 'begin') {
       aVal = aVal ? new Date(aVal).getTime() : Number.POSITIVE_INFINITY;
       bVal = bVal ? new Date(bVal).getTime() : Number.POSITIVE_INFINITY;
+    } else if (key === 'naam_bedrijf' || key === 'lokaal') {
+      // Alfabetisch sorteren met Nederlandse collator
+      const collator = new Intl.Collator('nl', { sensitivity: 'base' });
+      aVal = (aVal || '').toLowerCase();
+      bVal = (bVal || '').toLowerCase();
+      return collator.compare(aVal, bVal);
     } else if (typeof aVal === 'string' && typeof bVal === 'string') {
       aVal = aVal.toLowerCase();
       bVal = bVal.toLowerCase();
@@ -158,7 +165,7 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
       <tr>
         <td><span class="bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(v)}' style="color:#0077cc;cursor:pointer;text-decoration:underline;">${v.naam_bedrijf}</span></td>
         <td>${v.lokaal || '-'}</td>
-        <td>${formatTimeFromBegin(v.begin)}</td>
+        <td>${formatUTCTime(v.begin)}</td>
         <td class="status-cell">
           <button class="accept-btn" data-id="${v.id}">Accepteer</button>
           <button class="deny-btn" data-id="${v.id}">Weiger</button>
@@ -361,8 +368,8 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
       <p><strong>Tijd:</strong> ${s.begin ? new Date(s.begin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Onbekend'}</p>
       <p><strong>Locatie:</strong> ${s.lokaal || 'Onbekend'}</p>
       <p><strong>Status:</strong> ${s.akkoord !== undefined ? (s.akkoord ? 'Geaccepteerd' : 'In afwachting') : '-'}</p>
-      <p><strong>LinkedIn:</strong> <a id=\"popup-linkedin\" href=\"#\" target=\"_blank\">Laden...</a></p>
-      <div id=\"popup-skills\"><em>Skills laden...</em></div>
+      <p><strong>LinkedIn:</strong> <a id="popup-linkedin" href="#" target="_blank">Laden...</a></p>
+      <div id="popup-skills"><em>Skills laden...</em></div>
     `;
     overlay.appendChild(popup);
     document.body.appendChild(overlay);

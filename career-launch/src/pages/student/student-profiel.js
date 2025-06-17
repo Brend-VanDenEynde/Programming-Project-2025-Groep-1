@@ -23,6 +23,12 @@ function isoToDateString(isoString) {
   return isoString.split('T')[0];
 }
 
+function getProfielFotoUrl(profiel_foto) {
+  if (!profiel_foto || profiel_foto === 'null') return defaultAvatar;
+  if (profiel_foto.startsWith('http')) return profiel_foto;
+  return 'https://gt0kk4fbet.ufs.sh/f/' + profiel_foto;
+}
+
 export function renderStudentProfiel(
   rootElement,
   studentData = {},
@@ -54,10 +60,7 @@ export function renderStudentProfiel(
   } = studentData;
 
   // Gebruik default als profiel_foto null, leeg of undefined is
-  const profiel_foto =
-    !rawProfielFoto || rawProfielFoto === 'null'
-      ? defaultAvatar
-      : rawProfielFoto;
+  const profiel_foto = getProfielFotoUrl(rawProfielFoto);
 
   // Map opleiding name to id if id is missing
   let resolvedOpleidingId = opleiding_id;
@@ -179,13 +182,8 @@ export function renderStudentProfiel(
       </div>
       
       <footer class="student-profile-footer">
-        <div class="footer-content">
-          <span>&copy; 2025 EhB Career Launch</span>
-          <div class="footer-links">
-            <a href="/privacy" data-route="/privacy">Privacy</a>
-            <a href="/contact" data-route="/contact">Contact</a>
-          </div>
-        </div>
+        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
       </footer>
     </div>
   `;
@@ -302,6 +300,7 @@ export function renderStudentProfiel(
     const editBtn = document.getElementById('btn-edit-profile');
     if (editBtn) {
       editBtn.addEventListener('click', () => {
+        console.log("EDIT clicked", {readonlyMode, studentData});
         renderStudentProfiel(rootElement, studentData, false);
       });
     }
@@ -408,7 +407,16 @@ export function renderStudentProfiel(
           }
 
           // 2. Profielfoto uploaden indien geselecteerd
-          let profielFotoKey = studentData.profiel_foto; // default
+          // Altijd alleen de key, nooit de URL of null!
+          let profielFotoKey = null;
+          if (studentData.profiel_foto && typeof studentData.profiel_foto === 'string') {
+            if (studentData.profiel_foto.startsWith('http')) {
+              const parts = studentData.profiel_foto.split('/');
+              profielFotoKey = parts[parts.length - 1];
+            } else if (studentData.profiel_foto !== 'null') {
+              profielFotoKey = studentData.profiel_foto;
+            }
+          }
           const photoInput = document.getElementById('photoInput');
           if (photoInput && photoInput.files && photoInput.files.length > 0) {
             const file = photoInput.files[0];
@@ -439,16 +447,18 @@ export function renderStudentProfiel(
             const uploadResult = await uploadResp.json();
             profielFotoKey = uploadResult.profiel_foto_key;
           }
+          console.log('Stuur profielfoto key:', profielFotoKey);
           // 3. Overige profielinfo via /studenten/{studentID} (JSON)
           const payload = {
             voornaam: document.getElementById('firstNameInput').value,
             achternaam: document.getElementById('lastNameInput').value,
             studiejaar: parseInt(document.getElementById('yearInput').value, 10),
-            date_of_birth: birthDateValue,
+            date_of_birth: document.getElementById('birthDateInput').value, // <-- correct!
             linkedin: document.getElementById('linkedinInput').value,
             opleiding_id: parseInt(newOpleidingId, 10),
             profiel_foto: profielFotoKey
           };
+          console.log("Payload met profielfoto key:", payload);
           const respStudent = await fetch(`https://api.ehb-match.me/studenten/${studentID}`, {
             method: 'PUT',
             headers: {
@@ -466,15 +476,9 @@ export function renderStudentProfiel(
           const result = await respStudent.json();
           // Backend geeft { message, student } terug
           if (result.student) {
-            // Combineer email met nieuwe studentdata voor sessionStorage
-            const nieuweStudentData = {
-              ...result.student,
-              email: studentData.email,
-            };
-            sessionStorage.setItem(
-              'studentData',
-              JSON.stringify(nieuweStudentData)
-            );
+            alert('Je profiel is succesvol opgeslagen!');
+            // Haal altijd de nieuwste studentdata op na update
+            const nieuweStudentData = await fetchAndStoreStudentProfile();
             renderStudentProfiel(rootElement, nieuweStudentData, true);
           } else {
             alert('Profiel opgeslagen, maar geen student-object in response!');
