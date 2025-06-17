@@ -298,3 +298,29 @@ export async function sendContactMessage(contactData) {
 
   return await response.json();
 }
+
+/**
+ * Create a new speeddate request
+ * @param {number} studentId - The student ID
+ * @param {number} bedrijfId - The company ID
+ * @param {string} datum - The datetime in format "YYYY-MM-DD HH:MM:SS"
+ * @returns {Promise<Object>} Speeddate creation response
+ */
+export async function createSpeeddate(studentId, bedrijfId, datum) {
+  try {
+    const speeddateData = {
+      id_student: parseInt(studentId),
+      id_bedrijf: parseInt(bedrijfId),
+      datum: datum,
+    };
+
+    const response = await apiPost(
+      'https://api.ehb-match.me/speeddates',
+      speeddateData
+    );
+    return response;
+  } catch (error) {
+    console.error('Error creating speeddate:', error);
+    throw error;
+  }
+}

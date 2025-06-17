@@ -20,10 +20,8 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
           <ul>
             <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
             <li><button data-route="search-criteria" class="sidebar-link active">Zoek-criteria</button></li>
-            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
-            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
+            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
             <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
-            <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
           </ul>
         </nav>
         
@@ -69,9 +67,6 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
             break;
           case 'studenten':
             Router.navigate('/bedrijf/studenten');
-            break;
-          case 'qr':
-            Router.navigate('/bedrijf/qr-code');
             break;
         }
       });

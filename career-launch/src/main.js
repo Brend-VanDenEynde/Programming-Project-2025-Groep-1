@@ -26,7 +26,6 @@ import { renderBedrijven } from './pages/student/bedrijven.js';
 import { renderBedrijfSpeeddates } from './pages/bedrijf/bedrijf-speeddates.js';
 import { renderBedrijfSpeeddatesRequests } from './pages/bedrijf/bedrijf-speeddates-verzoeken.js';
 import { renderSearchCriteriaBedrijf } from './pages/bedrijf/search-criteria-bedrijf.js';
-import { renderBedrijfQRPopup } from './pages/bedrijf/bedrijf-qr-popup.js';
 import { renderStudenten } from './pages/bedrijf/studenten.js';
 
 function renderNotFound(rootElement) {
@@ -70,7 +69,6 @@ const routes = {
   '/bedrijf/speeddates': renderBedrijfSpeeddates,
   '/bedrijf/speeddates-verzoeken': renderBedrijfSpeeddatesRequests,
   '/bedrijf/zoek-criteria': renderSearchCriteriaBedrijf,
-  '/bedrijf/qr-code': renderBedrijfQRPopup,
   '/bedrijf/studenten': renderStudenten,
   '/bedrijf/bedrijf-settings': showSettingsPopup,
 };
