@@ -30,8 +30,8 @@ export function renderRegister(rootElement) {
             <label for="passwordInput">Wachtwoord</label>
             <div style="position:relative;display:flex;align-items:center;">
               <input type="password" id="passwordInput" name="password" required placeholder="Wachtwoord" style="flex:1;">
-              <button type="button" id="togglePassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">
-                <img id="togglePasswordIcon" src="${hideIcon}" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
+              <button type="button" id="togglePassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;" tabindex="-1">
+                <img id="togglePasswordIcon" src="${hideIcon}" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" tabindex="-1" aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -39,8 +39,8 @@ export function renderRegister(rootElement) {
             <label for="confirmPasswordInput">Bevestig wachtwoord</label>
             <div style="position:relative;display:flex;align-items:center;">
               <input type="password" id="confirmPasswordInput" name="confirmPassword" required placeholder="Bevestig wachtwoord" style="flex:1;">
-              <button type="button" id="toggleConfirmPassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;">
-                <img id="toggleConfirmPasswordIcon" src="${hideIcon}" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" />
+              <button type="button" id="toggleConfirmPassword" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;" tabindex="-1">
+                <img id="toggleConfirmPasswordIcon" src="${hideIcon}" alt="Toon wachtwoord" style="height:22px;width:22px;vertical-align:middle;" tabindex="-1" aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -52,7 +52,7 @@ export function renderRegister(rootElement) {
               Student
             </label>
             <label class="radio-option">
-              <input type="radio" id="bedrijf" name="rol" value="bedrijf">
+              <input type="radio" id="bedrijf" name="rol" value="bedrijf" required>
               <span class="radio-checkmark"></span>
               Bedrijf
             </label>

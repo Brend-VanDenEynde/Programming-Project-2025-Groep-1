@@ -1,70 +1,46 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import defaultAvatar from '../../images/default.png';
+import '../../css/consolidated-style.css';
+import { createBedrijfNavbar, closeBedrijfNavbar, setupBedrijfNavbarEvents } from '../../utils/bedrijf-navbar.js';
 
 export function renderBedrijfQRPopup(rootElement, companyData = {}) {
   rootElement.innerHTML = `
-    <div class="company-profile-container">
-      <header class="company-profile-header">
-        <div class="logo-section">
-          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
-          <span>EhB Career Launch</span>
+    ${createBedrijfNavbar('qr')}
+    <div class="bedrijf-profile-content">
+      <div class="bedrijf-profile-form-container">
+        <h1 class="bedrijf-profile-title">Jouw QR-code</h1>
+        <div class="qr-code-section">
+          <div class="qr-code-label">Laat deze QR-code scannen door bedrijven of tijdens events</div>
+          <img src="${companyData.qrCode || ''}" alt="QR code" class="qr-code-img" id="qr-code-img">
         </div>
-        <button id="burger-menu" class="company-profile-burger">
-          &#9776;
-        </button>
-        <ul id="burger-dropdown" class="company-profile-dropdown">
-          <li><button id="nav-settings">Instellingen</button></li>
-          <li><button id="nav-logout">Log out</button></li>
-        </ul>
-      </header>
-      <div class="company-profile-main">
-        <!-- Dummy QR content -->
-        <div style="padding:2rem;text-align:center;">QR-code Dummy</div>
       </div>
     </div>
+    ${closeBedrijfNavbar()}
   `;
-}
 
-export default renderBedrijfQRPopup;
+  setupBedrijfNavbarEvents();
 
-function renderSidebar() {
-  const sidebarHtml = `
-    <nav class="company-profile-sidebar">
-      <ul>
-        <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
-        <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
-        <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-        <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
-      </ul>
-    </nav>`;
-
-  const sidebarContainer = document.querySelector('.sidebar-container');
-  if (sidebarContainer) {
-    sidebarContainer.innerHTML = sidebarHtml;
+  // QR-code popup functionaliteit (zonder sluitknop, sluit bij klik buiten popup)
+  const qrImg = document.getElementById('qr-code-img');
+  const qrModal = document.getElementById('qr-modal');
+  const qrModalContent = document.getElementById('qr-modal-content');
+  if (qrImg && qrModal && qrModalContent) {
+    qrImg.style.cursor = 'pointer';
+    qrImg.addEventListener('click', () => {
+      qrModal.style.display = 'flex';
+    });
+    qrModal.addEventListener('click', (e) => {
+      // Sluit alleen als je buiten de modal-content klikt
+      if (e.target === qrModal) {
+        qrModal.style.display = 'none';
+      }
+    });
+    // voorkom sluiten bij klik op de content zelf
+    qrModalContent.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
   }
 }
 
-function setupNavigationLinks(companyData = {}) {
-  document.querySelectorAll('.sidebar-link').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const route = btn.getAttribute('data-route');
-      switch (route) {
-        case 'profile':
-          import('./bedrijf-profiel.js').then((m) => m.renderBedrijfProfiel(document.getElementById('app'), companyData));
-          break;
-        case 'speeddates':
-          import('./bedrijf-speeddates.js').then((m) => m.renderBedrijfSpeeddates(document.getElementById('app'), companyData));
-          break;
-        case 'requests':
-          import('./bedrijf-speeddates-verzoeken.js').then((m) => m.renderBedrijfSpeeddatesRequests(document.getElementById('app'), companyData));
-          break;
-        case 'qr':
-          // Already on QR page, do nothing
-          break;
-      }
-    });
-  });
-}
-
-renderSidebar();
+export default renderBedrijfQRPopup;
 

@@ -393,8 +393,8 @@ a:hover {
   transition: border 0.15s, background 0.15s;
 }
 
-.checkbox-option input[type="checkbox"],
-.checkbox-option input[type="radio"] {
+.checkbox-option input[type='checkbox'],
+.checkbox-option input[type='radio'] {
   accent-color: #0077b5;
   width: 1.1em;
   height: 1.1em;
@@ -1904,7 +1904,7 @@ body.darkmode .student-profile-footer a:hover {
 }
 
 .modern-submit-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #007bff;
   color: white;
   border: none;
   padding: 14px 28px;
@@ -1921,8 +1921,9 @@ body.darkmode .student-profile-footer a:hover {
 }
 
 .modern-submit-button:hover:not(:disabled) {
+  background: #0056b3;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
 }
 
 .modern-submit-button:disabled {
@@ -2432,6 +2433,37 @@ body.darkmode .student-profile-footer a:hover {
   justify-content: center;
   border-radius: 50%;
   margin: 0 auto 0.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.uploaded-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: contain;
+  text-align: center;
+}
+
+.delete-overlay {
+  display: none;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.45);
+  color: #fff;
+  border-width: 0;
+  font-size: 2.2rem;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 2;
+  transition: background 0.2s;
+  pointer-events: auto;
+}
+.upload-icon:hover .delete-overlay {
+  display: flex;
 }
 
 .upload-section label {
@@ -2679,7 +2711,7 @@ body.darkmode .student-profile-footer a:hover {
 }
 
 .opleiding-select:focus {
-   outline: none;
+  outline: none;
   border-color: #004080;
 }
 
@@ -2729,10 +2761,6 @@ body.darkmode .student-profile-footer a:hover {
   border-radius: 6px;
   padding: 0.3rem 0.7rem;
   font-size: 0.92em;
-
-
-
-
 
   margin: 0 0.2rem 0.2rem 0;
   font-weight: 500;
@@ -3023,8 +3051,6 @@ body.darkmode .btn-decline:hover {
 body.darkmode .status-final {
   color: #b0b6c6;
 }
-
-
 
 /* Bedrijf Profile Styles */
 .bedrijf-profile-container {
