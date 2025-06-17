@@ -250,6 +250,39 @@ export async function fetchStudentSpeeddateRequests(studentId = null) {
 }
 
 /**
+ * Fetch discover students for a company
+ * @param {number} bedrijfId - Optional company ID to fetch matched students for. If omitted, uses the authenticated user.
+ * @param {boolean} suggestions - If true (default), results are weighted by functie, opleiding and skills.
+ * @param {boolean} onlyNew - If true, only returns students that have not been matched with the bedrijf before.
+ * @returns {Promise<Array>} Array of matched students data ordered by relevance
+ */
+export async function fetchDiscoverStudenten(
+  bedrijfId = null,
+  suggestions = true,
+  onlyNew = false
+) {
+  try {
+    let url = 'https://api.ehb-match.me/discover/studenten';
+    const params = new URLSearchParams();
+
+    if (bedrijfId) {
+      params.append('id', bedrijfId);
+    }
+    params.append('suggestions', suggestions);
+    params.append('onlyNew', onlyNew);
+
+    if (params.toString()) {
+      url += '?' + params.toString();
+    }
+
+    const students = await apiGet(url);
+    return students;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
  * Send a contact message to the support team
  */
 export async function sendContactMessage(contactData) {
@@ -264,4 +297,30 @@ export async function sendContactMessage(contactData) {
   }
 
   return await response.json();
+}
+
+/**
+ * Create a new speeddate request
+ * @param {number} studentId - The student ID
+ * @param {number} bedrijfId - The company ID
+ * @param {string} datum - The datetime in format "YYYY-MM-DD HH:MM:SS"
+ * @returns {Promise<Object>} Speeddate creation response
+ */
+export async function createSpeeddate(studentId, bedrijfId, datum) {
+  try {
+    const speeddateData = {
+      id_student: parseInt(studentId),
+      id_bedrijf: parseInt(bedrijfId),
+      datum: datum,
+    };
+
+    const response = await apiPost(
+      'https://api.ehb-match.me/speeddates',
+      speeddateData
+    );
+    return response;
+  } catch (error) {
+    console.error('Error creating speeddate:', error);
+    throw error;
+  }
 }

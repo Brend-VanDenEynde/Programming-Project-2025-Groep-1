@@ -2912,7 +2912,6 @@ body.darkmode .student-profile-footer a:hover {
   color: rgba(255, 255, 255, 0.8);
   font-style: italic;
   padding: 2rem;
-  font-size: 1.1rem;
 }
 
 /* Student avatar in speeddate requests table */
@@ -3389,158 +3388,169 @@ body.darkmode .status-final {
   padding: 1rem;
 }
 
-/* Dark mode support for bedrijf styling */
-body.darkmode .bedrijf-profile-container {
-  background: #121212;
-}
-
-body.darkmode .bedrijf-profile-header {
-  background: #000;
-  border-bottom-color: #333;
-}
-
-body.darkmode .bedrijf-profile-header .logo-section {
-  color: #e0f7fa;
-}
-
-body.darkmode .bedrijf-profile-burger {
-  color: #e0f7fa;
-}
-
-body.darkmode .bedrijf-profile-burger:hover {
-  background: #333;
-}
-
-body.darkmode .bedrijf-profile-dropdown {
-  background: #000;
-  border-color: #333;
-}
-
-body.darkmode .bedrijf-profile-dropdown li button {
-  color: #e0f7fa;
-}
-
-body.darkmode .bedrijf-profile-dropdown li button:hover {
-  background: #333;
-}
-
-body.darkmode .bedrijf-profile-sidebar {
-  background: #000;
-  border-right-color: #333;
-}
-
-body.darkmode .bedrijf-profile-sidebar button {
-  color: #e0f7fa;
-}
-
-body.darkmode .bedrijf-profile-sidebar button.active,
-body.darkmode .bedrijf-profile-sidebar button:hover {
-  background: #181c1f;
-  color: #00e6ef;
-  border-left-color: #00e6ef;
-}
-
-body.darkmode .bedrijf-profile-form-container,
-body.darkmode .speeddates-verzoeken-content {
-  background: #000;
-  color: #e0f7fa;
-  border: 1.5px solid #232323;
-}
-
-body.darkmode .bedrijf-profile-footer {
-  background: #000;
-  border-top-color: #333;
-  color: #b0b6c6;
-}
-
-body.darkmode .bedrijf-profile-footer a {
-  color: #00e6ef;
-}
-
-body.darkmode .content-header h1 {
-  color: #00e6ef;
-}
-
-body.darkmode .content-header p {
-  color: #b0b6c6;
-}
-
-body.darkmode .no-requests {
-  color: #b0b6c6;
-}
-
 /* =============================================================================
-   14. TABLE CONTAINER STYLING
+   SPEEDDATE LIJSTEN (voor geplande en pending speeddates)
    ============================================================================= */
 
-.speeddates-table-container {
-  min-width: 700px;
-  max-width: 950px;
-  margin: 0 auto 2rem auto;
-  overflow-x: auto;
-  /* Zorgt dat beide tabellen altijd even breed zijn */
+.speeddates-lijst {
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-.speeddates-table .bedrijf-popup-trigger {
-  color: #222;
-  cursor: pointer;
-  text-decoration: none;
-  border: none;
-  background: none;
-  transition: color 0.18s, background 0.18s;
-}
-.speeddates-table .bedrijf-popup-trigger:hover {
-  color: #28bb8a;
-  background: #f1f9f6;
-  text-decoration: none;
+.speeddates-header {
+  margin-bottom: 20px;
 }
 
-/* Slot status styling */
-.slot-pending {
-  background: #fffbe6 !important;
-  color: #bfa700 !important;
-  border: 1px solid #ffe58f !important;
-  cursor: not-allowed !important;
-}
-.slot-taken {
-  background: #ffeaea !important;
-  color: #d32f2f !important;
-  border: 1px solid #ffb3b3 !important;
-  cursor: not-allowed !important;
-}
-.slot-btn[disabled] {
-  opacity: 0.7;
-  pointer-events: none;
+.speeddates-header h2 {
+  color: #333;
+  font-size: 1.5rem;
+  margin: 0;
 }
 
-/* =============================================================================
-   FILTER BUTTONS STYLING
-   ============================================================================= */
-
-.filter-buttons {
+.speeddates-table {
   display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 10px;
+  flex-direction: column;
+  gap: 15px;
 }
-.filter-btn {
-  background: #f5f5f5;
-  border: 1px solid #bbb;
-  border-radius: 6px;
-  padding: 6px 18px;
+
+.speeddate-item {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.speeddate-item.goedgekeurd {
+  border-left: 4px solid #28a745;
+}
+
+.speeddate-item.in-behandeling,
+.speeddate-item.pending {
+  border-left: 4px solid #ffc107;
+}
+
+.speeddate-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.bedrijf-info, .student-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.profiel-foto {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+.bedrijf-details h4, .student-details h4 {
+  margin: 0 0 4px 0;
   font-size: 1rem;
   color: #333;
+}
+
+.sector {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.afspraak-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.tijd-lokaal p {
+  margin: 0 0 4px 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.goedgekeurd {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.in-behandeling,
+.status-badge.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.speeddate-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, border 0.2s;
+  transition: background-color 0.2s;
 }
-.filter-btn:hover {
-  background: #e0eaff;
-  color: #0056b3;
-  border-color: #0056b3;
+
+.accept-btn {
+  background: #28a745;
+  color: white;
 }
-.filter-btn.active {
-  background: #0056b3;
-  color: #fff;
-  border-color: #0056b3;
-  font-weight: bold;
+
+.accept-btn:hover {
+  background: #218838;
+}
+
+.cancel-btn, .delete-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.cancel-btn:hover, .delete-btn:hover {
+  background: #c82333;
+}
+
+.geen-data {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 40px;
+}
+
+@media (max-width: 768px) {
+  .speeddate-info {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+  
+  .bedrijf-info, .student-info, .afspraak-details {
+    min-width: auto;
+  }
+  
+  .speeddate-actions {
+    justify-content: center;
+  }
 }

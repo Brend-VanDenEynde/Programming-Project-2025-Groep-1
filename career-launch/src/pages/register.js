@@ -104,16 +104,25 @@ export function renderRegister(rootElement) {
   linkedinButton.addEventListener('click', () => {
     // LinkedIn integratie nog niet geïmplementeerd
   });
-  // FOOTER LINKS
-  document.getElementById('privacy-policy').addEventListener('click', (e) => {
-    e.preventDefault();
-    Router.navigate('/privacy');
-  });
-
-  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
-    e.preventDefault();
-    Router.navigate('/contact');
-  });
+  // FOOTER LINKS (verwijder dubbele listeners, alleen deze behouden)
+  const privacyLink = document.getElementById('privacy-policy');
+  if (privacyLink) {
+    privacyLink.setAttribute('href', '#');
+    privacyLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      Router.navigate('/privacy');
+    });
+  }
+  const contactLink = document.getElementById('contacteer-ons');
+  if (contactLink) {
+    contactLink.setAttribute('href', '#');
+    contactLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      Router.navigate('/contact');
+    });
+  }
 
   // Zet altijd light mode bij laden van register
   localStorage.setItem('darkmode', 'false');

@@ -70,6 +70,15 @@ function formatUTCTime(isoString) {
 
 // export function renderSpeeddatesRequests(rootElement, studentData = {}) {
 export function renderSpeeddatesRequests(rootElement, studentData = {}) {
+  // AUTH CHECK: blokkeer toegang zonder geldige login
+  const token = window.sessionStorage.getItem('authToken');
+  if (!token) {
+    import('../login.js').then((module) => {
+      module.renderLogin(rootElement);
+    });
+    return;
+  }
+
   let currentSort = [{ key: 'begin', asc: true }];
 
   rootElement.innerHTML = `

@@ -25,10 +25,8 @@ import { renderBedrijfRegister } from './pages/register-bedrijf/bedrijf-register
 import { renderBedrijven } from './pages/student/bedrijven.js';
 import { renderSearchCriteriaBedrijf } from './pages/bedrijf/search-criteria-bedrijf.js';
 import { renderBedrijfSpeeddates } from './pages/bedrijf/bedrijf-speeddates.js';
-import { renderBedrijfSpeeddatesVerzoeken } from './pages/bedrijf/bedrijf-speeddates-verzoeken.js';
-import { renderBedrijfQRPopup } from './pages/bedrijf/bedrijf-qr-popup.js';
-import { showBedrijfSettingsPopup } from './pages/bedrijf/bedrijf-settings.js';
-import { renderBedrijfStudenten } from './pages/bedrijf/bedrijf-studenten.js';
+import { renderBedrijfSpeeddatesRequests } from './pages/bedrijf/bedrijf-speeddates-verzoeken.js';
+import { renderStudenten } from './pages/bedrijf/studenten.js';
 
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
@@ -72,17 +70,20 @@ const routes = {
     renderAdminProcessingCompanyDetail,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
-  '/bedrijf/bedrijf-profiel': renderBedrijfProfiel,
+  '/bedrijf/bedrijf-profiel': async (rootElement) => {
+    const bedrijfData = JSON.parse(
+      window.sessionStorage.getItem('bedrijfData') || '{}'
+    );
+    await renderBedrijfProfiel(rootElement, bedrijfData, true);
+  },
   '/bedrijf/zoek-criteria': renderSearchCriteriaBedrijf,
   '/bedrijf/speeddates': renderBedrijfSpeeddates,
-  '/bedrijf/speeddates-verzoeken': renderBedrijfSpeeddatesVerzoeken,
-  '/bedrijf/qr-code': renderBedrijfQRPopup,
-  '/bedrijf/settings': showBedrijfSettingsPopup,
+  '/bedrijf/speeddates-verzoeken': renderBedrijfSpeeddatesRequests,
   '/bedrijf/studenten': (rootElement) => {
     const bedrijfData = JSON.parse(
-      window.sessionStorage.getItem('bedrijfData')
+      window.sessionStorage.getItem('bedrijfData') || '{}'
     );
-    renderBedrijfStudenten(rootElement, bedrijfData);
+    renderStudenten(rootElement, bedrijfData);
   },
   '/registreer-bedrijf': renderBedrijfRegister,
 };
@@ -137,7 +138,6 @@ class Router {
     // Fallback naar de opgegeven route
     this.navigate(fallbackPath);
   }
-
   handleRouteChange() {
     let path = window.location.pathname;
     if (!path.startsWith('/')) path = '/' + path;
@@ -147,8 +147,15 @@ class Router {
     const route = this.routes[path] || this.routes['/404'];
     if (route) {
       this.rootElement.innerHTML = '';
-      // Optioneel: je kan extra data meegeven als je wil
-      route(this.rootElement);
+      // Handle both sync and async route functions
+      const result = route(this.rootElement);
+      if (result && typeof result.then === 'function') {
+        // It's a promise, handle async
+        result.catch((error) => {
+          console.error('Route error:', error);
+          this.rootElement.innerHTML = '<div>Error loading page</div>';
+        });
+      }
       this.updateTitle(path);
     }
   }
@@ -176,7 +183,6 @@ class Router {
       '/bedrijf/speeddates': 'Speeddates - Career Launch 2025',
       '/bedrijf/speeddates-verzoeken':
         'Speeddate Verzoeken - Career Launch 2025',
-      '/bedrijf/qr-code': 'QR Code - Career Launch 2025',
       '/bedrijf/settings': 'Instellingen - Career Launch 2025',
       '/bedrijf/studenten': 'Studenten - Career Launch 2025',
       '/registreer-bedrijf': 'Bedrijf Registreren - Career Launch 2025',

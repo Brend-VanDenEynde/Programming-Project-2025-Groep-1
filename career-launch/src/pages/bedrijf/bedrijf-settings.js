@@ -82,22 +82,22 @@ export function showBedrijfSettingsPopup(onClose) {
     window.location.reload();
   });
 
-  document.getElementById('delete-account-btn').addEventListener('click', () => {
-    if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
-      deleteUser();
-      window.location.reload();
-    }
-  });
+  document
+    .getElementById('delete-account-btn')
+    .addEventListener('click', () => {
+      if (confirm('Weet je zeker dat je je account wilt verwijderen?')) {
+        deleteUser();
+        window.location.reload();
+      }
+    });
 }
 
 function renderSidebar() {
   const sidebarHtml = `
     <nav class="company-profile-sidebar">
-      <ul>
-        <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
+      <ul>        <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
         <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
         <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-        <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
       </ul>
     </nav>`;
 
@@ -110,31 +110,31 @@ function renderSidebar() {
 
 function setupNavigationLinks(companyData = {}) {
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
       const route = btn.getAttribute('data-route');
-      switch (route) {
-        case 'profile':
-          import('./bedrijf-profiel.js').then((m) => m.renderBedrijfProfiel(document.getElementById('app'), companyData));
-          break;
-        case 'search':
-          import('./search-criteria-bedrijf.js').then((m) => m.renderSearchCriteriaBedrijf(document.getElementById('app'), companyData));
-          break;
-        case 'speeddates':
-          import('./bedrijf-speeddates.js').then((m) => m.renderBedrijfSpeeddates(document.getElementById('app'), companyData));
-          break;
-        case 'requests':
-          import('./bedrijf-speeddates-verzoeken.js').then((m) => m.renderBedrijfSpeeddatesRequests(document.getElementById('app'), companyData));
-          break;
-        case 'studenten':
-          import('./studenten.js').then((m) => m.renderStudenten(document.getElementById('app'), companyData));
-          break;
-        case 'qr':
-          import('./bedrijf-qr-popup.js').then((m) => m.renderBedrijfQRPopup(document.getElementById('app'), companyData));
-          break;
-      }
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        switch (route) {
+          case 'profile':
+            Router.navigate('/bedrijf/bedrijf-profiel');
+            break;
+          case 'search-criteria':
+            Router.navigate('/bedrijf/zoek-criteria');
+            break;
+          case 'speeddates':
+            Router.navigate('/bedrijf/speeddates');
+            break;
+          case 'requests':
+            Router.navigate('/bedrijf/speeddates-verzoeken');
+            break;
+          case 'studenten':
+            Router.navigate('/bedrijf/studenten');
+            break;
+        }
+      });
     });
   });
 }
 
 renderSidebar();
-

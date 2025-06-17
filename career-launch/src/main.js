@@ -23,6 +23,10 @@ import { renderAdminProcessingCompanyDetail } from './pages/admin/admin-processi
 import { renderBedrijfProfiel } from './pages/bedrijf/bedrijf-profiel.js';
 import { renderBedrijfRegister } from './pages/register-bedrijf/bedrijf-register.js';
 import { renderBedrijven } from './pages/student/bedrijven.js';
+import { renderBedrijfSpeeddates } from './pages/bedrijf/bedrijf-speeddates.js';
+import { renderBedrijfSpeeddatesRequests } from './pages/bedrijf/bedrijf-speeddates-verzoeken.js';
+import { renderSearchCriteriaBedrijf } from './pages/bedrijf/search-criteria-bedrijf.js';
+import { renderStudenten } from './pages/bedrijf/studenten.js';
 
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
@@ -62,10 +66,11 @@ const routes = {
   '/student/bedrijven': renderBedrijven,
   '/bedrijf/bedrijf-profiel': renderBedrijfProfiel,
   '/registreer-bedrijf': renderBedrijfRegister,
-  '/bedrijf/bedrijf-speeddates': renderSpeeddates,
-  '/bedrijf/bedrijf-speeddates-verzoeken': renderSpeeddatesRequests,
+  '/bedrijf/speeddates': renderBedrijfSpeeddates,
+  '/bedrijf/speeddates-verzoeken': renderBedrijfSpeeddatesRequests,
+  '/bedrijf/zoek-criteria': renderSearchCriteriaBedrijf,
+  '/bedrijf/studenten': renderStudenten,
   '/bedrijf/bedrijf-settings': showSettingsPopup,
-  '/bedrijf/bedrijf-qr-popup': renderQRPopup,
 };
 
 const router = new Router(routes);
@@ -77,14 +82,14 @@ function setupFooterLinks() {
   if (privacyLink) {
     privacyLink.onclick = (e) => {
       e.preventDefault();
-      window.appRouter.navigate('/privacy', { replace: true });
+      window.appRouter.navigate('/privacy');
     };
   }
   const contactLink = document.getElementById('contacteer-ons');
   if (contactLink) {
     contactLink.onclick = (e) => {
       e.preventDefault();
-      window.appRouter.navigate('/contact', { replace: true });
+      window.appRouter.navigate('/contact');
     };
   }
 }

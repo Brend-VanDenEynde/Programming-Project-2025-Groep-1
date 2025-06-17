@@ -253,3 +253,100 @@ export function getCurrentUserData() {
       return null;
   }
 }
+
+/**
+ * Fetches the current authenticated user's information
+ * @returns {Promise<Object>} User info from API
+ */
+export async function fetchUserInfo() {
+  const apiUrl = 'https://api.ehb-match.me/auth/info';
+  const token =
+    window.sessionStorage.getItem('authToken') ||
+    window.sessionStorage.getItem('accessToken');
+
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user info: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('User info fetched:', data);
+
+    return {
+      success: true,
+      user: data.user || data,
+      data: data,
+    };
+  } catch (error) {
+    console.error('Fetch user info error:', error);
+    return {
+      success: false,
+      message: 'Failed to fetch user information',
+      error: error.message,
+    };
+  }
+}
+
+/**
+ * Updates a company profile via API
+ * @param {number} bedrijfID - The company ID
+ * @param {Object} updateData - The data to update
+ * @returns {Promise<Object>} API response
+ */
+export async function updateBedrijfProfile(bedrijfID, updateData) {
+  const apiUrl = `https://api.ehb-match.me/bedrijven/${bedrijfID}`;
+  const token =
+    window.sessionStorage.getItem('authToken') ||
+    window.sessionStorage.getItem('accessToken');
+
+  if (!token) {
+    throw new Error('No authentication token found');
+  }
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || `Failed to update company: ${response.status}`
+      );
+    }
+
+    const data = await response.json();
+    console.log('Company updated successfully:', data);
+
+    return {
+      success: true,
+      message: data.message,
+      bedrijf: data.bedrijf,
+      data: data,
+    };
+  } catch (error) {
+    console.error('Update company error:', error);
+    return {
+      success: false,
+      message: error.message || 'Failed to update company information',
+      error: error.message,
+    };
+  }
+}

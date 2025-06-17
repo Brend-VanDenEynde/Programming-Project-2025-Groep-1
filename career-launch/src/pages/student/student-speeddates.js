@@ -109,6 +109,14 @@ function formatUTCTime(isoString) {
 }
 
 export async function renderSpeeddates(rootElement, studentData = {}) {
+  // AUTH CHECK: blokkeer toegang zonder geldige login
+  const token = window.sessionStorage.getItem('authToken');
+  if (!token) {
+    const module = await import('../login.js');
+    module.renderLogin(rootElement);
+    return;
+  }
+
   // Sorteervolgorde behouden als er al gesorteerd is, anders default op tijd
   if (!currentSort || !Array.isArray(currentSort) || currentSort.length === 0) {
     currentSort = [{ key: 'begin', asc: true }];
