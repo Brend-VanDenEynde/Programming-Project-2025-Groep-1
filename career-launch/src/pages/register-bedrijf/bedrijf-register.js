@@ -215,13 +215,13 @@ async function handleBedrijfRegister(event) {
 
     // Clear stored user data
 
-    alert('Je bedrijf account is succesvol aangemaakt! Je kunt nu inloggen.');
+    alert('Uw bedrijfsaccount is succesvol aangemaakt! Gelieve te wachten tot ons team uw account bevestigt.');
     Router.navigate('/login');
   } catch (error) {
     console.error('Fout bij het aanmaken van bedrijf account:', error);
     errorLabel.textContent =
       error.message ||
-      'Er is een fout opgetreden bij het aanmaken van je account.';
+      'Er is een fout opgetreden bij het aanmaken van uw account.';
     errorLabel.style.display = 'block';
   }
 }
