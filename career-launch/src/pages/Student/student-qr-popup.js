@@ -27,11 +27,9 @@ export function renderQRPopup(rootElement, studentData = {}) {
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
-            <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
-            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
-            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="bedrijven" class="sidebar-link">Bedrijven</button></li>
-            <li><button data-route="qr" class="sidebar-link active">QR-code</button></li>
+            <li><button data-route="speeddates" class="sidebar-link" type="button">Speeddates</button></li>
+            <li><button data-route="requests" class="sidebar-link" type="button">Speeddates-verzoeken</button></li>
+            <li><button data-route="bedrijven" class="sidebar-link" type="button">Bedrijven</button></li>
           </ul>
         </nav>
         <div class="student-profile-content">

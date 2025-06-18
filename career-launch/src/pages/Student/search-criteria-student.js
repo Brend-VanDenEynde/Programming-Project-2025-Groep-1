@@ -1,95 +1,194 @@
-import logoIcon from '../../icons/favicon-32x32.png';
-import { renderLogin } from '../login.js';
-import { showSettingsPopup } from './student-settings.js';
+import { refreshToken } from '../../utils/auth-api.js';
 
-// API helpers
-async function fetchAllSkills() {
-  const token = sessionStorage.getItem('authToken');
-  const resp = await fetch('https://api.ehb-match.me/skills', {
-    headers: { Authorization: 'Bearer ' + token },
-  });
-  if (!resp.ok) throw new Error('Kan skills niet ophalen');
-  return await resp.json();
-}
-async function fetchStudentSkills(studentId) {
-  const token = sessionStorage.getItem('authToken');
-  const resp = await fetch(`https://api.ehb-match.me/studenten/${studentId}/skills`, {
-    headers: { Authorization: 'Bearer ' + token },
-  });
-  if (!resp.ok) throw new Error('Kan student skills niet ophalen');
-  return await resp.json();
-}
-async function fetchStudentFuncties(studentId) {
-  const token = sessionStorage.getItem('authToken');
-  const resp = await fetch(`https://api.ehb-match.me/studenten/${studentId}/functies`, {
-    headers: { Authorization: 'Bearer ' + token },
-  });
-  if (!resp.ok) throw new Error('Kan functies niet ophalen');
-  return await resp.json();
-}
-async function addSkillOrTaal(name, isTaal = 0) {
-  const token = sessionStorage.getItem('authToken');
-  const payload = { naam: name, type: isTaal };
-  console.log('Payload naar /skills:', JSON.stringify(payload));
-  const resp = await fetch('https://api.ehb-match.me/skills', {
-    method: 'POST',
+/**
+ * Centrale authenticated request (zoals in bedrijf)
+ */
+async function makeAuthenticatedRequest(url, options = {}) {
+  let authToken = window.sessionStorage.getItem('authToken');
+  if (!authToken) throw new Error('Geen auth token gevonden');
+
+  const requestOptions = {
+    ...options,
     headers: {
-      Authorization: 'Bearer ' + token,
       'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
-  if (!resp.ok) throw new Error('Skill/Taal toevoegen mislukt');
-  return (await resp.json()).skill;
+      'Authorization': `Bearer ${authToken}`,
+      ...options.headers
+    }
+  };
+
+  let response = await fetch(url, requestOptions);
+  if (response.status === 401) {
+    const refreshResult = await refreshToken();
+    if (refreshResult.success && refreshResult.accessToken) {
+      requestOptions.headers['Authorization'] = `Bearer ${refreshResult.accessToken}`;
+      response = await fetch(url, requestOptions);
+    } else {
+      throw new Error('Authenticatie mislukt - log opnieuw in');
+    }
+  }
+  return response;
 }
-async function setStudentSkills(studentId, skillIds) {
+
+/**
+ * Haal alle skills (en talen) op
+ */
+export async function fetchAllSkills() {
+  try {
+    const resp = await makeAuthenticatedRequest('https://api.ehb-match.me/skills', { method: 'GET' });
+    if (!resp.ok) throw new Error('Kan skills niet ophalen');
+    return await resp.json();
+  } catch (err) {
+    // Fallback skills indien gewenst (zoals bij bedrijf)
+    return [
+      { id: null, naam: 'JavaScript', type: 0 },
+      { id: null, naam: 'Python', type: 0 },
+      { id: null, naam: 'Nederlands', type: 1 },
+      { id: null, naam: 'Engels', type: 1 }
+    ];
+  }
+}
+
+/**
+ * Haal skills en talen van een student op
+ */
+export async function fetchStudentSkills(studentId) {
+  try {
+    const resp = await makeAuthenticatedRequest(`https://api.ehb-match.me/studenten/${studentId}/skills`, { method: 'GET' });
+    if (!resp.ok) throw new Error('Kan student skills niet ophalen');
+    return await resp.json();
+  } catch (err) {
+    return [];
+  }
+}
+
+/**
+ * Haal functies van een student op
+ */
+export async function fetchStudentFuncties(studentId) {
+  try {
+    const resp = await makeAuthenticatedRequest(`https://api.ehb-match.me/studenten/${studentId}/functies`, { method: 'GET' });
+    if (!resp.ok) throw new Error('Kan functies niet ophalen');
+    return await resp.json();
+  } catch (err) {
+    return [];
+  }
+}
+
+/**
+ * Voeg nieuwe skill of taal toe aan skills database (type: 0 = skill, 1 = taal)
+ */
+export async function addSkillOrTaal(name, isTaal = 0) {
+  try {
+    const payload = { naam: name, type: isTaal };
+    const resp = await makeAuthenticatedRequest('https://api.ehb-match.me/skills', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    if (!resp.ok) {
+      const errorText = await resp.text();
+      if (resp.status === 400 || resp.status === 409) {
+        // Skill bestaat waarschijnlijk al, haal alle skills opnieuw op
+        const all = await fetchAllSkills();
+        return all.find(s => s.naam.toLowerCase() === name.toLowerCase() && s.type === isTaal);
+      }
+      throw new Error('Skill/Taal toevoegen mislukt: ' + errorText);
+    }
+    return (await resp.json()).skill;
+  } catch (err) {
+    throw new Error('Skill/Taal toevoegen mislukt: ' + err.message);
+  }
+}
+
+/**
+ * Zet alle skills/talen voor een student (overschrijft bestaande)
+ */
+export async function setStudentSkills(studentId, skillIds) {
   if (!Array.isArray(skillIds)) throw new Error('skillIds is geen array!');
-  const ids = skillIds.filter(id => typeof id === 'number' && id > 0);
-  if (ids.length === 0) {
-    throw new Error('Je moet minstens één skill of taal selecteren.');
-  }
+  // Sta id === 0 toe (zoals API verwacht)
+  const ids = skillIds.filter(id => typeof id === 'number' && Number.isFinite(id) && id >= 0);
+  if (ids.length === 0) throw new Error('Je moet minstens één skill of taal selecteren.');
   const payload = { skills: ids };
-  console.log('Payload naar /studenten/' + studentId + '/skills:', JSON.stringify(payload));
-  const token = sessionStorage.getItem('authToken');
-  const resp = await fetch(`https://api.ehb-match.me/studenten/${studentId}/skills`, {
-    method: 'POST',
-    headers: {
-      Authorization: 'Bearer ' + token,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
-  if (!resp.ok) {
-    const txt = await resp.text();
-    console.error('Skills setten mislukt:', txt);
-    throw new Error('Skills setten faalt: ' + txt);
+  try {
+    const resp = await makeAuthenticatedRequest(`https://api.ehb-match.me/studenten/${studentId}/skills`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    if (!resp.ok) {
+      const txt = await resp.text();
+      throw new Error('Skills setten faalt: ' + txt);
+    }
+    return await resp.json();
+  } catch (err) {
+    throw new Error('Skills setten faalt: ' + err.message);
   }
-  return await resp.json();
 }
-async function setStudentFuncties(studentId, functieIds) {
+
+/**
+ * Zet alle functies voor een student (overschrijft bestaande)
+ */
+export async function setStudentFuncties(studentId, functieIds) {
   if (!Array.isArray(functieIds)) throw new Error('functieIds is geen array!');
   // Remove dups & maak platte array
   const cleanFuncties = [...new Set(functieIds.flat().filter(id => typeof id === 'number' && id > 0))];
   if (cleanFuncties.length === 0) throw new Error('Je moet minstens één functie selecteren.');
-  // API verwacht platte array!
-  const payload = { functies: cleanFuncties };
-  console.log('Payload naar /studenten/' + studentId + '/functies:', JSON.stringify(payload));
-  const token = sessionStorage.getItem('authToken');
-  const resp = await fetch(`https://api.ehb-match.me/studenten/${studentId}/functies`, {
-    method: 'POST',
-    headers: {
-      Authorization: 'Bearer ' + token,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
-  if (!resp.ok) {
-    const txt = await resp.text();
-    console.error('Functies setten mislukt:', txt);
-    throw new Error('Functies setten faalt: ' + txt);
+  const payload = { functies: cleanFuncties }; // GEEN dubbele array!
+  console.log('Functies naar backend (platte array):', JSON.stringify(payload));
+  try {
+    const resp = await makeAuthenticatedRequest(
+      `https://api.ehb-match.me/studenten/${studentId}/functies`,
+      { method: 'POST', body: JSON.stringify(payload) }
+    );
+    if (!resp.ok) {
+      const txt = await resp.text();
+      throw new Error('Functies setten faalt: ' + txt);
+    }
+    return await resp.json();
+  } catch (err) {
+    throw new Error('Functies setten faalt: ' + err.message);
   }
-  return await resp.json();
 }
+
+/**
+ * Verwijder een skill van een student
+ */
+export async function removeStudentSkill(studentId, skillId) {
+  try {
+    const resp = await makeAuthenticatedRequest(
+      `https://api.ehb-match.me/studenten/${studentId}/skills/${skillId}`,
+      { method: 'DELETE' }
+    );
+    if (!resp.ok) {
+      const txt = await resp.text();
+      throw new Error('Skill verwijderen faalt: ' + txt);
+    }
+    return await resp.json();
+  } catch (err) {
+    throw new Error('Skill verwijderen faalt: ' + err.message);
+  }
+}
+
+/**
+ * Verwijder een functie van een student
+ */
+export async function removeStudentFunctie(studentId, functieId) {
+  try {
+    const resp = await makeAuthenticatedRequest(
+      `https://api.ehb-match.me/studenten/${studentId}/functies/${functieId}`,
+      { method: 'DELETE' }
+    );
+    if (!resp.ok) {
+      const txt = await resp.text();
+      throw new Error('Functie verwijderen faalt: ' + txt);
+    }
+    return await resp.json();
+  } catch (err) {
+    throw new Error('Functie verwijderen faalt: ' + err.message);
+  }
+}
+
+import logoIcon from '../../icons/favicon-32x32.png';
+import { renderLogin } from '../login.js';
+import { showSettingsPopup } from './student-settings.js';
 
 const FUNCTIES = [
   { id: 1, naam: 'Fulltime' },
@@ -97,6 +196,9 @@ const FUNCTIES = [
   { id: 3, naam: 'Stagiair(e)' },
 ];
 
+/**
+ * Inject CSS styles for criteria chips and autocomplete
+ */
 function injectStyle() {
   if (document.getElementById('criteria-chips-style')) return;
   const style = document.createElement('style');
@@ -112,6 +214,9 @@ function injectStyle() {
   document.head.appendChild(style);
 }
 
+/**
+ * Render chips for skills or languages
+ */
 function renderChips(list, allItems, containerId, readonly, onRemove) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -130,6 +235,9 @@ function renderChips(list, allItems, containerId, readonly, onRemove) {
   }
 }
 
+/**
+ * Render the search criteria student view
+ */
 export async function renderSearchCriteriaStudent(
   root, studentData = {}, readonly = true, allSkills = null, allTalen = null,
   localSkillsParam = null, localTalenParam = null, localFunctiesParam = null
@@ -141,7 +249,9 @@ export async function renderSearchCriteriaStudent(
     if (stored) studentData = JSON.parse(stored);
     else { alert('Geen student info gevonden. Log opnieuw in.'); return; }
   }
+  // Gebruik altijd de id uit de API (id of gebruiker_id)
   const studentId = studentData.id || studentData.gebruiker_id;
+  console.log('Gebruikte studentId:', studentId, 'studentData:', studentData); // Debug
   if (!studentId) { alert('Student ID ontbreekt!'); return; }
 
   // Data ophalen
@@ -181,11 +291,9 @@ export async function renderSearchCriteriaStudent(
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
-            <li><button data-route="search" class="sidebar-link active" type="button">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link" type="button">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link" type="button">Speeddates-verzoeken</button></li>
             <li><button data-route="bedrijven" class="sidebar-link" type="button">Bedrijven</button></li>
-            <li><button data-route="qr" class="sidebar-link" type="button">QR-code</button></li>
           </ul>
         </nav>
         <div class="student-profile-content">
@@ -266,7 +374,7 @@ export async function renderSearchCriteriaStudent(
     });
   });
 
-  // Add skill
+  // Add skill (direct sync, geen lokale array)
   const addSkillBtn = document.getElementById('add-skill-btn');
   if (addSkillBtn) {
     addSkillBtn.onclick = async e => {
@@ -274,22 +382,25 @@ export async function renderSearchCriteriaStudent(
       const input = document.getElementById('skill-input');
       const value = input.value.trim();
       if (!value) return;
-      let bestaande = localAllSkills.find(skill => skill.naam.toLowerCase() === value.toLowerCase());
+      let bestaande = allSkills.find(skill => skill.naam.toLowerCase() === value.toLowerCase());
       let id;
       if (bestaande) {
         id = bestaande.id;
       } else {
         const nieuwSkill = await addSkillOrTaal(value, 0);
         id = nieuwSkill.id;
-        localAllSkills.push(nieuwSkill);
+        allSkills.push(nieuwSkill);
       }
-      const alleIds = [...new Set([...localSkills, id, ...localTalen])];
+      // Haal huidige skills/talen van student op
+      const allStudentSkills = await fetchStudentSkills(studentId);
+      const studentTalen = allStudentSkills.filter(s => s.type === 1).map(s => s.id);
+      const alleIds = [...new Set([id, ...studentTalen])];
       await setStudentSkills(studentId, alleIds);
-      renderSearchCriteriaStudent(root, studentData, true, localAllSkills, localAllTalen, [...localSkills, id], localTalen, localFuncties);
+      renderSearchCriteriaStudent(root, studentData, true, allSkills, allTalen, null, null, localFuncties);
       input.value = '';
     };
   }
-  // Add taal
+  // Add taal (direct sync, geen lokale array)
   const addTaalBtn = document.getElementById('add-taal-btn');
   if (addTaalBtn) {
     addTaalBtn.onclick = async e => {
@@ -297,50 +408,52 @@ export async function renderSearchCriteriaStudent(
       const input = document.getElementById('taal-input');
       const value = input.value.trim();
       if (!value) return;
-      let bestaande = localAllTalen.find(taal => taal.naam.toLowerCase() === value.toLowerCase());
+      let bestaande = allTalen.find(taal => taal.naam.toLowerCase() === value.toLowerCase());
       let id;
       if (bestaande) {
         id = bestaande.id;
       } else {
         const nieuwTaal = await addSkillOrTaal(value, 1);
         id = nieuwTaal.id;
-        localAllTalen.push(nieuwTaal);
+        allTalen.push(nieuwTaal);
       }
-      const alleIds = [...new Set([...localSkills, ...localTalen, id])];
+      // Haal huidige skills/talen van student op
+      const allStudentSkills = await fetchStudentSkills(studentId);
+      const studentSkills = allStudentSkills.filter(s => s.type === 0).map(s => s.id);
+      const alleIds = [...new Set([...studentSkills, id])];
       await setStudentSkills(studentId, alleIds);
-      renderSearchCriteriaStudent(root, studentData, true, localAllSkills, localAllTalen, localSkills, [...localTalen, id], localFuncties);
+      renderSearchCriteriaStudent(root, studentData, true, allSkills, allTalen, null, null, localFuncties);
       input.value = '';
     };
   }
-  // Autocomplete skills
+  // Autocomplete skills (direct sync)
   const skillInput = document.getElementById('skill-input');
   const skillSuggestiesDiv = document.getElementById('skill-suggesties');
   if (skillInput && skillSuggestiesDiv) {
     skillInput.addEventListener('input', () => {
       const query = skillInput.value.toLowerCase();
-      const filtered = localAllSkills.filter(s => s.naam.toLowerCase().includes(query) && !localSkills.includes(s.id));
+      const filtered = allSkills.filter(s => s.naam.toLowerCase().includes(query));
       if (query && filtered.length > 0) {
-        skillSuggestiesDiv.innerHTML = filtered.map(s => `<div class=\"suggestie\" data-id=\"${s.id}\">${s.naam}</div>`).join('');
+        skillSuggestiesDiv.innerHTML = filtered.map(s => `<div class="suggestie" data-id="${s.id}">${s.naam}</div>`).join('');
         skillSuggestiesDiv.style.display = 'block';
       } else {
         skillSuggestiesDiv.innerHTML = '';
         skillSuggestiesDiv.style.display = 'none';
       }
     });
-    skillSuggestiesDiv.addEventListener('click', e => {
+    skillSuggestiesDiv.addEventListener('click', async e => {
       const target = e.target.closest('.suggestie');
       if (!target) return;
       const id = parseInt(target.getAttribute('data-id'));
-      if (!localSkills.includes(id)) localSkills.push(id);
-      // Debug: check arrays voor rerender
-      console.log('Voor rerender (autocomplete): localSkills:', localSkills, 'localAllSkills:', localAllSkills);
+      // Haal huidige skills/talen van student op
+      const allStudentSkills = await fetchStudentSkills(studentId);
+      const studentTalen = allStudentSkills.filter(s => s.type === 1).map(s => s.id);
+      const alleIds = [...new Set([id, ...studentTalen])];
+      await setStudentSkills(studentId, alleIds);
       skillInput.value = '';
       skillSuggestiesDiv.innerHTML = '';
       skillSuggestiesDiv.style.display = 'none';
-      renderSearchCriteriaStudent(
-        root, studentData, false, localAllSkills, localAllTalen,
-        localSkills, localTalen, localFuncties
-      );
+      renderSearchCriteriaStudent(root, studentData, true, allSkills, allTalen, null, null, localFuncties);
     });
     document.addEventListener('click', e => {
       if (!skillSuggestiesDiv.contains(e.target) && e.target !== skillInput) {
@@ -349,13 +462,13 @@ export async function renderSearchCriteriaStudent(
       }
     });
   }
-  // Autocomplete talen
+  // Autocomplete talen (direct sync)
   const taalInput = document.getElementById('taal-input');
   const taalSuggestiesDiv = document.getElementById('taal-suggesties');
   if (taalInput && taalSuggestiesDiv) {
     taalInput.addEventListener('input', () => {
       const query = taalInput.value.toLowerCase();
-      const filtered = localAllTalen.filter(t => t.naam.toLowerCase().includes(query) && !localTalen.includes(t.id));
+      const filtered = allTalen.filter(t => t.naam.toLowerCase().includes(query));
       if (query && filtered.length > 0) {
         taalSuggestiesDiv.innerHTML = filtered.map(t => `<div class="suggestie" data-id="${t.id}">${t.naam}</div>`).join('');
         taalSuggestiesDiv.style.display = 'block';
@@ -364,20 +477,19 @@ export async function renderSearchCriteriaStudent(
         taalSuggestiesDiv.style.display = 'none';
       }
     });
-    taalSuggestiesDiv.addEventListener('click', e => {
+    taalSuggestiesDiv.addEventListener('click', async e => {
       const target = e.target.closest('.suggestie');
       if (!target) return;
       const id = parseInt(target.getAttribute('data-id'));
-      if (!localTalen.includes(id)) localTalen.push(id);
-      // Debug: check arrays voor rerender
-      console.log('Voor rerender (autocomplete): localTalen:', localTalen, 'localAllTalen:', localAllTalen);
+      // Haal huidige skills/talen van student op
+      const allStudentSkills = await fetchStudentSkills(studentId);
+      const studentSkills = allStudentSkills.filter(s => s.type === 0).map(s => s.id);
+      const alleIds = [...new Set([...studentSkills, id])];
+      await setStudentSkills(studentId, alleIds);
       taalInput.value = '';
       taalSuggestiesDiv.innerHTML = '';
       taalSuggestiesDiv.style.display = 'none';
-      renderSearchCriteriaStudent(
-        root, studentData, false, localAllSkills, localAllTalen,
-        localSkills, localTalen, localFuncties
-      );
+      renderSearchCriteriaStudent(root, studentData, true, allSkills, allTalen, null, null, localFuncties);
     });
     document.addEventListener('click', e => {
       if (!taalSuggestiesDiv.contains(e.target) && e.target !== taalInput) {
