@@ -62,10 +62,11 @@ export async function renderBedrijfProfiel(
             'Mijn Bedrijf',
           profiel_foto_key: apiUser.profiel_foto_key || apiUser.logo_key || DEFAULT_AVATAR_KEY,
           profiel_foto_url:
-            apiUser.profiel_foto_url || apiUser.logo_url || defaultLogo,
+            apiUser.profiel_foto_url || apiUser.logo_url || DEFAULT_AVATAR_URL,
           plaats: apiUser.plaats || apiUser.locatie || apiUser.location || '',
           linkedin: apiUser.linkedin || '',
           sector_bedrijf: apiUser.sector_bedrijf || apiUser.sector || '',
+          id_sector_bedrijf: apiUser.id_sector_bedrijf || null,
         };
 
         // Log de gemapte bedrijf data voor debugging
@@ -87,7 +88,8 @@ export async function renderBedrijfProfiel(
           profiel_foto_url: DEFAULT_AVATAR_URL,
           plaats: 'Brussel',
           linkedin: 'https://www.linkedin.com/company/techcorp-belgium',
-          sector_bedrijf: 'IT & Technology',
+          sector_bedrijf: 'Informatica',
+          id_sector_bedrijf: 4, // Dummy sector ID
         };
       }
     } catch (error) {
@@ -100,7 +102,8 @@ export async function renderBedrijfProfiel(
         profiel_foto_url: DEFAULT_AVATAR_URL,
         plaats: 'Brussel',
         linkedin: 'https://www.linkedin.com/company/techcorp-belgium',
-        sector_bedrijf: 'IT & Technology',
+        sector_bedrijf: 'Informatica',
+        id_sector_bedrijf: 4, // Dummy sector ID
       };
     }
   } // Gebruik ENKEL de huidige API velden
@@ -123,7 +126,8 @@ export async function renderBedrijfProfiel(
         <div class="logo-section">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
-        </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
+        </div>
+        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
         <ul id="burger-dropdown" class="bedrijf-profile-dropdown">
           <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
@@ -131,10 +135,12 @@ export async function renderBedrijfProfiel(
         </ul>
       </header>
       
-      <div class="bedrijf-profile-main">        <nav class="bedrijf-profile-sidebar">
+      <div class="bedrijf-profile-main">
+        <nav class="bedrijf-profile-sidebar">
           <ul>
             <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
-            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
+            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
+            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
             <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
           </ul>
         </nav>
@@ -146,51 +152,37 @@ export async function renderBedrijfProfiel(
               <div class="bedrijf-profile-avatar-section">
                 <div class="bedrijf-profile-avatar-div" style="position:relative;">
                   <img
-                    src="${foto}"
-                    alt="Logo ${naam}"
                     id="logo-preview"
                     class="bedrijf-profile-avatar"
                   />
                   <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
                 </div>
-                <input type="file" accept="image/*" id="logoInput" style="display:${
-                  readonlyMode ? 'none' : 'block'
-                };margin-top:10px;">
+                <input type="file" accept="image/*" id="logoInput" style="display:${readonlyMode ? 'none' : 'block'};margin-top:10px;">
               </div>
               
               <div class="bedrijf-profile-form-group">
                 <label for="bedrijfsnaamInput">Bedrijfsnaam</label>
-                <input type="text" id="bedrijfsnaamInput" value="${naam}" placeholder="Bedrijfsnaam" required ${
-    readonlyMode ? 'disabled' : ''
-  }>
+                <input type="text" id="bedrijfsnaamInput" placeholder="Bedrijfsnaam" required ${readonlyMode ? 'disabled' : ''}>
               </div>
               
               <div class="bedrijf-profile-form-group">
                 <label for="emailInput">E-mailadres</label>
-                <input type="email" id="emailInput" value="${contact_email}" placeholder="contact@bedrijf.be" required ${
-    readonlyMode ? 'disabled' : ''
-  }>
+                <input type="email" id="emailInput" placeholder="contact@bedrijf.be" required ${readonlyMode ? 'disabled' : ''}>
               </div>
               
               <div class="bedrijf-profile-form-group">
                 <label for="plaatsInput">Plaats</label>
-                <input type="text" id="plaatsInput" value="${plaats}" placeholder="Brussel" ${
-    readonlyMode ? 'disabled' : ''
-  }>
+                <input type="text" id="plaatsInput" placeholder="Brussel" ${readonlyMode ? 'disabled' : ''}>
               </div>
               
               <div class="bedrijf-profile-form-group">
                 <label for="linkedinInput">LinkedIn</label>
-                <input type="url" id="linkedinInput" value="${linkedin ? linkedin : ''}" placeholder="https://www.linkedin.com/company/bedrijf" ${
-    readonlyMode ? 'disabled' : ''
-  }>
+                <input type="url" id="linkedinInput" placeholder="https://www.linkedin.com/company/bedrijf" ${readonlyMode ? 'disabled' : ''}>
               </div>
               
               <div class="bedrijf-profile-form-group">
                 <label for="sectorInput">Sector</label>
-                <input type="text" id="sectorInput" value="${sector_bedrijf}" placeholder="IT & Technology" ${
-    readonlyMode ? 'disabled' : ''
-  }>
+                <input type="text" id="sectorInput" placeholder="IT & Technology" ${readonlyMode ? 'disabled' : ''}>
               </div>
               
               <div class="bedrijf-profile-buttons">
@@ -218,6 +210,15 @@ export async function renderBedrijfProfiel(
       </footer>
     </div>
   `;
+
+  // Set user-controlled values safely after rendering
+  document.getElementById('logo-preview').src = foto;
+  document.getElementById('logo-preview').alt = `Logo ${naam}`;
+  document.getElementById('bedrijfsnaamInput').value = naam;
+  document.getElementById('emailInput').value = contact_email;
+  document.getElementById('plaatsInput').value = plaats;
+  document.getElementById('linkedinInput').value = linkedin ? linkedin : '';
+  document.getElementById('sectorInput').value = sector_bedrijf;
   // Event listeners
 
   // Burger menu
@@ -372,7 +373,7 @@ export async function renderBedrijfProfiel(
           contact_email: document.getElementById('emailInput').value,
           plaats: document.getElementById('plaatsInput').value,
           linkedin: linkedinValue,
-          id_sector: sectorID || bedrijfData.sector_bedrijf, // Gebruik sectorID als deze is opgehaald, anders huidige waarde
+          id_sector: sectorID || bedrijfData.id_sector_bedrijf, // Gebruik sectorID als deze is opgehaald, anders huidige waarde
           // sector_bedrijf wordt niet geaccepteerd door de API, dus weggelaten
         }; // Haal het bedrijf ID op uit de huidige data
         const bedrijfID = bedrijfData.id || bedrijfData.gebruiker_id;
@@ -467,6 +468,7 @@ export async function renderBedrijfProfiel(
             sector_bedrijf: (result.bedrijf?.sector_bedrijf && result.bedrijf.sector_bedrijf.length > 0)
               ? result.bedrijf.sector_bedrijf.charAt(0).toUpperCase() + result.bedrijf.sector_bedrijf.slice(1)
               : bedrijfData.sector_bedrijf,
+            id_sector_bedrijf: result.bedrijf?.id_sector_bedrijf || bedrijfData.id_sector_bedrijf,
             profiel_foto_key:
               result.bedrijf?.profiel_foto_key || bedrijfData.profiel_foto_key,
             profiel_foto_url:
