@@ -1489,8 +1489,6 @@ body.darkmode .student-profile-sidebar button.active,
 body.darkmode .student-profile-sidebar button:hover {
   background: #181c1f !important;
   color: #00e6ef !important;
-  border-left: 4px solid #00e6ef !important;
-  font-weight: 700;
 }
 
 body.darkmode .student-profile-content {
@@ -3743,4 +3741,45 @@ body.darkmode .status-final {
     flex-direction: column;
     gap: 10px;
   }
+}
+
+/* DARK MODE voor bedrijf profiel */
+body.darkmode .bedrijf-profile-container {
+  background: #10131a !important;
+}
+body.darkmode .bedrijf-profile-header,
+body.darkmode .bedrijf-profile-sidebar,
+body.darkmode .bedrijf-profile-content,
+body.darkmode .bedrijf-profile-form-container,
+body.darkmode .bedrijf-profile-footer {
+  background: #181c1f !important;
+  color: #e0f7fa !important;
+  border-color: #232323 !important;
+}
+body.darkmode .bedrijf-profile-header .logo-section span,
+body.darkmode .bedrijf-profile-footer a {
+  color: #00e6ef !important;
+}
+body.darkmode .bedrijf-profile-footer a:hover {
+  color: #3dd686 !important;
+}
+body.darkmode .bedrijf-profile-sidebar button,
+body.darkmode .bedrijf-profile-sidebar button.active,
+body.darkmode .bedrijf-profile-sidebar button:hover {
+  background: #181c1f !important;
+  color: #00e6ef !important;
+  border-left: 4px solid transparent !important;
+  font-weight: 500;
+}
+body.darkmode .bedrijf-profile-dropdown {
+  background: #181c1f !important;
+  color: #e0f7fa !important;
+  border: 1px solid #232323 !important;
+}
+body.darkmode .bedrijf-profile-dropdown button {
+  color: #e0f7fa !important;
+}
+body.darkmode .bedrijf-profile-dropdown button:hover {
+  background: #232323 !important;
+  color: #00e6ef !important;
 }
