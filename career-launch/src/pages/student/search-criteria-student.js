@@ -1,582 +1,719 @@
-import { refreshToken } from '../../utils/auth-api.js';
-
-/**
- * Centrale authenticated request (zoals in bedrijf)
- */
-async function makeAuthenticatedRequest(url, options = {}) {
-  let authToken = window.sessionStorage.getItem('authToken');
-  if (!authToken) throw new Error('Geen auth token gevonden');
-
-  const requestOptions = {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${authToken}`,
-      ...options.headers
-    }
-  };
-
-  let response = await fetch(url, requestOptions);
-  if (response.status === 401) {
-    const refreshResult = await refreshToken();
-    if (refreshResult.success && refreshResult.accessToken) {
-      requestOptions.headers['Authorization'] = `Bearer ${refreshResult.accessToken}`;
-      response = await fetch(url, requestOptions);
-    } else {
-      throw new Error('Authenticatie mislukt - log opnieuw in');
-    }
-  }
-  return response;
-}
-
-/**
- * Haal alle skills (en talen) op
- */
-export async function fetchAllSkills() {
-  try {
-    const resp = await makeAuthenticatedRequest('https://api.ehb-match.me/skills', { method: 'GET' });
-    if (!resp.ok) throw new Error('Kan skills niet ophalen');
-    return await resp.json();
-  } catch (err) {
-    // Fallback skills indien gewenst (zoals bij bedrijf)
-    return [
-      { id: null, naam: 'JavaScript', type: 0 },
-      { id: null, naam: 'Python', type: 0 },
-      { id: null, naam: 'Nederlands', type: 1 },
-      { id: null, naam: 'Engels', type: 1 }
-    ];
-  }
-}
-
-/**
- * Haal skills en talen van een student op
- */
-export async function fetchStudentSkills(studentId) {
-  try {
-    const resp = await makeAuthenticatedRequest(`https://api.ehb-match.me/studenten/${studentId}/skills`, { method: 'GET' });
-    if (!resp.ok) throw new Error('Kan student skills niet ophalen');
-    return await resp.json();
-  } catch (err) {
-    return [];
-  }
-}
-
-/**
- * Haal functies van een student op
- */
-export async function fetchStudentFuncties(studentId) {
-  try {
-    const resp = await makeAuthenticatedRequest(`https://api.ehb-match.me/studenten/${studentId}/functies`, { method: 'GET' });
-    if (!resp.ok) throw new Error('Kan functies niet ophalen');
-    return await resp.json();
-  } catch (err) {
-    return [];
-  }
-}
-
-/**
- * Voeg nieuwe skill of taal toe aan skills database (type: 0 = skill, 1 = taal)
- */
-export async function addSkillOrTaal(name, isTaal = 0) {
-  try {
-    const payload = { naam: name, type: isTaal };
-    const resp = await makeAuthenticatedRequest('https://api.ehb-match.me/skills', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
-    if (!resp.ok) {
-      const errorText = await resp.text();
-      if (resp.status === 400 || resp.status === 409) {
-        // Skill bestaat waarschijnlijk al, haal alle skills opnieuw op
-        const all = await fetchAllSkills();
-        return all.find(s => s.naam.toLowerCase() === name.toLowerCase() && s.type === isTaal);
-      }
-      throw new Error('Skill/Taal toevoegen mislukt: ' + errorText);
-    }
-    return (await resp.json()).skill;
-  } catch (err) {
-    throw new Error('Skill/Taal toevoegen mislukt: ' + err.message);
-  }
-}
-
-/**
- * Zet alle skills/talen voor een student (overschrijft bestaande)
- */
-export async function setStudentSkills(studentId, skillIds) {
-  if (!Array.isArray(skillIds)) throw new Error('skillIds is geen array!');
-  // Sta id === 0 toe (zoals API verwacht)
-  const ids = skillIds.filter(id => typeof id === 'number' && Number.isFinite(id) && id >= 0);
-  if (ids.length === 0) throw new Error('Je moet minstens één skill of taal selecteren.');
-  const payload = { skills: ids };
-  try {
-    const resp = await makeAuthenticatedRequest(`https://api.ehb-match.me/studenten/${studentId}/skills`, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
-    if (!resp.ok) {
-      const txt = await resp.text();
-      throw new Error('Skills setten faalt: ' + txt);
-    }
-    return await resp.json();
-  } catch (err) {
-    throw new Error('Skills setten faalt: ' + err.message);
-  }
-}
-
-/**
- * Check of student bestaat in de backend (status 200 = bestaat)
- */
-export async function checkStudentExists(studentId) {
-  try {
-    const resp = await makeAuthenticatedRequest(`https://api.ehb-match.me/studenten/${studentId}`, { method: 'GET' });
-    return resp.ok;
-  } catch (err) {
-    return false;
-  }
-}
-
-/**
- * Zet alle functies voor een student (overschrijft bestaande)
- * Nu met extra check of student bestaat vóór POST
- */
-export async function setStudentFuncties(studentId, functieIds) {
-  if (!Array.isArray(functieIds)) throw new Error('functieIds is geen array!');
-  // Remove dups & maak platte array
-  const cleanFuncties = [...new Set(functieIds.flat().filter(id => typeof id === 'number' && id > 0))];
-  if (cleanFuncties.length === 0) throw new Error('Je moet minstens één functie selecteren.');
-  const payload = { functies: cleanFuncties }; // GEEN dubbele array!
-  console.log('Functies naar backend (platte array):', JSON.stringify(payload));
-  // Extra check: bestaat student?
-  const bestaat = await checkStudentExists(studentId);
-  if (!bestaat) throw new Error('Student bestaat niet in de backend (ID: ' + studentId + ')');
-  try {
-    const resp = await makeAuthenticatedRequest(
-      `https://api.ehb-match.me/studenten/${studentId}/functies`,
-      { method: 'POST', body: JSON.stringify(payload) }
-    );
-    if (!resp.ok) {
-      const txt = await resp.text();
-      throw new Error('Functies setten faalt: ' + txt);
-    }
-    return await resp.json();
-  } catch (err) {
-    throw new Error('Functies setten faalt: ' + err.message);
-  }
-}
-
-/**
- * Verwijder een skill van een student
- */
-export async function removeStudentSkill(studentId, skillId) {
-  try {
-    const resp = await makeAuthenticatedRequest(
-      `https://api.ehb-match.me/studenten/${studentId}/skills/${skillId}`,
-      { method: 'DELETE' }
-    );
-    if (!resp.ok) {
-      const txt = await resp.text();
-      throw new Error('Skill verwijderen faalt: ' + txt);
-    }
-    return await resp.json();
-  } catch (err) {
-    throw new Error('Skill verwijderen faalt: ' + err.message);
-  }
-}
-
-/**
- * Verwijder een functie van een student
- */
-export async function removeStudentFunctie(studentId, functieId) {
-  try {
-    const resp = await makeAuthenticatedRequest(
-      `https://api.ehb-match.me/studenten/${studentId}/functies/${functieId}`,
-      { method: 'DELETE' }
-    );
-    if (!resp.ok) {
-      const txt = await resp.text();
-      throw new Error('Functie verwijderen faalt: ' + txt);
-    }
-    return await resp.json();
-  } catch (err) {
-    throw new Error('Functie verwijderen faalt: ' + err.message);
-  }
-}
-
 import logoIcon from '../../icons/favicon-32x32.png';
+import { renderStudentProfiel } from './student-profiel.js';
+import { renderSpeeddates } from './student-speeddates.js';
+import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
 
-const FUNCTIES = [
+// ... [alle utility functies uit jouw code hierboven, niet aangepast] ...
+// Skills ophalen: false = skill, true = taal
+async function fetchAllSkills() {
+  const token = sessionStorage.getItem('authToken');
+  const resp = await fetch('https://api.ehb-match.me/skills', {
+    headers: { Authorization: 'Bearer ' + token },
+  });
+  if (!resp.ok) throw new Error('Kan skills niet ophalen');
+  return await resp.json(); // [{id, naam, type}]
+}
+
+// Skill/taal toevoegen: type is boolean: false (skill), true (taal)
+async function addSkillOrTaal(name, isTaal = 0) {
+  const token = sessionStorage.getItem('authToken');
+  console.log('Toevoegen skill/taal:', { naam: name, type: isTaal });
+  const resp = await fetch('https://api.ehb-match.me/skills', {
+    method: 'POST',
+    headers: {
+      Authorization: 'Bearer ' + token,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ naam: name, type: isTaal }), // type: false/true
+  });
+  const text = await resp.text();
+  if (!resp.ok) {
+    console.error('API error response:', text);
+    throw new Error('Skill/Taal toevoegen mislukt: ' + text);
+  }
+  let json;
+  try {
+    json = JSON.parse(text);
+  } catch (err) {
+    throw new Error('API gaf geen geldige JSON: ' + text);
+  }
+  return json.skill || json; // meestal { id, naam, type }
+}
+
+// Skill/taal verwijderen van student
+async function removeSkillFromStudent(studentId, skillId) {
+  const token = sessionStorage.getItem('authToken');
+  const resp = await fetch(
+    `https://api.ehb-match.me/studenten/${studentId}/skills/${skillId}`,
+    {
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer ' + token },
+    }
+  );
+  const text = await resp.text();
+  if (!resp.ok) {
+    console.error('Fout bij verwijderen skill:', text);
+    throw new Error(`Skill met ID ${skillId} kon niet verwijderd worden: ${text}`);
+  }
+  return true;
+}
+
+// Haal alle skills/talen van de student op
+async function fetchStudentSkills(studentId) {
+  const token = sessionStorage.getItem('authToken');
+  const resp = await fetch(
+    `https://api.ehb-match.me/studenten/${studentId}/skills`,
+    {
+      headers: { Authorization: 'Bearer ' + token },
+    }
+  );
+  const text = await resp.text();
+  if (!resp.ok) {
+    console.error('API error response:', text);
+    throw new Error('Kan student skills niet ophalen: ' + text);
+  }
+  let json;
+  try {
+    json = JSON.parse(text);
+  } catch (err) {
+    throw new Error('API gaf geen geldige JSON: ' + text);
+  }
+  return json; // [{id, naam, type}]
+}
+
+// Skills/talen in bulk instellen
+async function setStudentSkills(studentId, skillIds) {
+  const token = sessionStorage.getItem('authToken');
+  if (!token) {
+    alert('Je bent niet ingelogd of je sessie is verlopen. Log opnieuw in.');
+    import('../login.js').then(({ renderLogin }) => renderLogin(document.body));
+    throw new Error('Geen auth token aanwezig (401)');
+  }
+  const huidigeSkills = await fetchStudentSkills(studentId);
+  const huidigeSkillIds = huidigeSkills.map((s) => s.id);
+
+  // Skills verwijderen (alle oude)
+  for (const id of huidigeSkillIds) {
+    await removeSkillFromStudent(studentId, id);
+  }
+
+  // Skills toevoegen (alle nieuwe)
+  if (!skillIds || skillIds.length === 0) {
+    console.warn('Skills array is leeg; niets gepost.');
+    return [];
+  }
+
+  const resp = await fetch(
+    `https://api.ehb-match.me/studenten/${studentId}/skills`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ skills: skillIds }),
+    }
+  );
+
+  const text = await resp.text();
+  console.log('Status:', resp.status, 'Response:', text);
+
+  if (!resp.ok) {
+    console.error('API error response:', text);
+    throw new Error('Skills instellen mislukt: ' + text);
+  }
+
+  return JSON.parse(text).skills;
+}
+
+// Debug: voeg skills één voor één toe om te zien welke ID crasht
+async function debugSetStudentSkillsIndividueel(studentId, skillIds) {
+  const token = sessionStorage.getItem('authToken');
+  for (const id of skillIds) {
+    try {
+      const resp = await fetch(
+        `https://api.ehb-match.me/studenten/${studentId}/skills`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: 'Bearer ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ skills: [id] }),
+        }
+      );
+      const text = await resp.text();
+      console.log(`Skill ${id}: status ${resp.status}`, text);
+      if (!resp.ok) {
+        alert(`Skill ${id} toevoegen faalt: ${text}`);
+      }
+    } catch (e) {
+      console.error(`Skill ${id} exception:`, e);
+    }
+  }
+}
+
+// Sync skills/talen van student met de aangevinkte waardes (in bulk)
+async function syncStudentSkills(studentId, checkedSkillIds, checkedTaalIds) {
+  // Debug: toon alle ID's en types
+  const allIds = [...checkedSkillIds, ...checkedTaalIds].map(Number);
+  console.log('All IDs naar API:', allIds, allIds.map(x => typeof x));
+  await setStudentSkills(studentId, allIds);
+}
+
+// Functies (API-conform: id = 1,2,3)
+const functies = [
   { id: 1, naam: 'Fulltime' },
   { id: 2, naam: 'Parttime' },
   { id: 3, naam: 'Stagiair(e)' },
 ];
 
-/**
- * Inject CSS styles for criteria chips and autocomplete
- */
-function injectStyle() {
-  if (document.getElementById('criteria-chips-style')) return;
-  const style = document.createElement('style');
-  style.id = 'criteria-chips-style';
-  style.textContent = `
-    .chip { display:inline-flex;align-items:center;background:#f2f2f7;border-radius:20px;padding:0.35em 0.9em;margin:0 0.4em 0.4em 0;font-size:0.98em;color:#2364aa;border:1.5px solid #e1e5e9;box-shadow:0 1px 3px #00000008; }
-    .chip-remove { cursor:pointer;color:#888;font-size:1.15em;margin-left:0.4em; }
-    .chip-remove:hover { color:#d33; }
-    .autocomplete-dropdown { position:absolute;z-index:10;background:#fff;border:1px solid #e1e5e9;border-radius:6px;box-shadow:0 2px 8px #0001;max-height:180px;overflow:auto;width:180px; }
-    .suggestie { padding:0.4em 0.8em;cursor:pointer; }
-    .suggestie:hover { background:#e6f0fa; }
-  `;
-  document.head.appendChild(style);
-}
-
-/**
- * Render chips for skills or languages
- */
-function renderChips(list, allItems, containerId, readonly, onRemove) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = list.map(id => {
-    const item = allItems.find(s => s.id === id);
-    if (!item) return '';
-    return `<span class="chip">${item.naam}${!readonly ? `<span class="chip-remove" data-id="${id}">&#10005;</span>` : ''}</span>`;
-  }).join('');
-  if (!readonly) {
-    container.querySelectorAll('.chip-remove').forEach(btn => {
-      btn.onclick = e => {
-        e.preventDefault();
-        onRemove(Number(btn.getAttribute('data-id')));
-      };
+// Functies API helper
+async function updateFunctiesForStudent(studentId, selectedFunctieIds) {
+  if (!selectedFunctieIds || selectedFunctieIds.length === 0) {
+    selectedFunctieIds = [];
+  }
+  const token = sessionStorage.getItem('authToken');
+  // Haal huidige functies op
+  const resp = await fetch(
+    `https://api.ehb-match.me/studenten/${studentId}/functies`,
+    {
+      headers: { Authorization: 'Bearer ' + token },
+    }
+  );
+  if (!resp.ok) throw new Error('Kan functies niet ophalen');
+  const huidigeFuncties = await resp.json();
+  const huidigeIds = huidigeFuncties.map((f) => f.id);
+  // Bepaal toe te voegen en te verwijderen functies
+  const toeTeVoegen = selectedFunctieIds.filter((id) => !huidigeIds.includes(id));
+  const teVerwijderen = huidigeIds.filter((id) => !selectedFunctieIds.includes(id));
+  // Verwijder oude
+  for (const id of teVerwijderen) {
+    await fetch(
+      `https://api.ehb-match.me/studenten/${studentId}/functies/${id}`,
+      {
+        method: 'DELETE',
+        headers: { Authorization: 'Bearer ' + token },
+      }
+    );
+  }
+  // Voeg nieuwe toe
+  if (!Array.isArray(toeTeVoegen)) {
+    console.warn('Toe te voegen is geen array:', toeTeVoegen);
+  }
+  console.log('Type van toeTeVoegen:', Array.isArray(toeTeVoegen), toeTeVoegen);
+  if (toeTeVoegen.length > 0) {
+    // Flatten als het een nested array is
+    const functiesBody = { functies: Array.isArray(toeTeVoegen[0]) ? toeTeVoegen[0] : toeTeVoegen };
+    console.log('Functies body =', JSON.stringify(functiesBody));
+    console.log('Verstuur naar API:', {
+      studentId,
+      functiesBody
     });
+    const resp = await fetch(
+      `https://api.ehb-match.me/studenten/${studentId}/functies`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + token,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(functiesBody), // ✅ juiste key
+      }
+    );
+    const text = await resp.text();
+    console.log('API response:', resp.status, text);
+  } else {
+    console.log('Geen functies om toe te voegen, POST wordt niet uitgevoerd.');
   }
 }
 
-/**
- * Render the search criteria student view
- */
+// Functies ophalen van student
+async function fetchStudentFuncties(studentId) {
+  const token = sessionStorage.getItem('authToken');
+  if (!token) {
+    console.warn('GEEN token gevonden in sessionStorage!');
+  }
+  console.log('fetchStudentFuncties: studentId:', studentId, 'token:', token);
+  const resp = await fetch(`https://api.ehb-match.me/studenten/${studentId}/functies`, {
+    headers: { Authorization: 'Bearer ' + token },
+  });
+  if (!resp.ok) {
+    const errText = await resp.text();
+    console.error(`Fout bij ophalen functies: ${resp.status} - ${errText}`);
+    throw new Error('Kan functies niet ophalen');
+  }
+  return await resp.json(); // [{ id, naam }]
+}
+
+// ---- HOOFDFUNCTIE ----
 export async function renderSearchCriteriaStudent(
-  root, studentData = {}, readonly = true, allSkills = null, allTalen = null,
-  localSkillsParam = null, localTalenParam = null, localFunctiesParam = null
+  rootElement,
+  studentData = {},
+  readonlyMode = true
 ) {
-  injectStyle();
-  // --- State ophalen ---
+  // AUTH CHECK: blokkeer toegang zonder geldige login
+  const token = window.sessionStorage.getItem('authToken');
+  if (!token) {
+    import('../login.js').then((module) => {
+      module.renderLogin(rootElement);
+    });
+    return;
+  }
+
+  // Patch: Altijd proberen de studentData te laden uit sessionStorage
   if (!studentData || (!studentData.id && !studentData.gebruiker_id)) {
     const stored = sessionStorage.getItem('studentData');
-    if (stored) studentData = JSON.parse(stored);
-    else { alert('Geen student info gevonden. Log opnieuw in.'); return; }
+    if (stored) {
+      studentData = JSON.parse(stored);
+    } else {
+      alert('Geen student info gevonden. Log opnieuw in.');
+      return;
+    }
   }
-  // Gebruik altijd de id uit de API (id of gebruiker_id)
+  // Patch: altijd één variabele voor ID
   const studentId = studentData.id || studentData.gebruiker_id;
-  console.log('Gebruikte studentId:', studentId, 'studentData:', studentData); // Debug
-  if (!studentId) { alert('Student ID ontbreekt!'); return; }
-
-  // Data ophalen
-  if (!allSkills || !allTalen) {
-    const all = await fetchAllSkills();
-    allSkills = all.filter(s => s.type === 0);
-    allTalen = all.filter(s => s.type === 1);
+  if (!studentId) {
+    alert('Student ID ontbreekt! Probeer opnieuw in te loggen.');
+    return;
   }
-  // Haal skills/talen van student (type 0/1 apart), alleen ID's
-  const allStudentSkills = await fetchStudentSkills(studentId);
-  const studentSkills = allStudentSkills.filter(s => s.type === 0).map(s => s.id);
-  const studentTalen  = allStudentSkills.filter(s => s.type === 1).map(s => s.id);
-  const studentFuncties = (await fetchStudentFuncties(studentId)).map(f => f.id);
+  setTimeout(async () => {
+    rootElement.innerHTML = `
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Zoekcriteria laden...</div>
+      </div>
+    `;
 
-  // ---- Local state (alleen in edit mode gemuteerd) ----
-  let localSkills = localSkillsParam ?? [...studentSkills];
-  let localTalen = localTalenParam ?? [...studentTalen];
-  let localFuncties = localFunctiesParam ?? [...studentFuncties];
-  let localAllSkills = [...allSkills]; // kan tijdelijke nieuwe skills bevatten (neg ID)
-  let localAllTalen = [...allTalen];   // idem
+    // Declare these at the top of the function scope
+    let allSkills = [],
+      allTalen = [],
+      alleFuncties = [
+        { id: 1, naam: 'Fulltime' },
+        { id: 2, naam: 'Parttime' },
+        { id: 3, naam: 'Stagiair(e)' }
+      ],
+      studentFunctieIds = [];
+    try {
+      const all = await fetchAllSkills();
+      allSkills = all.filter((s) => s.type === 0); // Skills
+      allTalen = all.filter((s) => s.type === 1); // Talen
+      // Functies ophalen van student
+      console.log('studentId voor fetchStudentFuncties:', studentId);
+      console.log('token voor fetchStudentFuncties:', sessionStorage.getItem('authToken'));
+      studentFunctieIds = (await fetchStudentFuncties(studentId)).map(f => f.id);
+    } catch (e) {
+      rootElement.innerHTML = `<div style="color:red">Fout bij ophalen skills/talen/functies: ${e.message}</div>`;
+      return;
+    }
 
-  // ----- UI rendering -----
-  root.innerHTML = `
-    <div class="student-profile-container">
-      <header class="student-profile-header">
-        <div class="logo-section">
-          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
-          <span>EhB Career Launch</span>
-        </div>
-        <button id="burger-menu" class="student-profile-burger" type="button">☰</button>
-        <ul id="burger-dropdown" class="student-profile-dropdown">
-          <li><button id="nav-profile" type="button">Profiel</button></li>
-          <li><button id="nav-settings" type="button">Instellingen</button></li>
-          <li><button id="nav-logout" type="button">Log out</button></li>
-        </ul>
-      </header>
-      <div class="student-profile-main">
-        <nav class="student-profile-sidebar">
-          <ul>
-            <li><button data-route="speeddates" class="sidebar-link" type="button">Speeddates</button></li>
-            <li><button data-route="requests" class="sidebar-link" type="button">Speeddates-verzoeken</button></li>
-            <li><button data-route="bedrijven" class="sidebar-link" type="button">Bedrijven</button></li>
+    // Dynamisch radiobuttons genereren
+    const radiobuttonsHtml = alleFuncties
+      .map(
+        (f) => `
+        <label class="checkbox-option">
+          <input type="radio" name="jobType" value="${f.id}" ${
+            studentFunctieIds.includes(f.id) ? 'checked' : ''
+          } ${readonlyMode ? 'disabled' : ''}>
+          <span>${f.naam}</span>
+        </label>
+      `
+      )
+      .join('');
+
+    if (!studentData.skills) studentData.skills = [];
+    if (!studentData.talen) studentData.talen = [];
+    if (!studentData.zoekType) studentData.zoekType = '';
+
+    function isChecked(id, list) {
+      return list.map(Number).includes(Number(id));
+    }
+    function renderCheckboxes(list, checkedArr, name) {
+      return list
+        .map(
+          (item) => `
+            <label class="checkbox-option">
+              <input type="checkbox" name="${name}" value="${item.id}" ${
+            isChecked(item.id, checkedArr) ? 'checked' : ''
+          } ${readonlyMode ? 'disabled' : ''}>
+              <span>${item.naam}</span>
+            </label>
+          `
+        )
+        .join('');
+    }
+
+    rootElement.innerHTML = `
+      <div class="student-profile-container">
+        <header class="student-profile-header">
+          <div class="logo-section">
+            <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
+            <span>EhB Career Launch</span>
+          </div>
+          <button id="burger-menu" class="student-profile-burger">☰</button>
+          <ul id="burger-dropdown" class="student-profile-dropdown">
+            <li><button id="nav-profile">Profiel</button></li>
+            <li><button id="nav-settings">Instellingen</button></li>
+            <li><button id="nav-logout">Log out</button></li>
           </ul>
-        </nav>
-        <div class="student-profile-content">
-          <div class="student-profile-form-container" style="position:relative;">
-            <button id="btn-to-profile" type="button" class="skills-btn" style="position:absolute;top:0;left:0;margin:0.2em 0 0 0.2em;z-index:2;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2364aa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.5em;"><path d="M15 18l-6-6 6-6"/></svg>
-              Terug naar profiel
-            </button>
-            <div style="height:2.2em;"></div>
-            <h1 class="student-profile-title">Skills & voorkeuren</h1>
-            <form id="criteriaForm" class="criteria-form" autocomplete="off">
-              <fieldset class="search-fieldset">
-                <legend>Ik zoek</legend>
-                <div class="checkbox-group">
-                  ${FUNCTIES.map(f => `
-                    <label class="checkbox-option">
-                      <input type="radio" name="jobType" value="${f.id}" ${localFuncties.includes(f.id) ? 'checked' : ''} onchange="this.blur();">
-                      <span>${f.naam}</span>
-                    </label>
-                  `).join('')}
+        </header>
+        <div class="student-profile-main">
+          <nav class="student-profile-sidebar">
+            <ul>
+              <li><button data-route="search" class="sidebar-link active">Zoek-criteria</button></li>
+              <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
+              <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
+              <li><button data-route="bedrijven" class="sidebar-link">Bedrijven</button></li>
+            </ul>
+          </nav>
+          <div class="student-profile-content">
+            <div class="student-profile-form-container">
+              <h1 class="student-profile-title">Zoek-criteria</h1>
+              <form id="criteriaForm" class="criteria-form" autocomplete="off">
+                <fieldset class="search-fieldset">
+                  <legend>Ik zoek</legend>
+                  <div class="checkbox-group">
+                    ${radiobuttonsHtml}
+                  </div>
+                </fieldset>
+                <fieldset class="search-fieldset">
+                  <legend>Mijn Skills</legend>
+                  <div class="checkbox-group" id="skills-list">
+                    ${renderCheckboxes(allSkills, studentData.skills, 'skills')}
+                  </div>
+                  ${
+                    !readonlyMode
+                      ? `<div class="add-custom-wrapper">
+                          <input type="text" id="skill-andere-text" placeholder="Andere skill..." class="form-input" style="width:180px;"/>
+                          <button id="add-skill-btn" class="add-btn" type="button">+ Toevoegen</button>
+                      </div>`
+                      : ''
+                  }
+                </fieldset>
+                <fieldset class="search-fieldset">
+                  <legend>Mijn Talen</legend>
+                  <div class="checkbox-group" id="talen-list">
+                    ${renderCheckboxes(allTalen, studentData.talen, 'talen')}
+                  </div>
+                  ${
+                    !readonlyMode
+                      ? `<div class="add-custom-wrapper">
+                          <input type="text" id="taal-andere-text" placeholder="Andere taal..." class="form-input" style="width:180px;"/>
+                          <button id="add-taal-btn" class="add-btn" type="button">+ Toevoegen</button>
+                      </div>`
+                      : ''
+                  }
+                </fieldset>
+                <div class="student-profile-buttons">
+                  ${
+                    readonlyMode
+                      ? `<button id="btn-edit" type="button" class="student-profile-btn student-profile-btn-secondary">EDIT</button>`
+                      : `
+                    <button id="btn-save" type="submit" class="student-profile-btn student-profile-btn-primary">SAVE</button>
+                    <button id="btn-reset" type="button" class="student-profile-btn student-profile-btn-secondary">RESET</button>
+                    <button id="btn-cancel" type="button" class="student-profile-btn student-profile-btn-secondary">CANCEL</button>
+                  `
+                  }
                 </div>
-              </fieldset>
-              <fieldset class="search-fieldset">
-                <legend>Mijn Skills</legend>
-                <div id="skills-chips" class="chips-row"></div>
-                <div class="add-custom-wrapper" style="position:relative; margin-top: 1em;">
-                  <input type="text" id="skill-input" placeholder="Andere skill..." class="form-input" style="width:180px;" autocomplete="off"/>
-                  <div id="skill-suggesties" class="autocomplete-dropdown"></div>
-                  <button id="add-skill-btn" class="add-btn" type="button">+ Toevoegen</button>
-                </div>
-              </fieldset>
-              <fieldset class="search-fieldset">
-                <legend>Mijn Talen</legend>
-                <div id="talen-chips" class="chips-row"></div>
-                <div class="add-custom-wrapper" style="position:relative; margin-top: 1em;">
-                  <input type="text" id="taal-input" placeholder="Andere taal..." class="form-input" style="width:180px;" autocomplete="off"/>
-                  <div id="taal-suggesties" class="autocomplete-dropdown"></div>
-                  <button id="add-taal-btn" class="add-btn" type="button">+ Toevoegen</button>
-                </div>
-              </fieldset>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
+        <footer class="student-profile-footer">
+          <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
+          <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+        </footer>
       </div>
-    </div>
-  `;
+    `;
 
-  // --- Chips rendering met verwijderknop ---
-  renderChips(localSkills, localAllSkills, 'skills-chips', true, async id => {
-    const nieuweSkills = localSkills.filter(sid => sid !== id);
-    const alleIds = [...new Set([...nieuweSkills, ...localTalen])];
-    await setStudentSkills(studentId, alleIds);
-    renderSearchCriteriaStudent(
-      root, studentData, true, localAllSkills, localAllTalen,
-      nieuweSkills, localTalen, localFuncties
-    );
-  });
-  renderChips(localTalen, localAllTalen, 'talen-chips', true, async id => {
-    const nieuweTalen = localTalen.filter(tid => tid !== id);
-    const alleIds = [...new Set([...localSkills, ...nieuweTalen])];
-    await setStudentSkills(studentId, alleIds);
-    renderSearchCriteriaStudent(
-      root, studentData, true, localAllSkills, localAllTalen,
-      localSkills, nieuweTalen, localFuncties
-    );
-  });
+    // --- Interactie (EVENTS) ---
+    const form = document.getElementById('criteriaForm');
+    if (form) {
+      // EDIT
+      const editBtn = document.getElementById('btn-edit');
+      if (editBtn) {
+        editBtn.addEventListener('click', () => {
+          renderSearchCriteriaStudent(rootElement, studentData, false);
+        });
+      }
+      // RESET
+      const resetBtn = document.getElementById('btn-reset');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', async () => {
+          studentData.skills = [];
+          studentData.talen = [];
+          try {
+            await updateFunctiesForStudent(studentId, []);
+            // Skills/talen worden via syncStudentSkills verwijderd
+            let studentSkillsAll = await fetchStudentSkills(studentId);
+            let allStudentSkillIds = studentSkillsAll
+              .filter((s) => s.type === 0)
+              .map((s) => s.id);
+            let allStudentTaalIds = studentSkillsAll
+              .filter((s) => s.type === 1)
+              .map((s) => s.id);
+            for (const id of allStudentSkillIds.concat(allStudentTaalIds)) {
+              await removeSkillFromStudent(studentId, id);
+            }
+          } catch (e) {
+            console.error('Reset fout:', e);
+            alert('Fout bij resetten: ' + e.message);
+          }
+          renderSearchCriteriaStudent(rootElement, studentData, false);
+        });
+      }
+      // CANCEL
+      const cancelBtn = document.getElementById('btn-cancel');
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+          renderSearchCriteriaStudent(rootElement, studentData, true);
+        });
+      }
+      // SAVE
+      const saveBtn = document.getElementById('btn-save');
+      if (saveBtn) {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          let checkedSkills = Array.from(
+            form.querySelectorAll('input[name="skills"]:checked')
+          ).map((i) => Number(i.value));
+          let checkedTalen = Array.from(
+            form.querySelectorAll('input[name="talen"]:checked')
+          ).map((i) => Number(i.value));
+          const selectedRadio = form.querySelector(
+            'input[name="jobType"]:checked'
+          );
+          const selectedFunctieId = selectedRadio ? parseInt(selectedRadio.value, 10) : null;
+          const zoekType = selectedRadio ? selectedRadio.value : '';
+          const skillInput = document.getElementById('skill-andere-text');
+          if (skillInput && skillInput.value.trim()) {
+            const value = skillInput.value.trim();
+            if (
+              !allSkills.some(
+                (skill) => skill.naam.toLowerCase() === value.toLowerCase()
+              )
+            ) {
+              try {
+                const nieuwSkill = await addSkillOrTaal(value, 0);
+                allSkills.push(nieuwSkill);
+                checkedSkills.push(nieuwSkill.id);
+              } catch (e) {
+                alert('Skill toevoegen mislukt: ' + e.message);
+                return;
+              }
+            }
+          }
+          const taalInput = document.getElementById('taal-andere-text');
+          if (taalInput && taalInput.value.trim()) {
+            const value = taalInput.value.trim();
+            if (
+              !allTalen.some(
+                (taal) => taal.naam.toLowerCase() === value.toLowerCase()
+              )
+            ) {
+              try {
+                const nieuweTaal = await addSkillOrTaal(value, 1);
+                allTalen.push(nieuwTaal);
+                checkedTalen.push(nieuwTaal.id);
+              } catch (e) {
+                alert('Taal toevoegen mislukt: ' + e.message);
+                return;
+              }
+            }
+          }
+          if (!selectedFunctieId) return alert('Selecteer een zoektype!');
+          await syncStudentSkills(
+            studentId,
+            checkedSkills,
+            checkedTalen
+          );
+          try {
+            await updateFunctiesForStudent(studentId, selectedFunctieId ? [selectedFunctieId] : []);
+            studentData.skills = checkedSkills;
+            studentData.talen = checkedTalen;
+            studentData.zoekType = selectedFunctieId; // ✅ DIT IS TOEGEVOEGD
+            sessionStorage.setItem('studentData', JSON.stringify(studentData));
+            renderSearchCriteriaStudent(rootElement, studentData, true);
+          } catch (e) {
+            console.error('Fout bij opslaan:', e);
+            alert('Fout bij opslaan: ' + e.message);
+          }
+        });
+      }
+      // Toevoegen custom skill
+      const addSkillBtn = document.getElementById('add-skill-btn');
+      if (addSkillBtn) {
+        addSkillBtn.addEventListener('click', async () => {
+          const input = document.getElementById('skill-andere-text');
+          const value = input.value.trim();
+          if (!value) return;
+          if (
+            allSkills.some(
+              (skill) => skill.naam.toLowerCase() === value.toLowerCase()
+            )
+          ) {
+            alert('Skill bestaat al!');
+            return;
+          }
+          try {
+            const nieuwSkill = await addSkillOrTaal(value, 0);
+            allSkills.push(nieuwSkill);
+            input.value = '';
 
-  // Direct updaten bij click op functie-radio:
-  document.querySelectorAll('input[name="jobType"]').forEach(radio => {
-    radio.addEventListener('change', async (e) => {
-      const newId = parseInt(e.target.value, 10);
-      try {
-        await setStudentFuncties(studentId, [newId]);
-        renderSearchCriteriaStudent(root, studentData, true, allSkills, allTalen, localSkills, localTalen, [newId]);
-      } catch (err) {
-        alert('Fout bij aanpassen functie: ' + err.message);
-      }
-    });
-  });
+            // Haal alle nu geselecteerde vinkjes op:
+            const checkedSkills = Array.from(
+              document.querySelectorAll('input[name="skills"]:checked')
+            ).map((i) => Number(i.value));
+            // Voeg de nieuwe toe aan de selectie:
+            if (!checkedSkills.includes(nieuwSkill.id))
+              checkedSkills.push(nieuwSkill.id);
+            // Zet als geselecteerd voor render:
+            studentData.skills = checkedSkills;
 
-  // Add skill (direct sync, geen lokale array)
-  const addSkillBtn = document.getElementById('add-skill-btn');
-  if (addSkillBtn) {
-    addSkillBtn.onclick = async e => {
-      e.preventDefault();
-      const input = document.getElementById('skill-input');
-      const value = input.value.trim();
-      if (!value) return;
-      let bestaande = allSkills.find(skill => skill.naam.toLowerCase() === value.toLowerCase());
-      let id;
-      if (bestaande) {
-        id = bestaande.id;
-      } else {
-        const nieuwSkill = await addSkillOrTaal(value, 0);
-        id = nieuwSkill.id;
-        allSkills.push(nieuwSkill);
+            renderSearchCriteriaStudent(rootElement, studentData, false);
+          } catch (e) {
+            alert('Skill toevoegen mislukt: ' + e.message);
+          }
+        });
       }
-      // Haal huidige skills/talen van student op
-      const allStudentSkills = await fetchStudentSkills(studentId);
-      const studentTalen = allStudentSkills.filter(s => s.type === 1).map(s => s.id);
-      const alleIds = [...new Set([id, ...studentTalen])];
-      await setStudentSkills(studentId, alleIds);
-      renderSearchCriteriaStudent(root, studentData, true, allSkills, allTalen, null, null, localFuncties);
-      input.value = '';
-    };
-  }
-  // Add taal (direct sync, geen lokale array)
-  const addTaalBtn = document.getElementById('add-taal-btn');
-  if (addTaalBtn) {
-    addTaalBtn.onclick = async e => {
-      e.preventDefault();
-      const input = document.getElementById('taal-input');
-      const value = input.value.trim();
-      if (!value) return;
-      let bestaande = allTalen.find(taal => taal.naam.toLowerCase() === value.toLowerCase());
-      let id;
-      if (bestaande) {
-        id = bestaande.id;
-      } else {
-        const nieuwTaal = await addSkillOrTaal(value, 1);
-        id = nieuwTaal.id;
-        allTalen.push(nieuwTaal);
+      // Toevoegen custom taal
+      const addTaalBtn = document.getElementById('add-taal-btn');
+      if (addTaalBtn) {
+        addTaalBtn.addEventListener('click', async () => {
+          const input = document.getElementById('taal-andere-text');
+          const value = input.value.trim();
+          if (!value) return;
+          if (
+            allTalen.some(
+              (taal) => taal.naam.toLowerCase() === value.toLowerCase()
+            )
+          ) {
+            alert('Taal bestaat al!');
+            return;
+          }
+          try {
+            const nieuweTaal = await addSkillOrTaal(value, 1);
+            allTalen.push(nieuwTaal);
+            input.value = '';
+
+            // Haal alle nu geselecteerde vinkjes op:
+            const checkedTalen = Array.from(
+              document.querySelectorAll('input[name="talen"]:checked')
+            ).map((i) => Number(i.value));
+            // Voeg de nieuwe toe aan de selectie:
+            if (!checkedTalen.includes(nieuweTaal.id))
+              checkedTalen.push(nieuweTaal.id);
+            // Zet als geselecteerd voor render:
+            studentData.talen = checkedTalen;
+
+            renderSearchCriteriaStudent(rootElement, studentData, false);
+          } catch (e) {
+            alert('Taal toevoegen mislukt: ' + e.message);
+          }
+        });
       }
-      // Haal huidige skills/talen van student op
-      const allStudentSkills = await fetchStudentSkills(studentId);
-      const studentSkills = allStudentSkills.filter(s => s.type === 0).map(s => s.id);
-      const alleIds = [...new Set([...studentSkills, id])];
-      await setStudentSkills(studentId, alleIds);
-      renderSearchCriteriaStudent(root, studentData, true, allSkills, allTalen, null, null, localFuncties);
-      input.value = '';
-    };
-  }
-  // Autocomplete skills (direct sync)
-  const skillInput = document.getElementById('skill-input');
-  const skillSuggestiesDiv = document.getElementById('skill-suggesties');
-  if (skillInput && skillSuggestiesDiv) {
-    skillInput.addEventListener('input', () => {
-      const query = skillInput.value.toLowerCase();
-      const filtered = allSkills.filter(s => s.naam.toLowerCase().includes(query));
-      if (query && filtered.length > 0) {
-        skillSuggestiesDiv.innerHTML = filtered.map(s => `<div class="suggestie" data-id="${s.id}">${s.naam}</div>`).join('');
-        skillSuggestiesDiv.style.display = 'block';
-      } else {
-        skillSuggestiesDiv.innerHTML = '';
-        skillSuggestiesDiv.style.display = 'none';
-      }
-    });
-    skillSuggestiesDiv.addEventListener('click', async e => {
-      const target = e.target.closest('.suggestie');
-      if (!target) return;
-      const id = parseInt(target.getAttribute('data-id'));
-      // Haal huidige skills/talen van student op
-      const allStudentSkills = await fetchStudentSkills(studentId);
-      const studentTalen = allStudentSkills.filter(s => s.type === 1).map(s => s.id);
-      const alleIds = [...new Set([id, ...studentTalen])];
-      await setStudentSkills(studentId, alleIds);
-      skillInput.value = '';
-      skillSuggestiesDiv.innerHTML = '';
-      skillSuggestiesDiv.style.display = 'none';
-      renderSearchCriteriaStudent(root, studentData, true, allSkills, allTalen, null, null, localFuncties);
-    });
-    document.addEventListener('click', e => {
-      if (!skillSuggestiesDiv.contains(e.target) && e.target !== skillInput) {
-        skillSuggestiesDiv.innerHTML = '';
-        skillSuggestiesDiv.style.display = 'none';
-      }
-    });
-  }
-  // Autocomplete talen (direct sync)
-  const taalInput = document.getElementById('taal-input');
-  const taalSuggestiesDiv = document.getElementById('taal-suggesties');
-  if (taalInput && taalSuggestiesDiv) {
-    taalInput.addEventListener('input', () => {
-      const query = taalInput.value.toLowerCase();
-      const filtered = allTalen.filter(t => t.naam.toLowerCase().includes(query));
-      if (query && filtered.length > 0) {
-        taalSuggestiesDiv.innerHTML = filtered.map(t => `<div class="suggestie" data-id="${t.id}">${t.naam}</div>`).join('');
-        taalSuggestiesDiv.style.display = 'block';
-      } else {
-        taalSuggestiesDiv.innerHTML = '';
-        taalSuggestiesDiv.style.display = 'none';
-      }
-    });
-    taalSuggestiesDiv.addEventListener('click', async e => {
-      const target = e.target.closest('.suggestie');
-      if (!target) return;
-      const id = parseInt(target.getAttribute('data-id'));
-      // Haal huidige skills/talen van student op
-      const allStudentSkills = await fetchStudentSkills(studentId);
-      const studentSkills = allStudentSkills.filter(s => s.type === 0).map(s => s.id);
-      const alleIds = [...new Set([...studentSkills, id])];
-      await setStudentSkills(studentId, alleIds);
-      taalInput.value = '';
-      taalSuggestiesDiv.innerHTML = '';
-      taalSuggestiesDiv.style.display = 'none';
-      renderSearchCriteriaStudent(root, studentData, true, allSkills, allTalen, null, null, localFuncties);
-    });
-    document.addEventListener('click', e => {
-      if (!taalSuggestiesDiv.contains(e.target) && e.target !== taalInput) {
-        taalSuggestiesDiv.innerHTML = '';
-        taalSuggestiesDiv.style.display = 'none';
-      }
-    });
-  }
-  // Sidebar navigatie
-  document.querySelectorAll('.sidebar-link').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.preventDefault();
-      const route = e.currentTarget.getAttribute('data-route');
-      import('../../router.js').then(module => {
-        const Router = module.default;
-        switch (route) {
-          case 'search': Router.navigate('/student/zoek-criteria'); break;
-          case 'speeddates': Router.navigate('/student/student-speeddates'); break;
-          case 'requests': Router.navigate('/student/student-speeddates-verzoeken'); break;
-          case 'bedrijven': Router.navigate('/student/bedrijven'); break;
-          case 'qr': Router.navigate('/student/student-qr-popup'); break;
-        }
+    }
+
+    // --- Sidebar navigatie ---
+    document.querySelectorAll('.sidebar-link').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const route = e.currentTarget.getAttribute('data-route');
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          switch (route) {
+            // case 'profile': // verwijderd
+            case 'search':
+              Router.navigate('/student/zoek-criteria');
+              break;
+            case 'speeddates':
+              Router.navigate('/student/student-speeddates');
+              break;
+            case 'requests':
+              Router.navigate('/student/student-speeddates-verzoeken');
+              break;
+            case 'bedrijven':
+              Router.navigate('/student/bedrijven');
+              break;
+          }
+        });
       });
     });
-  });
-  // Hamburger menu
-  const burger = document.getElementById('burger-menu');
-  const dropdown = document.getElementById('burger-dropdown');
-  if (burger && dropdown) {
-    dropdown.classList.remove('open');
-    burger.addEventListener('click', event => {
-      event.stopPropagation();
-      dropdown.classList.toggle('open');
-    });
-    document.addEventListener('click', function (event) {
-      if (dropdown.classList.contains('open') && !dropdown.contains(event.target) && event.target !== burger) {
+
+    // --- Hamburger menu ---
+    const burger = document.getElementById('burger-menu');
+    const dropdown = document.getElementById('burger-dropdown');
+    if (burger && dropdown) {
+      dropdown.classList.remove('open');
+      burger.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (!dropdown.classList.contains('open')) {
+          dropdown.classList.add('open');
+        } else {
+          dropdown.classList.remove('open');
+        }
+      });
+      document.addEventListener('click', function (event) {
+        if (
+          dropdown.classList.contains('open') &&
+          !dropdown.contains(event.target) &&
+          event.target !== burger
+        ) {
+          dropdown.classList.remove('open');
+        }
+      });
+      document.getElementById('nav-settings').addEventListener('click', () => {
         dropdown.classList.remove('open');
+        showSettingsPopup();
+      });
+      document.getElementById('nav-logout').addEventListener('click', () => {
+        dropdown.classList.remove('open');
+        window.sessionStorage.removeItem('studentData');
+        window.sessionStorage.removeItem('authToken');
+        window.sessionStorage.removeItem('userType');
+        localStorage.setItem('darkmode', 'false');
+        document.body.classList.remove('darkmode');
+        renderLogin(rootElement);
+      });
+      // Hamburger menu Profiel knop
+      const navProfileBtn = document.getElementById('nav-profile');
+      if (navProfileBtn) {
+        navProfileBtn.addEventListener('click', () => {
+          dropdown.classList.remove('open');
+          import('../../router.js').then((module) => {
+            const Router = module.default;
+            Router.navigate('/student/student-profiel');
+          });
+        });
       }
-    });
-    document.getElementById('nav-settings').addEventListener('click', () => {
-      dropdown.classList.remove('open');
-      showSettingsPopup();
-    });
-    document.getElementById('nav-logout').addEventListener('click', () => {
-      dropdown.classList.remove('open');
-      window.sessionStorage.removeItem('studentData');
-      window.sessionStorage.removeItem('authToken');
-      window.sessionStorage.removeItem('userType');
-      localStorage.setItem('darkmode', 'false');
-      document.body.classList.remove('darkmode');
-      renderLogin(root);
-    });
-    const navProfileBtn = document.getElementById('nav-profile');
-    if (navProfileBtn) {
-      navProfileBtn.addEventListener('click', () => {
-        dropdown.classList.remove('open');
-        import('../../router.js').then(module => {
+    }
+    // --- Footer links: gebruik alleen Router.navigate, geen hash of import ---
+    const privacyLink = document.getElementById('privacy-policy');
+    if (privacyLink) {
+      privacyLink.setAttribute('href', '#');
+      privacyLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        import('../../router.js').then((module) => {
           const Router = module.default;
-          Router.navigate('/student/student-profiel');
+          Router.navigate('/privacy');
         });
       });
     }
-  }
-  // btn-to-profile navigatie
-  const btnToProfile = document.getElementById('btn-to-profile');
-  if (btnToProfile) {
-    btnToProfile.addEventListener('click', () => {
-      import('../../router.js').then(module => {
-        const Router = module.default;
-        Router.navigate('/student/student-profiel');
+    const contactLink = document.getElementById('contacteer-ons');
+    if (contactLink) {
+      contactLink.setAttribute('href', '#');
+      contactLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/contact');
+        });
       });
-    });
-  }
+    }
+    // END setTimeout
+  }, 200);
 }
