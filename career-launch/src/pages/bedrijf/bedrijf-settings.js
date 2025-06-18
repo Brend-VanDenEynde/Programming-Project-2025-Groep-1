@@ -41,7 +41,6 @@ export function showBedrijfSettingsPopup(onClose) {
       .settings-action-btn.delete:hover { background: linear-gradient(90deg, #fd7855 0%, #fa626a 100%);}
       @keyframes popupIn { 0% { transform: scale(0.85) translateY(40px); } 100% { transform: scale(1) translateY(0); } }
       @media (max-width: 600px) { .settings-popup-card {padding:8px 2vw;} .settings-title {font-size:1.19rem;} }
-      body.darkmode, .darkmode .settings-popup-card { background: #232846 !important; color: #f3f6fa; }
     `;
     document.head.appendChild(style);
   }
@@ -59,13 +58,7 @@ export function showBedrijfSettingsPopup(onClose) {
     <div class="settings-popup-card">
       <button class="settings-popup-close" id="settings-close">&times;</button>
       <h2 class="settings-title">Instellingen</h2>
-      <div class="settings-row">
-        <label class="settings-label">Donkere modus</label>
-        <label class="switch">
-          <input type="checkbox" id="dark-mode-toggle">
-          <span class="slider"></span>
-        </label>
-      </div>
+      <div class="settings-row"></div>
       <div class="settings-btn-row">
         <button class="settings-action-btn logout" id="logout-btn">Log uit</button>
         <button class="settings-action-btn delete" id="delete-account-btn">Verwijder account</button>

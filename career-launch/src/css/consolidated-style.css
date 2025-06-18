@@ -609,6 +609,7 @@ a:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
   margin-bottom: 1.5rem;
 }
@@ -1398,244 +1399,7 @@ a:hover {
    9. DARK MODE STYLING
    ============================================================================= */
 
-/* Dark mode CSS variabelen */
-body.darkmode {
-  --accent: lightgrey;
-  --accent-contrast: #181c1f;
-  --header-logo: url('../images/EhB-logo-transparant-558-DarkMode.png');
-  background: #000 !important;
-  color: #e0f7fa !important;
-}
-
-/* Dark mode voor links */
-body.darkmode a {
-  color: #00e6ef;
-  transition: color 0.18s;
-}
-
-body.darkmode a:hover {
-  color: #3dd686;
-}
-
-/* Dark mode voor admin back knop */
-body.darkmode .back-btn {
-  color: #00e6ef !important;
-}
-
-body.darkmode .back-btn:hover {
-  color: #3dd686 !important;
-}
-
-/* Dark mode voor formulieren */
-body.darkmode .register-container,
-body.darkmode .login-container {
-  background-color: #000 !important;
-}
-
-body.darkmode .register-card,
-body.darkmode .login-card {
-  background: #181c1f !important;
-  color: #e0f7fa !important;
-  border-radius: 14px;
-  box-shadow: 0 4px 24px 0 rgba(0, 230, 239, 0.1), 0 1.5px 0 0 #232323;
-}
-
-body.darkmode .register-header h1,
-body.darkmode .login-header h1 {
-  color: #00e6ef !important;
-}
-
-body.darkmode .register-header p,
-body.darkmode .login-header p {
-  color: #b0b6c6 !important;
-}
-
-body.darkmode .register-input,
-body.darkmode .login-input {
-  background: #181c1f !important;
-  color: #e0f7fa !important;
-  border: 2px solid #00e6ef !important;
-}
-
-body.darkmode .register-input:focus,
-body.darkmode .login-input:focus {
-  border-color: #00e6ef !important;
-  background: #181c1f !important;
-}
-
-/* Dark mode voor student profiel */
-body.darkmode .student-profile-container {
-  background: #000 !important;
-}
-
-body.darkmode .student-profile-header,
-body.darkmode .student-profile-sidebar {
-  background: #000 !important;
-  color: #00e6ef !important;
-  border-color: #232323 !important;
-}
-
-body.darkmode .student-profile-header .logo-section span {
-  color: #00e6ef !important;
-}
-
-body.darkmode .student-profile-header .logo-section img {
-  content: var(--header-logo);
-  filter: none !important;
-}
-
-body.darkmode .student-profile-sidebar button {
-  color: #e0f7fa !important;
-  background: #000 !important;
-  border-left: 4px solid transparent !important;
-  font-weight: 500;
-}
-
-body.darkmode .student-profile-sidebar button.active,
-body.darkmode .student-profile-sidebar button:hover {
-  background: #181c1f !important;
-  color: #00e6ef !important;
-  border-left: 4px solid #00e6ef !important;
-  font-weight: 700;
-}
-
-body.darkmode .student-profile-content {
-  background: #000 !important;
-}
-
-body.darkmode .student-profile-form-container,
-body.darkmode .settings-popup-card {
-  background: #000 !important;
-  color: #e0f7fa !important;
-  border-radius: 14px;
-  border: 1.5px solid #232323;
-  box-shadow: 0 4px 24px 0 rgba(0, 230, 239, 0.1), 0 1.5px 0 0 #232323;
-}
-
-body.darkmode .student-profile-dropdown {
-  background: #000 !important;
-  border-color: #333 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22) !important;
-}
-
-body.darkmode .student-profile-dropdown li button {
-  color: #e0f7fa !important;
-}
-
-body.darkmode .student-profile-dropdown li button:hover {
-  background: #181c1f !important;
-  color: var(--accent) !important;
-}
-
-/* Dark mode voor buttons */
-body.darkmode .student-profile-btn,
-body.darkmode .student-profile-btn-primary {
-  background-color: grey !important;
-  color: #fff !important;
-  border-radius: 8px !important;
-  border: none !important;
-  box-shadow: 0 2px 8px rgba(0, 230, 239, 0.1) !important;
-}
-
-body.darkmode .student-profile-btn-secondary {
-  background-color: #232323 !important;
-  color: #00e6ef !important;
-  border-radius: 8px !important;
-  border: none !important;
-  box-shadow: 0 2px 8px rgba(0, 230, 239, 0.1) !important;
-}
-
-body.darkmode .student-profile-btn:hover,
-body.darkmode .student-profile-btn-primary:hover,
-body.darkmode .student-profile-btn-secondary:hover {
-  background-color: #181c1f !important;
-  color: #00e6ef !important;
-  box-shadow: 0 4px 16px rgba(0, 230, 239, 0.13) !important;
-  transform: translateY(-2px) !important;
-}
-
-/* Dark mode voor tabellen */
-body.darkmode .speeddates-table {
-  background: #000 !important;
-  border-radius: 12px;
-  border: 1.5px solid #232323;
-  box-shadow: 0 2px 12px rgba(0, 230, 239, 0.07);
-}
-
-body.darkmode .speeddates-table th {
-  background: #101214 !important;
-  color: #00e6ef !important;
-  border-bottom: 1.5px solid #232323 !important;
-  text-align: center;
-  vertical-align: middle;
-}
-
-body.darkmode .speeddates-table td {
-  background: #000 !important;
-  color: #e0f7fa !important;
-  border-bottom: 1px solid #232323 !important;
-  text-align: center;
-  vertical-align: middle;
-}
-
-body.darkmode .speeddates-table tr:nth-child(even) td {
-  background: #181c1f !important;
-}
-
-body.darkmode .speeddates-table tr:last-child td {
-  border-bottom: none !important;
-}
-
-/* Dark mode voor speeddate buttons */
-body.darkmode .speeddates-table .status-badge.badge-accepted {
-  background: #1a3d1a !important;
-  color: #00ff7f !important;
-  border: 1.5px solid #00ff7f !important;
-}
-
-body.darkmode .speeddates-table .accept-btn {
-  background: #1a3d1a !important;
-  color: #00ff7f !important;
-  border: 1.5px solid #00ff7f !important;
-}
-
-body.darkmode .speeddates-table .accept-btn:hover {
-  background: #00ff7f !important;
-  color: #181c1f !important;
-  border-color: #00ff7f !important;
-  transform: translateY(-2px);
-}
-
-body.darkmode .speeddates-table .status-badge.badge-denied {
-  background: #3d1a1a !important;
-  color: #ff4d4f !important;
-  border: 1.5px solid #ff4d4f !important;
-}
-
-body.darkmode .speeddates-table .deny-btn {
-  background: #3d1a1a !important;
-  color: #ff4d4f !important;
-  border: 1.5px solid #ff4d4f !important;
-}
-
-body.darkmode .speeddates-table .deny-btn:hover {
-  background: #ff4d4f !important;
-  color: #181c1f !important;
-  border-color: #ff4d4f !important;
-  transform: translateY(-2px);
-}
-
-body.darkmode .speeddates-table .status-badge.badge-waiting {
-  background: #3d3a1a !important;
-  color: #ffd740 !important;
-  border: 1.5px solid #ffd740 !important;
-}
-
-body.darkmode .speeddates-table .status-badge.badge-other {
-  background: #181c1f !important;
-  color: #b0b6c6 !important;
-  border: 1.5px solid #b0b6c6 !important;
-}
+/* Alle dark mode CSS is verwijderd */
 
 /* =============================================================================
    10. FOOTER
@@ -1694,38 +1458,6 @@ body.darkmode .speeddates-table .status-badge.badge-other {
 
 .footer a:hover {
   color: #009ca6;
-  text-decoration: underline;
-}
-
-body.darkmode .footer {
-  background: #181c1f !important;
-  color: #b0b6c6 !important;
-  border-top: 1px solid #232323 !important;
-}
-
-body.darkmode .footer a {
-  color: #b0b6c6 !important;
-  text-decoration: none;
-}
-
-body.darkmode .footer a:hover {
-  color: #009ca6 !important;
-  text-decoration: underline;
-}
-
-body.darkmode .student-profile-footer {
-  background: #181c1f !important;
-  color: #b0b6c6 !important;
-  border-top: 1px solid #232323 !important;
-}
-
-body.darkmode .student-profile-footer a {
-  color: #b0b6c6 !important;
-  text-decoration: none;
-}
-
-body.darkmode .student-profile-footer a:hover {
-  color: #009ca6 !important;
   text-decoration: underline;
 }
 
@@ -3088,47 +2820,6 @@ body.darkmode .student-profile-footer a:hover {
   font-weight: 600;
 }
 
-/* Dark mode for new elements */
-body.darkmode .student-avatar {
-  border-color: #333;
-}
-
-body.darkmode .loading-state p,
-body.darkmode .error-state p {
-  color: #e0f7fa;
-}
-
-body.darkmode .btn-retry {
-  background-color: #00e6ef;
-  color: #000;
-}
-
-body.darkmode .btn-retry:hover {
-  background-color: #00acc1;
-}
-
-body.darkmode .btn-accept {
-  background-color: #00ff7f;
-  color: #000;
-}
-
-body.darkmode .btn-accept:hover {
-  background-color: #00e66a;
-}
-
-body.darkmode .btn-decline {
-  background-color: #ff4d4f;
-  color: #fff;
-}
-
-body.darkmode .btn-decline:hover {
-  background-color: #ff3333;
-}
-
-body.darkmode .status-final {
-  color: #b0b6c6;
-}
-
 /* Bedrijf Profile Styles */
 .bedrijf-profile-container {
   display: flex;
@@ -3518,8 +3209,8 @@ body.darkmode .status-final {
 .speeddate-info {
   display: flex;
   align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
+  gap: 12px;
+  flex: 1;
 }
 
 .bedrijf-info,
