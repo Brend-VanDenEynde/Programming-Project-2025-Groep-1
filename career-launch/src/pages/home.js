@@ -7,22 +7,28 @@ export function renderHome(rootElement) {
   document.body.classList.remove('darkmode');
 
   rootElement.innerHTML = `
-    <div class="home-container">
-      <img 
-        src="${ehbLogo}"
-        alt="Erasmus Hogeschool Brussels Logo" 
-      />
+    <div class="home-background">
+      <div class="home-container">
+        <img 
+          src="${ehbLogo}"
+          alt="Erasmus Hogeschool Brussels Logo" 
+        />
 
-     
-      <h2>CAREER LAUNCH 2025</h2>
+         
+          <h2>CAREER LAUNCH 2025</h2>
 
-      <p>Geïnteresseerd?</p>
-      <button id="btn-register" class="btn" data-route="/registreer">Registreer je nu!</button>      <p>Al ingeschreven?</p>
-      <button id="btn-login" class="btn" data-route="/login">Login</button>    </div>      <!-- FOOTER -->
-      <footer class="student-profile-footer">
-        <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
-      </footer>  `;
+          <p>Geïnteresseerd?</p>
+          <button id="btn-register" class="btn" data-route="/registreer">Registreer je nu!</button>
+          <p>Al ingeschreven?</p>
+          <button id="btn-login" class="btn" data-route="/login">Login</button>
+          <!-- FOOTER -->
+          <footer class="student-profile-footer">
+            <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
+            <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
+          </footer>
+        </div>
+      </div>
+    </div>`;
 
   // Event listeners voor navigatie knoppen
   const btnReg = document.getElementById('btn-register');
