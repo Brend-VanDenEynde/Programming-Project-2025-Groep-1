@@ -234,6 +234,10 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
         } catch (err) { alert('Fout bij weigeren: ' + err.message); }
       });
     });
+    addBedrijfPopupListeners();
+  }
+
+  function addBedrijfPopupListeners() {
     document.querySelectorAll('.bedrijf-popup-trigger').forEach((el) => {
       el.addEventListener('click', async () => {
         const data = JSON.parse(el.dataset.bedrijf);
@@ -343,7 +347,7 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     });
   });
 
-  // --- Popup met bedrijfsinfo ---
+  // --- Popup met bedrijfsinfo (compact, bedrijven-style) ---
   async function createBedrijfPopup(s) {
     const overlay = document.createElement('div');
     overlay.style.cssText = `
@@ -353,22 +357,38 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     `;
     const popup = document.createElement('div');
     popup.style.cssText = `
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      max-width: 480px;
-      width: 90%;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      background: #fff;
+      padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+      border-radius: 14px;
+      max-width: 420px;
+      width: 96vw;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
       position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     `;
+    const profielFoto = (s.foto && s.foto.trim() !== '') ? s.foto : '/src/Images/defaultlogo.webp';
     popup.innerHTML = `
       <button id=\"popup-close\" style=\"position:absolute;top:10px;right:12px;font-size:1.4rem;background:none;border:none;cursor:pointer;\">×</button>
-      <h2 style=\"margin-top:0;\">${s.naam_bedrijf}</h2>
-      <p><strong>Tijd:</strong> ${s.begin ? new Date(s.begin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Onbekend'}</p>
-      <p><strong>Locatie:</strong> ${s.lokaal || 'Onbekend'}</p>
-      <p><strong>Status:</strong> ${s.akkoord !== undefined ? (s.akkoord ? 'Geaccepteerd' : 'In afwachting') : '-'}</p>
-      <p><strong>LinkedIn:</strong> <a id="popup-linkedin" href="#" target="_blank">Laden...</a></p>
-      <div id="popup-skills"><em>Skills laden...</em></div>
+      <img src=\"${profielFoto}\" alt=\"Logo ${s.naam_bedrijf}\" style=\"width:70px;height:70px;border-radius:50%;object-fit:contain;margin-bottom:1rem;\" onerror=\"this.onerror=null;this.src='../../Images/defaultlogo.webp'\">
+      <h2 style=\"margin-bottom:0.3rem;text-align:center;\">${s.naam_bedrijf}</h2>
+      <div style=\"font-size:1rem;color:#666;margin-bottom:0.2rem;\">${s.locatie || ''}</div>
+      <div style=\"font-size:0.97rem;color:#888;margin-bottom:0.5rem;\">${s.werkdomein || ''}</div>
+      <a href=\"${s.linkedin || '#'}\" target=\"_blank\" style=\"color:#0077b5;margin-bottom:0.7rem;\">${s.linkedin ? 'LinkedIn' : ''}</a>
+      <div style=\"font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;\">
+        <a href=\"mailto:${s.contact_email || ''}\" style=\"color:#444;\">${s.contact_email || ''}</a>
+      </div>
+      <div style=\"margin-bottom:0.7rem;width:100%;display:flex;flex-direction:row;gap:1.5rem;justify-content:center;\">
+        <div style=\"text-align:left;\">
+          <strong>Functies:</strong>
+          <div id=\"popup-functies\" style=\"margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;\"></div>
+        </div>
+        <div style=\"text-align:left;\">
+          <strong>Skills/talen:</strong>
+          <div id=\"popup-skills\" style=\"margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;\"></div>
+        </div>
+      </div>
     `;
     overlay.appendChild(popup);
     document.body.appendChild(overlay);
@@ -380,20 +400,14 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     const bedrijfId = s.id_bedrijf || s.gebruiker_id;
     if (bedrijfId) {
       const { functies, skills } = await fetchFunctiesSkills(bedrijfId);
+      const functiesHtml = functies.length
+        ? functies.map(f => `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#e3f2fd;font-size:0.85rem;\">${f.naam}</span>`).join('')
+        : '<em>Geen functies beschikbaar</em>';
+      document.getElementById('popup-functies').innerHTML = functiesHtml;
       const skillsHtml = skills.length
-        ? skills.map(skill =>
-            `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#f1f1f1;font-size:0.85rem;\">${skill.naam}</span>`
-          ).join('')
+        ? skills.map(skill => `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#f1f1f1;font-size:0.85rem;\">${skill.naam}</span>`).join('')
         : '<em>Geen skills beschikbaar</em>';
-      document.getElementById('popup-skills').innerHTML = `<strong>Skills:</strong><div style=\"margin-top:0.4rem;\">${skillsHtml}</div>`;
-    }
-    // LinkedIn
-    if (s.linkedin) {
-      document.getElementById('popup-linkedin').textContent = s.linkedin;
-      document.getElementById('popup-linkedin').href = s.linkedin;
-    } else {
-      document.getElementById('popup-linkedin').textContent = 'Niet beschikbaar';
-      document.getElementById('popup-linkedin').removeAttribute('href');
+      document.getElementById('popup-skills').innerHTML = skillsHtml;
     }
   }
 }

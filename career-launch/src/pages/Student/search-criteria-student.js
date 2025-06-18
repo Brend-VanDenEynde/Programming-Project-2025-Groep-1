@@ -124,7 +124,20 @@ export async function setStudentSkills(studentId, skillIds) {
 }
 
 /**
+ * Check of student bestaat in de backend (status 200 = bestaat)
+ */
+export async function checkStudentExists(studentId) {
+  try {
+    const resp = await makeAuthenticatedRequest(`https://api.ehb-match.me/studenten/${studentId}`, { method: 'GET' });
+    return resp.ok;
+  } catch (err) {
+    return false;
+  }
+}
+
+/**
  * Zet alle functies voor een student (overschrijft bestaande)
+ * Nu met extra check of student bestaat vóór POST
  */
 export async function setStudentFuncties(studentId, functieIds) {
   if (!Array.isArray(functieIds)) throw new Error('functieIds is geen array!');
@@ -133,6 +146,9 @@ export async function setStudentFuncties(studentId, functieIds) {
   if (cleanFuncties.length === 0) throw new Error('Je moet minstens één functie selecteren.');
   const payload = { functies: cleanFuncties }; // GEEN dubbele array!
   console.log('Functies naar backend (platte array):', JSON.stringify(payload));
+  // Extra check: bestaat student?
+  const bestaat = await checkStudentExists(studentId);
+  if (!bestaat) throw new Error('Student bestaat niet in de backend (ID: ' + studentId + ')');
   try {
     const resp = await makeAuthenticatedRequest(
       `https://api.ehb-match.me/studenten/${studentId}/functies`,
@@ -552,5 +568,15 @@ export async function renderSearchCriteriaStudent(
         });
       });
     }
+  }
+  // btn-to-profile navigatie
+  const btnToProfile = document.getElementById('btn-to-profile');
+  if (btnToProfile) {
+    btnToProfile.addEventListener('click', () => {
+      import('../../router.js').then(module => {
+        const Router = module.default;
+        Router.navigate('/student/student-profiel');
+      });
+    });
   }
 }
