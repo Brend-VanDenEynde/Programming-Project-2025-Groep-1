@@ -107,7 +107,8 @@ a:hover {
 .home-background {
   min-height: 100vh;
   width: 100vw;
-  background: url('../images/website banner 2_3Ehb.jpg') center center/cover no-repeat fixed !important;
+  background: url('../images/website banner 2_3Ehb.jpg') center center/cover
+    no-repeat fixed !important;
   position: relative;
   overflow: hidden;
 }
@@ -116,7 +117,12 @@ a:hover {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(255,255,255,0.6); /* Iets minder wit voor meer zichtbaarheid */
+  background: rgba(
+    255,
+    255,
+    255,
+    0.6
+  ); /* Iets minder wit voor meer zichtbaarheid */
   z-index: 1;
   pointer-events: none;
 }
@@ -2743,7 +2749,7 @@ body.darkmode .student-profile-footer a:hover {
 .opleiding-select {
   width: 100%;
   padding: 0.75rem;
-   border: 1px solid #ddd;
+  border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
   background-color: white;
@@ -2890,11 +2896,22 @@ body.darkmode .student-profile-footer a:hover {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Zorg ervoor dat alle child elementen geen witte achtergrond hebben, behalve buttons */
-.speeddate-item *:not(button) {
-  background: transparent !important;
+.speeddate-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.speeddate-item.goedgekeurd {
+  border-left: 4px solid #28a745;
+}
+
+.speeddate-item.in-behandeling,
+.speeddate-item.pending {
+  border-left: 4px solid #ffc107;
 }
 
 .speeddate-info {
@@ -3481,6 +3498,12 @@ body.darkmode .status-final {
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.speeddate-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .speeddate-item.goedgekeurd {
@@ -3665,7 +3688,7 @@ body.darkmode .status-final {
   max-height: 200px;
   overflow-y: auto;
   z-index: 1000;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .skill-suggestion {
@@ -3740,7 +3763,7 @@ body.darkmode .status-final {
   gap: 8px;
 }
 
-.werktype-option input[type="checkbox"] {
+.werktype-option input[type='checkbox'] {
   margin: 0;
   width: 16px;
   height: 16px;
