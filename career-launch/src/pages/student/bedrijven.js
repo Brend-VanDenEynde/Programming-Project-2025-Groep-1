@@ -174,7 +174,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
     <div id="bedrijf-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:600px;width:98vw;min-width:340px;position:relative;display:flex;flex-direction:column;align-items:center;">
       <button id="bedrijf-popup-close" style="position:absolute;top:10px;right:14px;font-size:1.7rem;background:none;border:none;cursor:pointer;color:#888;">&times;</button>
       <button id="popup-favorite-btn" class="popup-favorite-btn" title="${isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'}">${hartIcon}</button>
-      <img src="${bedrijf.foto}" alt="Logo ${bedrijf.naam}" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
+      <img src="${bedrijf.foto}" alt="Logo ${bedrijf.naam}" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='/src/images/defaultlogo.webp'">
       <h2 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h2>
       <div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${bedrijf.locatie}</div>
       <div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${bedrijf.werkdomein}</div>
@@ -982,7 +982,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
   <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;position:relative;" data-bedrijf-idx="${bedrijven.indexOf(bedrijf)}">
     <span class="match-badge" style="position:absolute;top:10px;left:10px;background:${badgeColor};color:#fff;font-weight:bold;padding:0.3em 0.8em;border-radius:16px;font-size:0.98em;z-index:3;box-shadow:0 2px 8px #0002;">${typeof matchPercentage === 'number' ? matchPercentage.toFixed(1) : '?'}%</span>
     <button class="favorite-btn" data-company-id="${bedrijf.gebruiker_id}" title="${isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'}" style="position:absolute;top:10px;right:10px;font-size:1.3rem;background:none;border:none;cursor:pointer;z-index:2;">${hartIcon}</button>
-    <img src="${profielFoto}" alt="Logo ${bedrijf.naam}" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
+    <img src="${profielFoto}" alt="Logo ${bedrijf.naam}" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.onerror=null;this.src='/src/images/defaultlogo.webp'">
     <h3 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h3>
     <div style="font-size:0.97rem;color:#666;margin-bottom:0.3rem;">${bedrijf.locatie}</div>
     <div style="font-size:0.97rem;color:#888;margin-bottom:0.3rem;">${bedrijf.werkdomein}</div>

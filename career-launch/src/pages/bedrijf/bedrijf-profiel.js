@@ -7,6 +7,19 @@ import {
 } from '../../utils/auth-api.js';
 import Router from '../../router.js';
 
+// Consistente logo helper
+function getBedrijfLogoUrl(foto, url) {
+  // Gebruik altijd defaultLogo als alles ontbreekt of ongeldig is
+  if (!foto || foto === 'null' || foto === 'undefined') return defaultLogo;
+  if (typeof foto === 'string' && foto.startsWith('http')) return foto;
+  if (url && typeof url === 'string' && url.startsWith('http')) return url;
+  // Als het een key is, plak achter base-url
+  if (typeof foto === 'string' && foto.length > 10) {
+    return 'https://gt0kk4fbet.ufs.sh/f/' + foto;
+  }
+  return defaultLogo;
+}
+
 const BASE_AVATAR_URL = 'https://gt0kk4fbet.ufs.sh/f/';
 const DEFAULT_AVATAR_KEY = '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
 const DEFAULT_AVATAR_URL = BASE_AVATAR_URL + DEFAULT_AVATAR_KEY;
@@ -23,12 +36,6 @@ const defaultBedrijfProfile = {
 };
 
 // Haal de token altijd dynamisch op binnen event handlers of functies waar nodig
-
-function getBedrijfLogoUrl(foto) {
-  if (!foto || foto === 'null') return DEFAULT_AVATAR_URL;
-  if (foto.startsWith('http')) return foto;
-  return BASE_AVATAR_URL + foto;
-}
 
 export async function renderBedrijfProfiel(
   rootElement,
@@ -115,7 +122,7 @@ export async function renderBedrijfProfiel(
   } = bedrijfData;
 
   // Gebruik default als foto null, leeg of undefined is
-  const foto = getBedrijfLogoUrl(profiel_foto_key);
+  const foto = getBedrijfLogoUrl(profiel_foto_key, profiel_foto_url);
 
   rootElement.innerHTML = `
     <div class="bedrijf-profile-container">

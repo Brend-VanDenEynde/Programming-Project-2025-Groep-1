@@ -197,7 +197,7 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
           }" 
                alt="${s.naam_bedrijf}" 
                class="profiel-foto bedrijf-foto"
-               onerror="this.src='/images/defaultlogo.webp'" />
+               onerror="this.src='/src/images/defaultlogo.webp'" />
           <div class="bedrijf-details">
             <h4>${s.naam_bedrijf}</h4>
             <p class="bedrijf-id">Bedrijf ID: ${s.id_bedrijf}</p>

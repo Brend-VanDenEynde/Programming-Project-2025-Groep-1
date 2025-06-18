@@ -186,7 +186,7 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
             }" 
                  alt="${v.naam_bedrijf}" 
                  class="profiel-foto bedrijf-foto"
-                 onerror="this.src='/images/defaultlogo.webp'" />
+                 onerror="this.onerror=null;this.src='/src/images/defaultlogo.webp'" />
             <div class="bedrijf-details">
               <h4>${v.naam_bedrijf}</h4>
               <p class="bedrijf-id">Bedrijf ID: ${v.id_bedrijf}</p>
