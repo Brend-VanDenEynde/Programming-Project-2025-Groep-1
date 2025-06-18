@@ -12,6 +12,7 @@ import {
   filterFavoriteCompanies,
 } from '../../utils/favorites-storage.js';
 import { fetchAndStoreStudentProfile } from '../../utils/fetch-student-profile.js';
+import { authenticatedFetch } from '../../utils/auth-api.js';
 
 // Globale variabelen
 let bedrijven = [];
@@ -55,24 +56,14 @@ async function showBedrijfPopup(bedrijf, studentId) {
   let functies = [];
   let skills = [];
   try {
-    const functiesResp = await fetch(
-      `https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/functies`,
-      {
-        headers: {
-          Authorization: 'Bearer ' + sessionStorage.getItem('authToken'),
-        },
-      }
+    const functiesResp = await authenticatedFetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/functies`
     );
     if (functiesResp.ok) functies = await functiesResp.json();
   } catch {}
   try {
-    const skillsResp = await fetch(
-      `https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/skills`,
-      {
-        headers: {
-          Authorization: 'Bearer ' + sessionStorage.getItem('authToken'),
-        },
-      }
+    const skillsResp = await authenticatedFetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/skills`
     );
     if (skillsResp.ok) skills = await skillsResp.json();
   } catch {}
@@ -102,10 +93,10 @@ async function showBedrijfPopup(bedrijf, studentId) {
     acceptedCompanyDates,
     pendingCompanyDates
   ] = await Promise.all([
-    fetch(`https://api.ehb-match.me/speeddates/accepted?id=${studentId}`, { headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` } }).then(r => r.ok ? r.json() : []),
-    fetch(`https://api.ehb-match.me/speeddates/pending?id=${studentId}`, { headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` } }).then(r => r.ok ? r.json() : []),
-    fetch(`https://api.ehb-match.me/speeddates/accepted?id=${bedrijf.gebruiker_id}`, { headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` } }).then(r => r.ok ? r.json() : []),
-    fetch(`https://api.ehb-match.me/speeddates/pending?id=${bedrijf.gebruiker_id}`, { headers: { Authorization: `Bearer ${sessionStorage.getItem('authToken')}` } }).then(r => r.ok ? r.json() : []),
+    authenticatedFetch(`https://api.ehb-match.me/speeddates/accepted?id=${studentId}`).then(r => r.ok ? r.json() : []),
+    authenticatedFetch(`https://api.ehb-match.me/speeddates/pending?id=${studentId}`).then(r => r.ok ? r.json() : []),
+    authenticatedFetch(`https://api.ehb-match.me/speeddates/accepted?id=${bedrijf.gebruiker_id}`).then(r => r.ok ? r.json() : []),
+    authenticatedFetch(`https://api.ehb-match.me/speeddates/pending?id=${bedrijf.gebruiker_id}`).then(r => r.ok ? r.json() : []),
   ]);
   const allAccepted = [...acceptedStudentDates, ...acceptedCompanyDates];
   const allPending  = [...pendingStudentDates, ...pendingCompanyDates];
@@ -365,11 +356,10 @@ async function showBedrijfPopup(bedrijf, studentId) {
     try {
       // Combineer datum + tijd voor de API
       const apiDatum = `${datum} ${tijd}:00`;
-      const req = await fetch('https://api.ehb-match.me/speeddates', {
+      const req = await authenticatedFetch('https://api.ehb-match.me/speeddates', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${window.sessionStorage.getItem('authToken')}`,
         },
         body: JSON.stringify({
           id_student: Number(studentId),
@@ -410,9 +400,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
 // Haal alle skills op uit de algemene skills API
 async function fetchAllSkills() {
   try {
-    const resp = await fetch('https://api.ehb-match.me/skills', {
-      headers: { Authorization: 'Bearer ' + sessionStorage.getItem('authToken') }
-    });
+    const resp = await authenticatedFetch('https://api.ehb-match.me/skills');
     return resp.ok ? await resp.json() : [];
   } catch {
     return [];
@@ -422,13 +410,8 @@ async function fetchAllSkills() {
 async function fetchSkillsForAllCompanies() {
   await Promise.all(bedrijven.map(async (bedrijf) => {
     try {
-      const resp = await fetch(
-        `https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/skills`,
-        {
-          headers: {
-            Authorization: 'Bearer ' + sessionStorage.getItem('authToken'),
-          },
-        }
+      const resp = await authenticatedFetch(
+        `https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/skills`
       );
       bedrijf.skillsArray = resp.ok ? await resp.json() : [];
     } catch {
@@ -441,13 +424,8 @@ async function fetchSkillsForAllCompanies() {
 async function fetchFunctiesForAllCompanies() {
   await Promise.all(bedrijven.map(async (bedrijf) => {
     try {
-      const resp = await fetch(
-        `https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/functies`,
-        {
-          headers: {
-            Authorization: 'Bearer ' + sessionStorage.getItem('authToken'),
-          },
-        }
+      const resp = await authenticatedFetch(
+        `https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/functies`
       );
       bedrijf.functiesArray = resp.ok ? await resp.json() : [];
     } catch {
@@ -580,9 +558,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       if (currentStudentId && currentStudentId !== 'anonymous-user') {
         apiUrl += `?id=${currentStudentId}`;
       }
-      const resp = await fetch(apiUrl, {
-        headers: { Authorization: 'Bearer ' + authToken }
-      });
+      const resp = await authenticatedFetch(apiUrl);
       const companies = resp.ok ? await resp.json() : [];
       console.log('API Companies:', companies); // DEBUG: check of match_percentage aanwezig is
       if (!Array.isArray(companies)) {

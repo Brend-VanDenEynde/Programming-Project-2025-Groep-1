@@ -3,6 +3,7 @@ import '../../css/consolidated-style.css';
 import Router from '../../router.js';
 
 import { previousData } from '../register.js';
+import { authenticatedFetch } from '../../utils/auth-api.js';
 
 let fileKey = null;
 
@@ -97,7 +98,7 @@ export function renderStudentRegister(rootElement) {
   deleteOverlay.addEventListener('click', handlePhotoClick);
 
   async function handlePhotoClick() {
-    fetch(`https://api.ehb-match.me/profielfotos/${fileKey}`, {
+    authenticatedFetch(`https://api.ehb-match.me/profielfotos/${fileKey}`, {
       method: 'DELETE',
     }).then((response) => {
       if (!response.ok) {
@@ -120,7 +121,7 @@ export function renderStudentRegister(rootElement) {
       const formData = new FormData();
 
       formData.append('image', file);
-      const uploadResponse = await fetch('https://api.ehb-match.me/profielfotos', {
+      const uploadResponse = await authenticatedFetch('https://api.ehb-match.me/profielfotos', {
         method: 'POST',
         body: formData,
       }).then((response) => {

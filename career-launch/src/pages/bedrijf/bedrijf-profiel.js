@@ -4,6 +4,7 @@ import {
   logoutUser,
   fetchUserInfo,
   updateBedrijfProfile,
+  authenticatedFetch,
 } from '../../utils/auth-api.js';
 import Router from '../../router.js';
 
@@ -359,7 +360,7 @@ export async function renderBedrijfProfiel(
           try {
             console.log('Sector input value:', document.getElementById('sectorInput').value);
             const currentToken = window.sessionStorage.getItem('authToken');
-            const response = await fetch('https://api.ehb-match.me/sectoren', {
+            const response = await authenticatedFetch('https://api.ehb-match.me/sectoren', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -421,7 +422,7 @@ export async function renderBedrijfProfiel(
             // remove https://gt0kk4fbet.ufs.sh/f/ prefix if present
             profielFotoKey = savedProfilePicture.replace(BASE_AVATAR_URL, '');
             const currentToken = window.sessionStorage.getItem('authToken');
-            const deleteResp = await fetch(`https://api.ehb-match.me/profielfotos/${profielFotoKey}`, {
+            const deleteResp = await authenticatedFetch(`https://api.ehb-match.me/profielfotos/${profielFotoKey}`, {
               method: 'DELETE',
               headers: {
                 'Authorization': 'Bearer ' + currentToken,
@@ -446,7 +447,7 @@ export async function renderBedrijfProfiel(
             const fileForm = new FormData();
             fileForm.append('image', file);
             const currentToken = window.sessionStorage.getItem('authToken');
-            const uploadResp = await fetch('https://api.ehb-match.me/profielfotos', {
+            const uploadResp = await authenticatedFetch('https://api.ehb-match.me/profielfotos', {
               method: 'POST',
               headers: {
                 'Authorization': 'Bearer ' + currentToken,

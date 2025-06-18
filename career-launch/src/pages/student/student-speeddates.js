@@ -6,6 +6,7 @@ import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './student-settings.js';
 import { fetchStudentSpeeddates } from '../../utils/data-api.js';
+import { authenticatedFetch } from '../../utils/auth-api.js';
 
 // Nieuw: API fetch
 async function fetchSpeeddates(rootElement) {
@@ -15,9 +16,7 @@ async function fetchSpeeddates(rootElement) {
     renderLogin(rootElement);
     return [];
   }
-  const resp = await fetch('https://api.ehb-match.me/speeddates', {
-    headers: { Authorization: 'Bearer ' + token },
-  });
+  const resp = await authenticatedFetch('https://api.ehb-match.me/speeddates');
   if (!resp.ok) {
     if (resp.status === 401) {
       sessionStorage.removeItem('authToken');
@@ -36,20 +35,14 @@ async function fetchFunctiesSkills(bedrijfId) {
   let functies = [];
   let skills = [];
   try {
-    const resFuncties = await fetch(
-      `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`,
-      {
-        headers: { Authorization: 'Bearer ' + token },
-      }
+    const resFuncties = await authenticatedFetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`
     );
     if (resFuncties.ok) functies = await resFuncties.json();
   } catch {}
   try {
-    const resSkills = await fetch(
-      `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`,
-      {
-        headers: { Authorization: 'Bearer ' + token },
-      }
+    const resSkills = await authenticatedFetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`
     );
     if (resSkills.ok) skills = await resSkills.json();
   } catch {}
@@ -95,9 +88,7 @@ async function fetchSpeeddatesWithStatus(
   if (status === 'Geaccepteerd') url += '/accepted';
   else if (status === 'In afwachting') url += '/pending';
   if (studentId) url += (url.includes('?') ? '&' : '?') + 'id=' + studentId;
-  const resp = await fetch(url, {
-    headers: { Authorization: 'Bearer ' + token },
-  });
+  const resp = await authenticatedFetch(url);
   if (!resp.ok) {
     if (resp.status === 401) {
       sessionStorage.removeItem('authToken');

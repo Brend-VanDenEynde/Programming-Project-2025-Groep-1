@@ -4,28 +4,21 @@ import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
+import { authenticatedFetch } from '../../utils/auth-api.js';
 
 // ... [alle utility functies uit jouw code hierboven, niet aangepast] ...
 // Skills ophalen: false = skill, true = taal
 async function fetchAllSkills() {
-  const token = sessionStorage.getItem('authToken');
-  const resp = await fetch('https://api.ehb-match.me/skills', {
-    headers: { Authorization: 'Bearer ' + token },
-  });
+  const resp = await authenticatedFetch('https://api.ehb-match.me/skills');
   if (!resp.ok) throw new Error('Kan skills niet ophalen');
   return await resp.json(); // [{id, naam, type}]
 }
 
 // Skill/taal toevoegen: type is boolean: false (skill), true (taal)
 async function addSkillOrTaal(name, isTaal = 0) {
-  const token = sessionStorage.getItem('authToken');
   console.log('Toevoegen skill/taal:', { naam: name, type: isTaal });
-  const resp = await fetch('https://api.ehb-match.me/skills', {
+  const resp = await authenticatedFetch('https://api.ehb-match.me/skills', {
     method: 'POST',
-    headers: {
-      Authorization: 'Bearer ' + token,
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify({ naam: name, type: isTaal }), // type: false/true
   });
   const text = await resp.text();
@@ -44,12 +37,10 @@ async function addSkillOrTaal(name, isTaal = 0) {
 
 // Skill/taal verwijderen van student
 async function removeSkillFromStudent(studentId, skillId) {
-  const token = sessionStorage.getItem('authToken');
-  const resp = await fetch(
+  const resp = await authenticatedFetch(
     `https://api.ehb-match.me/studenten/${studentId}/skills/${skillId}`,
     {
       method: 'DELETE',
-      headers: { Authorization: 'Bearer ' + token },
     }
   );
   const text = await resp.text();
@@ -62,12 +53,8 @@ async function removeSkillFromStudent(studentId, skillId) {
 
 // Haal alle skills/talen van de student op
 async function fetchStudentSkills(studentId) {
-  const token = sessionStorage.getItem('authToken');
-  const resp = await fetch(
-    `https://api.ehb-match.me/studenten/${studentId}/skills`,
-    {
-      headers: { Authorization: 'Bearer ' + token },
-    }
+  const resp = await authenticatedFetch(
+    `https://api.ehb-match.me/studenten/${studentId}/skills`
   );
   const text = await resp.text();
   if (!resp.ok) {
@@ -105,14 +92,10 @@ async function setStudentSkills(studentId, skillIds) {
     return [];
   }
 
-  const resp = await fetch(
+  const resp = await authenticatedFetch(
     `https://api.ehb-match.me/studenten/${studentId}/skills`,
     {
       method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + token,
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({ skills: skillIds }),
     }
   );
@@ -133,14 +116,10 @@ async function debugSetStudentSkillsIndividueel(studentId, skillIds) {
   const token = sessionStorage.getItem('authToken');
   for (const id of skillIds) {
     try {
-      const resp = await fetch(
+      const resp = await authenticatedFetch(
         `https://api.ehb-match.me/studenten/${studentId}/skills`,
         {
           method: 'POST',
-          headers: {
-            Authorization: 'Bearer ' + token,
-            'Content-Type': 'application/json',
-          },
           body: JSON.stringify({ skills: [id] }),
         }
       );
@@ -177,11 +156,8 @@ async function updateFunctiesForStudent(studentId, selectedFunctieIds) {
   }
   const token = sessionStorage.getItem('authToken');
   // Haal huidige functies op
-  const resp = await fetch(
-    `https://api.ehb-match.me/studenten/${studentId}/functies`,
-    {
-      headers: { Authorization: 'Bearer ' + token },
-    }
+  const resp = await authenticatedFetch(
+    `https://api.ehb-match.me/studenten/${studentId}/functies`
   );
   if (!resp.ok) throw new Error('Kan functies niet ophalen');
   const huidigeFuncties = await resp.json();
@@ -191,11 +167,10 @@ async function updateFunctiesForStudent(studentId, selectedFunctieIds) {
   const teVerwijderen = huidigeIds.filter((id) => !selectedFunctieIds.includes(id));
   // Verwijder oude
   for (const id of teVerwijderen) {
-    await fetch(
+    await authenticatedFetch(
       `https://api.ehb-match.me/studenten/${studentId}/functies/${id}`,
       {
         method: 'DELETE',
-        headers: { Authorization: 'Bearer ' + token },
       }
     );
   }
@@ -212,14 +187,10 @@ async function updateFunctiesForStudent(studentId, selectedFunctieIds) {
       studentId,
       functiesBody
     });
-    const resp = await fetch(
+    const resp = await authenticatedFetch(
       `https://api.ehb-match.me/studenten/${studentId}/functies`,
       {
         method: 'POST',
-        headers: {
-          Authorization: 'Bearer ' + token,
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(functiesBody), // ✅ juiste key
       }
     );
@@ -237,9 +208,7 @@ async function fetchStudentFuncties(studentId) {
     console.warn('GEEN token gevonden in sessionStorage!');
   }
   console.log('fetchStudentFuncties: studentId:', studentId, 'token:', token);
-  const resp = await fetch(`https://api.ehb-match.me/studenten/${studentId}/functies`, {
-    headers: { Authorization: 'Bearer ' + token },
-  });
+  const resp = await authenticatedFetch(`https://api.ehb-match.me/studenten/${studentId}/functies`);
   if (!resp.ok) {
     const errText = await resp.text();
     console.error(`Fout bij ophalen functies: ${resp.status} - ${errText}`);

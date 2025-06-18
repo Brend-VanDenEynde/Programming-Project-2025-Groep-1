@@ -1,5 +1,5 @@
 import logoIcon from '../../icons/favicon-32x32.png';
-import { refreshToken } from '../../utils/auth-api.js';
+import { authenticatedFetch, refreshToken } from '../../utils/auth-api.js';
 
 export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
   rootElement.innerHTML = `
@@ -270,7 +270,7 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
     if (!bedrijfId) {
       try {
         const authToken = window.sessionStorage.getItem('authToken');
-        const response = await fetch('https://api.ehb-match.me/auth/info', {
+        const response = await authenticatedFetch('https://api.ehb-match.me/auth/info', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -400,18 +400,9 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
       }
     };
 
-    let response = await fetch(url, requestOptions);    // Als we een 401 krijgen, probeer token te refreshen
+    let response = await authenticatedFetch(url, requestOptions);    // Als we een 401 krijgen, probeer token te refreshen
     if (response.status === 401) {
-      const refreshResult = await refreshToken();
-      
-      if (refreshResult.success && refreshResult.accessToken) {
-        // Update de authorization header met nieuwe token
-        requestOptions.headers['Authorization'] = `Bearer ${refreshResult.accessToken}`;
-        
-        // Probeer request opnieuw
-        response = await fetch(url, requestOptions);
-      } else {
-        throw new Error('Authenticatie mislukt - log opnieuw in');      }
+        throw new Error('Authenticatie mislukt - log opnieuw in');
     }
 
     return response;

@@ -3,6 +3,20 @@
  * This file contains functions for login, logout, and authentication management
  */
 
+
+// Global refresh lock (race-condition safe)
+let refreshPromise = null;
+
+function getRefreshPromise() {
+  if (!refreshPromise) {
+    refreshPromise = refreshToken().finally(() => {
+      refreshPromise = null;
+    });
+  }
+  return refreshPromise;
+}
+
+
 /**
  * Calls the logout endpoint to log the user out
  * @returns {Promise<Object>} API response
@@ -59,13 +73,6 @@ export async function refreshToken() {
   try {
     const response = await fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // Include authorization header if we have a token
-        ...(window.sessionStorage.getItem('authToken') && {
-          Authorization: `Bearer ${window.sessionStorage.getItem('authToken')}`,
-        }),
-      },
       credentials: 'include', // Include cookies in the request (for refresh token)
     });
 
@@ -316,7 +323,7 @@ export async function updateBedrijfProfile(bedrijfID, updateData) {
   }
 
   try {
-    const response = await fetch(apiUrl, {
+    const response = await authenticatedFetch(apiUrl, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -348,5 +355,83 @@ export async function updateBedrijfProfile(bedrijfID, updateData) {
       message: error.message || 'Failed to update company information',
       error: error.message,
     };
+  }
+}
+
+
+/**
+ * Makes an authenticated API call with automatic token refresh on 401 errors
+ * @param {string} url - The API endpoint URL
+ * @param {Object} options - Fetch options (method, headers, body, etc.)
+ * @returns {Promise<Response>} The fetch response
+ */
+export async function authenticatedFetch(url, options = {}) {
+  // Get the auth token from session storage
+  // Try accessToken first (used by admin), fallback to authToken
+  const accessToken = window.sessionStorage.getItem('accessToken');
+  const authToken = window.sessionStorage.getItem('authToken');
+  const token = accessToken || authToken;
+
+  // Prepare headers with authentication
+  const headers = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+    ...(token && {
+      Authorization: `Bearer ${token}`,
+    }),
+  };
+
+  // Make the initial API call
+  const requestOptions = {
+    headers,
+    ...options,
+  };
+
+  try {
+    const response = await fetch(url, requestOptions);
+
+    // If the response is successful, return it
+    if (response.ok) {
+      return response;
+    }
+
+    // If it's a 401 (Unauthorized), try to refresh the token and retry
+    if (response.status === 401) {
+      console.log('401 error detected, attempting token refresh...');
+
+      // --- BEGIN RACE-CONDITION SAFE REFRESH LOCK ---
+      const refreshResult = await getRefreshPromise();
+      // --- END REFRESH LOCK ---
+
+      if (refreshResult.success) {
+        console.log(
+          'Token refreshed successfully, retrying original request...'
+        );
+
+        // Update the Authorization header with the new token
+        const newHeaders = {
+          ...headers,
+          Authorization: `Bearer ${refreshResult.accessToken}`,
+        };
+
+        // Retry the original request with the new token
+        const retryResponse = await fetch(url, {
+          ...requestOptions,
+          headers: newHeaders,
+        });
+
+        return retryResponse;
+      } else {
+        console.error('Token refresh failed:', refreshResult.error);
+        window.location.href = '/login'; // Redirect to login on failure
+        throw new Error('Authentication failed - please log in again');
+      }
+    }
+
+    // For other errors, just return the response
+    return response;
+  } catch (error) {
+    console.error('API call error:', error);
+    throw error;
   }
 }

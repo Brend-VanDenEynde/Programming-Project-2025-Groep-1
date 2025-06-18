@@ -1,7 +1,7 @@
 // Admin company detail pagina
 import Router from '../../router.js';
 import defaultCompanyLogo from '../../images/defaultlogo.webp';
-import { logoutUser } from '../../utils/auth-api.js';
+import { authenticatedFetch, logoutUser } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 
@@ -100,7 +100,7 @@ export async function renderAdminCompanyDetail(rootElement) {
   const accessToken = sessionStorage.getItem('accessToken');
   try {
     // Fetch fresh data from the API
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `https://api.ehb-match.me/bedrijven/${companyId}`,
       {
         method: 'GET',
@@ -382,7 +382,7 @@ async function openSpeedDatesModal() {
   try {
     // Fetch speeddates data from API with company ID
     const accessToken = sessionStorage.getItem('accessToken');
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `https://api.ehb-match.me/speeddates?id=${companyId}`,
       {
         method: 'GET',
