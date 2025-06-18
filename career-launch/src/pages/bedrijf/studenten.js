@@ -1,6 +1,10 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import defaultStudentAvatar from '../../images/default.png';
-import { logoutUser, fetchUserInfo, authenticatedFetch } from '../../utils/auth-api.js';
+import {
+  logoutUser,
+  fetchUserInfo,
+  authenticatedFetch,
+} from '../../utils/auth-api.js';
 import {
   fetchDiscoverStudenten,
   createSpeeddate,
@@ -264,12 +268,18 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
         `https://api.ehb-match.me/speeddates/user/${bedrijfId}/unavailable`,
         { headers: { Authorization: `Bearer ${token}` } }
       ).then((r) => (r.ok ? r.json() : [])),
-      authenticatedFetch(`https://api.ehb-match.me/speeddates/pending?id=${studentId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }).then((r) => (r.ok ? r.json() : [])),
-      authenticatedFetch(`https://api.ehb-match.me/speeddates/pending?id=${bedrijfId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }).then((r) => (r.ok ? r.json() : [])),
+      authenticatedFetch(
+        `https://api.ehb-match.me/speeddates/pending?id=${studentId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      ).then((r) => (r.ok ? r.json() : [])),
+      authenticatedFetch(
+        `https://api.ehb-match.me/speeddates/pending?id=${bedrijfId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      ).then((r) => (r.ok ? r.json() : [])),
     ]);
 
     // Combine all unavailable slots from both student and company
@@ -364,10 +374,9 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
           <h2 style="margin-bottom:0.5rem;text-align:center;color:#333;">Speeddate Aanvragen</h2>
           <p style="margin-bottom:0.5rem;text-align:center;color:#666;">Vraag een speeddate aan met <strong>${fullName}</strong></p>
           <p style="margin-bottom:0;text-align:center;color:#888;font-size:0.9rem;">Datum: ${formattedDate}</p>
-        </div>
-          <div style="margin-bottom:1rem;">
+        </div>          <div style="margin-bottom:1rem;">
           <div style="margin-bottom:0.5rem;font-size:0.95rem;text-align:center;">
-            <strong>Legenda:</strong>
+            <strong>Tijdslot legenda:</strong>
             <span style="background:#fff;border:1px solid #ccc;padding:0.2rem 0.5rem;border-radius:5px;margin-left:0.5rem;font-size:0.85rem;">Vrij</span>
             <span style="background:#fff3cd;border:1px solid #ffeaa7;padding:0.2rem 0.5rem;border-radius:5px;margin-left:0.5rem;font-size:0.85rem;">Pending</span>
             <span style="background:#ffe0e0;border:1px solid #ffbdbd;padding:0.2rem 0.5rem;border-radius:5px;margin-left:0.5rem;font-size:0.85rem;">Bezet</span>
@@ -394,9 +403,7 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
     const submitBtn = document.getElementById('submit-speeddate');
     const statusDiv = document.getElementById('speeddate-status');
     let geselecteerdUur = null;
-    let gekozenTijd = '';
-
-    // Create hour selection buttons
+    let gekozenTijd = ''; // Create hour selection buttons
     uren.forEach((uur) => {
       const slotsForHour = allSlots.filter((slot) => {
         const slotHour = parseInt(slot.value.split(':')[0], 10);
@@ -407,19 +414,40 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
       ).length;
 
       const btn = document.createElement('button');
-      btn.innerHTML = `${uur}u <span style="background:#fff;border-radius:8px;padding:0.1rem 0.7rem;font-size:0.85em;margin-left:0.5em;border:1px solid #b7b7ff;color:#4e7bfa;">${vrijeSlots}</span>`;
+
+      // Bepaal kleur en style gebaseerd op aantal vrije slots
+      const isUnavailable = vrijeSlots === 0;
+      const backgroundColor = isUnavailable ? '#ffebee' : '#eef1fa';
+      const borderColor = isUnavailable ? '#f44336' : '#b7b7ff';
+      const textColor = isUnavailable ? '#c62828' : '#4e7bfa';
+      const spanBackground = isUnavailable ? '#ffcdd2' : '#fff';
+      const spanBorderColor = isUnavailable ? '#f44336' : '#b7b7ff';
+      const spanTextColor = isUnavailable ? '#c62828' : '#4e7bfa';
+
+      btn.innerHTML = `${uur}u <span style="background:${spanBackground};border-radius:8px;padding:0.1rem 0.7rem;font-size:0.85em;margin-left:0.5em;border:1px solid ${spanBorderColor};color:${spanTextColor};" title="Aantal beschikbare tijdslots">${vrijeSlots}</span>`;
       btn.style.cssText = `
-        background:#eef1fa;
-        border:1.5px solid #b7b7ff;
+        background:${backgroundColor};
+        border:1.5px solid ${borderColor};
         border-radius:8px;
         padding:0.5rem 1rem;
         font-size:0.95rem;
-        cursor:pointer;
+        cursor:${isUnavailable ? 'not-allowed' : 'pointer'};
         margin:0;
         transition:box-shadow .2s;
         display:flex;align-items:center;gap:0.4em;
+        color:${textColor};
+        opacity:${isUnavailable ? '0.7' : '1'};
       `;
+
+      if (isUnavailable) {
+        btn.disabled = true;
+        btn.title = 'Geen tijdslots beschikbaar voor dit uur';
+      } else {
+        btn.title = `${vrijeSlots} beschikbare tijdslots voor ${uur}:00 uur`;
+      }
+
       btn.addEventListener('click', () => {
+        if (isUnavailable) return;
         geselecteerdUur = uur;
         urenLijst
           .querySelectorAll('button')
@@ -471,11 +499,14 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
           submitBtn.disabled = false;
         });
       });
-    }
-
-    // Auto-select first hour
+    } // Auto-select first available hour (not unavailable/red)
     if (uren.length) {
-      urenLijst.querySelector('button').click();
+      const firstAvailableButton = urenLijst.querySelector(
+        'button:not([disabled])'
+      );
+      if (firstAvailableButton) {
+        firstAvailableButton.click();
+      }
     }
 
     // Event listeners
