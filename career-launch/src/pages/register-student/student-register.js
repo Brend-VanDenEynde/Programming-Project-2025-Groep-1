@@ -6,6 +6,8 @@ import { previousData } from '../register.js';
 
 let fileKey = null;
 
+export let mergedData = null;
+
 
 
 export function renderStudentRegister(rootElement) {
@@ -199,10 +201,7 @@ function handleNaamRegister(event) {
     return;
   }
 
-  const mergedData = { ...previousData, ...currentData };
-
-  // Store merged data in localStorage
-  localStorage.setItem('userData', JSON.stringify(mergedData));
+  mergedData = { ...previousData, ...currentData };
 
   renderStudentOpleiding(document.getElementById('app'));
 }
