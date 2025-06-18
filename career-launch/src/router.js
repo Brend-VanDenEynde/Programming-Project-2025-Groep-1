@@ -31,9 +31,11 @@ import { renderStudenten } from './pages/bedrijf/studenten.js';
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
     <div class="not-found-container">
-      <h1>404 - Pagina niet gevonden</h1>
-      <p>De pagina die je zoekt bestaat niet.</p>
-      <a href="/" data-route="/">Terug naar home</a>
+      <div class="not-found-content">
+        <h1>404</h1>
+        <p>Pagina niet gevonden</p>
+        <a href="/" data-route="/">← Terug naar home</a>
+      </div>
     </div>
   `;
 }

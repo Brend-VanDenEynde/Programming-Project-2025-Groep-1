@@ -2743,7 +2743,7 @@ body.darkmode .student-profile-footer a:hover {
 .opleiding-select {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
   background-color: white;
@@ -3737,10 +3737,42 @@ body.darkmode .status-final {
   color: #0077b5;
 }
 
-/* Responsive voor werktype */
-@media (max-width: 768px) {
-  .werktype-container {
-    flex-direction: column;
-    gap: 10px;
-  }
+/* =============================================================================
+   404 NOT FOUND PAGE STYLING
+   ============================================================================= */
+
+/* 404 Page - Simple and Clean */
+.not-found-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.not-found-content h1 {
+  font-size: 4rem;
+  font-weight: 300;
+  color: #666;
+  margin: 0 0 1rem 0;
+}
+
+.not-found-content p {
+  font-size: 1.2rem;
+  color: #888;
+  margin: 0 0 2rem 0;
+}
+
+.not-found-content a {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.not-found-content a:hover {
+  border-bottom-color: #007bff;
 }
