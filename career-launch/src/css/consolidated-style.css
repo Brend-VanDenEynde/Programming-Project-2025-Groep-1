@@ -2755,6 +2755,40 @@ body.darkmode .student-profile-footer a:hover {
   border-color: #004080;
 }
 
+.create-account-button {
+  width: 100%;
+  padding: 1rem;
+  background: #004080;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 400;
+  cursor: pointer;
+  margin-top: 2rem;
+}
+
+.create-account-button:hover {
+  background: #003060;
+}
+
+.back-button-outside {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1rem;
+  cursor: pointer;
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  padding: 0.5rem;
+  z-index: 10;
+}
+
+.back-button-outside:hover {
+  color: #004080;
+}
+
 /* =============================================================================
    13. UTILITIES EN HELPERS
    ========================================================================== */
