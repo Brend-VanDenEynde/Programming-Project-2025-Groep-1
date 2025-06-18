@@ -96,19 +96,6 @@ function renderSpeeddatesList(speeddates) {
             afspraak.akkoord ? 'goedgekeurd' : 'in-behandeling'
           }">
             <div class="speeddate-info">
-              <div class="bedrijf-info">
-                <img src="${
-                  afspraak.bedrijf.profielfoto || '/images/defaultlogo.webp'
-                }" 
-                     alt="${afspraak.bedrijf.naam}" 
-                     class="profiel-foto bedrijf-foto" 
-                     onerror="this.src='/images/defaultlogo.webp'" />
-                <div class="bedrijf-details">
-                  <h4>${afspraak.bedrijf.naam}</h4>
-                  <p class="sector">${afspraak.bedrijf.sector}</p>
-                </div>
-              </div>
-              
               <div class="student-info">
                 <img src="${
                   afspraak.student.profielfoto || '/images/default.png'
@@ -118,6 +105,7 @@ function renderSpeeddatesList(speeddates) {
                      onerror="this.src='/images/default.png'" />
                 <div class="student-details">
                   <h4>${afspraak.student.naam}</h4>
+                  <p class="student-id">Student ID: ${afspraak.student.id}</p>
                 </div>
               </div>
               
@@ -137,7 +125,9 @@ function renderSpeeddatesList(speeddates) {
                     ${afspraak.status}
                   </span>
                 </div>
-              </div>              <div class="speeddate-actions">
+              </div>
+
+              <div class="speeddate-actions">
                 ${
                   !afspraak.akkoord
                     ? `

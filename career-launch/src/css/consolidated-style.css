@@ -3701,3 +3701,46 @@ body.darkmode .status-final {
   padding: 0;
   margin-left: 5px;
 }
+
+/* =============================================================================
+   WERKTYPE SELECTION STYLING
+   ============================================================================= */
+
+.werktype-container {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.werktype-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.werktype-option input[type="checkbox"] {
+  margin: 0;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.werktype-option label {
+  cursor: pointer;
+  font-size: 1rem;
+  color: #333;
+  user-select: none;
+}
+
+.werktype-option label:hover {
+  color: #0077b5;
+}
+
+/* Responsive voor werktype */
+@media (max-width: 768px) {
+  .werktype-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
