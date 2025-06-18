@@ -319,7 +319,6 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
     }
   }
 
-  // ...existing code...
   function filterSkills(query) {
     if (!query || !skillsLoaded) return [];
     
@@ -1209,6 +1208,30 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
       }      return false;
     }
   }
+
+  // Event listeners voor skills
+  skillsInput?.addEventListener('input', (e) => {
+    const query = e.target.value.trim();
+    if (query.length > 0) {
+      const filteredSkills = filterSkills(query);
+      showDropdown(filteredSkills);
+    } else {
+      hideDropdown();
+    }
+  });
+
+  skillsInput?.addEventListener('keydown', async (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      await addSkill();
+    } else if (e.key === 'Escape') {
+      hideDropdown();
+    }
+  });
+
+  addSkillBtn?.addEventListener('click', async () => {
+    await addSkill();
+  });
 
   // Event listeners voor talen
   languagesInput?.addEventListener('input', (e) => {
