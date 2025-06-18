@@ -344,28 +344,28 @@ export async function renderBedrijfProfiel(
 
         let sectorID = null;
         if (document.getElementById('sectorInput').value) {
-          console.log('Sector input value:', document.getElementById('sectorInput').value);
-          const currentToken = window.sessionStorage.getItem('authToken');
-          sectorID = await fetch('https://api.ehb-match.me/sectoren', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + currentToken,
-            },
-            body: JSON.stringify({
-              naam: document.getElementById('sectorInput').value
-            })
-          }).then(response => {
+          try {
+            console.log('Sector input value:', document.getElementById('sectorInput').value);
+            const currentToken = window.sessionStorage.getItem('authToken');
+            const response = await fetch('https://api.ehb-match.me/sectoren', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + currentToken,
+              },
+              body: JSON.stringify({
+                naam: document.getElementById('sectorInput').value
+              })
+            });
             if (!response.ok) {
               throw new Error('Fout bij het ophalen van sector ID: ' + response.statusText);
             }
-            return response.json();
-          }).then(data => {
+            const data = await response.json();
             console.log('Sector ID opgehaald:', data);
-            return data.sector.id;
-          }).catch(error => {
+            sectorID = data.sector.id;
+          } catch (error) {
             console.error('Error fetching sector ID:', error);
-          });
+          }
         }
         const updateData = {
           naam: document.getElementById('bedrijfsnaamInput').value,
@@ -464,7 +464,9 @@ export async function renderBedrijfProfiel(
           const updatedBedrijfData = {
             ...bedrijfData,
             ...updateData,
-            sector_bedrijf: result.bedrijf?.sector_bedrijf.charAt(0).toUpperCase() + result.bedrijf?.sector_bedrijf.slice(1) || bedrijfData.sector_bedrijf,
+            sector_bedrijf: (result.bedrijf?.sector_bedrijf && result.bedrijf.sector_bedrijf.length > 0)
+              ? result.bedrijf.sector_bedrijf.charAt(0).toUpperCase() + result.bedrijf.sector_bedrijf.slice(1)
+              : bedrijfData.sector_bedrijf,
             profiel_foto_key:
               result.bedrijf?.profiel_foto_key || bedrijfData.profiel_foto_key,
             profiel_foto_url:
