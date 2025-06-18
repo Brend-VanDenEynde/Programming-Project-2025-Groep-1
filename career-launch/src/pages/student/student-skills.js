@@ -1,5 +1,6 @@
 import '../../css/consolidated-style.css';
 import Router from '../../router.js';
+import { authenticatedFetch } from "../../utils/auth-api.js";
 
 // Skills ophalen uit de API
 async function fetchSkills() {
