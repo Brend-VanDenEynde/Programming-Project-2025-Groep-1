@@ -28,7 +28,6 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
           <div class="bedrijf-profile-content">
           <div class="bedrijf-profile-form-container">
             <h1 class="bedrijf-profile-title">Zoek-criteria</h1>
-            <p>Stel hier je zoek-criteria in om de juiste studenten te vinden.</p>
               <form id="search-criteria-form" class="search-criteria-form">              <div class="form-group">
                 <label for="skills-input">Vereiste Skills:</label>
                 <div class="skills-input-container">
@@ -39,9 +38,7 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
                   <button type="button" id="add-skill-btn" class="btn">Toevoegen</button>
                 </div>
                 <div id="selected-skills" class="selected-skills"></div>
-              </div>
-
-              <div class="form-group">
+              </div>              <div class="form-group">
                 <label for="languages-input">Vereiste Talen:</label>
                 <div class="skills-input-container">
                   <div class="skills-input-wrapper">
@@ -51,6 +48,24 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
                   <button type="button" id="add-language-btn" class="btn">Toevoegen</button>
                 </div>
                 <div id="selected-languages" class="selected-skills"></div>
+              </div>              <div class="form-group">
+                <label>Werktype:</label>
+                <div class="werktype-container">
+                  <div class="werktype-option">
+                    <input type="checkbox" id="parttime" name="werktype" value="parttime">
+                    <label for="parttime">Parttime</label>
+                  </div>
+                  
+                  <div class="werktype-option">
+                    <input type="checkbox" id="fulltime" name="werktype" value="fulltime">
+                    <label for="fulltime">Fulltime</label>
+                  </div>
+                  
+                  <div class="werktype-option">
+                    <input type="checkbox" id="stage" name="werktype" value="stage">
+                    <label for="stage">Stagair</label>
+                  </div>
+                </div>
               </div>
             </form>
           </div>
@@ -139,7 +154,24 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
       const Router = module.default;
       Router.navigate('/contact');
     });
-  });  // Skills functionality
+  });  // Werktype functionality
+  let selectedWerktypes = [];
+  const werktypeCheckboxes = document.querySelectorAll('input[name="werktype"]');
+  
+  // Werktype ID mapping
+  const werktypeMapping = {
+    'parttime': 1,
+    'fulltime': 2, 
+    'stage': 3
+  };
+  
+  const werktypeReverseMapping = {
+    1: 'parttime',
+    2: 'fulltime',
+    3: 'stage'
+  };
+
+  // Skills functionality
   let selectedSkills = [];
   let availableSkills = []; // Array van {id, naam} objecten
   let skillsLoaded = false;
@@ -1193,6 +1225,150 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
         window.location.href = '#/bedrijf-login';
       }      return false;
     }
+  }  // Event listeners voor werktype
+  werktypeCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', async (e) => {
+      const value = e.target.value;
+      const functieId = werktypeMapping[value];
+      
+      if (e.target.checked) {
+        // Voeg functie toe
+        const success = await addFunctieToDatabase(functieId);
+        if (success) {
+          if (!selectedWerktypes.includes(value)) {
+            selectedWerktypes.push(value);
+          }
+        } else {
+          // Reset checkbox als opslaan mislukt
+          e.target.checked = false;
+        }
+      } else {
+        // Verwijder functie
+        const success = await removeFunctieFromDatabase(functieId);
+        if (success) {
+          selectedWerktypes = selectedWerktypes.filter(type => type !== value);
+        } else {
+          // Reset checkbox als verwijderen mislukt
+          e.target.checked = true;
+        }
+      }
+    });
+  });
+
+  // Functie om functie toe te voegen
+  async function addFunctieToDatabase(functieId) {
+    const bedrijfId = await getCurrentBedrijfId();
+    if (!bedrijfId) {
+      console.error('Geen bedrijf ID gevonden voor functie toevoegen');
+      return false;
+    }
+
+    try {
+      const requestBody = { functies: [functieId] };
+      
+      const response = await makeAuthenticatedRequest(`https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`, {
+        method: 'POST',
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response voor functie toevoegen:', errorText);
+        
+        // Check of functie al bestaat
+        if (response.status === 400 && (errorText.includes('already') || errorText.includes('duplicate'))) {
+          return true; // Functie bestaat al, dat is OK
+        }
+        
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Fout bij toevoegen functie:', {
+        functieId,
+        bedrijfId,
+        errorMessage: error.message
+      });
+      
+      if (error.message.includes('Authenticatie mislukt')) {
+        alert('Uw sessie is verlopen. Log opnieuw in.');
+        window.location.href = '#/bedrijf-login';
+      }
+      return false;
+    }
+  }
+
+  // Functie om functie te verwijderen
+  async function removeFunctieFromDatabase(functieId) {
+    const bedrijfId = await getCurrentBedrijfId();
+    if (!bedrijfId) {
+      console.error('Geen bedrijf ID gevonden voor functie verwijderen');
+      return false;
+    }
+
+    try {
+      const response = await makeAuthenticatedRequest(`https://api.ehb-match.me/bedrijven/${bedrijfId}/functies/${functieId}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response voor functie verwijderen:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Fout bij verwijderen functie:', {
+        functieId,
+        bedrijfId,
+        errorMessage: error.message
+      });
+      
+      if (error.message.includes('Authenticatie mislukt')) {
+        alert('Uw sessie is verlopen. Log opnieuw in.');
+        window.location.href = '#/bedrijf-login';
+      }
+      return false;
+    }  }
+
+  // Functie om bestaande werktypes te laden
+  async function loadBedrijfWerktypes() {
+    const bedrijfId = await getCurrentBedrijfId();
+    
+    if (!bedrijfId) {
+      return;
+    }
+
+    try {
+      const response = await makeAuthenticatedRequest(`https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`, {
+        method: 'GET'
+      });
+
+      if (response.ok) {
+        const functies = await response.json();
+        
+        if (Array.isArray(functies) && functies.length > 0) {
+          // Converteer functie IDs naar werktype namen
+          const werktypeNames = functies
+            .map(functie => werktypeReverseMapping[functie.id])
+            .filter(name => name !== undefined);
+          
+          selectedWerktypes = werktypeNames;
+          
+          // Set de checkboxes
+          werktypeNames.forEach(werktype => {
+            const checkbox = document.querySelector(`input[name="werktype"][value="${werktype}"]`);
+            if (checkbox) {
+              checkbox.checked = true;
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Fout bij laden werktypes:', error);
+    }
   }
 
   // Event listeners voor skills
@@ -1332,9 +1508,10 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
     initializeSkills(),
     initializeLanguages(),
     loadBedrijfSkills(),
-    loadBedrijfLanguages()
+    loadBedrijfLanguages(),
+    loadBedrijfWerktypes()
   ]).then((results) => {
-    const [skillsResult, languagesResult, bedrijfSkillsResult, bedrijfLanguagesResult] = results;
+    const [skillsResult, languagesResult, bedrijfSkillsResult, bedrijfLanguagesResult, bedrijfWerktypesResult] = results;
     
     if (skillsResult.status === 'rejected') {
       console.warn('Skills database kon niet geladen worden, maar fallback is beschikbaar');
@@ -1350,6 +1527,8 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
     
     if (bedrijfLanguagesResult.status === 'rejected') {
       console.warn('Bestaande bedrijf talen konden niet geladen worden');
+    }    if (bedrijfWerktypesResult.status === 'rejected') {
+      console.warn('Bestaande werktypes konden niet geladen worden');
     }
   });
 }
