@@ -2,7 +2,11 @@ import { renderStudentOpleiding } from './student-opleiding.js';
 import '../../css/consolidated-style.css';
 import Router from '../../router.js';
 
+import { previousData } from '../register.js';
+
 let fileKey = null;
+
+
 
 export function renderStudentRegister(rootElement) {
   rootElement.innerHTML = `
@@ -194,8 +198,6 @@ function handleNaamRegister(event) {
     errorLabel.style.display = 'block';
     return;
   }
-
-  const previousData = JSON.parse(localStorage.getItem('userData')) || {};
 
   const mergedData = { ...previousData, ...currentData };
 
