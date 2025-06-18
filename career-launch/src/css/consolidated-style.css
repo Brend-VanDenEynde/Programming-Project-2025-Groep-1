@@ -71,7 +71,6 @@ a:hover {
   min-height: calc(100vh - 50px);
   padding: 20px;
   padding-bottom: 70px;
-  background-color: white;
 }
 
 .home-container img {
@@ -102,6 +101,33 @@ a:hover {
   color: #333;
   margin-bottom: 15px;
   text-align: center;
+}
+
+/* Achtergrondafbeelding voor de homepagina */
+.home-background {
+  min-height: 100vh;
+  width: 100vw;
+  background: url('../Images/website banner 2_3Ehb.jpg') center center/cover no-repeat fixed !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.home-background::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.6); /* Iets minder wit voor meer zichtbaarheid */
+  z-index: 1;
+  pointer-events: none;
+}
+
+.home-background > * {
+  position: relative;
+  z-index: 2;
+}
+
+.home-container {
+  background: transparent !important;
 }
 
 /* =============================================================================
