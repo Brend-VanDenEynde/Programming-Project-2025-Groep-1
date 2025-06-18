@@ -2,7 +2,6 @@ import logoIcon from '../../icons/favicon-32x32.png';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
-import { renderQRPopup } from './student-qr-popup.js';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
 
@@ -367,7 +366,6 @@ export async function renderSearchCriteriaStudent(
               <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
               <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
               <li><button data-route="bedrijven" class="sidebar-link">Bedrijven</button></li>
-              <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
             </ul>
           </nav>
           <div class="student-profile-content">
@@ -638,9 +636,6 @@ export async function renderSearchCriteriaStudent(
               break;
             case 'bedrijven':
               Router.navigate('/student/bedrijven');
-              break;
-            case 'qr':
-              Router.navigate('/student/student-qr-popup');
               break;
           }
         });

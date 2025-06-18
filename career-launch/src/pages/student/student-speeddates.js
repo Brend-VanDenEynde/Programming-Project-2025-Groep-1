@@ -4,12 +4,11 @@ import { renderLogin } from '../login.js';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
-import { renderQRPopup } from './student-qr-popup.js';
 import { showSettingsPopup } from './student-settings.js';
 import { fetchStudentSpeeddates } from '../../utils/data-api.js';
-import Router from '../../router.js';
 
-// API fetch function
+
+// Nieuw: API fetch
 async function fetchSpeeddates(rootElement) {
   const token = sessionStorage.getItem('authToken');
   console.log('authToken:', token);
@@ -28,34 +27,35 @@ async function fetchSpeeddates(rootElement) {
     }
     const txt = await resp.text();
     throw new Error(`Kon speeddates niet ophalen: ${resp.status} – ${txt}`);
+
   }
   return await resp.json();
 }
 
-// Helper function to fetch company functions and skills
+// Nieuw: helper om functies en skills op te halen
 async function fetchFunctiesSkills(bedrijfId) {
   const token = sessionStorage.getItem('authToken');
   let functies = [];
   let skills = [];
   try {
-    const resFuncties = await fetch(
-      `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`,
-      {
-        headers: { Authorization: 'Bearer ' + token },
-      }
-    );
+    const resFuncties = await fetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`, {
+      headers: { Authorization: 'Bearer ' + token }
+    });
     if (resFuncties.ok) functies = await resFuncties.json();
   } catch {}
   try {
-    const resSkills = await fetch(
-      `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`,
-      {
-        headers: { Authorization: 'Bearer ' + token },
-      }
-    );
+    const resSkills = await fetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`, {
+      headers: { Authorization: 'Bearer ' + token }
+    });
     if (resSkills.ok) skills = await resSkills.json();
   } catch {}
   return { functies, skills };
+}
+
+function getStatusBadge(akkoord) {
+  return akkoord
+    ? '<span class="status-badge badge-accepted">Geaccepteerd</span>'
+    : '<span class="status-badge badge-waiting">In afwachting</span>';
 }
 
 function renderSpeeddatesError(root, err) {
@@ -63,14 +63,41 @@ function renderSpeeddatesError(root, err) {
     <div class="error">Fout bij ophalen speeddates:<br>${err.message}</div>
     <button id="reload-speeddates">Probeer opnieuw</button>
   `;
-  document.getElementById('reload-speeddates').onclick = () =>
-    renderSpeeddates(root);
+  document.getElementById('reload-speeddates').onclick = () => renderSpeeddates(root);
+}
+
+let currentSort = [{ key: 'begin', asc: true }];
+let currentStatusFilter = null; // null = alles tonen
+
+function getSortArrow(key) {
+  const found = currentSort.find(s => s.key === key);
+  if (!found) return '';
+  return found.asc ? ' ▲' : ' ▼';
 }
 
 function getSlotStatusClass(slot) {
   if (slot.status === 'pending') return 'slot-pending';
   if (slot.status === 'taken') return 'slot-taken';
   return '';
+}
+
+async function fetchSpeeddatesWithStatus(rootElement, status = null, studentId = null) {
+  const token = sessionStorage.getItem('authToken');
+  let url = 'https://api.ehb-match.me/speeddates';
+  if (status === 'Geaccepteerd') url += '/accepted';
+  else if (status === 'In afwachting') url += '/pending';
+  if (studentId) url += (url.includes('?') ? '&' : '?') + 'id=' + studentId;
+  const resp = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+  if (!resp.ok) {
+    if (resp.status === 401) {
+      sessionStorage.removeItem('authToken');
+      renderLogin(rootElement);
+      return [];
+    }
+    const txt = await resp.text();
+    throw new Error(`Kon speeddates niet ophalen: ${resp.status} – ${txt}`);
+  }
+  return await resp.json();
 }
 
 function formatUTCTime(isoString) {
@@ -81,15 +108,10 @@ function formatUTCTime(isoString) {
 }
 
 export async function renderSpeeddates(rootElement, studentData = {}) {
-  // AUTH CHECK: blokkeer toegang zonder geldige login
-  const token = window.sessionStorage.getItem('authToken');
-  if (!token) {
-    const module = await import('../login.js');
-    module.renderLogin(rootElement);
-    return;
+  // Sorteervolgorde behouden als er al gesorteerd is, anders default op tijd
+  if (!currentSort || !Array.isArray(currentSort) || currentSort.length === 0) {
+    currentSort = [{ key: 'begin', asc: true }];
   }
-
-  // Haal speeddates op via API
   let speeddates = [];
   try {
     speeddates = await fetchSpeeddates(rootElement);
@@ -100,9 +122,8 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       return;
     }
     console.error(e);
-    speeddates = [];
+    speeddates = []; // Fallback: leeg array bij API-fout
   }
-
   // DEBUG: Toon studentData en studentId
   console.log('studentData:', studentData);
   console.log('sessionStorage.user:', sessionStorage.getItem('user'));
@@ -116,56 +137,56 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     studentId = speeddates[0].id_student;
     console.warn('DEV: studentId fallback naar', studentId);
   }
+  // Haal speeddates direct gefilterd op via API
+  try {
+    speeddates = await fetchSpeeddatesWithStatus(rootElement, currentStatusFilter, studentId);
+    console.log('Alle opgehaalde speeddates:', speeddates);
+    // Verwijder deze filter zodat ALLE speeddates (zowel inkomend als uitgaand) zichtbaar zijn
+    // speeddates = speeddates.filter(s => s.asked_by !== studentId);
+  } catch (e) {
+    if (e.message.includes('401')) {
+      renderLogin(rootElement);
+      return;
+    }
+    console.error(e);
+    speeddates = [];
+  }
+  // Sorteren (meerdere kolommen)
+  const collator = new Intl.Collator('nl', { sensitivity: 'base' });
+  const sorted = [...speeddates].sort((a, b) => {
+    for (const sort of currentSort) {
+      let aVal = a[sort.key];
+      let bVal = b[sort.key];
+      if (sort.key === 'begin') {
+        aVal = aVal ? new Date(aVal).getTime() : 0;
+        bVal = bVal ? new Date(bVal).getTime() : 0;
+      } else if (sort.key === 'naam_bedrijf' || sort.key === 'lokaal') {
+        aVal = (aVal || '').toLowerCase();
+        bVal = (bVal || '').toLowerCase();
+        const cmp = collator.compare(aVal, bVal);
+        if (cmp !== 0) return sort.asc ? cmp : -cmp;
+        continue;
+      }
+      if (aVal < bVal) return sort.asc ? -1 : 1;
+      if (aVal > bVal) return sort.asc ? 1 : -1;
+    }
+    return 0;
+  });
 
-  // Create speeddate cards
-  const speeddateCards = speeddates
+  const tableRows = sorted
     .map(
       (s) => `
-        <div class="speeddate-item ${
-          s.akkoord ? 'goedgekeurd' : 'in-behandeling'
-        }">
-          <div class="speeddate-info">
-            <div class="bedrijf-info">
-              <img src="${
-                s.profiel_foto_bedrijf || '/images/defaultlogo.webp'
-              }" 
-                   alt="${s.naam_bedrijf}" 
-                   class="profiel-foto bedrijf-foto" 
-                   onerror="this.src='/images/defaultlogo.webp'" />
-              <div class="bedrijf-details">
-                <h4><span class="bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(
-                  s
-                )}' style="color:#0077b5;cursor:pointer;text-decoration:none;">${
-        s.naam_bedrijf
-      }</span></h4>
-                <p class="sector">${s.sector || 'Onbekend'}</p>
-              </div>
-            </div>
-            
-            <div class="afspraak-details">
-              <div class="tijd-lokaal">
-                <p class="tijdslot"><strong>Tijd:</strong> ${
-                  s.begin ? formatUTCTime(s.begin) : 'Onbekend'
-                }</p>
-                <p class="lokaal"><strong>Lokaal:</strong> ${
-                  s.lokaal || 'Onbekend'
-                }</p>
-              </div>
-              <div class="status">
-                <span class="status-badge ${
-                  s.akkoord ? 'goedgekeurd' : 'in-behandeling'
-                }">
-                  ${s.akkoord ? 'Geaccepteerd' : 'In afwachting'}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      `
+    <tr>
+      <td><span class="bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(s)}' style="color:#222;cursor:pointer;">${s.naam_bedrijf}</span></td>
+      <td>${s.begin ? formatUTCTime(s.begin) : ''}</td>
+      <td>${s.lokaal || ''}</td>
+      <td>${getStatusBadge(s.akkoord)}</td>
+    </tr>
+  `
     )
     .join('');
 
-  // Render the complete page
+  // Now render the complete page with the fetched data
   rootElement.innerHTML = `
     <div class="student-profile-container">
       <header class="student-profile-header">
@@ -183,33 +204,43 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
-            <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
-            <li><button data-route="speeddates" class="sidebar-link active">Speeddates</button></li>
-            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="bedrijven" class="sidebar-link">Bedrijven</button></li>
-            <li><button data-route="qr" class="sidebar-link">QR-code</button></li>
+            <li><button data-route="speeddates" class="sidebar-link" type="button">Speeddates</button></li>
+            <li><button data-route="requests" class="sidebar-link" type="button">Speeddates-verzoeken</button></li>
+            <li><button data-route="bedrijven" class="sidebar-link" type="button">Bedrijven</button></li>
           </ul>
         </nav>
         <div class="student-profile-content">
-          <div class="student-profile-form-container">            <h1 class="student-profile-title" style="text-align:center;width:100%;">Geplande Speeddates</h1>
+          <div class="student-profile-form-container">
+            <h1 class="student-profile-title" style="text-align:center;width:100%;">Mijn Speeddates</h1>
+            <div class="filter-buttons" style="margin-bottom:10px;text-align:center;">
+              <button class="filter-btn${currentStatusFilter === null ? ' active' : ''}" data-status="all">Alles</button>
+              <button class="filter-btn${currentStatusFilter === 'Geaccepteerd' ? ' active' : ''}" data-status="Geaccepteerd">Geaccepteerd</button>
+              <button class="filter-btn${currentStatusFilter === 'In afwachting' ? ' active' : ''}" data-status="In afwachting">In afwachting</button>
+            </div>
             <div>
               ${
-                speeddates.length === 0
+                sorted.length === 0
                   ? `<p style="text-align:center;">Geen speeddates gevonden.</p>`
                   : `
-                    <div class="speeddates-lijst">
-                      <div class="speeddates-header">
-                        <h2>Geplande Speeddates (${speeddates.length})</h2>
-                      </div>
-                      <div class="speeddates-table">
-                        ${speeddateCards}
-                      </div>
+                    <div class="speeddates-table-container">
+                      <table class="speeddates-table">
+                        <thead>
+                          <tr>
+                            <th class="sortable" data-key="naam_bedrijf">Bedrijf${getSortArrow('naam_bedrijf')}</th>
+                            <th class="sortable" data-key="begin">Tijd${getSortArrow('begin')}</th>
+                            <th class="sortable" data-key="lokaal">Locatie${getSortArrow('lokaal')}</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          ${tableRows}
+                        </tbody>
+                      </table>
                     </div>
                   `
               }
             </div>
-          </div>
-        </div>
+          </div>        </div>
       </div>
       <footer class="student-profile-footer">
         <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
@@ -218,15 +249,55 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     </div>
   `;
 
-  // Popup event listeners voor bedrijfsnaam
-  document.querySelectorAll('.bedrijf-popup-trigger').forEach((el) => {
-    el.addEventListener('click', async () => {
-      const data = JSON.parse(el.dataset.bedrijf);
-      await createBedrijfPopup(data);
+  // Sorteerbare kolommen (shift-klik = multi, gewone klik = enkel)
+  document.querySelectorAll('.sortable').forEach(th => {
+    th.addEventListener('mousedown', (e) => {
+      if (e.shiftKey) e.preventDefault(); // geen text-select bij shift
+    });
+    th.addEventListener('click', (e) => {
+      const key = th.dataset.key;
+      const found = currentSort.find(s => s.key === key);
+      if (!e.shiftKey) {
+        // Gewoon klik: alleen deze kolom (toggle asc/desc)
+        if (found) {
+          found.asc = !found.asc;
+          currentSort = [found];
+        } else {
+          currentSort = [{ key, asc: true }];
+        }
+      } else {
+        // Shift+klik: multi-level toevoegen/toggles
+        if (found) {
+          found.asc = !found.asc;
+        } else {
+          currentSort.push({ key, asc: true });
+        }
+      }
+      renderSpeeddates(rootElement, studentData);
+    });
+  });
+  // Filterknoppen
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const status = btn.dataset.status;
+      currentStatusFilter = status === 'all' ? null : status;
+      renderSpeeddates(rootElement, studentData);
     });
   });
 
-  // Sidebar navigation
+  function addBedrijfPopupListeners() {
+    document.querySelectorAll('.bedrijf-popup-trigger').forEach((el) => {
+      el.addEventListener('click', async () => {
+        const data = JSON.parse(el.dataset.bedrijf);
+        await createBedrijfPopup(data);
+      });
+    });
+  }
+
+  // Popup event listeners voor bedrijfsnaam
+  addBedrijfPopupListeners();
+
+  // Sidebar nav - gebruik de router voor echte URL navigatie
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -234,6 +305,7 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       import('../../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
+          // case 'profile': // verwijderd
           case 'search':
             Router.navigate('/student/zoek-criteria');
             break;
@@ -246,15 +318,12 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
           case 'bedrijven':
             Router.navigate('/student/bedrijven');
             break;
-          case 'qr':
-            Router.navigate('/student/student-qr-popup');
-            break;
         }
       });
     });
   });
 
-  // Hamburger menu
+  // Hamburger menu Profiel knop
   const navProfileBtn = document.getElementById('nav-profile');
   const dropdown = document.getElementById('burger-dropdown');
   if (navProfileBtn && dropdown) {
@@ -301,14 +370,20 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
 
   document.getElementById('privacy-policy').addEventListener('click', (e) => {
     e.preventDefault();
-    Router.navigate('/privacy');
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/privacy');
+    });
   });
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
-    Router.navigate('/contact');
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/contact');
+    });
   });
 
-  // Company popup function
+  // --- Popup met bedrijfsinfo (compact, bedrijven-style) ---
   async function createBedrijfPopup(s) {
     const overlay = document.createElement('div');
     overlay.style.cssText = `
@@ -318,43 +393,38 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     `;
     const popup = document.createElement('div');
     popup.style.cssText = `
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      max-width: 480px;
-      width: 90%;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      background: #fff;
+      padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+      border-radius: 14px;
+      max-width: 420px;
+      width: 96vw;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
       position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     `;
-    let slotsHtml = '';
-    const slots = s.slots || [];
-    if (slots.length > 0) {
-      slotsHtml = '<div class="slots-list">';
-      for (const slot of slots) {
-        const statusClass = getSlotStatusClass(slot);
-        const disabled = statusClass ? 'disabled' : '';
-        slotsHtml += `<button class="slot-btn ${statusClass}" ${disabled}>${slot.tijd}</button>`;
-      }
-      slotsHtml += '</div>';
-    }
+    const profielFoto = (s.foto && s.foto.trim() !== '') ? s.foto : '/src/Images/defaultlogo.webp';
     popup.innerHTML = `
       <button id="popup-close" style="position:absolute;top:10px;right:12px;font-size:1.4rem;background:none;border:none;cursor:pointer;">×</button>
-      <h2 style="margin-top:0;">${s.naam_bedrijf}</h2>
-      <p><strong>Tijd:</strong> ${
-        s.begin
-          ? new Date(s.begin).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-            })
-          : 'Onbekend'
-      }</p>
-      <p><strong>Locatie:</strong> ${s.lokaal || 'Onbekend'}</p>
-      <p><strong>Status:</strong> <span class="status-badge ${
-        s.akkoord ? 'goedgekeurd' : 'in-behandeling'
-      }">${s.akkoord ? 'Geaccepteerd' : 'In afwachting'}</span></p>
-      <p><strong>LinkedIn:</strong> <a id="popup-linkedin" href="#" target="_blank">Laden...</a></p>
-      <div id="popup-skills"><em>Skills laden...</em></div>
-      ${slotsHtml}
+      <img src="${profielFoto}" alt="Logo ${s.naam_bedrijf}" style="width:70px;height:70px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.onerror=null;this.src='../../Images/defaultlogo.webp'">
+      <h2 style="margin-bottom:0.3rem;text-align:center;">${s.naam_bedrijf}</h2>
+      <div style="font-size:1rem;color:#666;margin-bottom:0.2rem;">${s.locatie || ''}</div>
+      <div style="font-size:0.97rem;color:#888;margin-bottom:0.5rem;">${s.werkdomein || ''}</div>
+      <a href="${s.linkedin || '#'}" target="_blank" style="color:#0077b5;margin-bottom:0.7rem;">${s.linkedin ? 'LinkedIn' : ''}</a>
+      <div style="font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;">
+        <a href="mailto:${s.contact_email || ''}" style="color:#444;">${s.contact_email || ''}</a>
+      </div>
+      <div style="margin-bottom:0.7rem;width:100%;display:flex;flex-direction:row;gap:1.5rem;justify-content:center;">
+        <div style="text-align:left;">
+          <strong>Functies:</strong>
+          <div id="popup-functies" style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;"></div>
+        </div>
+        <div style="text-align:left;">
+          <strong>Skills/talen:</strong>
+          <div id="popup-skills" style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;"></div>
+        </div>
+      </div>
     `;
     overlay.appendChild(popup);
     document.body.appendChild(overlay);
@@ -362,32 +432,20 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) overlay.remove();
     });
-
-    // Fetch additional data
+    // Extra data ophalen
     const bedrijfId = s.id_bedrijf || s.gebruiker_id;
     if (bedrijfId) {
       const { functies, skills } = await fetchFunctiesSkills(bedrijfId);
+      const functiesHtml = functies.length
+        ? functies.map(f => `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#e3f2fd;font-size:0.85rem;\">${f.naam}</span>`).join('')
+        : '<em>Geen functies beschikbaar</em>';
+      document.getElementById('popup-functies').innerHTML = functiesHtml;
       const skillsHtml = skills.length
-        ? skills
-            .map(
-              (skill) =>
-                `<span style="display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#f1f1f1;font-size:0.85rem;">${skill.naam}</span>`
-            )
-            .join('')
+        ? skills.map(skill => `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#f1f1f1;font-size:0.85rem;\">${skill.naam}</span>`).join('')
         : '<em>Geen skills beschikbaar</em>';
-      document.getElementById(
-        'popup-skills'
-      ).innerHTML = `<strong>Skills:</strong><div style="margin-top:0.4rem;">${skillsHtml}</div>`;
-    }
-
-    // LinkedIn
-    if (s.linkedin) {
-      document.getElementById('popup-linkedin').textContent = s.linkedin;
-      document.getElementById('popup-linkedin').href = s.linkedin;
-    } else {
-      document.getElementById('popup-linkedin').textContent =
-        'Niet beschikbaar';
-      document.getElementById('popup-linkedin').removeAttribute('href');
+      document.getElementById('popup-skills').innerHTML = skillsHtml;
     }
   }
 }
+
+

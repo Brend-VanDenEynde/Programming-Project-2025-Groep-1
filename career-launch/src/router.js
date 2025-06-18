@@ -16,7 +16,6 @@ import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js'
 import { renderAdminProcessingCompanyDetail } from './pages/admin/admin-processing-company-detail.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
-import { renderQRPopup } from './pages/student/student-qr-popup.js';
 import { renderSpeeddates } from './pages/student/student-speeddates.js';
 import { renderSpeeddatesRequests } from './pages/student/student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './pages/student/student-settings.js';
@@ -48,7 +47,6 @@ const routes = {
   '/login': renderLogin,
   '/student/student-profiel': renderStudentProfiel,
   '/student/zoek-criteria': renderSearchCriteriaStudent,
-  '/student/student-qr-popup': renderQRPopup,
   '/student/student-speeddates': renderSpeeddates,
   '/student/student-speeddates-verzoeken': renderSpeeddatesRequests,
   '/student/student-settings': showSettingsPopup,
@@ -168,7 +166,6 @@ class Router {
       '/login': 'Inloggen - Career Launch 2025',
       '/student/student-profiel': 'Student Profiel - Career Launch 2025',
       '/student/zoek-criteria': 'Zoek Criteria - Career Launch 2025',
-      '/student/student-qr-popup': 'Jouw QR-code - Career Launch 2025',
       '/student/student-speeddates': 'Jouw Speeddates - Career Launch 2025',
       '/student/student-speeddates-verzoeken':
         'Speeddate Verzoeken - Career Launch 2025',
