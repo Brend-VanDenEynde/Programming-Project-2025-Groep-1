@@ -603,6 +603,7 @@ a:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
   margin-bottom: 1.5rem;
 }
@@ -1394,11 +1395,11 @@ a:hover {
 
 /* Dark mode CSS variabelen */
 body.darkmode {
-  --accent: lightgrey;
-  --accent-contrast: #181c1f;
+  --accent: #e0e0e0;
+  --accent-contrast: #23262b;
   --header-logo: url('/src/Images/EhB-logo-transparant-558-DarkMode.png');
-  background: #000 !important;
-  color: #e0f7fa !important;
+  background: #181c22 !important;
+  color: #eafcff !important;
 }
 
 /* Dark mode voor links */
@@ -1428,8 +1429,8 @@ body.darkmode .login-container {
 
 body.darkmode .register-card,
 body.darkmode .login-card {
-  background: #181c1f !important;
-  color: #e0f7fa !important;
+  background: #181c22 !important;
+  color: #eafcff !important;
   border-radius: 14px;
   box-shadow: 0 4px 24px 0 rgba(0, 230, 239, 0.1), 0 1.5px 0 0 #232323;
 }
@@ -1446,15 +1447,15 @@ body.darkmode .login-header p {
 
 body.darkmode .register-input,
 body.darkmode .login-input {
-  background: #181c1f !important;
-  color: #e0f7fa !important;
+  background: #181c22 !important;
+  color: #eafcff !important;
   border: 2px solid #00e6ef !important;
 }
 
 body.darkmode .register-input:focus,
 body.darkmode .login-input:focus {
   border-color: #00e6ef !important;
-  background: #181c1f !important;
+  background: #181c22 !important;
 }
 
 /* Dark mode voor student profiel */
@@ -1479,16 +1480,17 @@ body.darkmode .student-profile-header .logo-section img {
 }
 
 body.darkmode .student-profile-sidebar button {
-  color: #e0f7fa !important;
-  background: #000 !important;
+  background: none !important;
+  color: #00e6ef !important;
   border-left: 4px solid transparent !important;
   font-weight: 500;
 }
 
 body.darkmode .student-profile-sidebar button.active,
 body.darkmode .student-profile-sidebar button:hover {
-  background: #181c1f !important;
+  background: #23262b !important;
   color: #00e6ef !important;
+  border-left: 4px solid #00e6ef !important;
 }
 
 body.darkmode .student-profile-content {
@@ -1498,7 +1500,7 @@ body.darkmode .student-profile-content {
 body.darkmode .student-profile-form-container,
 body.darkmode .settings-popup-card {
   background: #000 !important;
-  color: #e0f7fa !important;
+  color: #eafcff !important;
   border-radius: 14px;
   border: 1.5px solid #232323;
   box-shadow: 0 4px 24px 0 rgba(0, 230, 239, 0.1), 0 1.5px 0 0 #232323;
@@ -1511,7 +1513,7 @@ body.darkmode .student-profile-dropdown {
 }
 
 body.darkmode .student-profile-dropdown li button {
-  color: #e0f7fa !important;
+  color: #eafcff !important;
 }
 
 body.darkmode .student-profile-dropdown li button:hover {
@@ -1548,10 +1550,10 @@ body.darkmode .student-profile-btn-secondary:hover {
 
 /* Dark mode voor tabellen */
 body.darkmode .speeddates-table {
-  background: #000 !important;
+  background: #181c22 !important;
   border-radius: 12px;
-  border: 1.5px solid #232323;
-  box-shadow: 0 2px 12px rgba(0, 230, 239, 0.07);
+  /*border: 1.5px solid #232323;*/  
+  /*box-shadow: 0 2px 12px rgba(0, 230, 239, 0.07);*/
 }
 
 body.darkmode .speeddates-table th {
@@ -1564,7 +1566,7 @@ body.darkmode .speeddates-table th {
 
 body.darkmode .speeddates-table td {
   background: #000 !important;
-  color: #e0f7fa !important;
+  color: #eafcff !important;
   border-bottom: 1px solid #232323 !important;
   text-align: center;
   vertical-align: middle;
@@ -1614,7 +1616,7 @@ body.darkmode .speeddates-table .deny-btn:hover {
   background: #ff4d4f !important;
   color: #181c1f !important;
   border-color: #ff4d4f !important;
-  transform: translateY(-2px);
+  transform: translateY(-2px) !important;
 }
 
 body.darkmode .speeddates-table .status-badge.badge-waiting {
@@ -2741,8 +2743,8 @@ body.darkmode .student-profile-footer a:hover {
 .opleiding-select {
   width: 100%;
   padding: 0.75rem;
-   border: 1px solid #ddd;
-  border-radius: 4px;
+   border:  1px solid #ddd;
+  border-radius:  4px;
   font-size: 1rem;
   background-color: white;
   color: #333;
@@ -3516,9 +3518,7 @@ body.darkmode .status-final {
 
 .bedrijf-details h4,
 .student-details h4 {
-  margin: 0 0 4px 0;
-  font-size: 1rem;
-  color: #333;
+  color: #eafcff !important;
 }
 
 .sector {
@@ -3798,16 +3798,16 @@ body.darkmode .status-final {
 
 /* DARK MODE voor bedrijf profiel */
 body.darkmode .bedrijf-profile-container {
-  background: #10131a !important;
+  background: #23262b !important;
 }
 body.darkmode .bedrijf-profile-header,
 body.darkmode .bedrijf-profile-sidebar,
 body.darkmode .bedrijf-profile-content,
 body.darkmode .bedrijf-profile-form-container,
 body.darkmode .bedrijf-profile-footer {
-  background: #181c1f !important;
-  color: #e0f7fa !important;
-  border-color: #232323 !important;
+  background: #181c22 !important;
+  color: #eafcff !important;
+  border-color: #2a2d33 !important;
 }
 body.darkmode .bedrijf-profile-header .logo-section span,
 body.darkmode .bedrijf-profile-footer a {
@@ -3816,23 +3816,44 @@ body.darkmode .bedrijf-profile-footer a {
 body.darkmode .bedrijf-profile-footer a:hover {
   color: #3dd686 !important;
 }
-body.darkmode .bedrijf-profile-sidebar button,
-body.darkmode .bedrijf-profile-sidebar button.active,
-body.darkmode .bedrijf-profile-sidebar button:hover {
-  background: #181c1f !important;
+body.darkmode .bedrijf-profile-sidebar button {
+  background: none !important;
   color: #00e6ef !important;
   border-left: 4px solid transparent !important;
   font-weight: 500;
 }
-body.darkmode .bedrijf-profile-dropdown {
-  background: #181c1f !important;
-  color: #e0f7fa !important;
-  border: 1px solid #232323 !important;
-}
-body.darkmode .bedrijf-profile-dropdown button {
-  color: #e0f7fa !important;
-}
-body.darkmode .bedrijf-profile-dropdown button:hover {
-  background: #232323 !important;
+body.darkmode .bedrijf-profile-sidebar button.active,
+body.darkmode .bedrijf-profile-sidebar button:hover {
+  background: #23262b !important;
   color: #00e6ef !important;
+  border-left: 4px solid #00e6ef !important;
+}
+body.darkmode .bedrijf-profile-form-group label {
+  color: #fff !important;
+}
+
+/* Student cards en filter container styling in dark mode */
+body.darkmode .student-card {
+  background: #23262b !important;
+  color: #eafcff !important;
+}
+body.darkmode .student-card .match-label {
+  color: #00e6ef !important;
+}
+body.darkmode .studenten-filters {
+  background: #23262b !important;
+  color: #eafcff !important;
+  border-color: #2a2d33 !important;
+}
+
+body.darkmode .speeddates-table .speeddates-row {
+  background: unset !important;
+  color: unset !important;
+  border-color: unset !important;
+}
+
+body.darkmode .speeddate-item.pending {
+  background: #23262b !important;
+  color: #eafcff !important;
+  border-color: #2a2d33 !important;
 }
