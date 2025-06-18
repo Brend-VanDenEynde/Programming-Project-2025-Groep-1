@@ -4,7 +4,6 @@ import { renderLogin } from '../login.js';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
-import { renderQRPopup } from './student-qr-popup.js';
 import { showSettingsPopup } from './student-settings.js';
 import { fetchStudentSpeeddates } from '../../utils/data-api.js';
 
