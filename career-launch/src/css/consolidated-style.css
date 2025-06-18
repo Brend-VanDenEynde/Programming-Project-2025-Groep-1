@@ -389,6 +389,66 @@ a:hover {
   align-items: center;
 }
 
+/* Toevoegen button styling */
+.add-btn {
+  background-color: #0077b5;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 119, 181, 0.2);
+  white-space: nowrap;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-btn:hover {
+  background-color: #005885;
+  box-shadow: 0 4px 8px rgba(0, 119, 181, 0.3);
+  transform: translateY(-1px);
+}
+
+.add-btn:active {
+  background-color: #004066;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 119, 181, 0.2);
+}
+
+.add-btn:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Dark mode support for add button */
+body.darkmode .add-btn {
+  background-color: #1a7aa8;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(26, 122, 168, 0.3);
+}
+
+body.darkmode .add-btn:hover {
+  background-color: #0d5f85;
+  box-shadow: 0 4px 8px rgba(26, 122, 168, 0.4);
+}
+
+body.darkmode .add-btn:active {
+  background-color: #0a4d6b;
+}
+
+body.darkmode .add-btn:disabled {
+  background-color: #555;
+  color: #999;
+}
+
 .form-input {
   font-size: 1.08rem;
   padding: 10px 13px;
