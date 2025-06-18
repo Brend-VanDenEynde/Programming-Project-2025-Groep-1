@@ -1,7 +1,7 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
-import { fetchCompanies } from '../../utils/data-api.js';
+// Gebruik GEEN fetchCompanies uit data-api.js, maar direct de Discover API
 import defaultBedrijfLogo from '../../images/defaultlogo.webp';
 import {
   getFavoriteCompanies,
@@ -13,9 +13,16 @@ import {
 } from '../../utils/favorites-storage.js';
 import { fetchAndStoreStudentProfile } from '../../utils/fetch-student-profile.js';
 
-// Globale variabele voor bedrijven data
+// Globale variabelen
 let bedrijven = [];
 let currentStudentId = null;
+let huidigeZoek = '';
+let huidigeLocaties = [];
+let huidigeSkills = [];
+let huidigeDomeinen = [];
+let huidigeFuncties = [];
+let toonAlleFavorieten = false;
+let sortPercentageAsc = false; // standaard: DESC (hoog naar laag)
 
 // Feedback notification function
 function showFeedbackNotification(message, type = 'success') {
@@ -148,43 +155,44 @@ async function showBedrijfPopup(bedrijf, studentId) {
   const isFavoriet = isCompanyFavorite(studentId, bedrijf.gebruiker_id);
   const hartIcon = isFavoriet ? '❤️' : '🤍';
 
+  // In de popup: toon álle functies/skills van het bedrijf, highlight matches met student
+  const studentSkills = Array.isArray(huidigeSkills) ? huidigeSkills : [];
+  const studentFuncties = Array.isArray(huidigeFuncties) ? huidigeFuncties : [];
+  // Skills type 0 van het bedrijf
+  const bedrijfSkillsType0 = (Array.isArray(skills) ? skills : []).filter(s => s.type === 0);
+  const skillsHTML = bedrijfSkillsType0.length
+    ? bedrijfSkillsType0.map(s => `<span class="skill-badge" style="display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${studentSkills.includes(s.naam) ? '#e3f2fd' : '#f5f5f5'};color:#222;font-size:0.97em;">${s.naam}</span>`).join(' ')
+    : '<span style="color:#aaa;">Geen skills/talen bekend</span>';
+
+  // Alle functies van het bedrijf
+  const bedrijfFuncties = Array.isArray(functies) ? functies : [];
+  const functiesHTML = bedrijfFuncties.length
+    ? bedrijfFuncties.map(f => `<span class="functie-badge" style="display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${studentFuncties.includes(f.naam) ? '#e3f2fd' : '#f5f5f5'};color:#222;font-size:0.97em;">${f.naam}</span>`).join(' ')
+    : '<span style="color:#aaa;">Geen functies bekend</span>';
+
   popup.innerHTML = `
     <div id="bedrijf-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:600px;width:98vw;min-width:340px;position:relative;display:flex;flex-direction:column;align-items:center;">
       <button id="bedrijf-popup-close" style="position:absolute;top:10px;right:14px;font-size:1.7rem;background:none;border:none;cursor:pointer;color:#888;">&times;</button>
       <button id="popup-favorite-btn" class="popup-favorite-btn" title="${isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'}">${hartIcon}</button>
-      <img src="${bedrijf.foto}" alt="Logo ${bedrijf.naam}" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
+      <img src="${bedrijf.foto}" alt="Logo ${bedrijf.naam}" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='/src/images/defaultlogo.webp'">
       <h2 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h2>
       <div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${bedrijf.locatie}</div>
       <div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${bedrijf.werkdomein}</div>
       <a href="${bedrijf.linkedin}" target="_blank" style="color:#0077b5;margin-bottom:1rem;">LinkedIn</a>
-      <p style="text-align:center;margin-bottom:1.2rem;max-height:3.2em;overflow:hidden;">${bedrijf.bio}</p>
       <div style="font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;">
         <a href="mailto:${bedrijf.contact_email}" style="color:#444;">${bedrijf.contact_email}</a>
       </div>
       <div style="margin-bottom:0.7rem;width:100%;display:flex;flex-direction:row;gap:1.5rem;justify-content:center;">
         <div style="text-align:left;">
-          <strong>Functies:</strong>
-          <div style="margin-top:0.3rem;max-width:220px;white-space:normal;">
-            ${
-              functies.length
-                ? functies.map((f) => `<span class="functie-badge">${f.naam}</span>`).join(' ')
-                : '<span style="color:#aaa;">Geen functies bekend</span>'
-            }
+          <strong>Gezochte functies:</strong>
+          <div style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;">
+            ${functiesHTML}
           </div>
         </div>
         <div style="text-align:left;">
-          <strong>Skills:</strong>
-          <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.4rem;max-width:220px;white-space:normal;">
-            ${
-              skills.length
-                ? skills
-                    .map(
-                      (s) =>
-                        `<span style="background:#eee;border-radius:6px;padding:0.3rem 0.7rem;font-size:0.85rem;">${s.naam}</span>`
-                    )
-                    .join('')
-                : '<span style="color:#aaa;">Geen skills opgegeven</span>'
-            }
+          <strong>Gezochte skills/talen:</strong>
+          <div style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;">
+            ${skillsHTML}
           </div>
         </div>
       </div>
@@ -341,7 +349,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
     status.style.display = 'block';
     // 🛑 DUBBELE BOEKING PREVENTIE: check of student op dit tijdstip al een speeddate heeft (pending/confirmed)
     const tijd = gekozenDatum; // nu alleen HH:MM
-    const alreadyBooked = [...studentDates, ...companyDates].some(s => {
+    const alreadyBooked = [...acceptedStudentDates, ...pendingStudentDates, ...acceptedCompanyDates, ...pendingCompanyDates].some(s => {
       if (!s.begin) return false;
       const dt = new Date(s.begin);
       const slotTijd = `${dt.getUTCHours().toString().padStart(2, '0')}:${dt.getUTCMinutes().toString().padStart(2, '0')}`;
@@ -372,9 +380,16 @@ async function showBedrijfPopup(bedrijf, studentId) {
       if (req.status === 201) {
         status.textContent = `✅ Speeddate succesvol aangevraagd voor ${tijd}!`;
         status.style.color = '#2aa97b';
+        aanvraagBtn.disabled = true;
+        // Alles in de popup on-click uitzetten (read-only)
+        Array.from(popup.querySelectorAll('button, input, select')).forEach(el => {
+          el.disabled = true;
+          el.style.pointerEvents = 'none';
+          el.style.opacity = '0.7';
+        });
         setTimeout(() => {
-          const popup = document.getElementById('bedrijf-popup-modal');
-          if (popup) popup.remove();
+          const popupEl = document.getElementById('bedrijf-popup-modal');
+          if (popupEl) popupEl.remove();
         }, 1300);
       } else {
         const err = await req.json();
@@ -392,26 +407,84 @@ async function showBedrijfPopup(bedrijf, studentId) {
   };
 }
 
+// Haal alle skills op uit de algemene skills API
+async function fetchAllSkills() {
+  try {
+    const resp = await fetch('https://api.ehb-match.me/skills', {
+      headers: { Authorization: 'Bearer ' + sessionStorage.getItem('authToken') }
+    });
+    return resp.ok ? await resp.json() : [];
+  } catch {
+    return [];
+  }
+}
+// Haal per bedrijf de skills op en voeg toe aan bedrijven
+async function fetchSkillsForAllCompanies() {
+  await Promise.all(bedrijven.map(async (bedrijf) => {
+    try {
+      const resp = await fetch(
+        `https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/skills`,
+        {
+          headers: {
+            Authorization: 'Bearer ' + sessionStorage.getItem('authToken'),
+          },
+        }
+      );
+      bedrijf.skillsArray = resp.ok ? await resp.json() : [];
+    } catch {
+      bedrijf.skillsArray = [];
+    }
+  }));
+}
+
+// Haal per bedrijf de functies op en voeg toe aan bedrijven
+async function fetchFunctiesForAllCompanies() {
+  await Promise.all(bedrijven.map(async (bedrijf) => {
+    try {
+      const resp = await fetch(
+        `https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/functies`,
+        {
+          headers: {
+            Authorization: 'Bearer ' + sessionStorage.getItem('authToken'),
+          },
+        }
+      );
+      bedrijf.functiesArray = resp.ok ? await resp.json() : [];
+    } catch {
+      bedrijf.functiesArray = [];
+    }
+  }));
+}
+
+function getUniekeSkills() {
+  // alle unieke skill-namen
+  const alleSkills = bedrijven.flatMap(b => 
+    Array.isArray(b.skillsArray) ? b.skillsArray.map(s => s.naam) : []
+  );
+  return [...new Set(alleSkills.filter(Boolean))];
+}
+
 // Filter en zoek functionaliteit (inclusief favorieten)
 // Nieuwe filterfunctie: multi-select voor locatie, functie, skills, talen + favorieten
-function filterBedrijven({ zoek = '', locaties = [], functies = [], skills = [], talen = [], toonAlleFavorieten = false }) {
+function filterBedrijven({ zoek = '', locaties = [], domeinen = [], functies = [], skills = [], toonAlleFavorieten = false }) {
   let gefilterdeBedrijven = bedrijven.filter((b) => {
     const matchZoek = zoek
       ? b.naam.toLowerCase().includes(zoek.toLowerCase())
       : true;
     const matchLocatie = locaties.length > 0 ? locaties.includes(b.locatie) : true;
+    const matchDomein = domeinen.length > 0 ? domeinen.includes(b.werkdomein) : true;
     const matchFunctie = functies.length > 0
-      ? (b.functiesArray || []).some(f => functies.includes(f.naam))
+      ? (Array.isArray(b.functiesArray) && b.functiesArray.length
+          ? b.functiesArray.some(f => functies.includes(f.naam))
+          : false)
       : true;
     const matchSkill = skills.length > 0
-      ? (b.skillsArray || []).some(s => s.type === 0 && skills.includes(s.naam))
+      ? (Array.isArray(b.skillsArray) && b.skillsArray.length
+          ? b.skillsArray.some(s => skills.includes(s.naam))
+          : false)
       : true;
-    const matchTaal = talen.length > 0
-      ? (b.skillsArray || []).some(s => s.type === 1 && talen.includes(s.naam))
-      : true;
-    return matchZoek && matchLocatie && matchFunctie && matchSkill && matchTaal;
+    return matchZoek && matchLocatie && matchDomein && matchFunctie && matchSkill;
   });
-  // Alleen favorieten tonen indien gewenst
   if (toonAlleFavorieten && currentStudentId) {
     gefilterdeBedrijven = filterFavoriteCompanies(
       gefilterdeBedrijven,
@@ -421,18 +494,28 @@ function filterBedrijven({ zoek = '', locaties = [], functies = [], skills = [],
   return gefilterdeBedrijven;
 }
 
-// Unieke locaties, functies, skills (type 0), talen (type 1)
+// Unieke locaties, domeinen, functies
 function getUniekeLocaties() {
   return [...new Set(bedrijven.map((b) => b.locatie).filter(Boolean))];
 }
+function getUniekeDomeinen() {
+  return [...new Set(bedrijven.map((b) => b.werkdomein).filter(Boolean))];
+}
 function getUniekeFuncties() {
-  return [...new Set(bedrijven.flatMap(b => (b.functiesArray || []).map(f => f.naam)))];
-}
-function getUniekeSkills() {
-  return [...new Set(bedrijven.flatMap(b => (b.skillsArray || []).filter(s => s.type === 0).map(s => s.naam)))];
-}
-function getUniekeTalen() {
-  return [...new Set(bedrijven.flatMap(b => (b.skillsArray || []).filter(s => s.type === 1).map(s => s.naam)))];
+  // Verzamel alle unieke functie-namen uit functie_matches of een vergelijkbaar veld
+  const alleFuncties = bedrijven.flatMap(b => {
+    if (Array.isArray(b.functiesArray) && b.functiesArray.length) {
+      return b.functiesArray.map(f => f.naam);
+    }
+    if (Array.isArray(b.functie_matches) && b.functie_matches.length) {
+      return b.functie_matches.map(f => f.naam || f);
+    }
+    if (typeof b.functie_matches === 'string') {
+      return [b.functie_matches];
+    }
+    return [];
+  });
+  return [...new Set(alleFuncties.filter(Boolean))];
 }
 
 // SlimSelect CDN injectie (indien nog niet aanwezig)
@@ -456,12 +539,6 @@ function injectSlimSelectCDN() {
 export async function renderBedrijven(rootElement, studentData = {}) {
   injectSlimSelectCDN();
   setTimeout(async () => {
-    let huidigeZoek = '';
-    let huidigeLocaties = [];
-    let huidigeFuncties = [];
-    let huidigeSkills = [];
-    let huidigeTalen = [];
-    let toonAlleFavorieten = false;
     // Probeer eerst studentData uit sessionStorage te halen
     let actualStudentData = studentData;
     if (!actualStudentData || (!actualStudentData.id && !actualStudentData.gebruiker_id)) {
@@ -496,51 +573,53 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         <div class="loading-text">Bedrijven laden...</div>
       </div>
     `;
-    // Load companies from API
+    // Load companies from Discover API
     try {
-      const companies = await fetchCompanies();
+      // Gebruik de juiste Discover endpoint met student-id
+      let apiUrl = 'https://api.ehb-match.me/discover/bedrijven';
+      if (currentStudentId && currentStudentId !== 'anonymous-user') {
+        apiUrl += `?id=${currentStudentId}`;
+      }
+      const resp = await fetch(apiUrl, {
+        headers: { Authorization: 'Bearer ' + authToken }
+      });
+      const companies = resp.ok ? await resp.json() : [];
+      console.log('API Companies:', companies); // DEBUG: check of match_percentage aanwezig is
       if (!Array.isArray(companies)) {
         bedrijven = [];
       } else {
-        bedrijven = await Promise.all(companies.map(async (company) => {
-          let functiesArray = [];
-          let skillsArray = [];
-          try {
-            const functiesResp = await fetch(`https://api.ehb-match.me/bedrijven/${company.gebruiker_id}/functies`, {
-              headers: { Authorization: 'Bearer ' + sessionStorage.getItem('authToken') }
-            });
-            if (functiesResp.ok) functiesArray = await functiesResp.json();
-          } catch {}
-          try {
-            const skillsResp = await fetch(`https://api.ehb-match.me/bedrijven/${company.gebruiker_id}/skills`, {
-              headers: { Authorization: 'Bearer ' + sessionStorage.getItem('authToken') }
-            });
-            if (skillsResp.ok) skillsArray = await skillsResp.json();
-          } catch {}
-          return {
-            naam: company.naam,
-            linkedin: company.linkedin || '',
-            bio: company.bio || '',
-            foto:
-              company.profiel_foto_url && company.profiel_foto_url.trim() !== ''
-                ? company.profiel_foto_url
-                : defaultBedrijfLogo,
-            locatie: company.plaats || '',
-            werkdomein: company.werkdomein || '',
-            contact_email: company.contact_email,
-            gebruiker_id: company.gebruiker_id,
-            functiesArray,
-            skillsArray
-          };
+        bedrijven = companies.map((company) => ({
+          naam: company.naam,
+          linkedin: company.linkedin || '',
+          bio: company.bio || '',
+          foto:
+            company.profiel_foto_url && company.profiel_foto_url.trim() !== ''
+              ? company.profiel_foto_url
+              : defaultBedrijfLogo,
+          locatie: company.plaats || '',
+          werkdomein: company.sector_bedrijf || '',
+          contact_email: company.contact_email,
+          gebruiker_id: company.gebruiker_id,
+          functiesArray: [], // niet uit Discover API
+          skillsArray: [],   // niet uit Discover API
+          match_percentage:
+            company.match_percentage !== undefined && company.match_percentage !== null
+              ? Number(company.match_percentage)
+              : null
         }));
       }
     } catch (error) {
-      if (error.message.includes('Authentication failed')) {
+      if (error.message && error.message.includes('Authentication failed')) {
         renderLogin(rootElement);
         return;
       }
       bedrijven = [];
     }
+    // Voeg skills en functies toe aan bedrijven
+    await Promise.all([
+      fetchSkillsForAllCompanies(),
+      fetchFunctiesForAllCompanies()
+    ]);
     // Function to update favorites count display
     function updateFavoritesCount() {
       const countElement = document.getElementById('favorites-count');
@@ -549,40 +628,371 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         countElement.textContent = `(${favoriteCompanies.length})`;
       }
     }
+    // Nieuwe CSS voor filterbalk en favorietenknop
+    const style = document.createElement('style');
+    style.innerHTML = `
+.bedrijven-filterbar-flex {
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 1.1rem;
+  background: #f8fafc;
+  padding: 0.7rem 1.2rem 0.7rem 1.2rem;
+  border-radius: 14px;
+  margin-bottom: 2.2rem;
+  box-shadow: 0 2px 8px #0001;
+  border: 1.5px solid #e1e5e9;
+  position: relative;
+  min-width: 0;
+}
+.bedrijven-filterbar-flex .filter-group,
+.bedrijven-filterbar-flex .zoek-group,
+.bedrijven-filterbar-flex .sort-group,
+.bedrijven-filterbar-flex .reset-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  flex: 1 1 0;
+  gap: 0.2rem;
+  min-width: 0;
+  max-width: 100%;
+}
+.bedrijven-filterbar-flex label {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 0.2rem;
+}
+.bedrijven-filterbar-flex select,
+.bedrijven-filterbar-flex input[type="text"],
+.bedrijven-filterbar-flex button:not(#filter-favorieten-btn) {
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  border: 1.5px solid #e1e5e9;
+  font-size: 0.95rem;
+  min-height: 42px;
+  height: 42px;
+  box-sizing: border-box;
+  width: 100%;
+  background: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bedrijven-filterbar-flex button:not(#filter-favorieten-btn) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#sort-percentage-btn, .bedrijven-filterbar-flex .sort-group button {
+  background: #f5f5f5;
+  border: 1.5px solid #e1e5e9;
+  color: #222;
+  font-weight: 600;
+  min-width: 120px;
+  max-width: 100%;
+  transition: background 0.2s, border 0.2s;
+  box-shadow: 0 1px 4px #0001;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#sort-percentage-btn:hover, .bedrijven-filterbar-flex .sort-group button:hover {
+  background: #e1e5e9;
+  border-color: #b7b7ff;
+}
+#filter-favorieten-btn {
+  position: absolute;
+  top: 2px;
+  right: 18px;
+  font-size: 1.7rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 5;
+  transition: transform 0.3s;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: content-box;
+}
+#filter-favorieten-btn.animating {
+  transform: scale(1.3);
+}
+.popup-favorite-btn {
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  transition: transform 0.2s;
+}
+.popup-favorite-btn.animating {
+  transform: scale(1.3);
+}
+@media (max-width: 1100px) {
+  .bedrijven-filterbar-flex {
+    flex-wrap: wrap;
+  }
+  .bedrijven-filterbar-flex .filter-group,
+  .bedrijven-filterbar-flex .zoek-group,
+  .bedrijven-filterbar-flex .sort-group,
+  .bedrijven-filterbar-flex .reset-group {
+    flex: 1 1 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+@media (max-width: 900px) {
+  #filter-favorieten-btn {
+    top: 8px;
+    left: 10px;
+  }
+}
+@media (max-width: 700px) {
+  .bedrijven-filterbar-flex {
+    flex-direction: column;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 0.7rem 0;
+    min-width: 0;
+  }
+  .bedrijven-filterbar-flex .filter-group,
+  .bedrijven-filterbar-flex .zoek-group,
+  .bedrijven-filterbar-flex .sort-group,
+  .bedrijven-filterbar-flex .reset-group {
+    flex: 1 1 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+  #filter-favorieten-btn {
+    top: 8px;
+    left: 10px;
+  }
+}
+`;
+    document.head.appendChild(style);
+    // Custom filter UI rendering
+    function renderFilterOptions() {
+      // Locaties
+      const locaties = getUniekeLocaties();
+      const locatieDiv = document.getElementById('filter-locaties');
+      locatieDiv.innerHTML = `
+        <label for="locaties-popup-trigger">Locatie</label>
+        <button id="locaties-popup-trigger" type="button">${huidigeLocaties.length ? huidigeLocaties.join(', ') : (locaties.length ? 'Locatie kiezen...' : 'Geen locaties')}</button>
+      `;
+      // DOMEIN
+      const domeinen = getUniekeDomeinen();
+      const domeinDiv = document.getElementById('filter-domein');
+      domeinDiv.innerHTML = `
+        <label for="domein-popup-trigger">Domein</label>
+        <button id="domein-popup-trigger" type="button">${huidigeDomeinen && huidigeDomeinen.length ? huidigeDomeinen.join(', ') : (domeinen.length ? 'Domein kiezen...' : 'Geen domeinen')}</button>
+      `;
+      // FUNCTIE
+      const functies = getUniekeFuncties();
+      const functieDiv = document.getElementById('filter-functie');
+      functieDiv.innerHTML = `
+        <label for="functie-popup-trigger">Functie</label>
+        <button id="functie-popup-trigger" type="button">${huidigeFuncties && huidigeFuncties.length ? huidigeFuncties.join(', ') : (functies.length ? 'Functie kiezen...' : 'Geen functies')}</button>
+      `;
+      // SKILLS
+      const skills = getUniekeSkills();
+      const skillsDiv = document.getElementById('filter-skills');
+      skillsDiv.innerHTML = `
+        <label for="skills-popup-trigger">Skills/talen</label>
+        <button id="skills-popup-trigger" type="button">${huidigeSkills && huidigeSkills.length ? huidigeSkills.join(', ') : (skills.length ? 'Skills/talen kiezen...' : 'Geen skills')}</button>
+      `;
+      // Sorteerknop vóór resetknop
+      const sortDiv = document.getElementById('sort-group');
+      sortDiv.innerHTML = `
+        <label for="sort-percentage-btn">&nbsp;</label>
+        <button id="sort-percentage-btn" type="button" style="padding:0.6rem 1.2rem;border-radius:8px;border:1.5px solid #e1e5e9;background:#f5f5f5;cursor:pointer;min-width:120px;">
+          matchpercentage${sortPercentageAsc ? '▲' : '▼'}
+        </button>
+      `;
+      // Popup triggers
+      document.getElementById('locaties-popup-trigger').onclick = () => {
+        if (!locaties.length) return;
+        createPopup({
+          id: 'locaties-filter-popup',
+          title: 'Kies locaties',
+          options: locaties,
+          selected: huidigeLocaties,
+          onSave: (gekozen) => {
+            huidigeLocaties = gekozen;
+            renderFilterOptions();
+            renderList();
+          },
+          showSearch: true
+        });
+      };
+      document.getElementById('domein-popup-trigger').onclick = () => {
+        if (!domeinen.length) return;
+        createPopup({
+          id: 'domein-filter-popup',
+          title: 'Kies domeinen',
+          options: domeinen,
+          selected: huidigeDomeinen || [],
+          onSave: (gekozen) => {
+            huidigeDomeinen = gekozen;
+            renderFilterOptions();
+            renderList();
+          },
+          showSearch: true
+        });
+      };
+      document.getElementById('functie-popup-trigger').onclick = () => {
+        if (!functies.length) return;
+        createPopup({
+          id: 'functie-filter-popup',
+          title: 'Kies functies',
+          options: functies,
+          selected: huidigeFuncties || [],
+          onSave: (gekozen) => {
+            huidigeFuncties = gekozen;
+            renderFilterOptions();
+            renderList();
+          }
+        });
+      };
+      document.getElementById('skills-popup-trigger').onclick = () => {
+        if (!skills.length) return;
+        createPopup({
+          id: 'skills-filter-popup',
+          title: 'Kies skills/talen',
+          options: skills,
+          selected: huidigeSkills || [],
+          onSave: (gekozen) => {
+            huidigeSkills = gekozen;
+            renderFilterOptions();
+            renderList();
+          },
+          showSearch: true
+        });
+      };
+      document.getElementById('sort-percentage-btn').onclick = () => {
+        sortPercentageAsc = !sortPercentageAsc;
+        renderFilterOptions();
+        renderList();
+      };
+    }
+    // Initial render with nieuwe filterbalk structuur
+    rootElement.innerHTML = `
+    <div class="student-profile-container">
+      <header class="student-profile-header">
+        <div class="logo-section">
+          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
+          <span>EhB Career Launch</span>
+        </div>
+        <button id="burger-menu" class="student-profile-burger">☰</button>
+        <ul id="burger-dropdown" class="student-profile-dropdown">
+          <li><button id="nav-profile">Profiel</button></li>
+          <li><button id="nav-settings">Instellingen</button></li>
+          <li><button id="nav-logout">Log out</button></li>
+        </ul>
+      </header>
+      <div class="student-profile-main">
+        <nav class="student-profile-sidebar">
+          <ul>
+            <li><button data-route="speeddates" class="sidebar-link" type="button">Speeddates</button></li>
+            <li><button data-route="requests" class="sidebar-link" type="button">Speeddates-verzoeken</button></li>
+            <li><button data-route="bedrijven" class="sidebar-link" type="button">Bedrijven</button></li>
+          </ul>
+        </nav>
+        <div class="student-profile-content">
+          <div class="student-profile-form-container" style="padding:2.5rem 2.2rem 2.2rem 2.2rem; border-radius:18px; background:#fff; box-shadow:0 4px 24px #0001; max-width:1200px; margin:auto;">
+            <h1 class="student-profile-title" style="margin: 0 0 1.4rem 0;">Bedrijven</h1>
+            <div id="bedrijven-filterbar" class="bedrijven-filterbar-flex">
+              <div class="zoek-group">
+                <label for="bedrijf-zoek">Zoeken</label>
+                <input id="bedrijf-zoek" type="text" placeholder="Zoek bedrijf of locatie...">
+              </div>
+              <div id="filter-locaties" class="filter-group"></div>
+              <div id="filter-domein" class="filter-group"></div>
+              <div id="filter-functie" class="filter-group"></div>
+              <div id="filter-skills" class="filter-group"></div>
+              <div id="sort-group" class="sort-group"></div>
+              <div class="reset-group">
+                <label for="reset-filters">&nbsp;</label>
+                <button id="reset-filters" title="Reset filters">Reset filters</button>
+              </div>
+              <button id="filter-favorieten-btn" title="Toon alleen favorieten" class="" style="padding-bottom:20px;">🤍</button>
+            </div>
+            <div style="height:24px;width:100%;padding-bottom:40px"></div>
+            <div style="height:1px;width:100%;background:#e1e5e9;margin-bottom:2.2rem;"></div>
+            <div id="bedrijven-list" class="bedrijven-list" style="display:flex;flex-wrap:wrap;gap:2rem;justify-content:center;">
+              <div style="text-align:center;width:100%;color:#888;">Laden van bedrijven...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="student-profile-footer">
+        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+      </footer>
+    </div>
+  `;
+    renderFilterOptions();
     function renderList() {
       const bedrijvenListElement = document.getElementById('bedrijven-list');
       if (!bedrijvenListElement) return;
-      if (bedrijven.length === 0) {
-        bedrijvenListElement.innerHTML = `<div style="text-align:center;width:100%;color:#888;">Laden van bedrijven...</div>`;
-        return;
-      }
-      const gefilterd = filterBedrijven({
+      let gefilterd = filterBedrijven({
         zoek: huidigeZoek,
         locaties: huidigeLocaties,
+        domeinen: huidigeDomeinen,
         functies: huidigeFuncties,
         skills: huidigeSkills,
-        talen: huidigeTalen,
-        toonAlleFavorieten: toonAlleFavorieten
+        toonAlleFavorieten
       });
-      bedrijvenListElement.innerHTML = gefilterd.length
-        ? gefilterd
-            .map((bedrijf, idx) => {
-              const isFavoriet = currentStudentId
-                ? isCompanyFavorite(currentStudentId, bedrijf.gebruiker_id)
-                : false;
-              const hartIcon = isFavoriet ? '❤️' : '🤍';
-              return `
-    <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;position:relative;" data-bedrijf-idx="${bedrijven.indexOf(bedrijf)}">
-      <button class="favorite-btn" data-company-id="${bedrijf.gebruiker_id}" title="${isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'}" style="position:absolute;top:10px;right:10px;font-size:1.3rem;background:none;border:none;cursor:pointer;z-index:2;">${hartIcon}</button>
-      <img src="${bedrijf.foto}" alt="Logo ${bedrijf.naam}" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.onerror=null;this.src='${defaultBedrijfLogo}'">
-      <h3 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h3>
-      <div style="font-size:0.97rem;color:#666;margin-bottom:0.3rem;">${bedrijf.locatie}</div>
-      <div style="font-size:0.97rem;color:#888;margin-bottom:0.3rem;">${bedrijf.werkdomein}</div>
-    </div>
+      // Sorteer op match_percentage
+      gefilterd.sort((a, b) =>
+        sortPercentageAsc
+          ? a.match_percentage - b.match_percentage
+          : b.match_percentage - a.match_percentage
+      );
+      bedrijvenListElement.innerHTML =
+        (gefilterd.length
+          ? gefilterd
+              .map((bedrijf, idx) => {
+                const isFavoriet = currentStudentId
+                  ? isCompanyFavorite(currentStudentId, bedrijf.gebruiker_id)
+                  : false;
+                const hartIcon = isFavoriet ? '❤️' : '🤍';
+                let matchPercentage = bedrijf.match_percentage;
+                let badgeColor = '#e74c3c';
+                if (typeof matchPercentage === 'number' && matchPercentage >= 80) badgeColor = '#2ecc40';
+                else if (typeof matchPercentage === 'number' && matchPercentage >= 60) badgeColor = '#f1c40f';
+                else if (typeof matchPercentage === 'number' && matchPercentage >= 40) badgeColor = '#ff9800';
+                const profielFoto = (bedrijf.foto && bedrijf.foto.trim() !== '') ? bedrijf.foto : defaultBedrijfLogo;
+                return `
+  <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;position:relative;" data-bedrijf-idx="${bedrijven.indexOf(bedrijf)}">
+    <span class="match-badge" style="position:absolute;top:10px;left:10px;background:${badgeColor};color:#fff;font-weight:bold;padding:0.3em 0.8em;border-radius:16px;font-size:0.98em;z-index:3;box-shadow:0 2px 8px #0002;">${typeof matchPercentage === 'number' ? matchPercentage.toFixed(1) : '?'}%</span>
+    <button class="favorite-btn" data-company-id="${bedrijf.gebruiker_id}" title="${isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'}" style="position:absolute;top:10px;right:10px;font-size:1.3rem;background:none;border:none;cursor:pointer;z-index:2;">${hartIcon}</button>
+    <img src="${profielFoto}" alt="Logo ${bedrijf.naam}" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.onerror=null;this.src='/src/images/defaultlogo.webp'">
+    <h3 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h3>
+    <div style="font-size:0.97rem;color:#666;margin-bottom:0.3rem;">${bedrijf.locatie}</div>
+    <div style="font-size:0.97rem;color:#888;margin-bottom:0.3rem;">${bedrijf.werkdomein}</div>
+    <div style="font-size:0.95rem;color:#555;margin-bottom:0.3rem;">${(Array.isArray(bedrijf.functiesArray) && bedrijf.functiesArray.length) ? bedrijf.functiesArray.map(f => f.naam).join(', ') : (Array.isArray(bedrijf.functie_matches) && bedrijf.functie_matches.length ? bedrijf.functie_matches.map(f => f.naam || f).join(', ') : '')}</div>
+  </div>
   `;
-            })
-            .join('')
-        : `<div style="text-align:center;width:100%;color:#888;">Geen bedrijven gevonden.</div>`;
+              })
+              .join('')
+          : `<div style="text-align:center;width:100%;color:#888;">Geen bedrijven gevonden.</div>`
+        );
       document.querySelectorAll('.bedrijf-card').forEach((card) => {
         card.addEventListener('click', (e) => {
           if (e.target.classList.contains('favorite-btn')) {
@@ -591,7 +1001,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
           const idx = card.getAttribute('data-bedrijf-idx');
           showBedrijfPopup(
             bedrijven[idx],
-            actualStudentData.id || actualStudentData.gebruiker_id
+            currentStudentId
           );
         });
       });
@@ -623,312 +1033,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       });
       updateFavoritesCount();
     }
-    // Initial render with loading state
-    rootElement.innerHTML = `
-    <div class="student-profile-container">
-      <header class="student-profile-header">
-        <div class="logo-section">
-          <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
-          <span>EhB Career Launch</span>
-        </div>
-        <button id="burger-menu" class="student-profile-burger">☰</button>
-        <ul id="burger-dropdown" class="student-profile-dropdown">
-          <li><button id="nav-profile">Profiel</button></li>
-          <li><button id="nav-settings">Instellingen</button></li>
-          <li><button id="nav-logout">Log out</button></li>
-        </ul>
-      </header>
-      <div class="student-profile-main">
-        <nav class="student-profile-sidebar">
-          <ul>
-            <li><button data-route="search" class="sidebar-link">Zoek-criteria</button></li>
-            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
-            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
-            <li><button data-route="bedrijven" class="sidebar-link active">Bedrijven</button></li>
-          </ul>
-        </nav>
-        <div class="student-profile-content">
-          <div class="student-profile-form-container" style="padding:2.5rem 2.2rem 2.2rem 2.2rem; border-radius:18px; background:#fff; box-shadow:0 4px 24px #0001; max-width:1200px; margin:auto;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.4rem;">
-              <h1 class="student-profile-title" style="margin: 0;">Bedrijven</h1>
-              <button id="filter-favorieten-btn" title="Toon alleen favorieten" style="font-size: 1.5rem; background: none; border: none; cursor: pointer; transition: transform 0.3s ease;" class="${toonAlleFavorieten ? 'animating' : ''}">${toonAlleFavorieten ? '❤️' : '🤍'}</button>
-            </div>
-            <div id="bedrijven-filterbar" class="bedrijven-filterbar-grid" style="background:#f8fafc; padding:1.2rem 1.2rem 1.2rem 1.2rem; border-radius:14px; margin-bottom:2.2rem; box-shadow:0 2px 8px #0001; border:1.5px solid #e1e5e9;">
-              <div class="zoek-group">
-                <label for="bedrijf-zoek">Zoeken</label>
-                <input id="bedrijf-zoek" type="text" placeholder="Zoek bedrijf of locatie...">
-              </div>
-              <div id="filter-locaties" class="filter-group"></div>
-              <div id="filter-functies" class="filter-group"></div>
-              <div id="filter-skills" class="filter-group"></div>
-              <div id="filter-talen" class="filter-group"></div>
-              <div class="reset-group">
-                <button id="reset-filters" style="padding:0.6rem 1.2rem;border-radius:8px;border:1.5px solid #e1e5e9;background:#f5f5f5;cursor:pointer;min-width:120px;">Reset filters</button>
-              </div>
-            </div>
-            <div style="height:1px;width:100%;background:#e1e5e9;margin-bottom:2.2rem;"></div>
-            <div id="bedrijven-list" class="bedrijven-list" style="display:flex;flex-wrap:wrap;gap:2rem;justify-content:center;">
-              <div style="text-align:center;width:100%;color:#888;">Laden van bedrijven...</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <footer class="student-profile-footer">
-        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
-      </footer>
-    </div>
-  `;
-
-    // Voeg moderne grid CSS toe voor de filterbalk en card
-    const style = document.createElement('style');
-    style.innerHTML = `
-.student-profile-form-container.bedrijven-form-card {
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 4px 24px #0001;
-  padding: 2.2rem 2.2rem 2.5rem 2.2rem;
-  margin: 2.5rem auto 2.5rem auto;
-  max-width: 1200px;
-  width: 100%;
-  box-sizing: border-box;
-  position: relative;
-}
-.bedrijven-filterbar-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1.2rem 1.6rem;
-  align-items: end;
-  background: transparent;
-  border-radius: 12px;
-  margin-bottom: 1.2rem;
-  padding: 0;
-  position: relative;
-}
-.bedrijven-filterbar-grid .filter-group,
-.bedrijven-filterbar-grid .zoek-group,
-.bedrijven-filterbar-grid .reset-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
-  width: 100%;
-}
-.bedrijven-filterbar-grid label {
-  font-weight: 500;
-  font-size: 0.9rem;
-  margin-bottom: 0.2rem;
-}
-.bedrijven-filterbar-grid select,
-.bedrijven-filterbar-grid input[type="text"] {
-  padding: 0.6rem 0.9rem;
-  border-radius: 8px;
-  border: 1.5px solid #e1e5e9;
-  font-size: 0.95rem;
-  min-height: 42px;
-  height: 42px;
-  box-sizing: border-box;
-  width: 100%;
-}
-.bedrijven-filterbar-grid .ss-main {
-  min-height: 42px !important;
-  height: 42px !important;
-  box-sizing: border-box;
-}
-/* SlimSelect: scrollbare chips bij veel geselecteerde opties */
-.bedrijven-filterbar-grid .ss-main.multi {
-  max-height: 86px !important;
-  overflow-y: auto !important;
-  flex-wrap: wrap !important;
-  align-items: flex-start !important;
-  scrollbar-width: thin;
-}
-.bedrijven-filterbar-grid .ss-main {
-  padding: 0.6rem 0.8rem;
-}
-/* Scrollbar styling voor Chrome */
-.bedrijven-filterbar-grid .ss-main.multi::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
-}
-.bedrijven-filterbar-grid .ss-main.multi::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 6px;
-}
-.bedrijven-divider {
-  border: none;
-  border-top: 1.5px solid #e1e5e9;
-  margin: 1.2rem 0 2.2rem 0;
-}
-#filter-favorieten-btn.animating {
-  transform: scale(1.3);
-}
-@media (min-width: 1200px) {
-  .bedrijven-filterbar-grid {
-    grid-template-columns: repeat(6, 1fr);
-  }
-  .student-profile-form-container.bedrijven-form-card {
-    padding: 2.5rem 3.5rem 2.8rem 3.5rem;
-  }
-}
-`;
-    document.head.appendChild(style);
-
-    // Custom filter UI rendering
-    function renderFilterOptions() {
-      // Locaties (popup trigger ipv select)
-      const locaties = getUniekeLocaties();
-      const locatieDiv = document.getElementById('filter-locaties');
-      locatieDiv.innerHTML = `
-        <label for="locaties-popup-trigger">Locatie</label>
-        <button id="locaties-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
-          ${huidigeLocaties.length ? huidigeLocaties.join(', ') : 'Locatie kiezen...'}
-        </button>
-      `;
-      // Functies (popup trigger ipv select)
-      const functies = getUniekeFuncties();
-      const functieDiv = document.getElementById('filter-functies');
-      functieDiv.innerHTML = `
-        <label for="functies-popup-trigger">Functie</label>
-        <button id="functies-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
-          ${huidigeFuncties.length ? huidigeFuncties.join(', ') : 'Functie kiezen...'}
-        </button>
-      `;
-      // Skills (popup trigger ipv select)
-      const skills = getUniekeSkills();
-      const skillDiv = document.getElementById('filter-skills');
-      skillDiv.innerHTML = `
-        <label for="skills-popup-trigger">Skills</label>
-        <button id="skills-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
-          ${huidigeSkills.length ? huidigeSkills.join(', ') : 'Skills kiezen...'}
-        </button>
-      `;
-      // Talen (popup trigger ipv select)
-      const talen = getUniekeTalen();
-      const taalDiv = document.getElementById('filter-talen');
-      taalDiv.innerHTML = `
-        <label for="talen-popup-trigger">Talen</label>
-        <button id="talen-popup-trigger" type="button" style="padding:0.6rem 0.9rem;border:1.5px solid #e1e5e9;border-radius:8px;background:#fff;cursor:pointer;text-align:left;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
-          ${huidigeTalen.length ? huidigeTalen.join(', ') : 'Talen kiezen...'}
-        </button>
-      `;
-      // Favorietenknop rechtsboven in de filterbalk
-      const filterbar = document.getElementById('bedrijven-filterbar');
-      let favBtn = document.getElementById('filter-favorieten-btn');
-      if (favBtn) favBtn.remove();
-      favBtn = document.createElement('button');
-      favBtn.id = 'filter-favorieten-btn';
-      favBtn.title = 'Toon alleen favorieten';
-      favBtn.style.cssText = `
-        position: absolute;
-        top: 10px;
-        right: 14px;
-        font-size: 1.4rem;
-        background: none;
-        border: none;
-        cursor: pointer;
-        z-index: 5;
-      `;
-      favBtn.innerHTML = toonAlleFavorieten ? '❤️' : '🤍';
-      filterbar.appendChild(favBtn);
-      // Popup triggers voor alle filters
-      document.getElementById('locaties-popup-trigger').addEventListener('click', () => {
-        createPopup({
-          id: 'locaties-filter-popup',
-          title: 'Kies locaties',
-          options: getUniekeLocaties(),
-          selected: huidigeLocaties,
-          onSave: (gekozen) => {
-            huidigeLocaties = gekozen;
-            renderFilterOptions();
-            renderList();
-          }
-        });
-      });
-      document.getElementById('functies-popup-trigger').addEventListener('click', () => {
-        createPopup({
-          id: 'functies-filter-popup',
-          title: 'Kies functies',
-          options: getUniekeFuncties(),
-          selected: huidigeFuncties,
-          onSave: (gekozen) => {
-            huidigeFuncties = gekozen;
-            renderFilterOptions();
-            renderList();
-          }
-        });
-      });
-      document.getElementById('skills-popup-trigger').addEventListener('click', () => {
-        createPopup({
-          id: 'skills-filter-popup',
-          title: 'Kies je skills',
-          options: getUniekeSkills(),
-          selected: huidigeSkills,
-          onSave: (gekozen) => {
-            huidigeSkills = gekozen;
-            renderFilterOptions();
-            renderList();
-          }
-        });
-      });
-      document.getElementById('talen-popup-trigger').addEventListener('click', () => {
-        createPopup({
-          id: 'talen-filter-popup',
-          title: 'Kies je talen',
-          options: getUniekeTalen(),
-          selected: huidigeTalen,
-          onSave: (gekozen) => {
-            huidigeTalen = gekozen;
-            renderFilterOptions();
-            renderList();
-          }
-        });
-      });
-    }
-
-    // Update filters and render list after data is loaded
-    renderFilterOptions();
     renderList();
-
-    // --- Sidebar navigatie uniform maken ---
-    document.querySelectorAll('.sidebar-link').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const route = e.currentTarget.getAttribute('data-route');
-        import('../../router.js').then((module) => {
-          const Router = module.default;
-          switch (route) {
-            // case 'profile': // verwijderd
-            case 'search':
-              Router.navigate('/student/zoek-criteria');
-              break;
-            case 'speeddates':
-              Router.navigate('/student/student-speeddates');
-              break;
-            case 'requests':
-              Router.navigate('/student/student-speeddates-verzoeken');
-              break;
-            case 'bedrijven':
-              Router.navigate('/student/bedrijven');
-              break;
-          }
-        });
-      });
-    });
-
-    // Hamburger menu Profiel knop
-    const navProfileBtn = document.getElementById('nav-profile');
-    const dropdown = document.getElementById('burger-dropdown');
-    if (navProfileBtn && dropdown) {
-      navProfileBtn.addEventListener('click', () => {
-        dropdown.classList.remove('open');
-        import('../../router.js').then((module) => {
-          const Router = module.default;
-          Router.navigate('/student/student-profiel');
-        });
-      });
-    }
-
     // Filter & zoek events - setup after data is loaded
     const setupEventListeners = () => {
       const zoekElement = document.getElementById('bedrijf-zoek');
@@ -950,41 +1055,14 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         });
       }
       // Multi-select events
-      const locatieSelect = document.getElementById('filter-locaties-select');
-      if (locatieSelect) {
-        locatieSelect.addEventListener('change', (e) => {
-          huidigeLocaties = Array.from(e.target.selectedOptions).map(opt => opt.value);
-          renderList();
-        });
-      }
-      const functieSelect = document.getElementById('filter-functies-select');
-      if (functieSelect) {
-        functieSelect.addEventListener('change', (e) => {
-          huidigeFuncties = Array.from(e.target.selectedOptions).map(opt => opt.value);
-          renderList();
-        });
-      }
-      const skillSelect = document.getElementById('filter-skills-select');
-      if (skillSelect) {
-        skillSelect.addEventListener('change', (e) => {
-          huidigeSkills = Array.from(e.target.selectedOptions).map(opt => opt.value);
-          renderList();
-        });
-      }
-      const taalSelect = document.getElementById('filter-talen-select');
-      if (taalSelect) {
-        taalSelect.addEventListener('change', (e) => {
-          huidigeTalen = Array.from(e.target.selectedOptions).map(opt => opt.value);
-          renderList();
-        });
-      }
+      // (popup events zitten in renderFilterOptions)
       // Reset button
       document.getElementById('reset-filters').addEventListener('click', () => {
         huidigeZoek = '';
         huidigeLocaties = [];
-        huidigeFuncties = [];
         huidigeSkills = [];
-        huidigeTalen = [];
+        huidigeDomeinen = [];
+        huidigeFuncties = [];
         document.getElementById('bedrijf-zoek').value = '';
         renderFilterOptions();
         setupEventListeners();
@@ -992,6 +1070,50 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       });
     };
     setupEventListeners();
+    // --- Sidebar navigatie uniform maken ---
+    document.querySelectorAll('.sidebar-link').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const route = e.currentTarget.getAttribute('data-route');
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          switch (route) {
+            // case 'profile': // verwijderd
+            case 'search':
+              Router.navigate('/student/zoek-criteria');
+              break;
+            case 'speeddates':
+              Router.navigate('/student/student-speeddates');
+              break;
+            case 'requests':
+              Router.navigate('/student/student-speeddates-verzoeken');
+              break;
+            case 'bedrijven':
+              Router.navigate('/student/bedrijven');
+              break;
+            case 'qr':
+              Router.navigate('/student/student-qr-popup');
+              break;
+          }
+        });
+      });
+    });
+
+    // Hamburger menu Profiel knop
+    const navProfileBtn = document.getElementById('nav-profile');
+    const dropdown = document.getElementById('burger-dropdown');
+    if (navProfileBtn && dropdown) {
+      navProfileBtn.addEventListener('click', () => {
+        dropdown.classList.remove('open');
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/student/student-profiel');
+        });
+      });
+    }
+
+    // Filter & zoek events - setup after data is loaded
+    // const setupEventListeners = () => { ... } // VERWIJDER DEZE DUBBELE DECLARATIE indien aanwezig
     // Burger menu
     const burger = document.getElementById('burger-menu');
     if (burger) {
@@ -1048,7 +1170,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
   return;
 }
 
-function createPopup({ id, title, options = [], selected = [], onSave }) {
+function createPopup({ id, title, options = [], selected = [], onSave, showSearch = false }) {
   // Verwijder oude popup
   const existing = document.getElementById(id);
   if (existing) existing.remove();
@@ -1066,6 +1188,7 @@ function createPopup({ id, title, options = [], selected = [], onSave }) {
   `;
   popup.innerHTML = `
     <h2 style="margin-bottom:1rem;">${title}</h2>
+    ${showSearch ? '<input id="popup-search" type="text" placeholder="Zoeken..." style="margin-bottom:1rem;padding:0.5rem 1rem;width:100%;border-radius:6px;border:1.2px solid #e1e5e9;font-size:1rem;">' : ''}
     <div id="${id}-options" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.5rem;"></div>
     <div style="display:flex;justify-content:flex-end;gap:1rem;">
       <button id="${id}-cancel" style="padding:0.5rem 1.2rem;border:none;background:#eee;border-radius:6px;cursor:pointer;">Annuleer</button>
@@ -1076,16 +1199,26 @@ function createPopup({ id, title, options = [], selected = [], onSave }) {
   document.body.appendChild(overlay);
   // Voeg checkboxen toe
   const optionsContainer = document.getElementById(`${id}-options`);
-  options.forEach((opt) => {
-    const div = document.createElement('label');
-    div.style.display = 'flex';
-    div.style.alignItems = 'center';
-    div.innerHTML = `
-      <input type="checkbox" value="${opt}" ${selected.includes(opt) ? 'checked' : ''} />
-      <span style="margin-left:0.6rem;">${opt}</span>
-    `;
-    optionsContainer.appendChild(div);
-  });
+  function renderOptions(filter = '') {
+    optionsContainer.innerHTML = '';
+    options.filter(opt => !filter || opt.toLowerCase().includes(filter.toLowerCase())).forEach((opt) => {
+      const div = document.createElement('label');
+      div.style.display = 'flex';
+      div.style.alignItems = 'center';
+      div.innerHTML = `
+        <input type="checkbox" value="${opt}" ${selected.includes(opt) ? 'checked' : ''} />
+        <span style="margin-left:0.6rem;">${opt}</span>
+      `;
+      optionsContainer.appendChild(div);
+    });
+  }
+  renderOptions();
+  if (showSearch) {
+    const searchInput = document.getElementById('popup-search');
+    searchInput.addEventListener('input', (e) => {
+      renderOptions(e.target.value);
+    });
+  }
   // Handlers
   document.getElementById(`${id}-cancel`).onclick = () => overlay.remove();
   document.getElementById(`${id}-save`).onclick = () => {
@@ -1098,4 +1231,12 @@ function createPopup({ id, title, options = [], selected = [], onSave }) {
 // Helper: ISO naar API datum formaat
 function isoToAPIDate(iso) {
   return iso.replace('T', ' ').replace('Z', '');
+}
+
+// Match kleur functie
+function getMatchColor(percentage) {
+  if (percentage >= 80) return '#2aa97b'; // groen
+  if (percentage >= 60) return '#f7b500'; // geel
+  if (percentage >= 40) return '#ff9800'; // oranje
+  return '#da2727'; // rood
 }
