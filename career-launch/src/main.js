@@ -1,57 +1,106 @@
-// main.js file
 import Router from './router.js';
-import './style.css';
+import './css/consolidated-style.css';
 
-// importeer de pagina's
 import { renderHome } from './pages/home.js';
 import { renderRegister } from './pages/register.js';
 import { renderLogin } from './pages/login.js';
-import { renderStudentProfiel } from './pages/student-profiel.js';
-import { renderSearchCriteriaStudent } from './pages/search-criteria-student.js';
-import { renderAdmin } from './pages/admin.js';
-import { renderAdminDashboard } from './pages/admin-dashboard.js';
+import { renderStudentProfiel } from './pages/student/student-profiel.js';
+import { renderSearchCriteriaStudent } from './pages/student/search-criteria-student.js';
+import { renderAdmin } from './pages/admin/admin-login.js';
+import { renderAdminSelectDashboard } from './pages/admin/admin-select-dashboard.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
-import { renderBedrijfProfiel } from './pages/bedrijf-profiel.js';
-import { renderSearchCriteriaBedrijf } from './pages/search-criteria-bedrijf.js';
-import { renderStudentRegister } from './pages/student-register.js';
-import { renderStudentOpleiding } from './pages/student-opleiding.js';
-import { renderStudentSkills } from './pages/student-skills.js';
-import { renderBedrijfRegister } from './pages/bedrijf-register.js';
+import { renderSpeeddates } from './pages/student/student-speeddates.js';
+import { renderSpeeddatesRequests } from './pages/student/student-speeddates-verzoeken.js';
+import { showSettingsPopup } from './pages/student/student-settings.js';
+import { renderAdminIngeschrevenStudenten } from './pages/admin/admin-ingeschreven-studenten.js';
+import { renderAdminIngeschrevenBedrijven } from './pages/admin/admin-ingeschreven-bedrijven.js';
+import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven-in-behandeling.js';
+import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js';
+import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
+import { renderAdminProcessingCompanyDetail } from './pages/admin/admin-processing-company-detail.js';
+import { renderBedrijfProfiel } from './pages/bedrijf/bedrijf-profiel.js';
+import { renderBedrijfRegister } from './pages/register-bedrijf/bedrijf-register.js';
+import { renderBedrijven } from './pages/student/bedrijven.js';
+import { renderBedrijfSpeeddates } from './pages/bedrijf/bedrijf-speeddates.js';
+import { renderBedrijfSpeeddatesRequests } from './pages/bedrijf/bedrijf-speeddates-verzoeken.js';
+import { renderSearchCriteriaBedrijf } from './pages/bedrijf/search-criteria-bedrijf.js';
+import { renderStudenten } from './pages/bedrijf/studenten.js';
 
-// functie om de 404 pagina te renderen
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
-        <div class="not-found-container">
-            <h1>404 - Pagina niet gevonden</h1>
-            <p>De pagina die je zoekt bestaat niet.</p>
-            <a href="/" data-route="/">Terug naar home</a>
-        </div>
-    `;
+    <div class="not-found-container">
+      <div class="not-found-content">
+        <h1>404</h1>
+        <p>Pagina niet gevonden</p>
+        <a href="/" data-route="/">← Terug naar home</a>
+      </div>
+    </div>
+  `;
 }
 
-// Definieer de routes
 const routes = {
   '/': renderHome,
   '/404': renderNotFound,
   '/registreer': renderRegister,
   '/login': renderLogin,
-  '/Student/Student-Profiel': renderStudentProfiel,
-  '/Student/Zoek-Criteria': renderSearchCriteriaStudent,
+  '/student/student-profiel': renderStudentProfiel,
+  '/student/zoek-criteria': renderSearchCriteriaStudent,
   '/admin': renderAdmin,
-  '/admin-dashboard': renderAdminDashboard,
+  '/admin-login': renderAdmin,
+  '/admin-select-dashboard': renderAdminSelectDashboard,
+  '/admin-dashboard': renderAdminSelectDashboard,
+  '/admin-dashboard/ingeschreven-studenten': renderAdminIngeschrevenStudenten,
+  '/admin-dashboard/ingeschreven-bedrijven': renderAdminIngeschrevenBedrijven,
+  '/admin-dashboard/bedrijven-in-behandeling':
+    renderAdminBedrijvenInBehandeling,
+  '/admin-dashboard/student-detail': renderAdminStudentDetail,
+  '/admin-dashboard/company-detail': renderAdminCompanyDetail,
+  '/admin-dashboard/processing-company-detail':
+    renderAdminProcessingCompanyDetail,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
-  '/Bedrijf/Bedrijf-Profiel': renderBedrijfProfiel,
-  '/Bedrijf/Zoek-Criteria': renderSearchCriteriaBedrijf,
-  '/Student-Register': renderStudentRegister,
-  '/Student-Opleiding': renderStudentOpleiding,
-  '/Student-Skills': renderStudentSkills,
-  '/Bedrijf-Register': renderBedrijfRegister,
+  '/student/student-speeddates': renderSpeeddates,
+  '/student/student-speeddates-verzoeken': renderSpeeddatesRequests,
+  '/student/student-settings': showSettingsPopup,
+  '/student/bedrijven': renderBedrijven,
+  '/bedrijf/bedrijf-profiel': renderBedrijfProfiel,
+  '/registreer-bedrijf': renderBedrijfRegister,
+  '/bedrijf/speeddates': renderBedrijfSpeeddates,
+  '/bedrijf/speeddates-verzoeken': renderBedrijfSpeeddatesRequests,
+  '/bedrijf/zoek-criteria': renderSearchCriteriaBedrijf,
+  '/bedrijf/studenten': renderStudenten,
+  '/bedrijf/bedrijf-settings': showSettingsPopup,
 };
 
-// Initialize router
 const router = new Router(routes);
-
-// Make router globally available for pages to use
 window.appRouter = router;
+
+// Footer event listeners éénmalig toevoegen na elke route change
+function setupFooterLinks() {
+  const privacyLink = document.getElementById('privacy-policy');
+  if (privacyLink) {
+    privacyLink.onclick = (e) => {
+      e.preventDefault();
+      window.appRouter.navigate('/privacy');
+    };
+  }
+  const contactLink = document.getElementById('contacteer-ons');
+  if (contactLink) {
+    contactLink.onclick = (e) => {
+      e.preventDefault();
+      window.appRouter.navigate('/contact');
+    };
+  }
+}
+
+// Hook in op elke route change
+window.addEventListener('popstate', setupFooterLinks);
+document.addEventListener('DOMContentLoaded', setupFooterLinks);
+
+if (
+  window.location.protocol === 'http:' &&
+  !window.location.hostname.includes('localhost')
+) {
+  window.location.href = window.location.href.replace('http:', 'https:');
+}

@@ -3,9 +3,9 @@ import Router from '../router.js';
 export function renderPrivacy(rootElement) {
   rootElement.innerHTML = `
     <div class="privacy-container">
+      <button class="back-button" id="back-button">← Terug</button>
       <div class="content-card">
         <div class="header">
-          <button class="back-button" id="back-button" data-route="/">← Terug naar Home</button>
           <h1>Privacy Policy</h1>
         </div>
           <div class="content">
@@ -83,32 +83,13 @@ export function renderPrivacy(rootElement) {
           <p class="last-updated"><strong>Laatste update:</strong> 5 juni 2025</p>
         </div>
       </div>
-      
-      <!-- FOOTER -->      <footer class="student-profile-footer">
-        <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
-      </footer>
-    </div>
-  `;
-  const backButton = document.getElementById('back-button');
-  backButton.addEventListener('click', () => {
-    Router.navigate('/');
-  });
+    </div>  `;
 
-  // FOOTER LINKS
-  document.getElementById('privacy-policy').addEventListener('click', (e) => {
-    e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/privacy');
+  // Back button - same technique as login and register pages
+  const backBtn = document.getElementById('back-button');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      window.history.back();
     });
-  });
-
-  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
-    e.preventDefault();
-    import('../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/contact');
-    });
-  });
+  }
 }

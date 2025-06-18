@@ -1,0 +1,211 @@
+/* --- Zoekcriteria Form --- */
+.criteria-form {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 3rem 2.5rem 2.5rem 2.5rem;
+  margin: 2.5rem auto 0 auto;
+  max-width: 800px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.criteria-form h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #0077b5;
+  text-align: center;
+}
+
+.form-section {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.form-section h3 {
+  font-size: 1.3rem;
+  color: #0077b5;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.form-section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-size: 1.07rem;
+  letter-spacing: 0.01em;
+}
+
+.form-section select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1.07rem;
+  background: #f8f9fa;
+  color: #333;
+  margin-top: 2px;
+  outline: none;
+  transition: border 0.17s;
+}
+
+.form-section select:focus {
+  border-color: #00bcd4;
+  background: #fff;
+}
+
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  font-weight: 400;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.checkbox-group label:hover {
+  background: #f8f9fa;
+}
+
+.checkbox-group input[type='checkbox'] {
+  margin-right: 0.5rem;
+  width: 18px;
+  height: 18px;
+  accent-color: #00bcd4;
+}
+
+.other-input {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 12px 15px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1.07rem;
+  background: #f8f9fa;
+  color: #333;
+  outline: none;
+  transition: border 0.17s;
+}
+
+.other-input:focus {
+  border-color: #00bcd4;
+  background: #fff;
+}
+
+.add-btn {
+  display: inline-block;
+  background: #00bcd4;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  min-width: 92px;
+  box-shadow: 0 2px 6px 0 rgba(44, 44, 44, 0.05);
+}
+
+.add-btn:hover,
+.add-btn:active {
+  background: #00acc1;
+  color: #fff;
+  box-shadow: 0 3px 16px 0 rgba(0, 188, 212, 0.13);
+}
+
+/* Tag-achtige styling voor custom items */
+.custom-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.custom-item {
+  background: #e1f5fe;
+  color: #006064;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.custom-item button {
+  background: none;
+  border: none;
+  color: #006064;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+}
+
+.custom-item button:hover {
+  color: #d32f2f;
+}
+
+/* Speeddates request buttons */
+.request-btn {
+  background: #00bcd4;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  min-width: 80px;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  box-shadow: 0 2px 6px 0 rgba(44, 44, 44, 0.05);
+}
+
+.request-btn:hover,
+.request-btn:active {
+  background: #00acc1;
+  color: #fff;
+  box-shadow: 0 3px 16px 0 rgba(0, 188, 212, 0.13);
+}
+
+.request-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.accept-btn {
+  background: #00bcd4;
+  color: #fff;
+}
+
+.accept-btn:hover {
+  background: #00acc1;
+  color: #fff;
+  box-shadow: 0 3px 16px 0 rgba(0, 188, 212, 0.13);
+}
+
+.deny-btn {
+  background: #fa626a;
+  color: #fff;
+}
+
+.deny-btn:hover {
+  background: #fd7855;
+  color: #fff;
+}

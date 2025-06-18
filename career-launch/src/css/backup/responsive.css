@@ -1,0 +1,194 @@
+/* Responsive design */
+@media (max-width: 600px) {
+  .settings-popup-card {
+    padding: 1rem 2vw;
+    min-width: 0;
+    max-width: 98vw;
+  }
+
+  .login-card,
+  .register-card {
+    margin-bottom: 32px;
+  }
+
+  .student-profile-footer {
+    font-size: 0.88rem;
+    padding: 13px 0 10px 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .student-profile-form-container,
+  .speeddates-table-container,
+  .criteria-form {
+    max-width: 98vw;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .speeddates-table-container {
+    max-width: 98vw;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .speeddates-table th,
+  .speeddates-table td {
+    padding: 13px 4px;
+    font-size: 0.88rem;
+  }
+
+  .student-profile-sidebar {
+    width: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-container {
+    padding: 15px;
+    padding-bottom: 50px;
+  }
+
+  .home-container h1 {
+    font-size: 2rem;
+  }
+
+  .home-container h2 {
+    font-size: 2.5rem;
+  }
+
+  .student-profile-header {
+    padding: 1rem;
+  }
+
+  .student-profile-main {
+    flex-direction: column;
+  }
+
+  .student-profile-sidebar {
+    width: 100%;
+    order: 2;
+  }
+
+  .student-profile-content {
+    padding: 1rem;
+    order: 1;
+  }
+
+  .student-profile-form-container {
+    padding: 2rem 1.5rem;
+  }
+
+  .student-profile-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .register-card,
+  .login-card {
+    padding: 20px;
+    margin: 10px;
+  }
+
+  .back-button {
+    left: 20px;
+    top: 20px;
+  }
+
+  .contact-info {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-form {
+    padding: 1rem;
+  }
+
+  .content-card {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+  }
+
+  .content-card h1 {
+    font-size: 2rem;
+  }
+
+  .not-found-container h1 {
+    font-size: 4rem;
+  }
+
+  .not-found-container h2 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-container h1 {
+    font-size: 1.5rem;
+  }
+
+  .home-container h2 {
+    font-size: 2rem;
+  }
+
+  .student-profile-title {
+    font-size: 1.5rem;
+  }
+
+  .criteria-form h1,
+  .speeddates-table-container h1 {
+    font-size: 1.5rem;
+  }
+
+  .checkbox-group {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .radio-group {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .student-profile-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .speeddates-table {
+    font-size: 0.75rem;
+  }
+
+  .speeddates-table th,
+  .speeddates-table td {
+    padding: 8px 2px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .student-profile-header,
+  .student-profile-footer,
+  .student-profile-sidebar,
+  .back-button,
+  .settings-modal-root {
+    display: none !important;
+  }
+
+  .student-profile-main {
+    flex-direction: column;
+  }
+
+  .student-profile-content {
+    padding: 0;
+  }
+
+  .student-profile-form-container {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+}
