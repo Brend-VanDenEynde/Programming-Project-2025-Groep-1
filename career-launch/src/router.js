@@ -14,6 +14,7 @@ import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven
 import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js';
 import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
 import { renderAdminProcessingCompanyDetail } from './pages/admin/admin-processing-company-detail.js';
+import { renderAdminContacten } from './pages/admin/admin-contacten.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
 import { renderQRPopup } from './pages/student/student-qr-popup.js';
@@ -65,9 +66,9 @@ const routes = {
   '/admin-dashboard/bedrijven-in-behandeling':
     renderAdminBedrijvenInBehandeling,
   '/admin-dashboard/student-detail': renderAdminStudentDetail,
-  '/admin-dashboard/company-detail': renderAdminCompanyDetail,
-  '/admin-dashboard/processing-company-detail':
+  '/admin-dashboard/company-detail': renderAdminCompanyDetail,  '/admin-dashboard/processing-company-detail':
     renderAdminProcessingCompanyDetail,
+  '/admin-dashboard/contacten': renderAdminContacten,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
   '/bedrijf/bedrijf-profiel': async (rootElement) => {

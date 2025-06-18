@@ -2941,34 +2941,352 @@ body.darkmode .student-profile-footer a:hover {
   background: #fff;
 }
 
-/* Loading and error states */
-.loading-state,
-.error-state {
+/* Contact Detail Modal Styles */
+.contact-detail-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.contact-detail-modal-content {
+  background-color: #2c3e50;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-detail-modal-header {
+  background-color: #34495e;
+  color: white;
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.contact-detail-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.contact-detail-modal-body {
+  background-color: #2c3e50;
+  padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.contact-detail-modal-footer {
+  background-color: #34495e;
+  padding: 1rem 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.modal-action-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-action-btn.primary {
+  background-color: #3498db;
+  color: white;
+}
+
+.modal-action-btn.primary:hover {
+  background-color: #2980b9;
+}
+
+.modal-action-btn.secondary {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.modal-action-btn.secondary:hover {
+  background-color: #7f8c8d;
+}
+
+.modal-action-btn.danger {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.modal-action-btn.danger:hover {
+  background-color: #c0392b;
+}
+
+/* Contact List Styles */
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.contact-item {
+  background-color: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.contact-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #3498db;
+}
+
+.contact-item.unread {
+  border-left: 4px solid #3498db;
+  background-color: #f8f9fa;
+}
+
+.contact-item.read {
+  border-left: 4px solid #95a5a6;
+}
+
+.contact-status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.unread-indicator {
+  background-color: #3498db;
+}
+
+.read-indicator {
+  background-color: #95a5a6;
+}
+
+.contact-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.contact-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.contact-name {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.contact-type {
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.contact-type.student {
+  background-color: #e8f5e8;
+  color: #27ae60;
+}
+
+.contact-type.bedrijf {
+  background-color: #e8f0ff;
+  color: #3498db;
+}
+
+.contact-date {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+}
+
+.contact-subject {
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+.contact-preview {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.contact-email {
+  color: #95a5a6;
+  font-size: 0.8rem;
+}
+
+.contact-actions {
+  flex-shrink: 0;
+}
+
+.view-contact-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.view-contact-btn:hover {
+  background-color: #2980b9;
+}
+
+/* Contact Detail Info Styles */
+.contact-detail-info {
+  color: white;
+}
+
+.detail-row {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.detail-row.full-width {
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-row strong {
+  min-width: 100px;
+  color: #ecf0f1;
+}
+
+.contact-message {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 6px;
+  border-left: 4px solid #3498db;
+  line-height: 1.6;
+  margin-top: 0.5rem;
+}
+
+.status.read {
+  color: #95a5a6;
+}
+
+.status.unread {
+  color: #3498db;
+  font-weight: 600;
+}
+
+/* Loading and Error States */
+.loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem 2rem;
+  padding: 3rem;
   text-align: center;
 }
 
-.loading-state p,
-.error-state p {
-  font-size: 1.1rem;
-  color: #666;
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
   margin-bottom: 1rem;
 }
 
-.btn-retry {
-  background-color: #0077b5;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-container,
+.no-data-container {
+  text-align: center;
+  padding: 3rem;
+}
+
+.error-container h2,
+.no-data-container h2 {
+  color: #e74c3c;
+  margin-bottom: 1rem;
+}
+
+.retry-btn {
+  background-color: #3498db;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.retry-btn:hover {
+  background-color: #2980b9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .contact-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .contact-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .contact-actions {
+    align-self: flex-end;
+  }
+  
+  .contact-detail-modal-content {
+    width: 95%;
+    max-height: 90vh;
+  }
+  
+  .contact-detail-modal-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .modal-action-btn {
+    width: 100%;
+  }
 }
 
 .btn-retry:hover {

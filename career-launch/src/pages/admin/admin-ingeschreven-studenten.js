@@ -28,11 +28,11 @@ export async function renderAdminIngeschrevenStudenten(rootElement) {
       
       <div class="admin-main-layout">
         <aside class="admin-sidebar-clean">
-          <nav class="admin-nav">
-            <ul>
+          <nav class="admin-nav">            <ul>
               <li><button class="nav-btn active" data-route="/admin-dashboard/ingeschreven-studenten">Ingeschreven studenten</button></li>
               <li><button class="nav-btn" data-route="/admin-dashboard/ingeschreven-bedrijven">Ingeschreven Bedrijven</button></li>
               <li><button class="nav-btn" data-route="/admin-dashboard/bedrijven-in-behandeling">Bedrijven in behandeling</button></li>
+              <li><button class="nav-btn" data-route="/admin-dashboard/contacten">Contacten</button></li>
             </ul>
           </nav>
         </aside>
