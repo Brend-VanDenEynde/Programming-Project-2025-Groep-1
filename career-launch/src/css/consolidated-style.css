@@ -107,7 +107,7 @@ a:hover {
 .home-background {
   min-height: 100vh;
   width: 100vw;
-  background: url('../Images/website banner 2_3Ehb.jpg') center center/cover no-repeat fixed !important;
+  background: url('../images/website banner 2_3Ehb.jpg') center center/cover no-repeat fixed !important;
   position: relative;
   overflow: hidden;
 }
@@ -1396,7 +1396,7 @@ a:hover {
 body.darkmode {
   --accent: lightgrey;
   --accent-contrast: #181c1f;
-  --header-logo: url('/src/Images/EhB-logo-transparant-558-DarkMode.png');
+  --header-logo: url('../images/EhB-logo-transparant-558-DarkMode.png');
   background: #000 !important;
   color: #e0f7fa !important;
 }
