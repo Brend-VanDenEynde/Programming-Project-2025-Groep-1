@@ -341,11 +341,38 @@ export async function renderBedrijfProfiel(
             linkedinValue = null;
           }
         }
+
+        let sectorID = null;
+        if (document.getElementById('sectorInput').value) {
+          console.log('Sector input value:', document.getElementById('sectorInput').value);
+          const currentToken = window.sessionStorage.getItem('authToken');
+          sectorID = await fetch('https://api.ehb-match.me/sectoren', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + currentToken,
+            },
+            body: JSON.stringify({
+              naam: document.getElementById('sectorInput').value
+            })
+          }).then(response => {
+            if (!response.ok) {
+              throw new Error('Fout bij het ophalen van sector ID: ' + response.statusText);
+            }
+            return response.json();
+          }).then(data => {
+            console.log('Sector ID opgehaald:', data);
+            return data.sector.id;
+          }).catch(error => {
+            console.error('Error fetching sector ID:', error);
+          });
+        }
         const updateData = {
           naam: document.getElementById('bedrijfsnaamInput').value,
           contact_email: document.getElementById('emailInput').value,
           plaats: document.getElementById('plaatsInput').value,
           linkedin: linkedinValue,
+          id_sector: sectorID || bedrijfData.sector_bedrijf, // Gebruik sectorID als deze is opgehaald, anders huidige waarde
           // sector_bedrijf wordt niet geaccepteerd door de API, dus weggelaten
         }; // Haal het bedrijf ID op uit de huidige data
         const bedrijfID = bedrijfData.id || bedrijfData.gebruiker_id;
@@ -437,8 +464,7 @@ export async function renderBedrijfProfiel(
           const updatedBedrijfData = {
             ...bedrijfData,
             ...updateData,
-            // Behoud sector_bedrijf omdat dit niet via API wordt geüpdatet
-            sector_bedrijf: document.getElementById('sectorInput').value,
+            sector_bedrijf: result.bedrijf?.sector_bedrijf.charAt(0).toUpperCase() + result.bedrijf?.sector_bedrijf.slice(1) || bedrijfData.sector_bedrijf,
             profiel_foto_key:
               result.bedrijf?.profiel_foto_key || bedrijfData.profiel_foto_key,
             profiel_foto_url:
