@@ -3544,6 +3544,11 @@ body.darkmode .status-final {
   color: #23262b !important;
 }
 
+body.darkmode .bedrijf-details h4,
+body.darkmode .student-details h4 {
+    color: #e5e5e5 !important;
+}
+
 .sector {
   margin: 0;
   font-size: 0.85rem;
@@ -3885,3 +3890,14 @@ body.darkmode .legend-label {
   color: #ddd !important;
 }
 
+body.darkmode .speeddates-header h2 {
+  color: #eafcff9c;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+body.darkmode .tijd-lokaal p {
+    margin: 0 0 4px 0;
+    font-size: 0.9rem;
+    color: #a9a9a9;
+}
