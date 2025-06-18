@@ -3,6 +3,8 @@ import '../../css/consolidated-style.css';
 import Router from '../../router.js';
 import { registerCompany } from '../../utils/data-api.js';
 
+import { previousData } from '../register.js';
+
 let fileKey = null;
 
 export function renderBedrijfRegister(rootElement) {
@@ -162,8 +164,6 @@ async function handleBedrijfRegister(event) {
   const errorLabel = document.getElementById('error-label');
   errorLabel.style.display = 'none';
 
-  // Get previously stored email and password from localStorage
-  const previousData = JSON.parse(localStorage.getItem('userData')) || {};
 
   // Validate required fields
   const bedrijfnaam = formData.get('bedrijfnaam');
@@ -213,7 +213,6 @@ async function handleBedrijfRegister(event) {
     console.log('Bedrijf registratie succesvol:', result);
 
     // Clear stored user data
-    localStorage.removeItem('userData');
 
     alert('Je bedrijf account is succesvol aangemaakt! Je kunt nu inloggen.');
     Router.navigate('/login');

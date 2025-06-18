@@ -5,6 +5,8 @@ import { renderLogin } from './login.js';
 import hideIcon from '../icons/hide.png';
 import eyeIcon from '../icons/eye.png';
 
+export let previousData = null;
+
 export function renderRegister(rootElement) {
   rootElement.innerHTML = `
     <div class="register-container">
@@ -174,8 +176,7 @@ function handleRegister(event) {
     return;
   }
 
-  // Store data securely in localStorage
-  localStorage.setItem('userData', JSON.stringify(data));
+  previousData = data;
 
   // Data naar server sturen (voorbeeld)
   if (formData.get('rol') === 'student') {

@@ -2741,7 +2741,7 @@ body.darkmode .student-profile-footer a:hover {
 .opleiding-select {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
   background-color: white;
@@ -2819,17 +2819,18 @@ body.darkmode .student-profile-footer a:hover {
 }
 
 .speeddates-modal-content {
-  background-color: #8b4a6b; /* Existing color from admin-style.css */
+  background-color: #2c3e50; /* Donkere achtergrond in plaats van #8b4a6b */
+  border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   width: 90%;
-  max-width: 500px;
+  max-width: 600px;
   max-height: 80vh;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .speeddates-modal-header {
-  background-color: #8b4a6b; /* Existing color */
+  background-color: #34495e; /* Donkere header */
   color: white;
   padding: 1.5rem;
   display: flex;
@@ -2865,7 +2866,7 @@ body.darkmode .student-profile-footer a:hover {
 }
 
 .speeddates-modal-body {
-  background-color: #8b4a6b; /* Existing color */
+  background-color: #2c3e50; /* Donkere body om consistent te zijn */
   padding: 1.5rem;
   max-height: 400px; /* Consider adjusting if needed */
   overflow-y: auto;
@@ -2875,20 +2876,23 @@ body.darkmode .student-profile-footer a:hover {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 50px; /* Ensure minimum height even when empty */
 }
 
 .speeddate-item {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 8px;
   padding: 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: background-color 0.2s ease;
+  margin-bottom: 8px;
 }
 
-.speeddate-item:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+/* Zorg ervoor dat alle child elementen geen witte achtergrond hebben, behalve buttons */
+.speeddate-item *:not(button) {
+  background: transparent !important;
 }
 
 .speeddate-info {
@@ -2896,25 +2900,31 @@ body.darkmode .student-profile-footer a:hover {
   gap: 20px;
   align-items: center;
   flex: 1;
+  background-color: transparent; /* Zorg ervoor dat er geen witte achtergrond is */
 }
 
 .speeddate-time {
-  color: white;
-  font-weight: 600;
+  color: #3498db; /* Blauwe kleur */
+  font-weight: 700;
   font-size: 1rem;
-  min-width: 60px;
+  min-width: 120px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  background: transparent !important; /* Force transparent background */
 }
 
 .speeddate-company,
 .speeddate-student {
   /* Combined as they share styles */
-  color: white;
+  color: #2980b9; /* Iets donkerder blauw */
   font-size: 1rem;
+  font-weight: 500;
   flex: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  background: transparent !important; /* Force transparent background */
 }
 
 .speeddate-cancel-btn {
-  background-color: #dc3545;
+  background-color: #dc3545 !important; /* Force rode achtergrond */
   color: white;
   border: none;
   width: 30px;
@@ -2930,15 +2940,26 @@ body.darkmode .student-profile-footer a:hover {
 }
 
 .speeddate-cancel-btn:hover {
-  background-color: #c82333;
+  background-color: #c82333 !important; /* Force donkerder rood bij hover */
   transform: scale(1.1);
 }
 
 .no-speeddates {
   text-align: center;
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
   font-style: italic;
   padding: 2rem;
+  font-size: 1.1rem;
+}
+
+.speeddates-list .error {
+  text-align: center;
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 8px;
+  padding: 1.5rem;
+  font-size: 1rem;
 }
 
 /* Student avatar in speeddate requests table */
@@ -3735,12 +3756,44 @@ body.darkmode .status-final {
   color: #0077b5;
 }
 
-/* Responsive voor werktype */
-@media (max-width: 768px) {
-  .werktype-container {
-    flex-direction: column;
-    gap: 10px;
-  }
+/* =============================================================================
+   404 NOT FOUND PAGE STYLING
+   ============================================================================= */
+
+/* 404 Page - Simple and Clean */
+.not-found-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.not-found-content h1 {
+  font-size: 4rem;
+  font-weight: 300;
+  color: #666;
+  margin: 0 0 1rem 0;
+}
+
+.not-found-content p {
+  font-size: 1.2rem;
+  color: #888;
+  margin: 0 0 2rem 0;
+}
+
+.not-found-content a {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.not-found-content a:hover {
+  border-bottom-color: #007bff;
 }
 
 /* DARK MODE voor bedrijf profiel */

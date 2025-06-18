@@ -3,6 +3,8 @@ import '../../css/consolidated-style.css';
 import Router from '../../router.js';
 import { apiGet, apiPost } from '../../utils/api.js';
 
+import { mergedData } from './student-register.js';
+
 export function renderStudentOpleiding(rootElement) {
   rootElement.innerHTML = `
     <div style="min-height: 100vh; display: flex; flex-direction: column; background-color: #f7f9fb;">
@@ -173,12 +175,11 @@ async function handleJaarRegister(event) {
     errorLabel.style.display = 'block';
     return;
   }
-  const previousData = JSON.parse(localStorage.getItem('userData')) || {};
 
   // Format LinkedIn URL to match API expectations
   let linkedinValue = '';
-  if (previousData.linkedin && previousData.linkedin.trim() !== '') {
-    const linkedin = previousData.linkedin.trim();
+  if (mergedData.linkedin && mergedData.linkedin.trim() !== '') {
+    const linkedin = mergedData.linkedin.trim();
     // If it's a full URL, extract the path part
     if (linkedin.startsWith('https://www.linkedin.com/in/')) {
       linkedinValue = linkedin.replace('https://www.linkedin.com', '');
@@ -194,15 +195,15 @@ async function handleJaarRegister(event) {
     linkedinValue = '/in/profile'; // Default placeholder instead of full URL
   }
   const data = {
-    email: previousData.email || '',
-    password: previousData.password || '',
-    voornaam: previousData.voornaam || '',
-    achternaam: previousData.achternaam || '',
+    email: mergedData.email || '',
+    password: mergedData.password || '',
+    voornaam: mergedData.voornaam || '',
+    achternaam: mergedData.achternaam || '',
     linkedin: linkedinValue,
-    profiel_foto: previousData.profielFoto,
+    profiel_foto: mergedData.profielFoto,
     studiejaar: parseInt(jaar, 10),
     opleiding_id: parseInt(opleiding, 10),
-    date_of_birth: previousData.date_of_birth || '',
+    date_of_birth: mergedData.date_of_birth || '',
   };
 
   // Validate required fields before sending

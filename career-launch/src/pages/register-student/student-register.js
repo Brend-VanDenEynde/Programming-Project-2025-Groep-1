@@ -2,7 +2,13 @@ import { renderStudentOpleiding } from './student-opleiding.js';
 import '../../css/consolidated-style.css';
 import Router from '../../router.js';
 
+import { previousData } from '../register.js';
+
 let fileKey = null;
+
+export let mergedData = null;
+
+
 
 export function renderStudentRegister(rootElement) {
   rootElement.innerHTML = `
@@ -195,12 +201,7 @@ function handleNaamRegister(event) {
     return;
   }
 
-  const previousData = JSON.parse(localStorage.getItem('userData')) || {};
-
-  const mergedData = { ...previousData, ...currentData };
-
-  // Store merged data in localStorage
-  localStorage.setItem('userData', JSON.stringify(mergedData));
+  mergedData = { ...previousData, ...currentData };
 
   renderStudentOpleiding(document.getElementById('app'));
 }
