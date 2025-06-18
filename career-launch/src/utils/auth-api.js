@@ -8,11 +8,20 @@
 let refreshPromise = null;
 
 function getRefreshPromise() {
-  if (!refreshPromise) {
-    refreshPromise = refreshToken().finally(() => {
-      refreshPromise = null;
-    });
+  // Always return the same in-progress promise for all callers
+  if (refreshPromise) {
+    return refreshPromise;
   }
+  // Start a new refresh and clear the promise only after it settles
+  refreshPromise = refreshToken()
+    .then((result) => {
+      refreshPromise = null;
+      return result;
+    })
+    .catch((err) => {
+      refreshPromise = null;
+      throw err;
+    });
   return refreshPromise;
 }
 
@@ -373,13 +382,16 @@ export async function authenticatedFetch(url, options = {}) {
   const token = accessToken || authToken;
 
   // Prepare headers with authentication
-  const headers = {
-    'Content-Type': 'application/json',
+  let headers = {
     ...options.headers,
     ...(token && {
       Authorization: `Bearer ${token}`,
     }),
   };
+  // Only add default Content-Type if not already present
+  if (!headers['Content-Type'] && !headers['content-type']) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   // Make the initial API call
   const requestOptions = {
