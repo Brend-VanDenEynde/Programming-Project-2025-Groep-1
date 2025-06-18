@@ -587,9 +587,9 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
         <div class="logo-section">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
-        </div>
-        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
+        </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
         <ul id="burger-dropdown" class="bedrijf-profile-dropdown">
+          <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
@@ -597,7 +597,6 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
       
       <div class="bedrijf-profile-main">        <nav class="bedrijf-profile-sidebar">
           <ul>
-            <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
             <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
@@ -841,9 +840,6 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
       e.preventDefault();
       const route = e.currentTarget.getAttribute('data-route');
       switch (route) {
-        case 'profile':
-          Router.navigate('/bedrijf/bedrijf-profiel');
-          break;
         case 'search-criteria':
           Router.navigate('/bedrijf/zoek-criteria');
           break;
@@ -885,9 +881,20 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
     });
   }
 
+  // Profile button
+  document.getElementById('nav-profile')?.addEventListener('click', () => {
+    dropdown.classList.remove('open');
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/bedrijf/bedrijf-profiel');
+    });
+  });
+
   document.getElementById('nav-settings')?.addEventListener('click', () => {
     dropdown.classList.remove('open');
-    alert('Instellingen komen binnenkort');
+    import('./bedrijf-settings.js').then((module) => {
+      module.showBedrijfSettingsPopup();
+    });
   });
 
   document.getElementById('nav-logout')?.addEventListener('click', async () => {

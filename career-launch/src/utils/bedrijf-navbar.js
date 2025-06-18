@@ -8,20 +8,16 @@ export function createBedrijfNavbar(activeRoute = '') {
         <div class="logo-section">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
-        </div>
-        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
-        <ul id="burger-dropdown" class="bedrijf-profile-dropdown" style="display: none;">
+        </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
+        <ul id="burger-dropdown" class="bedrijf-profile-dropdown">
+          <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
       </header>
 
-      <div class="bedrijf-profile-main">
-        <nav class="bedrijf-profile-sidebar">
+      <div class="bedrijf-profile-main">        <nav class="bedrijf-profile-sidebar">
           <ul>
-            <li><button data-route="profile" class="sidebar-link ${
-              activeRoute === 'profile' ? 'active' : ''
-            }">Profiel</button></li>
             <li><button data-route="search-criteria" class="sidebar-link ${
               activeRoute === 'search-criteria' ? 'active' : ''
             }">Zoek-criteria</button></li>
@@ -69,10 +65,6 @@ export function setupBedrijfNavbarEvents() {
       import('../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
-          case 'profile':
-            console.log('Navigating to bedrijf profile...');
-            Router.navigate('/bedrijf/bedrijf-profiel');
-            break;
           case 'search-criteria':
             Router.navigate('/bedrijf/zoek-criteria');
             break;
@@ -89,22 +81,41 @@ export function setupBedrijfNavbarEvents() {
       });
     });
   });
-
   // Burger menu functionality
   const burger = document.getElementById('burger-menu');
   const dropdown = document.getElementById('burger-dropdown');
   if (burger && dropdown) {
+    dropdown.classList.remove('open');
     burger.addEventListener('click', (event) => {
       event.stopPropagation();
-      dropdown.style.display =
-        dropdown.style.display === 'block' ? 'none' : 'block';
+      if (!dropdown.classList.contains('open')) {
+        dropdown.classList.add('open');
+      } else {
+        dropdown.classList.remove('open');
+      }
     });
 
     // Close dropdown when clicking outside
     document.addEventListener('click', (event) => {
-      if (!dropdown.contains(event.target) && event.target !== burger) {
-        dropdown.style.display = 'none';
+      if (
+        dropdown.classList.contains('open') &&
+        !dropdown.contains(event.target) &&
+        event.target !== burger
+      ) {
+        dropdown.classList.remove('open');
       }
+    });
+  }
+
+  // Profile button
+  const profileButton = document.getElementById('nav-profile');
+  if (profileButton) {
+    profileButton.addEventListener('click', () => {
+      dropdown.classList.remove('open');
+      import('../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/bedrijf/bedrijf-profiel');
+      });
     });
   }
 
@@ -112,8 +123,9 @@ export function setupBedrijfNavbarEvents() {
   const settingsButton = document.getElementById('nav-settings');
   if (settingsButton) {
     settingsButton.addEventListener('click', () => {
+      dropdown.classList.remove('open');
       import('../pages/bedrijf/bedrijf-settings.js').then((module) => {
-        module.showSettingsPopup();
+        module.showBedrijfSettingsPopup();
       });
     });
   }

@@ -600,6 +600,9 @@ a:hover {
 }
 
 .student-profile-avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
   margin-bottom: 1.5rem;
 }
@@ -612,6 +615,14 @@ a:hover {
   box-shadow: 0 2px 8px #0001;
   border: 3px solid #e1e5e9;
   background: #fff;
+}
+
+.student-profile-avatar-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  height: fit-content;
 }
 
 .student-profile-form-group {
@@ -2475,8 +2486,11 @@ body.darkmode .student-profile-footer a:hover {
 .delete-overlay {
   display: none;
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.45);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
   color: #fff;
   border-width: 0;
   font-size: 2.2rem;
@@ -3104,6 +3118,10 @@ body.darkmode .status-final {
   display: none;
 }
 
+.bedrijf-profile-dropdown.open {
+  display: block;
+}
+
 .bedrijf-profile-dropdown li {
   margin: 0;
 }
@@ -3194,6 +3212,10 @@ body.darkmode .status-final {
 }
 
 .bedrijf-profile-avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   margin-bottom: 1.5rem;
 }
@@ -3206,6 +3228,14 @@ body.darkmode .status-final {
   box-shadow: 0 2px 8px #0001;
   border: 3px solid #e1e5e9;
   background: #fff;
+}
+
+.bedrijf-profile-avatar-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  height: fit-content;
 }
 
 .bedrijf-profile-form-group {
@@ -3395,7 +3425,7 @@ body.darkmode .status-final {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .speeddate-item.goedgekeurd {
@@ -3414,7 +3444,8 @@ body.darkmode .status-final {
   flex-wrap: wrap;
 }
 
-.bedrijf-info, .student-info {
+.bedrijf-info,
+.student-info {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -3430,7 +3461,8 @@ body.darkmode .status-final {
   border: 2px solid #ddd;
 }
 
-.bedrijf-details h4, .student-details h4 {
+.bedrijf-details h4,
+.student-details h4 {
   margin: 0 0 4px 0;
   font-size: 1rem;
   color: #333;
@@ -3500,12 +3532,14 @@ body.darkmode .status-final {
   background: #218838;
 }
 
-.cancel-btn, .delete-btn {
+.cancel-btn,
+.delete-btn {
   background: #dc3545;
   color: white;
 }
 
-.cancel-btn:hover, .delete-btn:hover {
+.cancel-btn:hover,
+.delete-btn:hover {
   background: #c82333;
 }
 
@@ -3522,12 +3556,114 @@ body.darkmode .status-final {
     align-items: stretch;
     gap: 15px;
   }
-  
-  .bedrijf-info, .student-info, .afspraak-details {
+
+  .bedrijf-info,
+  .student-info,
+  .afspraak-details {
     min-width: auto;
   }
-  
+
   .speeddate-actions {
     justify-content: center;
   }
+}
+
+/* =============================================================================
+   SEARCH CRITERIA STYLING (SKILLS SYSTEM)
+   ============================================================================= */
+
+/* Skills input container */
+.skills-input-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.skills-input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+#skills-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+#skills-input:focus {
+  outline: none;
+  border-color: #0077b5;
+}
+
+/* Skills dropdown */
+.skills-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.skill-suggestion {
+  padding: 10px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.skill-suggestion:hover,
+.skill-suggestion.active {
+  background-color: #f5f5f5;
+}
+
+.skill-suggestion:last-child {
+  border-bottom: none;
+}
+
+/* Selected skills container */
+.selected-skills {
+  margin-top: 10px;
+}
+
+.no-skills {
+  color: #666;
+  font-style: italic;
+}
+
+/* Skills list */
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Individual skill tags */
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  background-color: #0077b5;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  gap: 5px;
+}
+
+/* Remove skill button */
+.remove-skill {
+  background: none;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  margin-left: 5px;
 }

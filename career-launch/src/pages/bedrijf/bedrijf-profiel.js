@@ -7,20 +7,27 @@ import {
 } from '../../utils/auth-api.js';
 import Router from '../../router.js';
 
+const BASE_AVATAR_URL = 'https://gt0kk4fbet.ufs.sh/f/';
+const DEFAULT_AVATAR_KEY = '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
+const DEFAULT_AVATAR_URL = BASE_AVATAR_URL + DEFAULT_AVATAR_KEY;
+
 // Default bedrijf profiel data (using API field names)
 const defaultBedrijfProfile = {
   contact_email: '',
   naam: '',
-  profiel_foto_url: defaultLogo,
+  profiel_foto_key: DEFAULT_AVATAR_KEY,
+  profiel_foto_url: DEFAULT_AVATAR_URL,
   plaats: '',
   linkedin: '',
   sector_bedrijf: '',
 };
 
+// Haal de token altijd dynamisch op binnen event handlers of functies waar nodig
+
 function getBedrijfLogoUrl(foto) {
-  if (!foto || foto === 'null') return defaultLogo;
+  if (!foto || foto === 'null') return DEFAULT_AVATAR_URL;
   if (foto.startsWith('http')) return foto;
-  return 'https://gt0kk4fbet.ufs.sh/f/' + foto;
+  return BASE_AVATAR_URL + foto;
 }
 
 export async function renderBedrijfProfiel(
@@ -33,17 +40,17 @@ export async function renderBedrijfProfiel(
     try {
       const stored = window.sessionStorage.getItem('bedrijfData');
       if (stored) bedrijfData = JSON.parse(stored);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // Probeer echte data van de API op te halen als geen data beschikbaar is
   if (!bedrijfData || Object.keys(bedrijfData).length === 0) {
     try {
       const userInfoResult = await fetchUserInfo();
-      if (userInfoResult.success && userInfoResult.user) {
+      if (userInfoResult.success) {
         const apiUser = userInfoResult.user;
         // Log de ruwe API data voor debugging
-        console.log('Raw API user data:', apiUser);
+        console.log('Raw API user data:', userInfoResult);
         console.log('USER OBJECT:', apiUser); // Map API data naar bedrijf profiel velden (gebruik API veldnamen)
         bedrijfData = {
           id: apiUser.id || apiUser.gebruiker_id,
@@ -53,6 +60,7 @@ export async function renderBedrijfProfiel(
             apiUser.bedrijfsnaam ||
             apiUser.company_name ||
             'Mijn Bedrijf',
+          profiel_foto_key: apiUser.profiel_foto_key || apiUser.logo_key || DEFAULT_AVATAR_KEY,
           profiel_foto_url:
             apiUser.profiel_foto_url || apiUser.logo_url || defaultLogo,
           plaats: apiUser.plaats || apiUser.locatie || apiUser.location || '',
@@ -75,7 +83,8 @@ export async function renderBedrijfProfiel(
         bedrijfData = {
           contact_email: 'info@techcorp.be',
           naam: 'TechCorp Belgium',
-          profiel_foto_url: defaultLogo,
+          profiel_foto_key: DEFAULT_AVATAR_KEY,
+          profiel_foto_url: DEFAULT_AVATAR_URL,
           plaats: 'Brussel',
           linkedin: 'https://www.linkedin.com/company/techcorp-belgium',
           sector_bedrijf: 'IT & Technology',
@@ -87,7 +96,8 @@ export async function renderBedrijfProfiel(
       bedrijfData = {
         contact_email: 'info@techcorp.be',
         naam: 'TechCorp Belgium',
-        profiel_foto_url: defaultLogo,
+        profiel_foto_key: DEFAULT_AVATAR_KEY,
+        profiel_foto_url: DEFAULT_AVATAR_URL,
         plaats: 'Brussel',
         linkedin: 'https://www.linkedin.com/company/techcorp-belgium',
         sector_bedrijf: 'IT & Technology',
@@ -97,14 +107,15 @@ export async function renderBedrijfProfiel(
   const {
     contact_email = defaultBedrijfProfile.contact_email,
     naam = defaultBedrijfProfile.naam,
-    profiel_foto_url: rawFoto = defaultBedrijfProfile.profiel_foto_url,
+    profiel_foto_key = defaultBedrijfProfile.profiel_foto_key,
+    profiel_foto_url = defaultBedrijfProfile.profiel_foto_url,
     plaats = defaultBedrijfProfile.plaats,
     linkedin = defaultBedrijfProfile.linkedin,
     sector_bedrijf = defaultBedrijfProfile.sector_bedrijf,
   } = bedrijfData;
 
   // Gebruik default als foto null, leeg of undefined is
-  const foto = getBedrijfLogoUrl(rawFoto);
+  const foto = getBedrijfLogoUrl(profiel_foto_key);
 
   rootElement.innerHTML = `
     <div class="bedrijf-profile-container">
@@ -112,18 +123,16 @@ export async function renderBedrijfProfiel(
         <div class="logo-section">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
-        </div>
-        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
+        </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
         <ul id="burger-dropdown" class="bedrijf-profile-dropdown">
+          <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
       </header>
       
-      <div class="bedrijf-profile-main">
-        <nav class="bedrijf-profile-sidebar">
+      <div class="bedrijf-profile-main">        <nav class="bedrijf-profile-sidebar">
           <ul>
-            <li><button data-route="profile" class="sidebar-link active">Profiel</button></li>
             <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
             <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
@@ -133,13 +142,17 @@ export async function renderBedrijfProfiel(
         <div class="bedrijf-profile-content">
           <div class="bedrijf-profile-form-container">
             <h1 class="bedrijf-profile-title">Bedrijf Profiel</h1>
-            <form id="bedrijfProfileForm" class="bedrijf-profile-form" autocomplete="off" enctype="multipart/form-data">              <div class="bedrijf-profile-avatar-section">
-                <img 
-                  src="${foto}" 
-                  alt="Logo ${naam}" 
-                  id="logo-preview"
-                  class="bedrijf-profile-avatar"
-                />
+            <form id="bedrijfProfileForm" class="bedrijf-profile-form" autocomplete="off" enctype="multipart/form-data">
+              <div class="bedrijf-profile-avatar-section">
+                <div class="bedrijf-profile-avatar-div" style="position:relative;">
+                  <img
+                    src="${foto}"
+                    alt="Logo ${naam}"
+                    id="logo-preview"
+                    class="bedrijf-profile-avatar"
+                  />
+                  <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
+                </div>
                 <input type="file" accept="image/*" id="logoInput" style="display:${
                   readonlyMode ? 'none' : 'block'
                 };margin-top:10px;">
@@ -168,7 +181,7 @@ export async function renderBedrijfProfiel(
               
               <div class="bedrijf-profile-form-group">
                 <label for="linkedinInput">LinkedIn</label>
-                <input type="url" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/company/bedrijf" ${
+                <input type="url" id="linkedinInput" value="${linkedin ? linkedin : ''}" placeholder="https://www.linkedin.com/company/bedrijf" ${
     readonlyMode ? 'disabled' : ''
   }>
               </div>
@@ -232,10 +245,18 @@ export async function renderBedrijfProfiel(
     });
   }
 
+  // Profile button
+  document.getElementById('nav-profile')?.addEventListener('click', () => {
+    dropdown.classList.remove('open');
+    Router.navigate('/bedrijf/bedrijf-profiel');
+  });
+
   // Settings en logout
   document.getElementById('nav-settings')?.addEventListener('click', () => {
     dropdown.classList.remove('open');
-    alert('Instellingen komen binnenkort');
+    import('./bedrijf-settings.js').then((module) => {
+      module.showBedrijfSettingsPopup();
+    });
   });
 
   document.getElementById('nav-logout')?.addEventListener('click', async () => {
@@ -272,6 +293,33 @@ export async function renderBedrijfProfiel(
       renderBedrijfProfiel(rootElement, bedrijfData, false);
     });
   }
+
+  // Delete overlay voor profielfoto
+    const profileAvatar = document.querySelector('.bedrijf-profile-avatar-div');
+    const photoInput = document.getElementById('logoInput');
+    const deleteOverlay = document.querySelector('.delete-overlay');
+    const bedrijfAvatar = document.getElementById('logo-preview');
+
+    let deleteProfilePicture = false;
+    let savedProfilePicture = bedrijfAvatar.src; // Bewaar de originele profielfoto URL
+
+    profileAvatar.addEventListener('mouseenter', () => {
+      if (!readonlyMode && !deleteProfilePicture && bedrijfAvatar.src !== DEFAULT_AVATAR_URL) {
+        deleteOverlay.style.display = 'flex';
+      }
+    });
+    profileAvatar.addEventListener('mouseleave', () => {
+      deleteOverlay.style.display = 'none';
+    });
+
+    deleteOverlay.addEventListener('click', async (e) => {
+      if (!readonlyMode && bedrijfAvatar.src !== DEFAULT_AVATAR_URL) {
+        photoInput.value = ''; // Reset file input
+        bedrijfAvatar.src = DEFAULT_AVATAR_URL; // Reset to default avatar
+        deleteProfilePicture = true; // Set flag to delete profile picture
+      }
+    });
+
   // SAVE knop
   const saveBtn = document.getElementById('btn-save-bedrijf');
   if (saveBtn) {
@@ -280,11 +328,24 @@ export async function renderBedrijfProfiel(
 
       try {
         // Verzamel form data met API veldnamen (alleen velden die de API accepteert)
+        let linkedinInput = document.getElementById('linkedinInput').value;
+        let linkedinValue = null;
+        if (linkedinInput && linkedinInput.trim() !== '') {
+          linkedinInput = linkedinInput.trim();
+          // Remove both 'https://www.linkedin.com' and 'https://linkedin.com' from the start
+          linkedinInput = linkedinInput.replace(/^(https?:\/\/)?(www\.)?linkedin\.com/i, '');
+          // Accept if it starts with '/company/'
+          if (linkedinInput.startsWith('/company/')) {
+            linkedinValue = linkedinInput;
+          } else {
+            linkedinValue = null;
+          }
+        }
         const updateData = {
           naam: document.getElementById('bedrijfsnaamInput').value,
           contact_email: document.getElementById('emailInput').value,
           plaats: document.getElementById('plaatsInput').value,
-          linkedin: document.getElementById('linkedinInput').value,
+          linkedin: linkedinValue,
           // sector_bedrijf wordt niet geaccepteerd door de API, dus weggelaten
         }; // Haal het bedrijf ID op uit de huidige data
         const bedrijfID = bedrijfData.id || bedrijfData.gebruiker_id;
@@ -307,8 +368,68 @@ export async function renderBedrijfProfiel(
           updateData
         );
 
+        // Voeg de profiel foto toe als deze is gewijzigd
+        let profielFotoKey = null;
+          if (bedrijfData.profiel_foto_url && typeof bedrijfData.profiel_foto_url === 'string' && !deleteProfilePicture) {
+            if (bedrijfData.profiel_foto_url.startsWith('http')) {
+              const parts = bedrijfData.profiel_foto_url.split('/');
+              profielFotoKey = parts[parts.length - 1];
+            } else if (bedrijfData.profiel_foto_url !== 'null') {
+              profielFotoKey = bedrijfData.profiel_foto_url;
+            }
+          }
+          if (deleteProfilePicture && savedProfilePicture && savedProfilePicture !== DEFAULT_AVATAR_URL) {
+            // remove https://gt0kk4fbet.ufs.sh/f/ prefix if present
+            profielFotoKey = savedProfilePicture.replace(BASE_AVATAR_URL, '');
+            const currentToken = window.sessionStorage.getItem('authToken');
+            const deleteResp = await fetch(`https://api.ehb-match.me/profielfotos/${profielFotoKey}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': 'Bearer ' + currentToken,
+              },
+            });
+            console.log('Profielfoto verwijderd:', deleteResp);
+            profielFotoKey = DEFAULT_AVATAR_KEY; // Reset de profielfoto key
+          }
+          const photoInput = document.getElementById('logoInput');
+          if (photoInput && photoInput.files && photoInput.files.length > 0) {
+            const file = photoInput.files[0];
+            // Controleer bestandstype en grootte
+            if (!file.type.match(/^image\/(jpeg|png|gif)$/)) {
+              alert('Ongeldig bestandstype. Kies een jpg, png of gif afbeelding.');
+              return;
+            }
+            if (file.size > 2 * 1024 * 1024) {
+              alert('Bestand is te groot. Maximaal 2 MB toegestaan.');
+              return;
+            }
+            // Gebruik altijd 'image' als veldnaam
+            const fileForm = new FormData();
+            fileForm.append('image', file);
+            const currentToken = window.sessionStorage.getItem('authToken');
+            const uploadResp = await fetch('https://api.ehb-match.me/profielfotos', {
+              method: 'POST',
+              headers: {
+                'Authorization': 'Bearer ' + currentToken,
+              },
+              body: fileForm,
+            });
+            if (!uploadResp.ok) {
+              const errText = await uploadResp.text();
+              console.error('Upload response for key "image":', errText);
+              throw new Error('Foto uploaden mislukt: ' + errText);
+            }
+            const uploadResult = await uploadResp.json();
+            profielFotoKey = uploadResult.profiel_foto_key;
+          }
+          console.log('Stuur profielfoto key:', profielFotoKey);
+
+          updateData.profiel_foto = profielFotoKey || DEFAULT_AVATAR_KEY; // Voeg de profielfoto key toe als deze bestaat
+          console.log('Final update data:', updateData);
+
         // Roep de API aan om het bedrijf bij te werken
         const result = await updateBedrijfProfile(bedrijfID, updateData);
+
 
         if (result.success) {
           alert('Bedrijfsprofiel succesvol opgeslagen!');
@@ -318,6 +439,8 @@ export async function renderBedrijfProfiel(
             ...updateData,
             // Behoud sector_bedrijf omdat dit niet via API wordt geüpdatet
             sector_bedrijf: document.getElementById('sectorInput').value,
+            profiel_foto_key:
+              result.bedrijf?.profiel_foto_key || bedrijfData.profiel_foto_key,
             profiel_foto_url:
               result.bedrijf?.profiel_foto_url || bedrijfData.profiel_foto_url,
           };
@@ -365,9 +488,6 @@ export async function renderBedrijfProfiel(
       e.preventDefault();
       const route = e.currentTarget.getAttribute('data-route');
       switch (route) {
-        case 'profile':
-          Router.navigate('/bedrijf/bedrijf-profiel');
-          break;
         case 'search-criteria':
           Router.navigate('/bedrijf/zoek-criteria');
           break;

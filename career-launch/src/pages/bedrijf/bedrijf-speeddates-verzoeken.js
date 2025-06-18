@@ -205,13 +205,16 @@ async function deleteSpeeddate(afspraakId) {
   }
 
   try {
-    const response = await fetch(`https://api.ehb-match.me/speeddates/reject/${afspraakId}`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
+    const response = await fetch(
+      `https://api.ehb-match.me/speeddates/reject/${afspraakId}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       }
-    });
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -222,7 +225,6 @@ async function deleteSpeeddate(afspraakId) {
     // Herlaad de data na succesvolle afwijzing
     await loadPendingSpeeddateData();
     alert('Speeddate succesvol verwijderd!');
-
   } catch (error) {
     console.error('Fout bij afwijzen van speeddate:', error);
     alert('Er is een fout opgetreden bij het afwijzen van de speeddate.');
@@ -289,18 +291,16 @@ export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
         <div class="logo-section">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
-        </div>
-        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
-        <ul id="burger-dropdown" class="bedrijf-profile-dropdown" style="display: none;">
+        </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
+        <ul id="burger-dropdown" class="bedrijf-profile-dropdown">
+          <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
           <li><button id="nav-logout">Log out</button></li>
         </ul>
       </header>
       
-      <div class="bedrijf-profile-main">
-        <nav class="bedrijf-profile-sidebar">
+      <div class="bedrijf-profile-main">        <nav class="bedrijf-profile-sidebar">
           <ul>
-            <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
             <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>            <li><button data-route="requests" class="sidebar-link active">Speeddates-verzoeken</button></li>
             <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
@@ -336,9 +336,6 @@ export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
       import('../../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
-          case 'profile':
-            Router.navigate('/bedrijf/bedrijf-profiel');
-            break;
           case 'search-criteria':
             Router.navigate('/bedrijf/zoek-criteria');
             break;
@@ -355,31 +352,49 @@ export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
       });
     });
   });
-
   // Burger menu and other functionality
   const burger = document.getElementById('burger-menu');
   const dropdown = document.getElementById('burger-dropdown');
   if (burger && dropdown) {
+    dropdown.classList.remove('open');
     burger.addEventListener('click', (event) => {
       event.stopPropagation();
-      dropdown.style.display =
-        dropdown.style.display === 'block' ? 'none' : 'block';
+      if (!dropdown.classList.contains('open')) {
+        dropdown.classList.add('open');
+      } else {
+        dropdown.classList.remove('open');
+      }
     });
 
     document.addEventListener('click', (event) => {
-      if (!dropdown.contains(event.target) && event.target !== burger) {
-        dropdown.style.display = 'none';
+      if (
+        dropdown.classList.contains('open') &&
+        !dropdown.contains(event.target) &&
+        event.target !== burger
+      ) {
+        dropdown.classList.remove('open');
       }
     });
   }
 
+  // Profile button
+  document.getElementById('nav-profile')?.addEventListener('click', () => {
+    dropdown.classList.remove('open');
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/bedrijf/bedrijf-profiel');
+    });
+  });
+
   document.getElementById('nav-settings')?.addEventListener('click', () => {
-    dropdown.style.display = 'none';
-    alert('Instellingen komen binnenkort');
+    dropdown.classList.remove('open');
+    import('./bedrijf-settings.js').then((module) => {
+      module.showBedrijfSettingsPopup();
+    });
   });
 
   document.getElementById('nav-logout')?.addEventListener('click', () => {
-    dropdown.style.display = 'none';
+    dropdown.classList.remove('open');
     import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/');
