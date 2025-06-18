@@ -1,4 +1,5 @@
 import logoIcon from '../../icons/favicon-32x32.png';
+import { authenticatedFetch } from '../../utils/auth-api.js';
 
 // Functie om pending speeddate data op te halen van de API
 async function fetchPendingSpeeddateData(bedrijfId, token) {
@@ -9,7 +10,7 @@ async function fetchPendingSpeeddateData(bedrijfId, token) {
   };
 
   try {
-    const response = await fetch(url, { headers });
+    const response = await authenticatedFetch(url, { headers });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -149,7 +150,7 @@ async function acceptSpeeddate(afspraakId) {
   }
 
   try {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `https://api.ehb-match.me/speeddates/accept/${afspraakId}`,
       {
         method: 'POST',
@@ -193,7 +194,7 @@ async function deleteSpeeddate(afspraakId) {
   }
 
   try {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `https://api.ehb-match.me/speeddates/reject/${afspraakId}`,
       {
         method: 'POST',

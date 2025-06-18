@@ -1,6 +1,6 @@
 // Admin ingeschreven bedrijven pagina
 import Router from '../../router.js';
-import { logoutUser } from '../../utils/auth-api.js';
+import { authenticatedFetch, logoutUser } from '../../utils/auth-api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 
 export async function renderAdminIngeschrevenBedrijven(rootElement) {
@@ -107,7 +107,7 @@ export async function renderAdminIngeschrevenBedrijven(rootElement) {
   let allCompanies = []; // Store all companies for filtering
 
   try {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       'https://api.ehb-match.me/bedrijven/goedgekeurd',
       {
         method: 'GET',

@@ -1,7 +1,7 @@
 // Admin student detail pagina
 import Router from '../../router.js';
 import defaultAvatar from '../../images/default.png';
-import { performLogout, logoutUser } from '../../utils/auth-api.js';
+import { performLogout, logoutUser, authenticatedFetch } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 
@@ -100,7 +100,7 @@ export async function renderAdminStudentDetail(rootElement) {
   const accessToken = sessionStorage.getItem('accessToken');
   try {
     // Fetch fresh data from the API
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `https://api.ehb-match.me/studenten/${studentId}`,
       {
         method: 'GET',
@@ -248,7 +248,7 @@ async function openSpeedDatesModal() {
   try {
     // Fetch speeddates data from API with student ID
     const accessToken = sessionStorage.getItem('accessToken');
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `https://api.ehb-match.me/speeddates?id=${studentId}`,
       {
         method: 'GET',

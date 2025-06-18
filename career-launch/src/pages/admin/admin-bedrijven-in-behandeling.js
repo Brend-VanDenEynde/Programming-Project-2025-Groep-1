@@ -1,6 +1,6 @@
 // Admin bedrijven in behandeling pagina
 import Router from '../../router.js';
-import { logoutUser } from '../../utils/auth-api.js';
+import { authenticatedFetch, logoutUser } from '../../utils/auth-api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 
 export async function renderAdminBedrijvenInBehandeling(rootElement) {
@@ -56,7 +56,7 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
   // Fetch unapproved companies from API
   const accessToken = sessionStorage.getItem('accessToken');
   try {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       'https://api.ehb-match.me/bedrijven/nietgoedgekeurd',
       {
         method: 'GET',
@@ -198,7 +198,7 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
 
           // Call the API to approve the company
           const accessToken = sessionStorage.getItem('accessToken');
-          const response = await fetch(
+          const response = await authenticatedFetch(
             `https://api.ehb-match.me/bedrijven/keur/${companyId}`,
             {
               method: 'POST',
@@ -288,7 +288,7 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
 
           // Call the DELETE user endpoint to reject/delete the company
           const accessToken = sessionStorage.getItem('accessToken');
-          const response = await fetch(
+          const response = await authenticatedFetch(
             `https://api.ehb-match.me/user/${companyId}`,
             {
               method: 'DELETE',

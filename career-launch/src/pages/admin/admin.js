@@ -1,5 +1,6 @@
 // Admin login pagina
 import Router from '../../router.js';
+import { authenticatedFetch } from '../../utils/auth-api.js';
 
 export function renderAdmin(rootElement) {
   rootElement.innerHTML = `
@@ -43,7 +44,7 @@ export function renderAdmin(rootElement) {
 
     try {
       // Make API call
-      const response = await fetch('https://api.ehb-match.me/auth/login', {
+      const response = await authenticatedFetch('https://api.ehb-match.me/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +75,7 @@ export function renderAdmin(rootElement) {
         sessionStorage.setItem('adminLoggedIn', 'true');
 
         // Make GET request to fetch additional info
-        const infoResponse = await fetch('https://api.ehb-match.me/auth/info', {
+        const infoResponse = await authenticatedFetch('https://api.ehb-match.me/auth/info', {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${responseData.accessToken}`,

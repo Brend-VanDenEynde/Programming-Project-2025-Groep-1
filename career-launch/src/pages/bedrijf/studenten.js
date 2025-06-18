@@ -1,6 +1,6 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import defaultStudentAvatar from '../../images/default.png';
-import { logoutUser, fetchUserInfo } from '../../utils/auth-api.js';
+import { logoutUser, fetchUserInfo, authenticatedFetch } from '../../utils/auth-api.js';
 import {
   fetchDiscoverStudenten,
   createSpeeddate,
@@ -256,18 +256,18 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
       studentPending,
       companyPending,
     ] = await Promise.all([
-      fetch(
+      authenticatedFetch(
         `https://api.ehb-match.me/speeddates/user/${studentId}/unavailable`,
         { headers: { Authorization: `Bearer ${token}` } }
       ).then((r) => (r.ok ? r.json() : [])),
-      fetch(
+      authenticatedFetch(
         `https://api.ehb-match.me/speeddates/user/${bedrijfId}/unavailable`,
         { headers: { Authorization: `Bearer ${token}` } }
       ).then((r) => (r.ok ? r.json() : [])),
-      fetch(`https://api.ehb-match.me/speeddates/pending?id=${studentId}`, {
+      authenticatedFetch(`https://api.ehb-match.me/speeddates/pending?id=${studentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       }).then((r) => (r.ok ? r.json() : [])),
-      fetch(`https://api.ehb-match.me/speeddates/pending?id=${bedrijfId}`, {
+      authenticatedFetch(`https://api.ehb-match.me/speeddates/pending?id=${bedrijfId}`, {
         headers: { Authorization: `Bearer ${token}` },
       }).then((r) => (r.ok ? r.json() : [])),
     ]);

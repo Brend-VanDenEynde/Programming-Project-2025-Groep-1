@@ -3,7 +3,7 @@ import { showSettingsPopup } from './student-settings.js';
 import logoIcon from '../../icons/favicon-32x32.png';
 import { getOpleidingNaamById, opleidingen } from './student-opleidingen.js';
 import defaultAvatar from '../../images/default.png';
-import { logoutUser } from '../../utils/auth-api.js';
+import { authenticatedFetch, logoutUser } from '../../utils/auth-api.js';
 import { renderBedrijven } from './bedrijven.js';
 
 const defaultProfile = {
@@ -409,14 +409,10 @@ export function renderStudentProfiel(
           if (nieuweEmail && nieuweEmail !== oudeEmail) {
 
             console.debug('PUT /user/' + userID, { email: nieuweEmail });
-            const respUser = await fetch(
+            const respUser = await authenticatedFetch(
               `https://api.ehb-match.me/user/${userID}`,
               {
                 method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: 'Bearer ' + token,
-                },
                 body: JSON.stringify({ email: nieuweEmail }),
               }
             );
@@ -458,11 +454,8 @@ export function renderStudentProfiel(
             // Gebruik altijd 'image' als veldnaam
             const fileForm = new FormData();
             fileForm.append('image', file);
-            const uploadResp = await fetch('https://api.ehb-match.me/profielfotos', {
+            const uploadResp = await authenticatedFetch('https://api.ehb-match.me/profielfotos', {
               method: 'POST',
-              headers: {
-                'Authorization': 'Bearer ' + token,
-              },
               body: fileForm,
             });
             if (!uploadResp.ok) {
@@ -485,12 +478,8 @@ export function renderStudentProfiel(
             profiel_foto: profielFotoKey
           };
           console.log("Payload met profielfoto key:", payload);
-          const respStudent = await fetch(`https://api.ehb-match.me/studenten/${studentID}`, {
+          const respStudent = await authenticatedFetch(`https://api.ehb-match.me/studenten/${studentID}`, {
             method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + token,
-            },
             body: JSON.stringify(payload),
           });
 
@@ -574,17 +563,13 @@ export async function fetchAndStoreStudentProfile() {
   const token = sessionStorage.getItem('authToken');
   if (!token) throw new Error('Geen authToken gevonden');
   // 1. Haal user-info op (voor email en userID)
-  const respUser = await fetch('https://api.ehb-match.me/auth/info', {
-    headers: { Authorization: 'Bearer ' + token },
-  });
+  const respUser = await authenticatedFetch('https://api.ehb-match.me/auth/info');
   if (!respUser.ok) throw new Error('Kan user-info niet ophalen');
   const userResult = await respUser.json();
   const user = userResult.user;
   if (!user || !user.id) throw new Error('User info onvolledig');
   // 2. Haal alle studenten op en zoek juiste student
-  const respStudents = await fetch('https://api.ehb-match.me/studenten', {
-    headers: { Authorization: 'Bearer ' + token },
-  });
+  const respStudents = await authenticatedFetch('https://api.ehb-match.me/studenten');
   if (!respStudents.ok) throw new Error('Kan studentenlijst niet ophalen');
   const studenten = await respStudents.json();
   const student = studenten.find((s) => s.gebruiker_id === user.id);

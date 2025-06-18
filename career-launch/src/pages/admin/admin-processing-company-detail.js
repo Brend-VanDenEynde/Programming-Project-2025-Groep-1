@@ -1,6 +1,6 @@
 // Admin processing company detail pagina
 import Router from '../../router.js';
-import { performLogout, logoutUser } from '../../utils/auth-api.js';
+import { performLogout, logoutUser, authenticatedFetch } from '../../utils/auth-api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 import defaultCompanyLogo from '../../images/defaultlogo.webp';
 
@@ -102,7 +102,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
   // Fetch company data from API
   const accessToken = sessionStorage.getItem('accessToken');
   try {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `https://api.ehb-match.me/bedrijven/${companyId}`,
       {
         method: 'GET',
@@ -162,7 +162,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
 
           // Call the API to approve the company
           const accessToken = sessionStorage.getItem('accessToken');
-          const response = await fetch(
+          const response = await authenticatedFetch(
             `https://api.ehb-match.me/bedrijven/keur/${companyId}`,
             {
               method: 'POST',
@@ -231,7 +231,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
 
           // Call the DELETE user endpoint to reject/delete the company
           const accessToken = sessionStorage.getItem('accessToken');
-          const response = await fetch(
+          const response = await authenticatedFetch(
             `https://api.ehb-match.me/user/${companyId}`,
             {
               method: 'DELETE',

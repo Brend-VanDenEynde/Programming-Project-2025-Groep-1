@@ -2,6 +2,7 @@ import Router from '../router.js';
 import { fetchAndStoreStudentProfile } from './student/student-profiel.js';
 import hideIcon from '../icons/hide.png';
 import eyeIcon from '../icons/eye.png';
+import { authenticatedFetch } from '../utils/auth-api.js';
 
 // Zet altijd light mode bij laden van login
 localStorage.setItem('darkmode', 'false');
@@ -103,10 +104,11 @@ async function loginUser(email, password) {
   const apiUrl = 'https://api.ehb-match.me/auth/login';
   const loginData = { email, password };
 
-  const response = await fetch(apiUrl, {
+  const response = await authenticatedFetch(apiUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(loginData),
+    credentials: 'include', // Include cookies in the request (for refresh token)
   });
 
   const data = await response.json();
@@ -121,7 +123,7 @@ async function loginUser(email, password) {
 
 async function fetchUserInfo(token) {
   const infoUrl = 'https://api.ehb-match.me/auth/info';
-  const response = await fetch(infoUrl, {
+  const response = await authenticatedFetch(infoUrl, {
     method: 'GET',
     headers: {
       Authorization: 'Bearer ' + token,

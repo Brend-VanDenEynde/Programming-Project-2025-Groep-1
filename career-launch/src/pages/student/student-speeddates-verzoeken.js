@@ -1,4 +1,5 @@
 import logoIcon from '../../icons/favicon-32x32.png';
+import { authenticatedFetch } from '../../utils/auth-api.js';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
 
@@ -9,25 +10,19 @@ async function fetchPendingSpeeddates() {
     renderLogin(document.body);
     return [];
   }
-  const resp = await fetch('https://api.ehb-match.me/speeddates/pending', {
-    headers: { Authorization: 'Bearer ' + token },
-  });
+  const resp = await authenticatedFetch('https://api.ehb-match.me/speeddates/pending');
   if (!resp.ok) throw new Error(`Fout bij ophalen: ${resp.status}`);
   return await resp.json();
 }
 async function acceptSpeeddate(id) {
-  const token = sessionStorage.getItem('authToken');
-  const resp = await fetch(`https://api.ehb-match.me/speeddates/accept/${id}`, {
+  const resp = await authenticatedFetch(`https://api.ehb-match.me/speeddates/accept/${id}`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
   });
   if (!resp.ok) throw new Error('Accepteren mislukt');
 }
 async function rejectSpeeddate(id) {
-  const token = sessionStorage.getItem('authToken');
-  const resp = await fetch(`https://api.ehb-match.me/speeddates/reject/${id}`, {
+  const resp = await authenticatedFetch(`https://api.ehb-match.me/speeddates/reject/${id}`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
   });
   if (!resp.ok) throw new Error('Weigeren mislukt');
 }
@@ -36,20 +31,14 @@ async function fetchFunctiesSkills(bedrijfId) {
   let functies = [];
   let skills = [];
   try {
-    const resFuncties = await fetch(
-      `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`,
-      {
-        headers: { Authorization: 'Bearer ' + token },
-      }
+    const resFuncties = await authenticatedFetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`
     );
     if (resFuncties.ok) functies = await resFuncties.json();
   } catch {}
   try {
-    const resSkills = await fetch(
-      `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`,
-      {
-        headers: { Authorization: 'Bearer ' + token },
-      }
+    const resSkills = await authenticatedFetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`
     );
     if (resSkills.ok) skills = await resSkills.json();
   } catch {}
