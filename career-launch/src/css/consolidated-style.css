@@ -3880,3 +3880,8 @@ body.darkmode .speeddate-item.pending {
   color: #eafcff !important;
   border-color: #2a2d33 !important;
 }
+
+body.darkmode .legend-label {
+  color: #ddd !important;
+}
+

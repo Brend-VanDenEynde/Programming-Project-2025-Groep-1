@@ -52,7 +52,7 @@ export function renderStudentRegister(rootElement) {
       }
     });
   }
-
+  
   // Footer links: gebruik alleen Router.navigate, geen hash of import, en selecteer alleen de lokale footer links
   const privacyLink = document.querySelector('.footer-links a[data-route="/privacy"]');
   if (privacyLink) {

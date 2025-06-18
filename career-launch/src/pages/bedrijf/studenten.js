@@ -619,7 +619,7 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
                 <!-- Color Legend section -->
                 <div style="flex:2;min-width:400px;">
                   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">
-                    <label style="font-weight:500;font-size:0.9rem;margin:0;color:#374151;">Match Percentage Legenda</label>
+                    <label id="legend-label" style="font-weight:500;font-size:0.9rem;margin:0;">Match Percentage Legenda</label>
                     <button id="toggle-legend" style="background:none;border:none;font-size:1rem;cursor:pointer;color:#6b7280;" title="Legenda in-/uitklappen">▼</button>
                   </div>
                   <div id="legend-content" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.6rem;">
