@@ -423,24 +423,45 @@ async function openSpeedDatesModal() {
           }" title="Annuleren">✕</button>
         `;
         speedDatesList.appendChild(speedDateItem);
-      });
-
-      // Add event listeners for cancel buttons
+      });      // Add event listeners for cancel buttons
       const cancelButtons = speedDatesList.querySelectorAll(
         '.speeddate-cancel-btn'
       );
       cancelButtons.forEach((btn) => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', async (e) => {
           e.stopPropagation();
           const speedDateId = btn.dataset.speeddateId;
           if (confirm('Weet je zeker dat je deze speeddate wilt annuleren?')) {
-            btn.closest('.speeddate-item').remove();
-            console.log(`Speeddate ${speedDateId} geannuleerd`);
+            // Disable button during processing
+            btn.disabled = true;
+            btn.textContent = '⏳';
+            
+            try {
+              // Call API to reject/delete the speeddate
+              await rejectSpeeddate(speedDateId);
+              
+              // Remove from DOM only if API call succeeded
+              btn.closest('.speeddate-item').remove();
+              console.log(`Speeddate ${speedDateId} geannuleerd`);
 
-            // Check if list is now empty
-            if (speedDatesList.children.length === 0) {
-              speedDatesList.innerHTML =
-                '<div class="no-speeddates">Geen speeddates gevonden</div>';
+              // Check if list is now empty
+              if (speedDatesList.children.length === 0) {
+                speedDatesList.innerHTML =
+                  '<div class="no-speeddates">Geen speeddates gevonden</div>';
+              }
+              
+              // Close modal after successful cancellation
+              setTimeout(() => {
+                closeSpeedDatesModal();
+              }, 500);
+              
+            } catch (error) {
+              console.error('Error rejecting speeddate:', error);
+              alert('Er is een fout opgetreden bij het annuleren van de speeddate. Probeer het opnieuw.');
+              
+              // Re-enable button
+              btn.disabled = false;
+              btn.textContent = '✕';
             }
           }
         });
@@ -477,4 +498,26 @@ async function openSpeedDatesModal() {
 function closeSpeedDatesModal() {
   const modal = document.getElementById('speeddates-modal');
   modal.style.display = 'none';
+}
+
+// Function to reject/delete a speeddate via API
+async function rejectSpeeddate(speeddateId) {
+  const accessToken = sessionStorage.getItem('accessToken');
+  
+  const response = await fetch(
+    `https://api.ehb-match.me/speeddates/reject/${speeddateId}`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return response;
 }
