@@ -20,6 +20,7 @@ const defaultBedrijfProfile = {
   plaats: '',
   linkedin: '',
   sector_bedrijf: '',
+  id_sector_bedrijf: null,
 };
 
 // Haal de token altijd dynamisch op binnen event handlers of functies waar nodig
@@ -115,6 +116,7 @@ export async function renderBedrijfProfiel(
     plaats = defaultBedrijfProfile.plaats,
     linkedin = defaultBedrijfProfile.linkedin,
     sector_bedrijf = defaultBedrijfProfile.sector_bedrijf,
+    id_sector_bedrijf = defaultBedrijfProfile.id_sector_bedrijf,
   } = bedrijfData;
 
   // Gebruik default als foto null, leeg of undefined is
@@ -154,6 +156,8 @@ export async function renderBedrijfProfiel(
                   <img
                     id="logo-preview"
                     class="bedrijf-profile-avatar"
+                    src="${foto}"
+                    alt="Logo ${naam}"
                   />
                   <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
                 </div>
