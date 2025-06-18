@@ -56,7 +56,7 @@ export function renderAdmin(rootElement) {
 
       // Debugging: Log API responses
       console.log('Login Response:', responseData); // Display the message from the API response in the label
-      
+
       errorMessage.textContent =
         responseData.message || 'Er is een fout opgetreden.';
       errorMessage.style.display = 'block';
@@ -80,15 +80,16 @@ export function renderAdmin(rootElement) {
             Authorization: `Bearer ${responseData.accessToken}`,
           },
         });
-
         const infoData = await infoResponse.json();
 
-        // Debugging: Log user type
-        console.log('User Type:', infoData.user.type);
+        // Debugging: Log user info
+        console.log('User Info:', infoData.user);
 
         // Check user type
         if (infoData.user.type === 1) {
-          // User is an admin, proceed to dashboard
+          // User is an admin, store admin email and proceed to dashboard
+          sessionStorage.setItem('adminUsername', infoData.user.email);
+          sessionStorage.setItem('adminEmail', infoData.user.email);
           Router.navigate('/admin-dashboard');
         } else {
           // User is not an admin, display error message
