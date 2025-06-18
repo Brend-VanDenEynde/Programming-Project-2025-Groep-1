@@ -1,3 +1,5 @@
+import { authenticatedFetch } from "./auth-api.js";
+
 // Utility: Haal student-profiel en user-info op en zet altijd id en gebruiker_id in sessionStorage
 export async function fetchAndStoreStudentProfile() {
   const token = sessionStorage.getItem('authToken');

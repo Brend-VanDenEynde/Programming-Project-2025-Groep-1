@@ -1,5 +1,5 @@
 import logoIcon from '../../icons/favicon-32x32.png';
-import { authenticatedFetch } from '../../utils/api.js';
+import { authenticatedFetch } from '../../utils/auth-api.js';
 
 // Functie om pending speeddate data op te halen van de API
 async function fetchPendingSpeeddateData(bedrijfId, token) {
