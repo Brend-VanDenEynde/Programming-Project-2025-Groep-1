@@ -78,9 +78,24 @@ const routes = {
     );
     await renderBedrijfProfiel(rootElement, bedrijfData, true);
   },
-  '/bedrijf/zoek-criteria': renderSearchCriteriaBedrijf,
-  '/bedrijf/speeddates': renderBedrijfSpeeddates,
-  '/bedrijf/speeddates-verzoeken': renderBedrijfSpeeddatesRequests,
+  '/bedrijf/zoek-criteria': (rootElement) => {
+    const bedrijfData = JSON.parse(
+      window.sessionStorage.getItem('bedrijfData') || '{}'
+    );
+    renderSearchCriteriaBedrijf(rootElement, bedrijfData);
+  },
+  '/bedrijf/speeddates': (rootElement) => {
+    const bedrijfData = JSON.parse(
+      window.sessionStorage.getItem('bedrijfData') || '{}'
+    );
+    renderBedrijfSpeeddates(rootElement, bedrijfData);
+  },
+  '/bedrijf/speeddates-verzoeken': (rootElement) => {
+    const bedrijfData = JSON.parse(
+      window.sessionStorage.getItem('bedrijfData') || '{}'
+    );
+    renderBedrijfSpeeddatesRequests(rootElement, bedrijfData);
+  },
   '/bedrijf/studenten': (rootElement) => {
     const bedrijfData = JSON.parse(
       window.sessionStorage.getItem('bedrijfData') || '{}'

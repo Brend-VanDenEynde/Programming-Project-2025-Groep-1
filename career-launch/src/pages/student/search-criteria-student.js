@@ -46,7 +46,9 @@ async function removeSkillFromStudent(studentId, skillId) {
   const text = await resp.text();
   if (!resp.ok) {
     console.error('Fout bij verwijderen skill:', text);
-    throw new Error(`Skill met ID ${skillId} kon niet verwijderd worden: ${text}`);
+    throw new Error(
+      `Skill met ID ${skillId} kon niet verwijderd worden: ${text}`
+    );
   }
   return true;
 }
@@ -138,7 +140,11 @@ async function debugSetStudentSkillsIndividueel(studentId, skillIds) {
 async function syncStudentSkills(studentId, checkedSkillIds, checkedTaalIds) {
   // Debug: toon alle ID's en types
   const allIds = [...checkedSkillIds, ...checkedTaalIds].map(Number);
-  console.log('All IDs naar API:', allIds, allIds.map(x => typeof x));
+  console.log(
+    'All IDs naar API:',
+    allIds,
+    allIds.map((x) => typeof x)
+  );
   await setStudentSkills(studentId, allIds);
 }
 
@@ -163,8 +169,12 @@ async function updateFunctiesForStudent(studentId, selectedFunctieIds) {
   const huidigeFuncties = await resp.json();
   const huidigeIds = huidigeFuncties.map((f) => f.id);
   // Bepaal toe te voegen en te verwijderen functies
-  const toeTeVoegen = selectedFunctieIds.filter((id) => !huidigeIds.includes(id));
-  const teVerwijderen = huidigeIds.filter((id) => !selectedFunctieIds.includes(id));
+  const toeTeVoegen = selectedFunctieIds.filter(
+    (id) => !huidigeIds.includes(id)
+  );
+  const teVerwijderen = huidigeIds.filter(
+    (id) => !selectedFunctieIds.includes(id)
+  );
   // Verwijder oude
   for (const id of teVerwijderen) {
     await authenticatedFetch(
@@ -181,11 +191,13 @@ async function updateFunctiesForStudent(studentId, selectedFunctieIds) {
   console.log('Type van toeTeVoegen:', Array.isArray(toeTeVoegen), toeTeVoegen);
   if (toeTeVoegen.length > 0) {
     // Flatten als het een nested array is
-    const functiesBody = { functies: Array.isArray(toeTeVoegen[0]) ? toeTeVoegen[0] : toeTeVoegen };
+    const functiesBody = {
+      functies: Array.isArray(toeTeVoegen[0]) ? toeTeVoegen[0] : toeTeVoegen,
+    };
     console.log('Functies body =', JSON.stringify(functiesBody));
     console.log('Verstuur naar API:', {
       studentId,
-      functiesBody
+      functiesBody,
     });
     const resp = await authenticatedFetch(
       `https://api.ehb-match.me/studenten/${studentId}/functies`,
@@ -208,7 +220,9 @@ async function fetchStudentFuncties(studentId) {
     console.warn('GEEN token gevonden in sessionStorage!');
   }
   console.log('fetchStudentFuncties: studentId:', studentId, 'token:', token);
-  const resp = await authenticatedFetch(`https://api.ehb-match.me/studenten/${studentId}/functies`);
+  const resp = await authenticatedFetch(
+    `https://api.ehb-match.me/studenten/${studentId}/functies`
+  );
   if (!resp.ok) {
     const errText = await resp.text();
     console.error(`Fout bij ophalen functies: ${resp.status} - ${errText}`);
@@ -262,7 +276,7 @@ export async function renderSearchCriteriaStudent(
       alleFuncties = [
         { id: 1, naam: 'Fulltime' },
         { id: 2, naam: 'Parttime' },
-        { id: 3, naam: 'Stagiair(e)' }
+        { id: 3, naam: 'Stagiair(e)' },
       ],
       studentFunctieIds = [];
     try {
@@ -271,8 +285,13 @@ export async function renderSearchCriteriaStudent(
       allTalen = all.filter((s) => s.type === 1); // Talen
       // Functies ophalen van student
       console.log('studentId voor fetchStudentFuncties:', studentId);
-      console.log('token voor fetchStudentFuncties:', sessionStorage.getItem('authToken'));
-      studentFunctieIds = (await fetchStudentFuncties(studentId)).map(f => f.id);
+      console.log(
+        'token voor fetchStudentFuncties:',
+        sessionStorage.getItem('authToken')
+      );
+      studentFunctieIds = (await fetchStudentFuncties(studentId)).map(
+        (f) => f.id
+      );
     } catch (e) {
       rootElement.innerHTML = `<div style="color:red">Fout bij ophalen skills/talen/functies: ${e.message}</div>`;
       return;
@@ -284,8 +303,8 @@ export async function renderSearchCriteriaStudent(
         (f) => `
         <label class="checkbox-option">
           <input type="radio" name="jobType" value="${f.id}" ${
-            studentFunctieIds.includes(f.id) ? 'checked' : ''
-          } ${readonlyMode ? 'disabled' : ''}>
+          studentFunctieIds.includes(f.id) ? 'checked' : ''
+        } ${readonlyMode ? 'disabled' : ''}>
           <span>${f.naam}</span>
         </label>
       `
@@ -313,11 +332,10 @@ export async function renderSearchCriteriaStudent(
         )
         .join('');
     }
-
     rootElement.innerHTML = `
       <div class="student-profile-container">
         <header class="student-profile-header">
-          <div class="logo-section">
+          <div class="logo-section" id="logo-navigation">
             <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
             <span>EhB Career Launch</span>
           </div>
@@ -454,7 +472,9 @@ export async function renderSearchCriteriaStudent(
           const selectedRadio = form.querySelector(
             'input[name="jobType"]:checked'
           );
-          const selectedFunctieId = selectedRadio ? parseInt(selectedRadio.value, 10) : null;
+          const selectedFunctieId = selectedRadio
+            ? parseInt(selectedRadio.value, 10)
+            : null;
           const zoekType = selectedRadio ? selectedRadio.value : '';
           const skillInput = document.getElementById('skill-andere-text');
           if (skillInput && skillInput.value.trim()) {
@@ -493,13 +513,12 @@ export async function renderSearchCriteriaStudent(
             }
           }
           if (!selectedFunctieId) return alert('Selecteer een zoektype!');
-          await syncStudentSkills(
-            studentId,
-            checkedSkills,
-            checkedTalen
-          );
+          await syncStudentSkills(studentId, checkedSkills, checkedTalen);
           try {
-            await updateFunctiesForStudent(studentId, selectedFunctieId ? [selectedFunctieId] : []);
+            await updateFunctiesForStudent(
+              studentId,
+              selectedFunctieId ? [selectedFunctieId] : []
+            );
             studentData.skills = checkedSkills;
             studentData.talen = checkedTalen;
             studentData.zoekType = selectedFunctieId; // ✅ DIT IS TOEGEVOEGD
@@ -610,6 +629,17 @@ export async function renderSearchCriteriaStudent(
         });
       });
     });
+
+    // Logo navigation event listener
+    const logoSection = document.getElementById('logo-navigation');
+    if (logoSection) {
+      logoSection.addEventListener('click', () => {
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/student/student-speeddates');
+        });
+      });
+    }
 
     // --- Hamburger menu ---
     const burger = document.getElementById('burger-menu');

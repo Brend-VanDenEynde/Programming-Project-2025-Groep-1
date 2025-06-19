@@ -1036,12 +1036,11 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         renderFilterOptions();
         renderList();
       };
-    }
-    // Initial render with nieuwe filterbalk structuur
+    } // Initial render with nieuwe filterbalk structuur
     rootElement.innerHTML = `
     <div class="student-profile-container">
       <header class="student-profile-header">
-        <div class="logo-section">
+        <div class="logo-section" id="logo-navigation">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>
@@ -1249,6 +1248,18 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       });
     };
     setupEventListeners();
+
+    // Logo navigation event listener
+    const logoSection = document.getElementById('logo-navigation');
+    if (logoSection) {
+      logoSection.addEventListener('click', () => {
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/student/student-speeddates');
+        });
+      });
+    }
+
     // --- Sidebar navigatie uniform maken ---
     document.querySelectorAll('.sidebar-link').forEach((btn) => {
       btn.addEventListener('click', (e) => {

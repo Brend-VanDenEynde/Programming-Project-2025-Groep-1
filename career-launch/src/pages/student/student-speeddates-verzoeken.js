@@ -10,20 +10,28 @@ async function fetchPendingSpeeddates() {
     renderLogin(document.body);
     return [];
   }
-  const resp = await authenticatedFetch('https://api.ehb-match.me/speeddates/pending');
+  const resp = await authenticatedFetch(
+    'https://api.ehb-match.me/speeddates/pending'
+  );
   if (!resp.ok) throw new Error(`Fout bij ophalen: ${resp.status}`);
   return await resp.json();
 }
 async function acceptSpeeddate(id) {
-  const resp = await authenticatedFetch(`https://api.ehb-match.me/speeddates/accept/${id}`, {
-    method: 'POST',
-  });
+  const resp = await authenticatedFetch(
+    `https://api.ehb-match.me/speeddates/accept/${id}`,
+    {
+      method: 'POST',
+    }
+  );
   if (!resp.ok) throw new Error('Accepteren mislukt');
 }
 async function rejectSpeeddate(id) {
-  const resp = await authenticatedFetch(`https://api.ehb-match.me/speeddates/reject/${id}`, {
-    method: 'POST',
-  });
+  const resp = await authenticatedFetch(
+    `https://api.ehb-match.me/speeddates/reject/${id}`,
+    {
+      method: 'POST',
+    }
+  );
   if (!resp.ok) throw new Error('Weigeren mislukt');
 }
 async function fetchFunctiesSkills(bedrijfId) {
@@ -72,7 +80,7 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
   rootElement.innerHTML = `
     <div class="student-profile-container">
       <header class="student-profile-header">
-        <div class="logo-section">
+        <div class="logo-section" id="logo-navigation">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>
@@ -308,6 +316,17 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     });
   });
 
+  // Logo navigation event listener
+  const logoSection = document.getElementById('logo-navigation');
+  if (logoSection) {
+    logoSection.addEventListener('click', () => {
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/student/student-speeddates');
+      });
+    });
+  }
+
   // Hamburger menu Profiel knop
   const navProfileBtn = document.getElementById('nav-profile');
   const dropdown = document.getElementById('burger-dropdown');
@@ -392,7 +411,9 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
       align-items: center;
     `;
     const profielFoto =
-      s.profiel_foto_bedrijf && s.profiel_foto_bedrijf.trim() !== '' ? s.profiel_foto_bedrijf : 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
+      s.profiel_foto_bedrijf && s.profiel_foto_bedrijf.trim() !== ''
+        ? s.profiel_foto_bedrijf
+        : 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
     popup.innerHTML = `
       <button id=\"popup-close\" style=\"position:absolute;top:10px;right:12px;font-size:1.4rem;background:none;border:none;cursor:pointer;\">×</button>
       <img src=\"${profielFoto}\" alt=\"Logo ${

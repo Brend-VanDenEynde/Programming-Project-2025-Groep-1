@@ -1,5 +1,6 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { authenticatedFetch } from '../../utils/auth-api.js';
+import Router from '../../router.js';
 
 // Functie om speeddate data op te halen van de API
 async function fetchSpeeddateData(bedrijfId, token) {
@@ -228,7 +229,7 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
   rootElement.innerHTML = `
     <div class="bedrijf-profile-container">
       <header class="bedrijf-profile-header">
-        <div class="logo-section">
+        <div class="logo-section" id="logo-navigation">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
@@ -296,6 +297,15 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
       });
     });
   });
+
+  // Logo navigation event listener
+  const logoSection = document.getElementById('logo-navigation');
+  if (logoSection) {
+    logoSection.addEventListener('click', () => {
+      Router.navigate('/bedrijf/speeddates');
+    });
+  }
+
   // Burger menu and other functionality
   const burger = document.getElementById('burger-menu');
   const dropdown = document.getElementById('burger-dropdown');
