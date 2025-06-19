@@ -105,7 +105,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
     authenticatedFetch(
       `https://api.ehb-match.me/speeddates/pending?id=${bedrijf.gebruiker_id}`
     ).then((r) => (r.ok ? r.json() : [])),
-  ]);
+]);
   const allAccepted = [...acceptedStudentDates, ...acceptedCompanyDates];
   const allPending = [...pendingStudentDates, ...pendingCompanyDates];
 
@@ -472,6 +472,12 @@ async function showBedrijfPopup(bedrijf, studentId) {
     try {
       // Combineer datum + tijd voor de API
       const apiDatum = `${datum} ${tijd}:00`;
+      const payload = {
+        id_student: Number(studentId),
+        id_bedrijf: Number(bedrijf.gebruiker_id),
+        datum: apiDatum, // LET OP: spatie, geen T
+      };
+      console.log('Speeddate aanvraag payload:', payload); // <-- LOG TOEGEVOEGD
       const req = await authenticatedFetch(
         'https://api.ehb-match.me/speeddates',
         {
@@ -479,11 +485,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            id_student: Number(studentId),
-            id_bedrijf: Number(bedrijf.gebruiker_id),
-            datum: apiDatum, // LET OP: spatie, geen T
-          }),
+          body: JSON.stringify(payload),
         }
       );
       if (req.status === 201) {

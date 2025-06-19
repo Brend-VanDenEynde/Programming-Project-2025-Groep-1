@@ -3575,8 +3575,59 @@ a:hover {
   }
 }
 
-.speeddate-uur, .bedrijf-profile-title h4 {
-  white-space: nowrap; /* Zorgt ervoor dat de tijd niet afbreekt */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(30, 34, 54, 0.38);
+  z-index: 3100;
+  display: flex;         /* Wordt door JS op 'flex' gezet */
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.25s;
+}
+.modal-overlay[style*="display: none"] {
+  opacity: 0; pointer-events: none;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+  padding: 2rem 1.5rem;
+  min-width: 320px;
+  max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  align-items: center;
+}
+.modal-buttons {
+  display: flex;
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+.modal-yes-btn, .modal-no-btn {
+  background: #00acc1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.modal-no-btn {
+  background: #ccc;
+  color: #333;
+}
+.modal-yes-btn:hover {
+  background: #0077b5;
+}
+.modal-no-btn:hover {
+  background: #999;
+}
+@media (max-width: 500px) {
+  .modal { min-width: unset; max-width: 98vw; padding: 1rem 0.3rem; }
 }
 
 
