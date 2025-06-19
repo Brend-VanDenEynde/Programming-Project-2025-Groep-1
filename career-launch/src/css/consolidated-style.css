@@ -3631,3 +3631,28 @@ a:hover {
 }
 
 
+#btn-register {
+    background-color: rgb(220, 20, 60);
+    color: rgb(255, 255, 255);
+    border-width: 2px;
+    border-style: solid;
+    border-color: rgb(220, 20, 60) !important;
+    border-image: initial;
+}
+
+#btn-login {
+    background-color: transparent;
+    color: rgb(220, 20, 60);
+    border-width: 2px;
+    border-style: solid;
+    border-color: rgb(220, 20, 60);
+    border-image: initial;
+}
+
+#btn-login:hover {
+    background-color: rgba(220, 20, 60, 0.05);
+    color: rgb(220, 20, 60);
+    transform: translateY(-1px);
+    box-shadow: rgba(220, 20, 60, 0.08) 0px 2px 8px;
+    border-color: rgb(220, 20, 60);
+}

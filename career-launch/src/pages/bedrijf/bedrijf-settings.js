@@ -83,23 +83,13 @@ export function showBedrijfSettingsPopup(onClose) {
         window.location.reload();
       }
     });
-
-  // Donkere modus toggle functionaliteit
-  const darkToggle = document.getElementById('dark-mode-toggle');
-  // Zet de toggle op basis van localStorage
-  darkToggle.checked = localStorage.getItem('darkmode') === 'true';
-  document.body.classList.toggle('darkmode', darkToggle.checked);
-  darkToggle.addEventListener('change', (e) => {
-    localStorage.setItem('darkmode', e.target.checked);
-    document.body.classList.toggle('darkmode', e.target.checked);
-  });
 }
 
 function renderSidebar() {
   const sidebarHtml = `
     <nav class="company-profile-sidebar">
       <ul>        <li><button data-route="profile" class="sidebar-link">Profiel</button></li>
-        <li><button data-route="speeddates" class="sidebar-link">Mijn speeddates</button></li>
+        <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
         <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
       </ul>
     </nav>`;

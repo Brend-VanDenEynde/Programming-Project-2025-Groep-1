@@ -151,7 +151,7 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
-            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
+            <li><button data-route="speeddates" class="sidebar-link">Mijn speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link active">Speeddates-verzoeken</button></li>
             <li><button data-route="bedrijven" class="sidebar-link">Bedrijven</button></li>
           </ul>
