@@ -16,7 +16,7 @@ export function renderBedrijfRegister(rootElement) {
       <button class="back-button" id="back-button">← Terug</button>
       <div class="upload-section">
         <div class="upload-icon" data-alt="⬆" style="position:relative;">
-          <img class="uploaded-photo" src="" style="display:none;" />
+          <img class="uploaded-photo" src="" style="display:none;" alt="" />
           <div class="upload-icon-text">⬆</div>
           <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
         </div>
