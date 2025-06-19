@@ -14,6 +14,7 @@ import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven
 import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js';
 import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
 import { renderAdminProcessingCompanyDetail } from './pages/admin/admin-processing-company-detail.js';
+import { renderAdminContacten } from './pages/admin/admin-contacten.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
 import { renderSpeeddates } from './pages/student/student-speeddates.js';
@@ -59,11 +60,12 @@ const routes = {
   '/admin': renderAdmin,
   '/admin-login': renderAdmin,
   '/admin-select-dashboard': renderAdminSelectDashboard,
-  '/admin-dashboard': renderAdminSelectDashboard,
+  '/admin-dashboard': renderAdminIngeschrevenStudenten,
   '/admin-dashboard/ingeschreven-studenten': renderAdminIngeschrevenStudenten,
   '/admin-dashboard/ingeschreven-bedrijven': renderAdminIngeschrevenBedrijven,
   '/admin-dashboard/bedrijven-in-behandeling':
     renderAdminBedrijvenInBehandeling,
+  '/admin-dashboard/contacten': renderAdminContacten,
   '/admin-dashboard/student-detail': renderAdminStudentDetail,
   '/admin-dashboard/company-detail': renderAdminCompanyDetail,
   '/admin-dashboard/processing-company-detail':
@@ -173,7 +175,7 @@ class Router {
       '/student/bedrijven': 'Bedrijven - Career Launch 2025',
       '/admin': 'Admin - Career Launch 2025',
       '/admin-login': 'Admin Login - Career Launch 2025',
-      '/admin-dashboard': 'Admin Dashboard - Career Launch 2025',
+      '/admin-dashboard': 'Ingeschreven Studenten - Admin - Career Launch 2025',
       '/contact': 'Contacteer ons - Career Launch 2025',
       '/privacy': 'Privacy Beleid - Career Launch 2025',
       '/404': 'Pagina niet gevonden - Career Launch 2025',
