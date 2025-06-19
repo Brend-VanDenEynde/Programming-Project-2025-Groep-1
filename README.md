@@ -164,7 +164,7 @@ Zie `/src/utils/api.js` en `/src/utils/auth-api.js` voor implementatie.
 
 - Documentatie, codevoorbeelden en best practices zijn mede tot stand gekomen met behulp van AI-assistentie, waaronder [GitHub Copilot](https://github.com/features/copilot).
 - Inspiratie en technische richtlijnen zijn deels gebaseerd op de officiële documentatie van [Vite](https://vitejs.dev/), [MDN Web Docs](https://developer.mozilla.org/), en [OWASP](https://owasp.org/) voor security best practices.
-- Bijdragen van het projectteam en open source community.
+- Bijdragen van het projectteam.
 
 ---
 
