@@ -796,9 +796,7 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
         };" title="${colorScheme.label}">${formattedMatch}%</div>
             <img src="${photo}" alt="Foto ${fullName}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:1rem;" onerror="this.src='${defaultStudentAvatar}'">
             <h3 style="margin-bottom:0.5rem;text-align:center;">${fullName}</h3>
-            <div style="font-size:0.9rem;color:#666;margin-bottom:0.3rem;">Studiejaar: ${
-              student.studiejaar
-            }</div>
+            <div style="font-size:0.9rem;color:#666;margin-bottom:0.3rem;">${student.opleiding_type} ${student.opleiding_naam}</div>
             <div style="font-size:0.85rem;color:#888;text-align:center;">
               <div>Functie: ${student.functie_matches || 0} | Opleiding: ${
           student.opleiding_matches || 0
