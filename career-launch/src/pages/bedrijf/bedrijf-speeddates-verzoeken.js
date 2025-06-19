@@ -1,5 +1,34 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 
+// Auth-check direct uitvoeren bij laden van deze pagina (bovenaan, vóór alles)
+function checkAuthAndRedirect() {
+  const token = window.sessionStorage.getItem('authToken');
+  if (!token) {
+    console.log('[AUTH] Geen token gevonden, redirect naar home');
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/');
+      // Fallback: forceer reload zodat bfcache niet blijft hangen
+      setTimeout(() => window.location.replace('/'), 100);
+    });
+    return;
+  }
+}
+
+// Alleen uitvoeren als de gebruiker op de profielpagina is (bevat substring check, werkt ook met trailing slash of query)
+const isBedrijfProfielPage =
+  window.location.pathname.includes('/bedrijf/bedrijf-speeddates-verzoeken') ||
+  window.location.hash.includes('#/bedrijf/bedrijf-speeddates-verzoeken');
+
+if (isBedrijfProfielPage) {
+  setTimeout(() => {
+    checkAuthAndRedirect();
+  }, 0);
+  window.addEventListener('pageshow', (event) => {
+    checkAuthAndRedirect();
+  });
+}
+
 // Functie om pending speeddate data op te halen van de API
 async function fetchPendingSpeeddateData(bedrijfId, token) {
   const url = `https://api.ehb-match.me/speeddates/pending?id=${bedrijfId}`;
@@ -272,7 +301,21 @@ async function loadPendingSpeeddateData() {
   }
 }
 
+function handleLogout() {
+  window.sessionStorage.removeItem('bedrijfData');
+  window.sessionStorage.removeItem('authToken');
+  window.sessionStorage.removeItem('userType');
+  localStorage.setItem('darkmode', 'false');
+  document.body.classList.remove('darkmode');
+  import('../../router.js').then((module) => {
+    const Router = module.default;
+    Router.navigate('/');
+    window.location.replace('/');
+  });
+}
+
 export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
+  checkAuthAndRedirect();
   rootElement.innerHTML = `
     <div class="bedrijf-profile-container">
       <header class="bedrijf-profile-header">
@@ -381,13 +424,7 @@ export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
     });
   });
 
-  document.getElementById('nav-logout')?.addEventListener('click', () => {
-    dropdown.classList.remove('open');
-    import('../../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/');
-    });
-  });
+  document.getElementById('nav-logout')?.addEventListener('click', handleLogout);
 
   document.getElementById('privacy-policy')?.addEventListener('click', (e) => {
     e.preventDefault();

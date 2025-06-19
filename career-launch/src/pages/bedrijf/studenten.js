@@ -7,6 +7,34 @@ import {
 } from '../../utils/data-api.js';
 import Router from '../../router.js';
 
+// Auth-check direct uitvoeren bij laden van deze pagina (bovenaan, vóór alles)
+function checkAuthAndRedirect() {
+  const token = window.sessionStorage.getItem('authToken');
+  if (!token) {
+    console.log('[AUTH] Geen token gevonden, redirect naar home');
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/');
+      setTimeout(() => window.location.replace('/'), 100);
+    });
+    return;
+  }
+}
+
+// Alleen uitvoeren als de gebruiker op de profielpagina is (bevat substring check, werkt ook met trailing slash of query)
+const isBedrijfProfielPage =
+  window.location.pathname.includes('/bedrijf/studenten') ||
+  window.location.hash.includes('#/bedrijf/studenten');
+
+if (isBedrijfProfielPage) {
+  setTimeout(() => {
+    checkAuthAndRedirect();
+  }, 0);
+  window.addEventListener('pageshow', (event) => {
+    checkAuthAndRedirect();
+  });
+}
+
 // Global variables for students data
 let studenten = [];
 let currentBedrijfId = null;
@@ -552,7 +580,21 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
   }
 }
 
+function handleLogout() {
+  window.sessionStorage.removeItem('bedrijfData');
+  window.sessionStorage.removeItem('authToken');
+  window.sessionStorage.removeItem('userType');
+  localStorage.setItem('darkmode', 'false');
+  document.body.classList.remove('darkmode');
+  import('../../router.js').then((module) => {
+    const Router = module.default;
+    Router.navigate('/');
+    window.location.replace('/');
+  });
+}
+
 export async function renderStudenten(rootElement, bedrijfData = {}) {
+  checkAuthAndRedirect();
   // Load bedrijf data from sessionStorage if empty
   if (!bedrijfData || Object.keys(bedrijfData).length === 0) {
     try {
@@ -897,17 +939,7 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
     });
   });
 
-  document.getElementById('nav-logout')?.addEventListener('click', async () => {
-    dropdown.classList.remove('open');
-    const response = await logoutUser();
-    console.log('Logout API response:', response);
-    window.sessionStorage.removeItem('bedrijfData');
-    window.sessionStorage.removeItem('authToken');
-    window.sessionStorage.removeItem('userType');
-    localStorage.setItem('darkmode', 'false');
-    document.body.classList.remove('darkmode');
-    Router.navigate('/');
-  });
+  document.getElementById('nav-logout')?.addEventListener('click', handleLogout);
 
   document.getElementById('privacy-policy')?.addEventListener('click', (e) => {
     e.preventDefault();
@@ -918,3 +950,4 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
     Router.navigate('/contact');
   });
 }
+

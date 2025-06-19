@@ -7,6 +7,33 @@ import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { renderQRPopup } from './student-qr-popup.js';
 import { showSettingsPopup } from './student-settings.js';
 import { fetchStudentSpeeddates } from '../../utils/data-api.js';
+import Router from '../../router.js';
+
+// Auth-check direct uitvoeren bij laden van deze pagina (bovenaan, vóór alles)
+function checkAuthAndRedirect() {
+  const token = window.sessionStorage.getItem('authToken');
+  if (!token) {
+    console.log('[AUTH] Geen token gevonden, redirect naar home');
+    Router.navigate('/');
+    // Fallback: forceer reload zodat bfcache niet blijft hangen
+    setTimeout(() => window.location.replace('/'), 100);
+    return;
+  }
+}
+
+// Alleen uitvoeren als de gebruiker op de profielpagina is (bevat substring check, werkt ook met trailing slash of query)
+const isStudentProfielPage =
+  window.location.pathname.includes('/student/student-speeddates') ||
+  window.location.hash.includes('#/student/student-speeddates');
+
+if (isStudentProfielPage) {
+  setTimeout(() => {
+    checkAuthAndRedirect();
+  }, 0);
+  window.addEventListener('pageshow', (event) => {
+    checkAuthAndRedirect();
+  });
+}
 
 // Nieuw: API fetch
 async function fetchSpeeddates(rootElement) {
@@ -119,6 +146,8 @@ function formatUTCTime(isoString) {
 }
 
 export async function renderSpeeddates(rootElement, studentData = {}) {
+  // Auth-check ook uitvoeren bij SPA navigatie/render
+  checkAuthAndRedirect();
   // Sorteervolgorde behouden als er al gesorteerd is, anders default op tijd
   if (!currentSort || !Array.isArray(currentSort) || currentSort.length === 0) {
     currentSort = [{ key: 'begin', asc: true }];
@@ -354,9 +383,15 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     });
     document.getElementById('nav-logout').addEventListener('click', () => {
       dropdown.classList.remove('open');
+      window.sessionStorage.removeItem('studentData');
+      window.sessionStorage.removeItem('authToken');
+      window.sessionStorage.removeItem('userType');
       localStorage.setItem('darkmode', 'false');
       document.body.classList.remove('darkmode');
-      renderLogin(rootElement);
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/');
+      });
     });
   }
 

@@ -1,7 +1,36 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { refreshToken } from '../../utils/auth-api.js';
 
+// Auth-check direct uitvoeren bij laden van deze pagina (bovenaan, vóór alles)
+function checkAuthAndRedirect() {
+  const token = window.sessionStorage.getItem('authToken');
+  if (!token) {
+    // Altijd dynamische import gebruiken voor Router
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/');
+      setTimeout(() => window.location.replace('/'), 100);
+    });
+    return;
+  }
+}
+
+// Alleen uitvoeren als de gebruiker op de profielpagina is (bevat substring check, werkt ook met trailing slash of query)
+const isBedrijfProfielPage =
+  window.location.pathname.includes('/bedrijf/search-criteria-bedrijf') ||
+  window.location.hash.includes('#/bedrijf/search-criteria-bedrijf');
+
+if (isBedrijfProfielPage) {
+  setTimeout(() => {
+    checkAuthAndRedirect();
+  }, 0);
+  window.addEventListener('pageshow', (event) => {
+    checkAuthAndRedirect();
+  });
+}
+
 export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
+  checkAuthAndRedirect();
   rootElement.innerHTML = `
     <div class="bedrijf-profile-container">
       <header class="bedrijf-profile-header">
@@ -148,13 +177,20 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
     });
   });
 
-  document.getElementById('nav-logout')?.addEventListener('click', () => {
-    dropdown.classList.remove('open');
+  function handleLogout() {
+    window.sessionStorage.removeItem('bedrijfData');
+    window.sessionStorage.removeItem('authToken');
+    window.sessionStorage.removeItem('userType');
+    localStorage.setItem('darkmode', 'false');
+    document.body.classList.remove('darkmode');
     import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/');
+      window.location.replace('/');
     });
-  });
+  }
+
+  document.getElementById('nav-logout')?.addEventListener('click', handleLogout);
 
   document.getElementById('privacy-policy')?.addEventListener('click', (e) => {
     e.preventDefault();

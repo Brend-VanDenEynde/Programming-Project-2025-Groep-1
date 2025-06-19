@@ -3901,3 +3901,15 @@ body.darkmode .tijd-lokaal p {
     font-size: 0.9rem;
     color: #a9a9a9;
 }
+
+
+
+body.darkmode .speeddate-item {
+    background: #23262b !important;
+    color: #eafcff !important;
+    border-color: #2a2d33;
+}
+
+body.darkmode .speeddate-item.goedgekeurd {
+    border-left: 4px solid #28a745;
+}

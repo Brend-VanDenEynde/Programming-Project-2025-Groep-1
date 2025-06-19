@@ -8,6 +8,32 @@ import { showSettingsPopup } from './student-settings.js';
 import defaultAvatar from '../../images/default.png';
 import Router from '../../router.js';
 
+// Auth-check direct uitvoeren bij laden van deze pagina (bovenaan, vóór alles)
+function checkAuthAndRedirect() {
+  const token = window.sessionStorage.getItem('authToken');
+  if (!token) {
+    console.log('[AUTH] Geen token gevonden, redirect naar home');
+    Router.navigate('/');
+    // Fallback: forceer reload zodat bfcache niet blijft hangen
+    setTimeout(() => window.location.replace('/'), 100);
+    return;
+  }
+}
+
+// Alleen uitvoeren als de gebruiker op de profielpagina is (bevat substring check, werkt ook met trailing slash of query)
+const isStudentProfielPage =
+  window.location.pathname.includes('/student/student-qr-popup') ||
+  window.location.hash.includes('#/student/student-qr-popup');
+
+if (isStudentProfielPage) {
+  setTimeout(() => {
+    checkAuthAndRedirect();
+  }, 0);
+  window.addEventListener('pageshow', (event) => {
+    checkAuthAndRedirect();
+  });
+}
+
 // src/views/student-qr-popup.js
 
 export function renderQRPopup(rootElement, studentData = {}) {

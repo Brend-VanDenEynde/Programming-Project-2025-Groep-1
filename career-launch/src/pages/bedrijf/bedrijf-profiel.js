@@ -22,7 +22,31 @@ const defaultBedrijfProfile = {
   sector_bedrijf: '',
 };
 
-// Haal de token altijd dynamisch op binnen event handlers of functies waar nodig
+// Auth-check direct uitvoeren bij laden van deze pagina (bovenaan, vóór alles)
+function checkAuthAndRedirect() {
+  const token = window.sessionStorage.getItem('authToken');
+  if (!token) {
+    console.log('[AUTH] Geen token gevonden, redirect naar home');
+    Router.navigate('/');
+    // Fallback: forceer reload zodat bfcache niet blijft hangen
+    setTimeout(() => window.location.replace('/'), 100);
+    return;
+  }
+}
+
+// Alleen uitvoeren als de gebruiker op de profielpagina is (bevat substring check, werkt ook met trailing slash of query)
+const isBedrijfProfielPage =
+  window.location.pathname.includes('/bedrijf/bedrijf-profiel') ||
+  window.location.hash.includes('#/bedrijf/bedrijf-profiel');
+
+if (isBedrijfProfielPage) {
+  setTimeout(() => {
+    checkAuthAndRedirect();
+  }, 0);
+  window.addEventListener('pageshow', (event) => {
+    checkAuthAndRedirect();
+  });
+}
 
 function getBedrijfLogoUrl(foto) {
   if (!foto || foto === 'null') return DEFAULT_AVATAR_URL;
@@ -30,11 +54,27 @@ function getBedrijfLogoUrl(foto) {
   return BASE_AVATAR_URL + foto;
 }
 
+// Pas logout overal aan (in nav-logout, profiel-formulier, etc.)
+function handleLogout() {
+  window.sessionStorage.removeItem('bedrijfData');
+  window.sessionStorage.removeItem('authToken');
+  window.sessionStorage.removeItem('userType');
+  localStorage.setItem('darkmode', 'false');
+  document.body.classList.remove('darkmode');
+  import('../../router.js').then((module) => {
+    const Router = module.default;
+    Router.navigate('/');
+    window.location.replace('/');
+  });
+}
+
 export async function renderBedrijfProfiel(
   rootElement,
   bedrijfData = {},
   readonlyMode = true
 ) {
+  checkAuthAndRedirect();
+
   // Laad uit sessionStorage als leeg
   if (!bedrijfData || Object.keys(bedrijfData).length === 0) {
     try {
@@ -259,31 +299,12 @@ export async function renderBedrijfProfiel(
     });
   });
 
-  document.getElementById('nav-logout')?.addEventListener('click', async () => {
-    dropdown.classList.remove('open');
-    const response = await logoutUser();
-    console.log('Logout API response:', response);
-    window.sessionStorage.removeItem('bedrijfData');
-    window.sessionStorage.removeItem('authToken');
-    window.sessionStorage.removeItem('userType');
-    localStorage.setItem('darkmode', 'false');
-    document.body.classList.remove('darkmode');
-    Router.navigate('/');
-  });
+  document.getElementById('nav-logout')?.addEventListener('click', handleLogout);
 
   // Ook de LOG OUT knop in het profiel-formulier zelf
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-      const response = await logoutUser();
-      console.log('Logout API response:', response);
-      window.sessionStorage.removeItem('bedrijfData');
-      window.sessionStorage.removeItem('authToken');
-      window.sessionStorage.removeItem('userType');
-      localStorage.setItem('darkmode', 'false');
-      document.body.classList.remove('darkmode');
-      Router.navigate('/');
-    });
+    logoutBtn.addEventListener('click', handleLogout);
   }
 
   // EDIT knop

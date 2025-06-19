@@ -1,4 +1,32 @@
+import Router from '../../router.js';
 import { refreshToken } from '../../utils/auth-api.js';
+
+// Auth-check direct uitvoeren bij laden van deze pagina (bovenaan, vóór alles)
+function checkAuthAndRedirect() {
+  const token = window.sessionStorage.getItem('authToken');
+  if (!token) {
+    console.log('[AUTH] Geen token gevonden, redirect naar home');
+    Router.navigate('/');
+    // Fallback: forceer reload zodat bfcache niet blijft hangen
+    setTimeout(() => window.location.replace('/'), 100);
+    return;
+  }
+}
+
+// Alleen uitvoeren als de gebruiker op de profielpagina is (bevat substring check, werkt ook met trailing slash of query)
+const isStudentProfielPage =
+  window.location.pathname.includes('/student/search-criteria-student') ||
+  window.location.hash.includes('#/student/search-criteria-student');
+
+if (isStudentProfielPage) {
+  setTimeout(() => {
+    checkAuthAndRedirect();
+  }, 0);
+  window.addEventListener('pageshow', (event) => {
+    checkAuthAndRedirect();
+  });
+}
+
 
 /**
  * Centrale authenticated request (zoals in bedrijf)
@@ -556,7 +584,10 @@ export async function renderSearchCriteriaStudent(
       window.sessionStorage.removeItem('userType');
       localStorage.setItem('darkmode', 'false');
       document.body.classList.remove('darkmode');
-      renderLogin(root);
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/');
+      });
     });
     const navProfileBtn = document.getElementById('nav-profile');
     if (navProfileBtn) {

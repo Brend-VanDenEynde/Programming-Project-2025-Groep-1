@@ -1,6 +1,33 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
+import Router from '../../router.js';
+
+// Auth-check direct uitvoeren bij laden van deze pagina (bovenaan, vóór alles)
+function checkAuthAndRedirect() {
+  const token = window.sessionStorage.getItem('authToken');
+  if (!token) {
+    console.log('[AUTH] Geen token gevonden, redirect naar home');
+    Router.navigate('/');
+    // Fallback: forceer reload zodat bfcache niet blijft hangen
+    setTimeout(() => window.location.replace('/'), 100);
+    return;
+  }
+}
+
+// Alleen uitvoeren als de gebruiker op de profielpagina is (bevat substring check, werkt ook met trailing slash of query)
+const isStudentProfielPage =
+  window.location.pathname.includes('/student/student-speeddates-verzoeken') ||
+  window.location.hash.includes('#/student/student-speeddates-verzoeken');
+
+if (isStudentProfielPage) {
+  setTimeout(() => {
+    checkAuthAndRedirect();
+  }, 0);
+  window.addEventListener('pageshow', (event) => {
+    checkAuthAndRedirect();
+  });
+}
 
 // API helpers
 async function fetchPendingSpeeddates() {
@@ -361,9 +388,15 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     });
     document.getElementById('nav-logout').addEventListener('click', () => {
       dropdown.classList.remove('open');
+      window.sessionStorage.removeItem('studentData');
+      window.sessionStorage.removeItem('authToken');
+      window.sessionStorage.removeItem('userType');
       localStorage.setItem('darkmode', 'false');
       document.body.classList.remove('darkmode');
-      renderLogin(rootElement);
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/');
+      });
     });
   }
 
