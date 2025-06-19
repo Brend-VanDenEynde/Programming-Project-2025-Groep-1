@@ -115,8 +115,8 @@ async function showBedrijfPopup(bedrijf, studentId) {
       if (!s.begin) return false;
       const dt = new Date(s.begin);
       return (
-        `${dt.getUTCHours().toString().padStart(2, '0')}:${dt
-          .getUTCMinutes()
+        `${dt.getHours().toString().padStart(2, '0')}:${dt
+          .getMinutes()
           .toString()
           .padStart(2, '0')}` === tijd
       );
@@ -126,8 +126,8 @@ async function showBedrijfPopup(bedrijf, studentId) {
       if (!s.begin) return false;
       const dt = new Date(s.begin);
       return (
-        `${dt.getUTCHours().toString().padStart(2, '0')}:${dt
-          .getUTCMinutes()
+        `${dt.getHours().toString().padStart(2, '0')}:${dt
+          .getMinutes()
           .toString()
           .padStart(2, '0')}` === tijd
       );
