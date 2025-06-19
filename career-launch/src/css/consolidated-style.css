@@ -2281,6 +2281,11 @@ body.darkmode .add-btn:disabled {
   text-align: center;
 }
 
+.upload-icon-text {
+  user-select: none;
+  cursor: default;
+}
+
 .delete-overlay {
   display: none;
   position: absolute;

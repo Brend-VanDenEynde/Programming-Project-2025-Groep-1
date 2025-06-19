@@ -16,7 +16,8 @@ export function renderBedrijfRegister(rootElement) {
       <button class="back-button" id="back-button">← Terug</button>
       <div class="upload-section">
         <div class="upload-icon" data-alt="⬆" style="position:relative;">
-          <img src="" alt="⬆" class="uploaded-photo" />
+          <img class="uploaded-photo" src="" style="display:none;" alt="" />
+          <div class="upload-icon-text">⬆</div>
           <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
         </div>
         <label for="profielFoto" class="upload-label">Logo</label>
@@ -72,6 +73,14 @@ export function renderBedrijfRegister(rootElement) {
     deleteOverlay.style.display = 'none';
   }
 
+  function updateUploadedPhotoVisibility() {
+    if (uploadedPhoto.hasAttribute('src') && uploadedPhoto.getAttribute('src')) {
+      uploadedPhoto.style.display = '';
+    } else {
+      uploadedPhoto.style.display = 'none';
+    }
+  }
+
   uploadIcon.addEventListener('mouseenter', () => {
     if (hasUploadedPhoto) {
       deleteOverlay.style.display = 'flex';
@@ -91,8 +100,9 @@ export function renderBedrijfRegister(rootElement) {
         console.error(`Failed to delete photo: ${response.status}`);
       }
     });
-    uploadedPhoto.alt = '⬆';
+    uploadedPhoto.style.display = 'none';
     uploadedPhoto.src = '';
+    document.querySelector('.upload-icon-text').style.display = '';
     fileStatus.textContent = 'No file selected.'; // Reset file status
     uploadedPhoto.removeEventListener('click', handlePhotoClick);
     fileKey = null; // Reset file key
@@ -120,12 +130,15 @@ export function renderBedrijfRegister(rootElement) {
 
       fileKey = uploadResponse.profiel_foto_key || null;
 
-      uploadedPhoto.alt = '';
+      document.querySelector('.upload-icon-text').style.display = 'none';
+      uploadedPhoto.style.display = '';
       uploadedPhoto.src = uploadResponse.profiel_foto_url || '';
       updateDeleteOverlay();
       uploadedPhoto.addEventListener('click', handlePhotoClick);
+      updateUploadedPhotoVisibility();
     } else {
       fileStatus.textContent = 'No file selected.';
+      uploadedPhoto.src = PLACEHOLDER_IMAGE; // Use placeholder if no file
       updateDeleteOverlay();
     }
   });
