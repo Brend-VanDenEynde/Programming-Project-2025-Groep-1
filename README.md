@@ -24,14 +24,14 @@ EhBMatch is een professionele webapplicatie die studenten en bedrijven met elkaa
 ## Belangrijkste Functionaliteiten
 
 - **Registratie & Login** voor studenten, bedrijven en admins
-- **Studentprofielen**: opleiding, vaardigheden, cv, profielfoto, privacy
-- **Bedrijfsprofielen**: bedrijfsinfo, vacatures, logo, contactpersonen
-- **Zoekfunctionaliteit**: studenten zoeken naar jobs, bedrijven zoeken naar kandidaten
+- **Studentprofielen**: opleiding, vaardigheden, profielfoto, privacy
+- **Bedrijfsprofielen**: bedrijfsinfo, logo, contactinfo
+- **Zoekfunctionaliteit**: studenten zoeken naar opportuniteiten, bedrijven zoeken naar kandidaten
 - **Speeddate-verzoeken**: bedrijven en studenten kunnen speeddates aanvragen
 - **Admin dashboard**: beheer van gebruikers, bedrijven, content en moderatie
 - **Geavanceerde authenticatie**: JWT, refresh tokens, automatische tokenvernieuwing
-- **Bestand- en afbeelding upload**: veilige upload van cv’s en profielfoto’s
-- **Responsief & toegankelijk ontwerp**: dark mode, toetsenbordnavigatie, ARIA-labels
+- **Bestand- en afbeelding upload**: veilige upload van profielfoto’s
+- **Responsief & toegankelijk ontwerp**: toetsenbordnavigatie, ARIA-labels
 
 ---
 
