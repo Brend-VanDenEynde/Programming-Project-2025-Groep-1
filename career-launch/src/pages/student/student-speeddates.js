@@ -4,7 +4,6 @@ import { renderLogin } from '../login.js';
 import { renderStudentProfiel } from './student-profiel.js';
 import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
-import { renderQRPopup } from './student-qr-popup.js';
 import { showSettingsPopup } from './student-settings.js';
 import { fetchStudentSpeeddates } from '../../utils/data-api.js';
 
@@ -200,7 +199,6 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
                onerror="this.src='/src/images/defaultlogo.webp'" />
           <div class="bedrijf-details">
             <h4>${s.naam_bedrijf}</h4>
-            <p class="bedrijf-id">Bedrijf ID: ${s.id_bedrijf}</p>
           </div>
         </div>
         
@@ -294,10 +292,6 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       import('../../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
-          // case 'profile': // verwijderd
-          case 'search':
-            Router.navigate('/student/zoek-criteria');
-            break;
           case 'speeddates':
             Router.navigate('/student/student-speeddates');
             break;
@@ -306,9 +300,6 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
             break;
           case 'bedrijven':
             Router.navigate('/student/bedrijven');
-            break;
-          case 'qr':
-            Router.navigate('/student/student-qr-popup');
             break;
         }
       });

@@ -1091,9 +1091,6 @@ export async function renderBedrijven(rootElement, studentData = {}) {
             case 'bedrijven':
               Router.navigate('/student/bedrijven');
               break;
-            case 'qr':
-              Router.navigate('/student/student-qr-popup');
-              break;
           }
         });
       });
