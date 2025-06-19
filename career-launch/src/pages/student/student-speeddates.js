@@ -6,6 +6,7 @@ import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './student-settings.js';
 import { fetchStudentSpeeddates } from '../../utils/data-api.js';
+import { authenticatedFetch } from '../../utils/auth-api.js';
 
 // Nieuw: API fetch
 async function fetchSpeeddates(rootElement) {
@@ -15,9 +16,7 @@ async function fetchSpeeddates(rootElement) {
     renderLogin(rootElement);
     return [];
   }
-  const resp = await fetch('https://api.ehb-match.me/speeddates', {
-    headers: { Authorization: 'Bearer ' + token },
-  });
+  const resp = await authenticatedFetch('https://api.ehb-match.me/speeddates');
   if (!resp.ok) {
     if (resp.status === 401) {
       sessionStorage.removeItem('authToken');
@@ -36,20 +35,14 @@ async function fetchFunctiesSkills(bedrijfId) {
   let functies = [];
   let skills = [];
   try {
-    const resFuncties = await fetch(
-      `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`,
-      {
-        headers: { Authorization: 'Bearer ' + token },
-      }
+    const resFuncties = await authenticatedFetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`
     );
     if (resFuncties.ok) functies = await resFuncties.json();
   } catch {}
   try {
-    const resSkills = await fetch(
-      `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`,
-      {
-        headers: { Authorization: 'Bearer ' + token },
-      }
+    const resSkills = await authenticatedFetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`
     );
     if (resSkills.ok) skills = await resSkills.json();
   } catch {}
@@ -95,9 +88,7 @@ async function fetchSpeeddatesWithStatus(
   if (status === 'Geaccepteerd') url += '/accepted';
   else if (status === 'In afwachting') url += '/pending';
   if (studentId) url += (url.includes('?') ? '&' : '?') + 'id=' + studentId;
-  const resp = await fetch(url, {
-    headers: { Authorization: 'Bearer ' + token },
-  });
+  const resp = await authenticatedFetch(url);
   if (!resp.ok) {
     if (resp.status === 401) {
       sessionStorage.removeItem('authToken');
@@ -222,12 +213,11 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
   `
     )
     .join('');
-
   // Now render the complete page with the fetched data
   rootElement.innerHTML = `
     <div class="student-profile-container">
       <header class="student-profile-header">
-        <div class="logo-section">
+        <div class="logo-section" id="logo-navigation">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>
@@ -305,6 +295,17 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       });
     });
   });
+
+  // Logo navigation event listener
+  const logoSection = document.getElementById('logo-navigation');
+  if (logoSection) {
+    logoSection.addEventListener('click', () => {
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/student/student-speeddates');
+      });
+    });
+  }
 
   // Hamburger menu Profiel knop
   const navProfileBtn = document.getElementById('nav-profile');
@@ -388,7 +389,9 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       align-items: center;
     `;
     const profielFoto =
-      s.foto && s.foto.trim() !== '' ? s.foto : '/src/Images/defaultlogo.webp';
+      s.profiel_foto_bedrijf && s.profiel_foto_bedrijf.trim() !== ''
+        ? s.profiel_foto_bedrijf
+        : 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
     popup.innerHTML = `
       <button id="popup-close" style="position:absolute;top:10px;right:12px;font-size:1.4rem;background:none;border:none;cursor:pointer;">×</button>
       <img src="${profielFoto}" alt="Logo ${

@@ -1,4 +1,6 @@
 import logoIcon from '../../icons/favicon-32x32.png';
+import { authenticatedFetch } from '../../utils/auth-api.js';
+import Router from '../../router.js';
 
 // Functie om pending speeddate data op te halen van de API
 async function fetchPendingSpeeddateData(bedrijfId, token) {
@@ -9,16 +11,18 @@ async function fetchPendingSpeeddateData(bedrijfId, token) {
   };
 
   try {
-    const response = await fetch(url, { headers });
+    const response = await authenticatedFetch(url, { headers });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
+    // Filter from data where asked_by is own id
     const data = await response.json();
+    const filteredData = data.filter((item) => item.asked_by !== bedrijfId);
 
     // Structureer de data voor eenvoudige rendering
-    return formatPendingSpeeddateData(data);
+    return formatPendingSpeeddateData(filteredData);
   } catch (error) {
     console.error('Fout bij ophalen van pending speeddate data:', error);
     throw error;
@@ -140,7 +144,7 @@ async function acceptSpeeddate(afspraakId) {
   }
 
   try {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `https://api.ehb-match.me/speeddates/accept/${afspraakId}`,
       {
         method: 'POST',
@@ -250,7 +254,7 @@ async function deleteSpeeddate(afspraakId, opts = {}) {
     return;
   }
   try {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `https://api.ehb-match.me/speeddates/reject/${afspraakId}`,
       {
         method: 'POST',
@@ -349,7 +353,7 @@ export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
   rootElement.innerHTML = `
     <div class="bedrijf-profile-container">
       <header class="bedrijf-profile-header">
-        <div class="logo-section">
+        <div class="logo-section" id="logo-navigation">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
@@ -425,6 +429,15 @@ export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
       });
     });
   });
+
+  // Logo navigation event listener
+  const logoSection = document.getElementById('logo-navigation');
+  if (logoSection) {
+    logoSection.addEventListener('click', () => {
+      Router.navigate('/bedrijf/speeddates');
+    });
+  }
+
   // Burger menu and other functionality
   const burger = document.getElementById('burger-menu');
   const dropdown = document.getElementById('burger-dropdown');

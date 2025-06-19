@@ -3,6 +3,7 @@ import '../../css/consolidated-style.css';
 import Router from '../../router.js';
 
 import { previousData } from '../register.js';
+import { authenticatedFetch } from '../../utils/auth-api.js';
 
 let fileKey = null;
 
@@ -18,7 +19,8 @@ export function renderStudentRegister(rootElement) {
       <button class="back-button" id="back-button">← Terug</button>
       <div class="upload-section">
         <div class="upload-icon" data-alt="⬆" style="position:relative;">
-          <img src="" alt="⬆" class="uploaded-photo" />
+          <img src="" class="uploaded-photo" style="display:none;" alt="" />
+          <div class="upload-icon-text">⬆</div>
           <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
         </div>
         <label for="profielFoto" class="upload-label">Foto</label>
@@ -97,15 +99,16 @@ export function renderStudentRegister(rootElement) {
   deleteOverlay.addEventListener('click', handlePhotoClick);
 
   async function handlePhotoClick() {
-    fetch(`https://api.ehb-match.me/profielfotos/${fileKey}`, {
+    authenticatedFetch(`https://api.ehb-match.me/profielfotos/${fileKey}`, {
       method: 'DELETE',
     }).then((response) => {
       if (!response.ok) {
         console.error(`Failed to delete photo: ${response.status}`);
       }
     });
-    uploadedPhoto.alt = '⬆';
+    uploadedPhoto.style.display = 'none';
     uploadedPhoto.src = '';
+    document.querySelector('.upload-icon-text').style.display = '';
     fileStatus.textContent = 'No file selected.'; // Reset file status
     uploadedPhoto.removeEventListener('click', handlePhotoClick);
     fileKey = null; // Reset file key
@@ -115,12 +118,14 @@ export function renderStudentRegister(rootElement) {
   fileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (file) {
+      document.querySelector('.upload-icon-text').style.display = 'none';
+      
       fileStatus.textContent = file.name;
 
       const formData = new FormData();
 
       formData.append('image', file);
-      const uploadResponse = await fetch('https://api.ehb-match.me/profielfotos', {
+      const uploadResponse = await authenticatedFetch('https://api.ehb-match.me/profielfotos', {
         method: 'POST',
         body: formData,
       }).then((response) => {
@@ -133,7 +138,8 @@ export function renderStudentRegister(rootElement) {
 
       fileKey = uploadResponse.profiel_foto_key || null;
 
-      uploadedPhoto.alt = '';
+      document.querySelector('.upload-icon-text').style.display = 'none';
+      uploadedPhoto.style.display = '';
       uploadedPhoto.src = uploadResponse.profiel_foto_url || '';
       updateDeleteOverlay();
       uploadedPhoto.addEventListener('click', handlePhotoClick);

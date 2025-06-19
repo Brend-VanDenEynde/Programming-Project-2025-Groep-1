@@ -10,6 +10,7 @@ import {
   apiDelete,
   publicApiPost,
 } from '../utils/api.js';
+import { authenticatedFetch } from './auth-api.js';
 
 /**
  * Fetch all available skills from the API
@@ -123,7 +124,7 @@ export async function deleteUser(userId) {
  */
 export async function registerCompany(companyData) {
   try {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       'https://api.ehb-match.me/auth/register/bedrijf',
       {
         method: 'POST',
@@ -286,7 +287,7 @@ export async function fetchDiscoverStudenten(
  * Send a contact message to the support team
  */
 export async function sendContactMessage(contactData) {
-  const response = await fetch('https://api.ehb-match.me/contact', {
+  const response = await authenticatedFetch('https://api.ehb-match.me/contact', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(contactData),

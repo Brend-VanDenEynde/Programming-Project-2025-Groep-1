@@ -3,7 +3,7 @@ import { showSettingsPopup } from './student-settings.js';
 import logoIcon from '../../icons/favicon-32x32.png';
 import { getOpleidingNaamById, opleidingen } from './student-opleidingen.js';
 import defaultAvatar from '../../images/default.png';
-import { logoutUser } from '../../utils/auth-api.js';
+import { authenticatedFetch, logoutUser } from '../../utils/auth-api.js';
 import { renderBedrijven } from './bedrijven.js';
 
 const defaultProfile = {
@@ -81,11 +81,10 @@ export function renderStudentProfiel(
   );
 
   const opleidingNaam = getOpleidingNaamById(resolvedOpleidingId);
-
   rootElement.innerHTML = `
     <div class="student-profile-container">
       <header class="student-profile-header">
-        <div class="logo-section">
+        <div class="logo-section" id="logo-navigation">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>
@@ -105,11 +104,10 @@ export function renderStudentProfiel(
           </ul>
         </nav>
         <div class="student-profile-content">
-          <div class="student-profile-form-container" style="position:relative;">
-            <button id="btn-search-criteria" type="button" class="skills-btn" style="position:absolute;top:0;right:0;margin:0.2em 0.2em 0 0;z-index:2;">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <circle cx="9" cy="9" r="7" stroke="#2364aa" stroke-width="2"/>
-                <line x1="14.2" y1="14.2" x2="18" y2="18" stroke="#2364aa" stroke-width="2" stroke-linecap="round"/>
+          <div class="student-profile-form-container" style="position:relative;">            <button id="btn-search-criteria" type="button" class="skills-btn" style="position:absolute;top:0;right:0;margin:0.5em 1em 0 0;z-index:2;" aria-label="Mijn skills en voorkeuren beheren" title="Beheer je skills en voorkeuren">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="2"/>
+                <line x1="14.2" y1="14.2" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               </svg>
               <span>Mijn skills en voorkeuren</span>
             </button>
@@ -128,15 +126,21 @@ export function renderStudentProfiel(
               </div>
               <div class="student-profile-form-group">
                 <label for="firstNameInput">Voornaam</label>
-                <input type="text" id="firstNameInput" value="${voornaam}" placeholder="voornaam" required ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="firstNameInput" value="${voornaam}" placeholder="voornaam" required ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="student-profile-form-group">
                 <label for="lastNameInput">Achternaam</label>
-                <input type="text" id="lastNameInput" value="${achternaam}" placeholder="achternaam" required ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="lastNameInput" value="${achternaam}" placeholder="achternaam" required ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="student-profile-form-group">
                 <label for="emailInput">E-mailadres</label>
-                <input type="email" id="emailInput" value="${email}" placeholder="e-mailadres" required ${readonlyMode ? 'disabled' : ''}>
+                <input type="email" id="emailInput" value="${email}" placeholder="e-mailadres" required ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="student-profile-form-group">
                 <label for="studyProgramInput">Studieprogramma</label>
@@ -145,7 +149,9 @@ export function renderStudentProfiel(
                   ${opleidingen
                     .map(
                       (o) =>
-                        `<option value="${o.id}" ${o.id == resolvedOpleidingId ? 'selected' : ''}>${o.naam}</option>`
+                        `<option value="${o.id}" ${
+                          o.id == resolvedOpleidingId ? 'selected' : ''
+                        }>${o.naam}</option>`
                     )
                     .join('')}
                 </select>
@@ -153,19 +159,29 @@ export function renderStudentProfiel(
               <div class="student-profile-form-group">
                 <label for="yearInput">Opleidingsjaar</label>
                 <select id="yearInput" ${readonlyMode ? 'disabled' : ''}>
-                  <option value="1" ${studiejaar == '1' ? 'selected' : ''}>1</option>
-                  <option value="2" ${studiejaar == '2' ? 'selected' : ''}>2</option>
-                  <option value="3" ${studiejaar == '3' ? 'selected' : ''}>3</option>
+                  <option value="1" ${
+                    studiejaar == '1' ? 'selected' : ''
+                  }>1</option>
+                  <option value="2" ${
+                    studiejaar == '2' ? 'selected' : ''
+                  }>2</option>
+                  <option value="3" ${
+                    studiejaar == '3' ? 'selected' : ''
+                  }>3</option>
                 </select>
               </div>
               <div class="student-profile-form-group">
                 <label for="birthDateInput">Geboortedatum</label>
-                <input type="date" id="birthDateInput" value="${geboortedatum}" placeholder="geboortedatum" ${readonlyMode ? 'disabled' : ''}>
+                <input type="date" id="birthDateInput" value="${geboortedatum}" placeholder="geboortedatum" ${
+    readonlyMode ? 'disabled' : ''
+  }>
                 <div id="birthDateError" style="color: red; font-size: 0.9em; min-height: 1.2em;"></div>
               </div>
               <div class="student-profile-form-group">
                 <label for="linkedinInput">LinkedIn-link</label>
-                <input type="url" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/in/jouwprofiel" ${readonlyMode ? 'disabled' : ''}>
+                <input type="url" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/in/jouwprofiel" ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               <div class="student-profile-buttons">
                 ${
@@ -243,6 +259,18 @@ export function renderStudentProfiel(
       dropdown.classList.remove('open');
       showSettingsPopup(() => renderStudentProfiel(rootElement, studentData));
     });
+
+    // Logo navigation event listener
+    const logoSection = document.getElementById('logo-navigation');
+    if (logoSection) {
+      logoSection.addEventListener('click', () => {
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/student/student-speeddates');
+        });
+      });
+    }
+
     // Profiel knop in hamburger menu
     const navProfileBtn = document.getElementById('nav-profile');
     if (navProfileBtn) {
@@ -254,20 +282,22 @@ export function renderStudentProfiel(
         });
       });
     }
-    document.getElementById('nav-logout').addEventListener('click', async () => {
-      dropdown.classList.remove('open');
-      const response = await logoutUser();
-      console.log('Logout API response:', response);
-      window.sessionStorage.removeItem('studentData');
-      window.sessionStorage.removeItem('authToken');
-      window.sessionStorage.removeItem('userType');
-      localStorage.setItem('darkmode', 'false');
-      document.body.classList.remove('darkmode');
-      import('../../router.js').then((module) => {
-        const Router = module.default;
-        Router.navigate('/');
+    document
+      .getElementById('nav-logout')
+      .addEventListener('click', async () => {
+        dropdown.classList.remove('open');
+        const response = await logoutUser();
+        console.log('Logout API response:', response);
+        window.sessionStorage.removeItem('studentData');
+        window.sessionStorage.removeItem('authToken');
+        window.sessionStorage.removeItem('userType');
+        localStorage.setItem('darkmode', 'false');
+        document.body.classList.remove('darkmode');
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/');
+        });
       });
-    });
 
     // Ook de LOG OUT knop in het profiel-formulier zelf (voor desktop)
     const logoutBtn = document.getElementById('logout-btn');
@@ -323,7 +353,7 @@ export function renderStudentProfiel(
     const editBtn = document.getElementById('btn-edit-profile');
     if (editBtn) {
       editBtn.addEventListener('click', () => {
-        console.log("EDIT clicked", {readonlyMode, studentData});
+        console.log('EDIT clicked', { readonlyMode, studentData });
         renderStudentProfiel(rootElement, studentData, false);
       });
     }
@@ -404,16 +434,11 @@ export function renderStudentProfiel(
         try {
           // 1. E-mail gewijzigd? Eerst /user/{userID}
           if (nieuweEmail && nieuweEmail !== oudeEmail) {
-
             console.debug('PUT /user/' + userID, { email: nieuweEmail });
-            const respUser = await fetch(
+            const respUser = await authenticatedFetch(
               `https://api.ehb-match.me/user/${userID}`,
               {
                 method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: 'Bearer ' + token,
-                },
                 body: JSON.stringify({ email: nieuweEmail }),
               }
             );
@@ -432,7 +457,10 @@ export function renderStudentProfiel(
           // 2. Profielfoto uploaden indien geselecteerd
           // Altijd alleen de key, nooit de URL of null!
           let profielFotoKey = null;
-          if (studentData.profiel_foto && typeof studentData.profiel_foto === 'string') {
+          if (
+            studentData.profiel_foto &&
+            typeof studentData.profiel_foto === 'string'
+          ) {
             if (studentData.profiel_foto.startsWith('http')) {
               const parts = studentData.profiel_foto.split('/');
               profielFotoKey = parts[parts.length - 1];
@@ -445,7 +473,9 @@ export function renderStudentProfiel(
             const file = photoInput.files[0];
             // Controleer bestandstype en grootte
             if (!file.type.match(/^image\/(jpeg|png|gif)$/)) {
-              alert('Ongeldig bestandstype. Kies een jpg, png of gif afbeelding.');
+              alert(
+                'Ongeldig bestandstype. Kies een jpg, png of gif afbeelding.'
+              );
               return;
             }
             if (file.size > 2 * 1024 * 1024) {
@@ -455,13 +485,13 @@ export function renderStudentProfiel(
             // Gebruik altijd 'image' als veldnaam
             const fileForm = new FormData();
             fileForm.append('image', file);
-            const uploadResp = await fetch('https://api.ehb-match.me/profielfotos', {
-              method: 'POST',
-              headers: {
-                'Authorization': 'Bearer ' + token,
-              },
-              body: fileForm,
-            });
+            const uploadResp = await authenticatedFetch(
+              'https://api.ehb-match.me/profielfotos',
+              {
+                method: 'POST',
+                body: fileForm,
+              }
+            );
             if (!uploadResp.ok) {
               const errText = await uploadResp.text();
               console.error('Upload response for key "image":', errText);
@@ -475,21 +505,23 @@ export function renderStudentProfiel(
           const payload = {
             voornaam: document.getElementById('firstNameInput').value,
             achternaam: document.getElementById('lastNameInput').value,
-            studiejaar: parseInt(document.getElementById('yearInput').value, 10),
+            studiejaar: parseInt(
+              document.getElementById('yearInput').value,
+              10
+            ),
             date_of_birth: document.getElementById('birthDateInput').value, // <-- correct!
             linkedin: document.getElementById('linkedinInput').value,
             opleiding_id: parseInt(newOpleidingId, 10),
-            profiel_foto: profielFotoKey
+            profiel_foto: profielFotoKey,
           };
-          console.log("Payload met profielfoto key:", payload);
-          const respStudent = await fetch(`https://api.ehb-match.me/studenten/${studentID}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + token,
-            },
-            body: JSON.stringify(payload),
-          });
+          console.log('Payload met profielfoto key:', payload);
+          const respStudent = await authenticatedFetch(
+            `https://api.ehb-match.me/studenten/${studentID}`,
+            {
+              method: 'PUT',
+              body: JSON.stringify(payload),
+            }
+          );
 
           if (!respStudent.ok) {
             const errText = await respStudent.text();
@@ -571,17 +603,17 @@ export async function fetchAndStoreStudentProfile() {
   const token = sessionStorage.getItem('authToken');
   if (!token) throw new Error('Geen authToken gevonden');
   // 1. Haal user-info op (voor email en userID)
-  const respUser = await fetch('https://api.ehb-match.me/auth/info', {
-    headers: { Authorization: 'Bearer ' + token },
-  });
+  const respUser = await authenticatedFetch(
+    'https://api.ehb-match.me/auth/info'
+  );
   if (!respUser.ok) throw new Error('Kan user-info niet ophalen');
   const userResult = await respUser.json();
   const user = userResult.user;
   if (!user || !user.id) throw new Error('User info onvolledig');
   // 2. Haal alle studenten op en zoek juiste student
-  const respStudents = await fetch('https://api.ehb-match.me/studenten', {
-    headers: { Authorization: 'Bearer ' + token },
-  });
+  const respStudents = await authenticatedFetch(
+    'https://api.ehb-match.me/studenten'
+  );
   if (!respStudents.ok) throw new Error('Kan studentenlijst niet ophalen');
   const studenten = await respStudents.json();
   const student = studenten.find((s) => s.gebruiker_id === user.id);

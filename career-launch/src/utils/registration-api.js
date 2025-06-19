@@ -4,6 +4,8 @@
  * en het versturen naar de backend API
  */
 
+import { authenticatedFetch } from "./auth-api";
+
 /**
  * Creëert een JSON-object voor gebruikersregistratie met alleen user-gegevens
  * @param {Object} formData - De ruwe formulierdata van het registratieformulier
@@ -36,7 +38,7 @@ export async function sendRegistrationToAPI(userData) {
     console.log('Verzenden registratiedata naar:', API_ENDPOINT);
     console.log('JSON payload:', JSON.stringify(userData, null, 2));
 
-    const response = await fetch(API_ENDPOINT, {
+    const response = await authenticatedFetch(API_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

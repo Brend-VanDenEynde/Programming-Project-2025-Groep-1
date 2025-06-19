@@ -1,15 +1,56 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import defaultStudentAvatar from '../../images/default.png';
-import { logoutUser, fetchUserInfo } from '../../utils/auth-api.js';
+import {
+  logoutUser,
+  fetchUserInfo,
+  authenticatedFetch,
+} from '../../utils/auth-api.js';
 import {
   fetchDiscoverStudenten,
   createSpeeddate,
 } from '../../utils/data-api.js';
+import {
+  getFavoriteStudents,
+  addFavoriteStudent,
+  removeFavoriteStudent,
+  isStudentFavorite,
+  toggleFavoriteStudent,
+  filterFavoriteStudents,
+} from '../../utils/bedrijf-favorites-storage.js';
 import Router from '../../router.js';
 
 // Global variables for students data
 let studenten = [];
 let currentBedrijfId = null;
+let toonAlleFavorieten = false;
+
+// Feedback notification function
+function showFeedbackNotification(message, type = 'success') {
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: ${type === 'success' ? '#10b981' : '#6b7280'};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10001;
+    font-weight: 500;
+    max-width: 350px;
+    word-wrap: break-word;
+  `;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    notification.style.transform = 'translateY(-10px)';
+    notification.style.transition = 'all 0.3s ease';
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
 
 // Function to get student profile photo URL
 function getStudentPhotoUrl(profiel_foto_key, profiel_foto_url) {
@@ -130,13 +171,30 @@ async function showStudentPopup(student) {
   }
 
   // Get opleiding name from opleiding_id (you might want to fetch this from API)
-  let opleidingText = student.opleiding_id
-    ? `Opleiding ID: ${student.opleiding_id}`
-    : '';
-
+  const opleidingResponse = await authenticatedFetch(
+    'https://api.ehb-match.me/opleidingen/' + student.opleiding_id,
+    {
+      method: 'GET',
+    }
+  ).then((response) => {
+    if (!response.ok) {
+      console.error(`Failed to fetch opleiding: ${response.status}`);
+      return {};
+    }
+    return response.json();
+  });
+  let opleidingText =
+    opleidingResponse.type + ' ' + opleidingResponse.naam || 'Onbekend';
   popup.innerHTML = `
     <div style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:600px;width:98vw;min-width:340px;position:relative;display:flex;flex-direction:column;align-items:center;">
       <button id="student-popup-close" style="position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#666;">×</button>
+      <button id="popup-favorite-btn" class="popup-favorite-btn" title="${
+        isStudentFavorite(currentBedrijfId, student.gebruiker_id)
+          ? 'Verwijder uit favorieten'
+          : 'Voeg toe aan favorieten'
+      }" style="position:absolute;top:10px;left:14px;font-size:2rem;background:none;border:none;cursor:pointer;z-index:2;display:flex;align-items:center;justify-content:center;color:inherit;transition:transform 0.2s;">${
+    isStudentFavorite(currentBedrijfId, student.gebruiker_id) ? '❤️' : '🤍'
+  }</button>
       
       <img src="${photo}" alt="Foto ${fullName}" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:1rem;" onerror="this.src='${defaultStudentAvatar}'">
       
@@ -189,11 +247,50 @@ async function showStudentPopup(student) {
       </div>
     </div>
   `;
-
   document.body.appendChild(popup);
 
   // Event listeners
   document.getElementById('student-popup-close').onclick = () => popup.remove();
+
+  // Popup favorite button event listener
+  const popupFavoriteBtn = document.getElementById('popup-favorite-btn');
+  if (popupFavoriteBtn && currentBedrijfId) {
+    popupFavoriteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isNowFavorite = toggleFavoriteStudent(
+        currentBedrijfId,
+        student.gebruiker_id
+      );
+
+      // Update the popup button
+      popupFavoriteBtn.innerHTML = isNowFavorite ? '❤️' : '🤍';
+      popupFavoriteBtn.title = isNowFavorite
+        ? 'Verwijder uit favorieten'
+        : 'Voeg toe aan favorieten';
+
+      // Update the card button in the background if it exists
+      const cardFavoriteBtn = document.querySelector(
+        `[data-student-id="${student.gebruiker_id}"]`
+      );
+      if (cardFavoriteBtn) {
+        cardFavoriteBtn.innerHTML = isNowFavorite ? '❤️' : '🤍';
+        cardFavoriteBtn.title = isNowFavorite
+          ? 'Verwijder uit favorieten'
+          : 'Voeg toe aan favorieten';
+      }
+
+      // Show feedback notification
+      const message = isNowFavorite
+        ? `${fullName} toegevoegd aan favorieten!`
+        : `${fullName} verwijderd uit favorieten`;
+      showFeedbackNotification(message, isNowFavorite ? 'success' : 'info');
+
+      // Add animation
+      popupFavoriteBtn.classList.add('animating');
+      setTimeout(() => popupFavoriteBtn.classList.remove('animating'), 400);
+    });
+  }
+
   popup.addEventListener('click', (e) => {
     if (e.target === popup) popup.remove();
   });
@@ -256,61 +353,55 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
       studentPending,
       companyPending,
     ] = await Promise.all([
-      fetch(
-        `https://api.ehb-match.me/speeddates/user/${studentId}/unavailable`,
-        { headers: { Authorization: `Bearer ${token}` } }
+      authenticatedFetch(
+      `https://api.ehb-match.me/speeddates/accepted?id=${studentId}`
+    ).then((r) => (r.ok ? r.json() : [])),
+      authenticatedFetch(
+      `https://api.ehb-match.me/speeddates/accepted?id=${bedrijfId}`
+    ).then((r) => (r.ok ? r.json() : [])),
+      authenticatedFetch(
+        `https://api.ehb-match.me/speeddates/pending?id=${studentId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       ).then((r) => (r.ok ? r.json() : [])),
-      fetch(
-        `https://api.ehb-match.me/speeddates/user/${bedrijfId}/unavailable`,
-        { headers: { Authorization: `Bearer ${token}` } }
+      authenticatedFetch(
+        `https://api.ehb-match.me/speeddates/pending?id=${bedrijfId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
       ).then((r) => (r.ok ? r.json() : [])),
-      fetch(`https://api.ehb-match.me/speeddates/pending?id=${studentId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }).then((r) => (r.ok ? r.json() : [])),
-      fetch(`https://api.ehb-match.me/speeddates/pending?id=${bedrijfId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }).then((r) => (r.ok ? r.json() : [])),
     ]);
 
     // Combine all unavailable slots from both student and company
     const allUnavailable = [...studentUnavailable, ...companyUnavailable];
     // Combine all pending requests from both student and company
     const allPending = [...studentPending, ...companyPending]; // Status function - check if time slot is unavailable or pending
-    function getStatusForTijd(tijd, unavailableSlots, pendingSlots) {
-      // Check if this time slot matches any unavailable slot
-      const isUnavailable = unavailableSlots.some((slot) => {
-        if (!slot.begin || !slot.einde) return false;
-
-        const slotBegin = new Date(slot.begin);
-
-        // Convert tijd (HH:MM) to comparable format
-        const [hours, minutes] = tijd.split(':').map(Number);
-        const slotHours = slotBegin.getHours();
-        const slotMinutes = slotBegin.getMinutes();
-
-        // Check if the time matches
-        return slotHours === hours && slotMinutes === minutes;
-      });
-
-      // Check if this time slot matches any pending slot
-      const isPending = pendingSlots.some((slot) => {
-        if (!slot.begin || !slot.einde) return false;
-
-        const slotBegin = new Date(slot.begin);
-
-        // Convert tijd (HH:MM) to comparable format
-        const [hours, minutes] = tijd.split(':').map(Number);
-        const slotHours = slotBegin.getHours();
-        const slotMinutes = slotBegin.getMinutes();
-
-        // Check if the time matches
-        return slotHours === hours && slotMinutes === minutes;
-      });
-
-      if (isUnavailable) return 'unavailable';
-      if (isPending) return 'pending';
-      return 'free';
-    }
+    function getStatusForTijd(tijd, allAccepted, allPending) {
+    const isConfirmed = allAccepted.some((s) => {
+      if (!s.begin) return false;
+      const dt = new Date(s.begin);
+      return (
+        `${dt.getHours().toString().padStart(2, '0')}:${dt
+          .getMinutes()
+          .toString()
+          .padStart(2, '0')}` === tijd
+      );
+    });
+    if (isConfirmed) return 'unavailable';
+    const isPending = allPending.some((s) => {
+      if (!s.begin) return false;
+      const dt = new Date(s.begin);
+      return (
+        `${dt.getHours().toString().padStart(2, '0')}:${dt
+          .getMinutes()
+          .toString()
+          .padStart(2, '0')}` === tijd
+      );
+    });
+    if (isPending) return 'pending';
+    return 'free';
+  }
 
     // Build time slots
     function buildTimeSlotOptions({
@@ -364,10 +455,9 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
           <h2 style="margin-bottom:0.5rem;text-align:center;color:#333;">Speeddate Aanvragen</h2>
           <p style="margin-bottom:0.5rem;text-align:center;color:#666;">Vraag een speeddate aan met <strong>${fullName}</strong></p>
           <p style="margin-bottom:0;text-align:center;color:#888;font-size:0.9rem;">Datum: ${formattedDate}</p>
-        </div>
-          <div style="margin-bottom:1rem;">
+        </div>          <div style="margin-bottom:1rem;">
           <div style="margin-bottom:0.5rem;font-size:0.95rem;text-align:center;">
-            <strong>Legenda:</strong>
+            <strong>Tijdslot legenda:</strong>
             <span style="background:#fff;border:1px solid #ccc;padding:0.2rem 0.5rem;border-radius:5px;margin-left:0.5rem;font-size:0.85rem;">Vrij</span>
             <span style="background:#fff3cd;border:1px solid #ffeaa7;padding:0.2rem 0.5rem;border-radius:5px;margin-left:0.5rem;font-size:0.85rem;">Pending</span>
             <span style="background:#ffe0e0;border:1px solid #ffbdbd;padding:0.2rem 0.5rem;border-radius:5px;margin-left:0.5rem;font-size:0.85rem;">Bezet</span>
@@ -394,9 +484,7 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
     const submitBtn = document.getElementById('submit-speeddate');
     const statusDiv = document.getElementById('speeddate-status');
     let geselecteerdUur = null;
-    let gekozenTijd = '';
-
-    // Create hour selection buttons
+    let gekozenTijd = ''; // Create hour selection buttons
     uren.forEach((uur) => {
       const slotsForHour = allSlots.filter((slot) => {
         const slotHour = parseInt(slot.value.split(':')[0], 10);
@@ -407,19 +495,40 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
       ).length;
 
       const btn = document.createElement('button');
-      btn.innerHTML = `${uur}u <span style="background:#fff;border-radius:8px;padding:0.1rem 0.7rem;font-size:0.85em;margin-left:0.5em;border:1px solid #b7b7ff;color:#4e7bfa;">${vrijeSlots}</span>`;
+
+      // Bepaal kleur en style gebaseerd op aantal vrije slots
+      const isUnavailable = vrijeSlots === 0;
+      const backgroundColor = isUnavailable ? '#ffebee' : '#eef1fa';
+      const borderColor = isUnavailable ? '#f44336' : '#b7b7ff';
+      const textColor = isUnavailable ? '#c62828' : '#4e7bfa';
+      const spanBackground = isUnavailable ? '#ffcdd2' : '#fff';
+      const spanBorderColor = isUnavailable ? '#f44336' : '#b7b7ff';
+      const spanTextColor = isUnavailable ? '#c62828' : '#4e7bfa';
+
+      btn.innerHTML = `${uur}u <span style="background:${spanBackground};border-radius:8px;padding:0.1rem 0.7rem;font-size:0.85em;margin-left:0.5em;border:1px solid ${spanBorderColor};color:${spanTextColor};" title="Aantal beschikbare tijdslots">${vrijeSlots}</span>`;
       btn.style.cssText = `
-        background:#eef1fa;
-        border:1.5px solid #b7b7ff;
+        background:${backgroundColor};
+        border:1.5px solid ${borderColor};
         border-radius:8px;
         padding:0.5rem 1rem;
         font-size:0.95rem;
-        cursor:pointer;
+        cursor:${isUnavailable ? 'not-allowed' : 'pointer'};
         margin:0;
         transition:box-shadow .2s;
         display:flex;align-items:center;gap:0.4em;
+        color:${textColor};
+        opacity:${isUnavailable ? '0.7' : '1'};
       `;
+
+      if (isUnavailable) {
+        btn.disabled = true;
+        btn.title = 'Geen tijdslots beschikbaar voor dit uur';
+      } else {
+        btn.title = `${vrijeSlots} beschikbare tijdslots voor ${uur}:00 uur`;
+      }
+
       btn.addEventListener('click', () => {
+        if (isUnavailable) return;
         geselecteerdUur = uur;
         urenLijst
           .querySelectorAll('button')
@@ -471,11 +580,14 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
           submitBtn.disabled = false;
         });
       });
-    }
-
-    // Auto-select first hour
+    } // Auto-select first available hour (not unavailable/red)
     if (uren.length) {
-      urenLijst.querySelector('button').click();
+      const firstAvailableButton = urenLijst.querySelector(
+        'button:not([disabled])'
+      );
+      if (firstAvailableButton) {
+        firstAvailableButton.click();
+      }
     }
 
     // Event listeners
@@ -580,11 +692,10 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
   }
 
   currentBedrijfId = bedrijfData.id || bedrijfData.gebruiker_id;
-
   rootElement.innerHTML = `
     <div class="bedrijf-profile-container">
       <header class="bedrijf-profile-header">
-        <div class="logo-section">
+        <div class="logo-section" id="logo-navigation">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
@@ -606,9 +717,9 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
         
         <div class="bedrijf-profile-content">
           <div class="bedrijf-profile-form-container">            <h1 class="bedrijf-profile-title">Matched Studenten</h1>
-            
-            <!-- Filter Controls and Color Legend combined -->
-            <div class="studenten-filters" style="background:#f8fafc; padding:1.2rem; border-radius:14px; margin-bottom:2.2rem; box-shadow:0 2px 8px #0001; border:1.5px solid #e1e5e9;">
+              <!-- Filter Controls and Color Legend combined -->
+            <div class="studenten-filters" style="background:#f8fafc; padding:1.2rem; border-radius:14px; margin-bottom:2.2rem; box-shadow:0 2px 8px #0001; border:1.5px solid #e1e5e9; position:relative;">
+              <button id="filter-favorieten-btn" title="Toon alleen favorieten" class="" style="position:absolute;top:8px;right:18px;font-size:1.7rem;background:none;border:none;cursor:pointer;z-index:5;transition:transform 0.3s;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;box-sizing:content-box;">🤍</button>
               <div style="display:flex;gap:2rem;align-items:start;">
                 <!-- Search section -->
                 <div style="flex:1;min-width:300px;">
@@ -706,8 +817,7 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
       border-radius: 12px;
       font-size: 0.8rem;
       font-weight: 500;
-    }
-    .studenten-filters label {
+    }    .studenten-filters label {
       font-weight: 500;
       font-size: 0.9rem;
       margin-bottom: 0.2rem;
@@ -716,9 +826,14 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
     .studenten-filters input[type="checkbox"] {
       margin-right: 0.5rem;
     }
+    .favorite-btn.animating, .popup-favorite-btn.animating {
+      transform: scale(1.3);
+    }
+    #filter-favorieten-btn.animating {
+      transform: scale(1.3);
+    }
   `;
   document.head.appendChild(style);
-
   // Function to render students list
   function renderStudentsList(studentsToShow = studenten) {
     const listElement = document.getElementById('studenten-list');
@@ -747,10 +862,21 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
 
         // Get color scheme for this match percentage
         const colorScheme = getMatchColorScheme(matchPercentage);
+
+        // Check if student is favorited
+        const isFavoriet = currentBedrijfId
+          ? isStudentFavorite(currentBedrijfId, student.gebruiker_id)
+          : false;
+        const hartIcon = isFavoriet ? '❤️' : '🤍';
         return `
           <div class="student-card" data-student-idx="${idx}" style="border-left: 4px solid ${
           colorScheme.cardBorder
-        };">
+        }; position: relative;">
+            <button class="favorite-btn" data-student-id="${
+              student.gebruiker_id
+            }" title="${
+          isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'
+        }" style="position:absolute;top:10px;left:10px;font-size:1.3rem;background:none;border:none;cursor:pointer;z-index:2;">${hartIcon}</button>
             <div class="match-badge" style="background: ${
               colorScheme.background
             }; color: ${colorScheme.color}; border: 2px solid ${
@@ -758,9 +884,9 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
         };" title="${colorScheme.label}">${formattedMatch}%</div>
             <img src="${photo}" alt="Foto ${fullName}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:1rem;" onerror="this.src='${defaultStudentAvatar}'">
             <h3 style="margin-bottom:0.5rem;text-align:center;">${fullName}</h3>
-            <div style="font-size:0.9rem;color:#666;margin-bottom:0.3rem;">Studiejaar: ${
-              student.studiejaar
-            }</div>
+            <div style="font-size:0.9rem;color:#666;margin-bottom:0.3rem;">${
+              student.opleiding_type
+            } ${student.opleiding_naam}</div>
             <div style="font-size:0.85rem;color:#888;text-align:center;">
               <div>Functie: ${student.functie_matches || 0} | Opleiding: ${
           student.opleiding_matches || 0
@@ -780,12 +906,48 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
     // Add click listeners to student cards
     document.querySelectorAll('.student-card').forEach((card) => {
       card.addEventListener('click', (e) => {
+        // Don't open popup if favorite button was clicked
+        if (e.target.classList.contains('favorite-btn')) {
+          return;
+        }
         const idx = card.getAttribute('data-student-idx');
         showStudentPopup(studentsToShow[idx]);
       });
     });
-  }
-  // Function to load students
+
+    // Add click listeners to favorite buttons
+    document.querySelectorAll('.favorite-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const studentId = btn.getAttribute('data-student-id');
+        if (!currentBedrijfId || !studentId) {
+          return;
+        }
+
+        const isNowFavorite = toggleFavoriteStudent(
+          currentBedrijfId,
+          studentId
+        );
+        btn.innerHTML = isNowFavorite ? '❤️' : '🤍';
+        btn.title = isNowFavorite
+          ? 'Verwijder uit favorieten'
+          : 'Voeg toe aan favorieten';
+
+        const student = studentsToShow.find((s) => s.gebruiker_id == studentId);
+        const studentNaam = student
+          ? `${student.voornaam} ${student.achternaam}`
+          : 'Student';
+        const message = isNowFavorite
+          ? `${studentNaam} toegevoegd aan favorieten!`
+          : `${studentNaam} verwijderd uit favorieten`;
+        showFeedbackNotification(message, isNowFavorite ? 'success' : 'info');
+
+        // Add animation
+        btn.classList.add('animating');
+        setTimeout(() => btn.classList.remove('animating'), 400);
+      });
+    });
+  } // Function to load students
   async function loadStudents() {
     try {
       // Use default values: suggestions = true, onlyNew = false
@@ -797,7 +959,14 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
         suggestions,
         onlyNew
       );
-      renderStudentsList();
+
+      // Apply favorites filter if active
+      let studentsToShow = studenten;
+      if (toonAlleFavorieten && currentBedrijfId) {
+        studentsToShow = filterFavoriteStudents(studenten, currentBedrijfId);
+      }
+
+      renderStudentsList(studentsToShow);
     } catch (error) {
       console.error('Error loading students:', error);
       document.getElementById('studenten-list').innerHTML =
@@ -824,15 +993,51 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
   }); // Event listeners for filters
   document.getElementById('student-zoek')?.addEventListener('input', (e) => {
     const searchTerm = e.target.value.toLowerCase();
-    const filtered = studenten.filter(
+    let filtered = studenten.filter(
       (student) =>
         `${student.voornaam} ${student.achternaam}`
           .toLowerCase()
           .includes(searchTerm) ||
         student.contact_email.toLowerCase().includes(searchTerm)
     );
+
+    // Apply favorites filter if active
+    if (toonAlleFavorieten && currentBedrijfId) {
+      filtered = filterFavoriteStudents(filtered, currentBedrijfId);
+    }
+
     renderStudentsList(filtered);
   });
+
+  // Favorites filter button event listener
+  document
+    .getElementById('filter-favorieten-btn')
+    ?.addEventListener('click', () => {
+      toonAlleFavorieten = !toonAlleFavorieten;
+      const favorietenBtn = document.getElementById('filter-favorieten-btn');
+      if (favorietenBtn) {
+        favorietenBtn.innerHTML = toonAlleFavorieten ? '❤️' : '🤍';
+        favorietenBtn.classList.add('animating');
+        setTimeout(() => favorietenBtn.classList.remove('animating'), 400);
+      }
+
+      // Re-apply current search with new favorites filter
+      const searchTerm =
+        document.getElementById('student-zoek')?.value?.toLowerCase() || '';
+      let filtered = studenten.filter(
+        (student) =>
+          `${student.voornaam} ${student.achternaam}`
+            .toLowerCase()
+            .includes(searchTerm) ||
+          student.contact_email.toLowerCase().includes(searchTerm)
+      );
+
+      if (toonAlleFavorieten && currentBedrijfId) {
+        filtered = filterFavoriteStudents(filtered, currentBedrijfId);
+      }
+
+      renderStudentsList(filtered);
+    });
 
   // Sidebar navigation
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
@@ -855,6 +1060,14 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
       }
     });
   });
+
+  // Logo navigation event listener
+  const logoSection = document.getElementById('logo-navigation');
+  if (logoSection) {
+    logoSection.addEventListener('click', () => {
+      Router.navigate('/bedrijf/speeddates');
+    });
+  }
 
   // Burger menu and other functionality
   const burger = document.getElementById('burger-menu');

@@ -1,15 +1,17 @@
 import logoIcon from '../../icons/favicon-32x32.png';
+import { authenticatedFetch } from '../../utils/auth-api.js';
+import Router from '../../router.js';
 
 // Functie om speeddate data op te halen van de API
 async function fetchSpeeddateData(bedrijfId, token) {
-  const url = `https://api.ehb-match.me/speeddates/accepted?id=${bedrijfId}`;
+  const url = `https://api.ehb-match.me/speeddates`;
   const headers = {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
   };
 
   try {
-    const response = await fetch(url, { headers });
+    const response = await authenticatedFetch(url, { headers });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -17,8 +19,11 @@ async function fetchSpeeddateData(bedrijfId, token) {
 
     const data = await response.json();
 
+    // Filter out unaccepted speeddate requests made by other users
+    const filteredData = data.filter((item) => item.akkoord !== 0 || item.asked_by === bedrijfId);
+
     // Structureer de data voor eenvoudige rendering
-    return formatSpeeddateData(data);
+    return formatSpeeddateData(filteredData);
   } catch (error) {
     console.error('Fout bij ophalen van speeddate data:', error);
     throw error;
@@ -68,8 +73,8 @@ function formatTijdslot(beginISO, eindeISO) {
     minute: '2-digit',
   };
 
-  const beginFormatted = begin.toLocaleDateString('nl-NL', opties);
-  const eindeFormatted = einde.toLocaleTimeString('nl-NL', {
+  const beginFormatted = begin.toLocaleDateString('be-BE', opties);
+  const eindeFormatted = einde.toLocaleTimeString('be-BE', {
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -226,7 +231,7 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
   rootElement.innerHTML = `
     <div class="bedrijf-profile-container">
       <header class="bedrijf-profile-header">
-        <div class="logo-section">
+        <div class="logo-section" id="logo-navigation">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
@@ -294,6 +299,15 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
       });
     });
   });
+
+  // Logo navigation event listener
+  const logoSection = document.getElementById('logo-navigation');
+  if (logoSection) {
+    logoSection.addEventListener('click', () => {
+      Router.navigate('/bedrijf/speeddates');
+    });
+  }
+
   // Burger menu and other functionality
   const burger = document.getElementById('burger-menu');
   const dropdown = document.getElementById('burger-dropdown');
