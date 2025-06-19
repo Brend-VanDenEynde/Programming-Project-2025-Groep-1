@@ -134,9 +134,16 @@ async function showStudentPopup(student) {
   }
 
   // Get opleiding name from opleiding_id (you might want to fetch this from API)
-  let opleidingText = student.opleiding_id
-    ? `Opleiding ID: ${student.opleiding_id}`
-    : '';
+  const opleidingResponse = await authenticatedFetch('https://api.ehb-match.me/opleidingen/' + student.opleiding_id, {
+    method: 'GET',
+  }).then((response) => {
+    if (!response.ok) {
+      console.error(`Failed to fetch opleiding: ${response.status}`);
+      return {};
+    }
+    return response.json();
+  });
+  let opleidingText = opleidingResponse.type + ' ' + opleidingResponse.naam || 'Onbekend';
 
   popup.innerHTML = `
     <div style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:600px;width:98vw;min-width:340px;position:relative;display:flex;flex-direction:column;align-items:center;">
