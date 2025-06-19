@@ -1,66 +1,193 @@
-# EhBMatch
+# EhBMatch / Career Launch
 
-EhBMatch is een webapplicatie ontworpen om studenten en bedrijven met elkaar te verbinden, waardoor carrièremogelijkheden en werving worden vergemakkelijkt. Het biedt een platform voor studenten om profielen aan te maken, hun vaardigheden te tonen en naar banen te zoeken, terwijl bedrijven vacatures kunnen plaatsen en geschikte kandidaten kunnen vinden.
+EhBMatch is een professionele webapplicatie die studenten en bedrijven met elkaar verbindt om carrièremogelijkheden, stages en werving te faciliteren. Studenten kunnen hun profiel en vaardigheden presenteren, terwijl bedrijven vacatures plaatsen en kandidaten zoeken. Het platform bevat uitgebreide authenticatie, robuuste API-integratie, toegankelijke UX en een modern, schaalbaar frontend-ontwerp.
 
-## Belangrijkste Kenmerken en Functionaliteit
+---
 
-- Gebruikersregistratie en login voor studenten en bedrijven.
-- Aanmaken van studentprofielen, inclusief opleiding, vaardigheden en ervaring.
-- Aanmaken van bedrijfsprofielen en de mogelijkheid om vacatures te plaatsen.
-- Zoekfunctionaliteit voor studenten om banen te vinden en voor bedrijven om kandidaten te vinden.
-- Admin dashboard voor het beheren van gebruikers en site-inhoud.
+## Inhoudsopgave
 
-## Technologie Stack & Afhankelijkheden
+- [Belangrijkste Functionaliteiten](#belangrijkste-functionaliteiten)
+- [Architectuur & Technologieën](#architectuur--technologieën)
+- [Mappenstructuur](#mappenstructuur)
+- [Installatie & Setup](#installatie--setup)
+- [Gebruiksinstructies](#gebruiksinstructies)
+- [Authenticatie & Security](#authenticatie--security)
+- [API & Dataflow](#api--dataflow)
+- [Best Practices & Toegankelijkheid](#best-practices--toegankelijkheid)
+- [Probleemoplossing](#probleemoplossing)
+- [Bijdragen](#bijdragen)
+- [Licentie](#licentie)
+- [Bronnen & Credits](#bronnen--credits)
 
-- **Programmeertaal:** JavaScript
-- **Framework/Bibliotheek:** Vite
-- **Opmaak/Styling:** HTML, CSS
-- **Afhankelijkheden:**
-  - `vite`: Een snelle build tool en ontwikkelingsserver.
+---
 
-## Installatie-instructies
+## Belangrijkste Functionaliteiten
+
+- **Registratie & Login** voor studenten, bedrijven en admins
+- **Studentprofielen**: opleiding, vaardigheden, cv, profielfoto, privacy
+- **Bedrijfsprofielen**: bedrijfsinfo, vacatures, logo, contactpersonen
+- **Zoekfunctionaliteit**: studenten zoeken naar jobs, bedrijven zoeken naar kandidaten
+- **Speeddate-verzoeken**: bedrijven en studenten kunnen speeddates aanvragen
+- **Admin dashboard**: beheer van gebruikers, bedrijven, content en moderatie
+- **Geavanceerde authenticatie**: JWT, refresh tokens, automatische tokenvernieuwing
+- **Bestand- en afbeelding upload**: veilige upload van cv’s en profielfoto’s
+- **Responsief & toegankelijk ontwerp**: dark mode, toetsenbordnavigatie, ARIA-labels
+
+---
+
+## Architectuur & Technologieën
+
+- **Frontend**: JavaScript (ES6+), Vite, HTML5, CSS3 (geconsolideerd, responsive, dark mode)
+- **API-communicatie**: Fetch API wrappers (`authenticatedFetch`, `apiGet`, `apiPost`, ...)
+- **Authenticatie**: JWT, refresh tokens, cookies (secure, HttpOnly), automatische token refresh
+- **Bestandbeheer**: FormData voor uploads, fallback/placeholder images
+- **Projectstructuur**: Modulaire JS-bestanden, gescheiden per functionaliteit
+- **Build & tooling**: Vite, npm scripts, sourcemaps, hot reload
+
+---
+
+## Mappenstructuur
+
+```
+career-launch/
+├── index.html
+├── package.json
+├── vite.config.js
+├── public/
+│   └── Icons/, images/, vite.svg, ...
+├── src/
+│   ├── main.js, router.js
+│   ├── css/
+│   │   ├── consolidated-style.css, ...
+│   ├── pages/
+│   │   ├── login.js, register.js, ...
+│   │   ├── student/, bedrijf/, admin/, ...
+│   ├── utils/
+│   │   ├── api.js, auth-api.js, data-api.js, ...
+│   ├── examples/, docs/, icons/, images/
+│   └── ...
+└── ...
+```
+
+Zie de map `src/` voor alle broncode, componenten en utilities. CSS is geconsolideerd voor performance en onderhoudbaarheid.
+
+---
+
+## Installatie & Setup
 
 ### Systeemvereisten
+- Node.js (v18 of hoger aanbevolen)
+- npm (of yarn)
 
-- Node.js (inclusief npm of yarn)
+### Installatie
+1. **Clone de repository** of download de broncode.
+2. **Navigeer naar de projectmap:**
+   ```powershell
+   cd career-launch
+   ```
+3. **Installeer afhankelijkheden:**
+   ```powershell
+   npm install
+   ```
 
-### Vereiste Afhankelijkheden/Voorwaarden
+### Omgevingsvariabelen
+- Configureer API endpoints en secrets via `.env` indien nodig (zie `vite.config.js` voor base URL).
 
-- Zorg ervoor dat Node.js op uw systeem is geïnstalleerd. U kunt het downloaden van [nodejs.org](https://nodejs.org/).
+---
 
-### Installatiecommando's
+## Gebruiksinstructies
 
-1.  Kloon de repository (indien van toepassing) of download de projectbestanden.
-2.  Navigeer naar de `career-launch` map in uw terminal:
-    ```powershell
-    cd career-launch
-    ```
-3.  Installeer de projectafhankelijkheden:
-    ```powershell
-    npm install
-    ```
+- **Start de ontwikkelserver:**
+  ```powershell
+  npm run dev
+  ```
+  Applicatie draait standaard op `http://localhost:3001` (zie `vite.config.js`).
 
-## Basis Gebruiksvoorbeelden
+- **Build voor productie:**
+  ```powershell
+  npm run build
+  ```
+  Output in `dist/` map.
 
-1.  **Om de ontwikkelingsserver te starten:**
-    Open uw terminal, navigeer naar de `career-launch` map en voer uit:
+- **Preview productie-build lokaal:**
+  ```powershell
+  npm run preview
+  ```
+  Preview draait standaard op `http://localhost:4173` (zie `vite.config.js`).
 
-    ```powershell
-    npm run dev
-    ```
+---
 
-    Dit start de applicatie doorgaans op `http://localhost:5173`.
+## Authenticatie & Security
 
-2.  **Om het project te bouwen voor productie:**
+- **JWT authenticatie** met automatische token refresh via `authenticatedFetch`.
+- **Refresh tokens** worden veilig beheerd (cookie, HttpOnly, Secure).
+- **Automatische afhandeling van 401/expired tokens**: gebruikers worden niet onderbroken.
+- **Logout** wist tokens, cookies en sessiegegevens volledig.
+- **Beveiligde endpoints**: alleen geauthenticeerde gebruikers kunnen gevoelige API’s aanroepen.
+- **Input validatie** en **sanitatie** op zowel frontend als backend.
 
-    ```powershell
-    npm run build
-    ```
+---
 
-    Dit commando zal een `dist` map aanmaken in de `career-launch` map met de geoptimaliseerde productie build.
+## API & Dataflow
 
-3.  **Om de productie build lokaal te bekijken:**
-    ```powershell
-    npm run preview
-    ```
-    Dit zal de inhoud van de `dist` map serveren.
+- **API-wrappers**: Gebruik altijd `authenticatedFetch` of `apiGet`/`apiPost` voor API-calls.
+- **Token refresh**: 401-responses triggeren automatisch een refresh en retry.
+- **Bestand uploads**: Gebruik `FormData` voor afbeeldingen en cv’s (zie registratie- en profielpagina’s).
+- **Foutafhandeling**: Robuuste error handling, duidelijke gebruikersmeldingen.
+- **Voorbeeld endpoints**:
+  - `POST /auth/login`, `POST /auth/register`, `POST /auth/refresh`, `POST /auth/logout`
+  - `GET/PUT /studenten/:id`, `GET/PUT /bedrijven/:id`, `GET /skills/`, ...
+
+Zie `/src/utils/api.js` en `/src/utils/auth-api.js` voor implementatie.
+
+---
+
+## Best Practices & Toegankelijkheid
+
+- **Toegankelijkheid**: ARIA-labels, toetsenbordnavigatie, duidelijke focus states
+- **Responsief ontwerp**: Mobile-first, dark mode, flexbox/grid
+- **Codekwaliteit**: Modulaire structuur, duidelijke bestandsnamen, JSDoc, error handling
+- **Performance**: Geconsolideerde CSS, minimale bundlegrootte, lazy loading waar mogelijk
+- **Veiligheid**: Geen gevoelige data in frontend, HTTPS verplicht in productie
+
+---
+
+## Probleemoplossing
+
+- **API werkt niet / 401-fouten**: Controleer of backend draait en CORS/cookie-instellingen correct zijn.
+- **Afbeeldingen worden niet geladen**: Controleer bestandsnamen, permissies en fallback-logica.
+- **Build errors**: Controleer Node.js-versie en npm dependencies.
+- **Login/registratie werkt niet**: Controleer API endpoint, netwerk en browserconsole op fouten.
+- **Gebruik `npm run lint`** (indien geconfigureerd) voor codekwaliteit.
+
+---
+
+## Bijdragen
+
+Bijdragen zijn welkom! Volg deze stappen:
+1. Fork de repository
+2. Maak een feature branch (`git checkout -b feature/naam`)
+3. Commit en push je wijzigingen
+4. Open een pull request met duidelijke beschrijving
+
+Houd je aan de bestaande code style en documentatie.
+
+---
+
+## Licentie
+
+Dit project is open source en beschikbaar onder de MIT-licentie.
+
+---
+
+## Bronnen & Credits
+
+- Documentatie, codevoorbeelden en best practices zijn mede tot stand gekomen met behulp van AI-assistentie, waaronder [GitHub Copilot](https://github.com/features/copilot).
+- Inspiratie en technische richtlijnen zijn deels gebaseerd op de officiële documentatie van [Vite](https://vitejs.dev/), [MDN Web Docs](https://developer.mozilla.org/), en [OWASP](https://owasp.org/) voor security best practices.
+- Bijdragen van het projectteam en open source community.
+
+---
+
+Made with ❤️ by us.
+
+© 2025 Programming Project Group 1 – EHB Match
