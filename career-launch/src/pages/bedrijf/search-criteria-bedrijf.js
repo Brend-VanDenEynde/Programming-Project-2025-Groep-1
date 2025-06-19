@@ -1,5 +1,6 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { authenticatedFetch, refreshToken } from '../../utils/auth-api.js';
+import Router from '../../router.js';
 
 export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
   rootElement.innerHTML = `

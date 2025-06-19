@@ -1,5 +1,6 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { authenticatedFetch } from '../../utils/auth-api.js';
+import Router from '../../router.js';
 
 // Functie om speeddate data op te halen van de API
 async function fetchSpeeddateData(bedrijfId, token) {
