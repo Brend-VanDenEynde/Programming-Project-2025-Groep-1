@@ -37,7 +37,7 @@ EhBMatch is een professionele webapplicatie die studenten en bedrijven met elkaa
 
 ## Architectuur & Technologieën
 
-- **Frontend**: JavaScript (ES6+), Vite, HTML5, CSS3 (geconsolideerd, responsive, dark mode)
+- **Frontend**: JavaScript (ES6+), Vite, HTML5, CSS3 (geconsolideerd, responsive)
 - **API-communicatie**: Fetch API wrappers (`authenticatedFetch`, `apiGet`, `apiPost`, ...)
 - **Authenticatie**: JWT, refresh tokens, cookies (secure, HttpOnly), automatische token refresh
 - **Bestandbeheer**: FormData voor uploads, fallback/placeholder images
