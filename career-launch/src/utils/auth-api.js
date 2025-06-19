@@ -388,16 +388,26 @@ export async function authenticatedFetch(url, options = {}) {
       Authorization: `Bearer ${token}`,
     }),
   };
-  // Only add default Content-Type if not already present
-  if (!headers['Content-Type'] && !headers['content-type']) {
-    headers['Content-Type'] = 'application/json';
-  }
 
   // Make the initial API call
   const requestOptions = {
     headers,
     ...options,
   };
+
+  // Only add default Content-Type if not already present and body is a plain object (JSON)
+  if (
+    !headers['Content-Type'] &&
+    !headers['content-type'] &&
+    requestOptions['body'] &&
+    typeof requestOptions['body'] === 'object' &&
+    !(requestOptions['body'] instanceof FormData) &&
+    !(requestOptions['body'] instanceof Blob) &&
+    !(requestOptions['body'] instanceof ArrayBuffer) &&
+    !Array.isArray(requestOptions['body'])
+  ) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   try {
     const response = await fetch(url, requestOptions);
