@@ -17,10 +17,12 @@ async function fetchPendingSpeeddateData(bedrijfId, token) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
+    // Filter from data where asked_by is own id
     const data = await response.json();
+    const filteredData = data.filter((item) => item.asked_by !== bedrijfId);
 
     // Structureer de data voor eenvoudige rendering
-    return formatPendingSpeeddateData(data);
+    return formatPendingSpeeddateData(filteredData);
   } catch (error) {
     console.error('Fout bij ophalen van pending speeddate data:', error);
     throw error;

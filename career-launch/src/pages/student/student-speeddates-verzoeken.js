@@ -14,7 +14,10 @@ async function fetchPendingSpeeddates() {
     'https://api.ehb-match.me/speeddates/pending'
   );
   if (!resp.ok) throw new Error(`Fout bij ophalen: ${resp.status}`);
-  return await resp.json();
+  const data = await resp.json();
+  // Filter from data where asked_by is own id
+  const studentId = JSON.parse(sessionStorage.getItem('studentData')).id;
+  return data.filter((item) => item.asked_by !== studentId);
 }
 async function acceptSpeeddate(id) {
   const resp = await authenticatedFetch(

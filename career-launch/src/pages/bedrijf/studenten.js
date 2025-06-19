@@ -272,13 +272,11 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
       companyPending,
     ] = await Promise.all([
       authenticatedFetch(
-        `https://api.ehb-match.me/speeddates/user/${studentId}/unavailable`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      ).then((r) => (r.ok ? r.json() : [])),
+      `https://api.ehb-match.me/speeddates/accepted?id=${studentId}`
+    ).then((r) => (r.ok ? r.json() : [])),
       authenticatedFetch(
-        `https://api.ehb-match.me/speeddates/user/${bedrijfId}/unavailable`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      ).then((r) => (r.ok ? r.json() : [])),
+      `https://api.ehb-match.me/speeddates/accepted?id=${bedrijfId}`
+    ).then((r) => (r.ok ? r.json() : [])),
       authenticatedFetch(
         `https://api.ehb-match.me/speeddates/pending?id=${studentId}`,
         {
@@ -297,41 +295,31 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
     const allUnavailable = [...studentUnavailable, ...companyUnavailable];
     // Combine all pending requests from both student and company
     const allPending = [...studentPending, ...companyPending]; // Status function - check if time slot is unavailable or pending
-    function getStatusForTijd(tijd, unavailableSlots, pendingSlots) {
-      // Check if this time slot matches any unavailable slot
-      const isUnavailable = unavailableSlots.some((slot) => {
-        if (!slot.begin || !slot.einde) return false;
-
-        const slotBegin = new Date(slot.begin);
-
-        // Convert tijd (HH:MM) to comparable format
-        const [hours, minutes] = tijd.split(':').map(Number);
-        const slotHours = slotBegin.getHours();
-        const slotMinutes = slotBegin.getMinutes();
-
-        // Check if the time matches
-        return slotHours === hours && slotMinutes === minutes;
-      });
-
-      // Check if this time slot matches any pending slot
-      const isPending = pendingSlots.some((slot) => {
-        if (!slot.begin || !slot.einde) return false;
-
-        const slotBegin = new Date(slot.begin);
-
-        // Convert tijd (HH:MM) to comparable format
-        const [hours, minutes] = tijd.split(':').map(Number);
-        const slotHours = slotBegin.getHours();
-        const slotMinutes = slotBegin.getMinutes();
-
-        // Check if the time matches
-        return slotHours === hours && slotMinutes === minutes;
-      });
-
-      if (isUnavailable) return 'unavailable';
-      if (isPending) return 'pending';
-      return 'free';
-    }
+    function getStatusForTijd(tijd, allAccepted, allPending) {
+    const isConfirmed = allAccepted.some((s) => {
+      if (!s.begin) return false;
+      const dt = new Date(s.begin);
+      return (
+        `${dt.getHours().toString().padStart(2, '0')}:${dt
+          .getMinutes()
+          .toString()
+          .padStart(2, '0')}` === tijd
+      );
+    });
+    if (isConfirmed) return 'unavailable';
+    const isPending = allPending.some((s) => {
+      if (!s.begin) return false;
+      const dt = new Date(s.begin);
+      return (
+        `${dt.getHours().toString().padStart(2, '0')}:${dt
+          .getMinutes()
+          .toString()
+          .padStart(2, '0')}` === tijd
+      );
+    });
+    if (isPending) return 'pending';
+    return 'free';
+  }
 
     // Build time slots
     function buildTimeSlotOptions({
