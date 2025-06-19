@@ -106,7 +106,6 @@ function renderSpeeddatesList(speeddates) {
                      onerror="this.src='/images/default.png'" />
                 <div class="student-details">
                   <h4>${afspraak.student.naam}</h4>
-                  <p class="student-id">Student ID: ${afspraak.student.id}</p>
                 </div>
               </div>
               
