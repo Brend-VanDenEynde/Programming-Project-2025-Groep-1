@@ -68,15 +68,21 @@ a:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 50px);
+  height: 100vh;
   padding: 20px;
-  padding-bottom: 70px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
 }
 
 .home-container img {
-  max-width: 300px;
+  max-width: 250px;
   height: auto;
   margin-bottom: 20px;
+  align-self: center;
 }
 
 .home-container h1 {
@@ -105,11 +111,13 @@ a:hover {
 
 /* Achtergrondafbeelding voor de homepagina */
 .home-background {
-  min-height: 100vh;
+  height: 100vh;
   width: 100vw;
   background: url('../images/website banner 2_3Ehb.jpg') center center/cover
     no-repeat fixed !important;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
   overflow: hidden;
 }
 
@@ -141,8 +149,6 @@ a:hover {
    ============================================================================= */
 
 .btn {
-  background-color: #c0c0c0;
-  color: #333;
   border: none;
   padding: 15px 40px;
   font-size: 1.1rem;
@@ -154,10 +160,33 @@ a:hover {
   transition: all 0.3s ease;
 }
 
-.btn:hover {
-  background-color: #b0b0b0;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+/* PRIMAIRE KNOP - Gevuld met merkkleur (rood) */
+#btn-register {
+  background-color: #dc143c;
+  color: white;
+  border: 2px solid #dc143c;
+}
+
+#btn-register:hover {
+  background-color: #d01439;
+  border-color: #d01439;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 20, 60, 0.1);
+}
+
+/* SECUNDAIRE KNOP - Omlijnd met merkkleur (rood) */
+#btn-login {
+  background-color: transparent;
+  color: #dc143c;
+  border: 2px solid #dc143c;
+}
+
+#btn-login:hover {
+  background-color: rgba(220, 20, 60, 0.05);
+  color: #dc143c;
+  border-color: #dc143c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 20, 60, 0.08);
 }
 
 .btn-primary {
