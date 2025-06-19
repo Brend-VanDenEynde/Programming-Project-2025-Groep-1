@@ -127,17 +127,14 @@ Zie de map `src/` voor alle broncode, componenten en utilities. CSS is geconsoli
 
 ---
 
-## API & Dataflow
+## API
 
-- **API-wrappers**: Gebruik altijd `authenticatedFetch` of `apiGet`/`apiPost` voor API-calls.
-- **Token refresh**: 401-responses triggeren automatisch een refresh en retry.
-- **Bestand uploads**: Gebruik `FormData` voor afbeeldingen en cv’s (zie registratie- en profielpagina’s).
-- **Foutafhandeling**: Robuuste error handling, duidelijke gebruikersmeldingen.
-- **Voorbeeld endpoints**:
-  - `POST /auth/login`, `POST /auth/register`, `POST /auth/refresh`, `POST /auth/logout`
-  - `GET/PUT /studenten/:id`, `GET/PUT /bedrijven/:id`, `GET /skills/`, ...
+De backend API voor EhB-Match is open source en beschikbaar voor integratie, testing en verdere ontwikkeling.
 
-Zie `/src/utils/api.js` en `/src/utils/auth-api.js` voor implementatie.
+- **API repository:** [https://github.com/imadofficial/programming-project-2025-groep-1-API](https://github.com/imadofficial/programming-project-2025-groep-1-API)
+- **API documentatie:** [https://api.ehb-match.me/](https://api.ehb-match.me/)
+
+De API biedt endpoints voor authenticatie, registratie, profielbeheer, matching, speeddate-verzoeken en meer. Raadpleeg de documentatie voor een volledig overzicht van alle beschikbare routes, request/response formats en security best practices.
 
 ---
 
@@ -166,6 +163,8 @@ Zie `/src/utils/api.js` en `/src/utils/auth-api.js` voor implementatie.
 - Documentatie, codevoorbeelden en best practices zijn mede tot stand gekomen met behulp van AI-assistentie, waaronder [GitHub Copilot](https://github.com/features/copilot).
 - Inspiratie en technische richtlijnen zijn deels gebaseerd op de officiële documentatie van [Vite](https://vitejs.dev/), [MDN Web Docs](https://developer.mozilla.org/), en [OWASP](https://owasp.org/) voor security best practices.
 - Bijdragen van het projectteam.
+- **API repository:** [https://github.com/imadofficial/programming-project-2025-groep-1-API](https://github.com/imadofficial/programming-project-2025-groep-1-API)
+- **API documentatie:** [https://api.ehb-match.me/](https://api.ehb-match.me/)
 
 ---
 
