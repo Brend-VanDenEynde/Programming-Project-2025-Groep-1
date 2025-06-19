@@ -148,7 +148,6 @@ export async function renderBedrijfProfiel(
       <div class="bedrijf-profile-main">
         <nav class="bedrijf-profile-sidebar">
           <ul>
-            <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
             <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
@@ -473,6 +472,7 @@ export async function renderBedrijfProfiel(
         const photoInput = document.getElementById('logoInput');
         if (photoInput && photoInput.files && photoInput.files.length > 0) {
           const file = photoInput.files[0];
+          // Controleer bestandstype en grootte
           // Controleer bestandstype en grootte
           if (!file.type.match(/^image\/(jpeg|png|gif)$/)) {
             alert(

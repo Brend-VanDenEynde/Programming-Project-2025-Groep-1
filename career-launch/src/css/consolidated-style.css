@@ -598,7 +598,7 @@ a:hover {
   position: relative;
 }
 
-.student-profile-title {
+.student-profile-title, .bedrijf-profile-title {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 2rem;
@@ -882,7 +882,7 @@ a:hover {
 .speeddates-table td {
   background: #fff;
   color: #222;
-  padding: 1rem 1rem;
+  padding: 1rem 2.5rem;
   border-bottom: 1px solid #e1e5e9;
   vertical-align: middle;
   text-align: center;
@@ -924,8 +924,8 @@ a:hover {
   font-weight: 600;
   font-size: 0.95em;
   padding: 0 18px;
-  min-width: 110px;
-  height: 38px;
+  min-width: 140px;
+  height: 44px;
   margin: 0 2px;
   text-align: center;
   display: inline-flex;
@@ -1533,7 +1533,7 @@ a:hover {
 /* Contact specific styles */
 .contact-info {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
   margin: 2rem 0;
 }
@@ -2621,20 +2621,15 @@ a:hover {
 }
 
 .speeddate-item {
-  background-color: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: white;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  cursor: pointer;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  min-width: 420px;
-  max-width: 900px;
+  min-width: 600px;   /* meer ruimte */
+  max-width: 1200px;  /* meer ruimte */
   width: 100%;
-  /* Zorgt dat het item breder wordt, maar responsief blijft */
 }
 
 .speeddate-item:hover {
@@ -2803,7 +2798,18 @@ a:hover {
   transform: translateY(-1px);
 }
 
-
+/* Forceer gelijke breedte en hoogte voor accept/deny knoppen */
+.accept-btn,
+.deny-btn {
+  width: 140px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  box-sizing: border-box;
+  padding: 0;
+}
 
 .status-final {
   font-weight: 600;
@@ -3171,18 +3177,38 @@ a:hover {
    ============================================================================= */
 
 .speeddates-lijst {
-  max-width: 1000px;
+  max-width: 1400px; /* meer ruimte */
+  min-width: 700px; /* optioneel, voor consistentie */
   margin: 0 auto;
 }
 
 .speeddates-header {
-  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
 
-.speeddates-header h2 {
+.speeddates-filter-group {
+  display: flex;
+  gap: 8px;
+}
+
+.speeddates-filter-btn {
+  background: #f5f5f5;
   color: #333;
-  font-size: 1.5rem;
-  margin: 0;
+  border: 1.5px solid #0077b5;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+}
+.speeddates-filter-btn.active,
+.speeddates-filter-btn:hover {
+  background: #0077b5;
+  color: #fff;
 }
 
 .speeddates-table {
@@ -3198,8 +3224,8 @@ a:hover {
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  min-width: 420px;
-  max-width: 900px;
+  min-width: 600px;   /* meer ruimte */
+  max-width: 1200px;  /* meer ruimte */
   width: 100%;
 }
 
@@ -3274,6 +3300,9 @@ a:hover {
   font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
+    white-space: nowrap; /* Belangrijk! */
+
+
 }
 
 .status-badge.goedgekeurd {
@@ -3328,14 +3357,6 @@ a:hover {
   color: #666;
   font-style: italic;
   padding: 40px;
-}
-
-.accept-btn,
-.deny-btn {
-  min-width: 120px;
-  padding: 0.6rem 0;
-  display: inline-block;
-  text-align: center;
 }
 
 /* Bedrijf zoekcriteria: skill-tag styling */
@@ -3553,6 +3574,9 @@ a:hover {
     right: 8px;
   }
 }
-.bedrijf-profile-form-container {
-  position: relative;
+
+.speeddate-uur, .bedrijf-profile-title h4 {
+  white-space: nowrap; /* Zorgt ervoor dat de tijd niet afbreekt */
 }
+
+

@@ -108,6 +108,19 @@ function formatUTCTime(isoString) {
   return `${hh}:${mm}`;
 }
 
+function formatTijdslotStudent(beginISO, eindeISO) {
+  const begin = new Date(beginISO);
+  const einde = new Date(eindeISO);
+  // Dag en datum
+  const dagOpties = { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' };
+  const dagDatum = begin.toLocaleDateString('nl-BE', dagOpties);
+  // Uur
+  const tijdOpties = { hour: '2-digit', minute: '2-digit' };
+  const beginTijd = begin.toLocaleTimeString('nl-BE', tijdOpties);
+  const eindeTijd = einde.toLocaleTimeString('nl-BE', tijdOpties);
+  return `<span class=\"speeddate-dag\"><strong>Dag:</strong> ${dagDatum}</span><br><span class=\"speeddate-uur\"><strong>Uur:</strong> ${beginTijd} - ${eindeTijd}</span>`;
+}
+
 export async function renderSpeeddates(rootElement, studentData = {}) {
   // Sorteervolgorde behouden als er al gesorteerd is, anders default op tijd
   if (!currentSort || !Array.isArray(currentSort) || currentSort.length === 0) {
@@ -192,13 +205,9 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
             <h4>${s.naam_bedrijf}</h4>
           </div>
         </div>
-        
         <div class="afspraak-details" style="display:flex;flex-direction:row;align-items:center;gap:24px;">
           <div class="tijd-lokaal">
-            <p class="tijdslot"><strong>Tijd:</strong> ${
-              s.begin ? formatUTCTime(s.begin) : '-'
-            }</p>
-            <p class="lokaal"><strong>Lokaal:</strong> ${s.lokaal || '-'}</p>
+            ${s.begin ? formatTijdslotStudent(s.begin, s.einde) : '-'}
           </div>
           <div class="status">
             <span class="status-badge ${
@@ -231,7 +240,7 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
-            <li><button data-route="speeddates" class="sidebar-link" type="button">Speeddates</button></li>
+            <li><button data-route="speeddates" class="sidebar-link" type="button">Mijn speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link" type="button">Speeddates-verzoeken</button></li>
             <li><button data-route="bedrijven" class="sidebar-link" type="button">Bedrijven</button></li>
           </ul>
@@ -246,6 +255,11 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
                     <div class="speeddates-lijst">
                       <div class="speeddates-header">
                         <h2>Geplande Speeddates (${sorted.length})</h2>
+                        <div class="speeddates-filter-group">
+                          <button class="speeddates-filter-btn active" data-filter="all">Alle speeddates</button>
+                          <button class="speeddates-filter-btn" data-filter="goedgekeurd">Goedgekeurd</button>
+                          <button class="speeddates-filter-btn" data-filter="in-behandeling">In behandeling</button>
+                        </div>
                       </div>
                       <div class="speeddates-table">
                         ${speeddateCards}
@@ -273,6 +287,9 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
 
   // Popup event listeners voor bedrijfsnaam
   addBedrijfPopupListeners();
+
+  // Filter functionaliteit voor speeddates (student)
+  initSpeeddatesFilter();
 
   // Sidebar nav - gebruik de router voor echte URL navigatie
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
@@ -456,3 +473,28 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     }
   }
 }
+
+// Filter functionaliteit voor speeddates (student)
+function initSpeeddatesFilter() {
+  const filterBtns = document.querySelectorAll('.speeddates-filter-btn');
+  if (!filterBtns.length) return;
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', function () {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      const filter = this.dataset.filter;
+      document.querySelectorAll('.speeddate-item').forEach(item => {
+        const badge = item.querySelector('.status-badge');
+        if (filter === 'all') {
+          item.style.display = '';
+        } else if (filter === 'goedgekeurd') {
+          item.style.display = badge && badge.classList.contains('goedgekeurd') ? '' : 'none';
+        } else if (filter === 'in-behandeling') {
+          item.style.display = badge && badge.classList.contains('in-behandeling') ? '' : 'none';
+        }
+      });
+    });
+  });
+}
+setTimeout(initSpeeddatesFilter, 0);
+document.addEventListener('DOMContentLoaded', initSpeeddatesFilter);

@@ -65,21 +65,17 @@ function formatTijdslot(beginISO, eindeISO) {
   const begin = new Date(beginISO);
   const einde = new Date(eindeISO);
 
-  const opties = {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  };
+  // Dag en datum
+  const dagOpties = { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' };
+  const dagDatum = begin.toLocaleDateString('nl-BE', dagOpties);
 
-  const beginFormatted = begin.toLocaleDateString('be-BE', opties);
-  const eindeFormatted = einde.toLocaleTimeString('be-BE', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  // Uur
+  const tijdOpties = { hour: '2-digit', minute: '2-digit' };
+  const beginTijd = begin.toLocaleTimeString('nl-BE', tijdOpties);
+  const eindeTijd = einde.toLocaleTimeString('nl-BE', tijdOpties);
 
-  return `${beginFormatted} - ${eindeFormatted}`;
+  // Output: dag: datum\n uur: tijd-tijd
+  return `<span class="speeddate-dag"><strong>Dag:</strong> ${dagDatum}</span><br><span class="speeddate-uur"><strong>Uur:</strong> ${beginTijd} - ${eindeTijd}</span>`;
 }
 
 // Functie om speeddate lijst te renderen
@@ -92,6 +88,11 @@ function renderSpeeddatesList(speeddates) {
     <div class="speeddates-lijst">
       <div class="speeddates-header">
         <h2>Geplande Speeddates (${speeddates.length})</h2>
+        <div class="speeddates-filter-group">
+          <button class="speeddates-filter-btn active" data-filter="all">Alle speeddates</button>
+          <button class="speeddates-filter-btn" data-filter="goedgekeurd">Goedgekeurd</button>
+          <button class="speeddates-filter-btn" data-filter="in-behandeling">In behandeling</button>
+        </div>
       </div>
       <div class="speeddates-table">
         ${speeddates
@@ -114,12 +115,7 @@ function renderSpeeddatesList(speeddates) {
               </div>
               <div class="afspraak-details" style="display:flex;flex-direction:row;align-items:center;gap:24px;">
                 <div class="tijd-lokaal">
-                  <p class="tijdslot"><strong>Tijd:</strong> ${
-                    afspraak.tijdslot.geformatteerd
-                  }</p>
-                  <p class="lokaal"><strong>Lokaal:</strong> ${
-                    afspraak.lokaal
-                  }</p>
+                  ${afspraak.tijdslot.geformatteerd}
                 </div>
                 <div class="status">
                   <span class="status-badge ${
@@ -129,18 +125,6 @@ function renderSpeeddatesList(speeddates) {
                   </span>
                 </div>
               </div>
-            </div>
-
-            <div class="speeddate-actions">
-              ${
-                !afspraak.akkoord
-                  ? `
-                <button class="action-btn cancel-btn" onclick="cancelSpeeddate(${afspraak.id})">
-                  Annuleren
-                </button>
-              `
-                  : ''
-              }
             </div>
           </div>
         `
@@ -220,11 +204,35 @@ async function loadSpeeddateData() {
 
     // Render de speeddate lijst
     contentDiv.innerHTML = renderSpeeddatesList(speeddates);
+    initSpeeddatesFilter();
   } catch (error) {
     console.error('Fout bij laden van speeddate data:', error);
     contentDiv.innerHTML =
       '<p class="error">Er is een fout opgetreden: ' + error.message + '</p>';
   }
+}
+
+// Filter functionaliteit voor speeddates (bedrijf/student)
+function initSpeeddatesFilter() {
+  const filterBtns = document.querySelectorAll('.speeddates-filter-btn');
+  if (!filterBtns.length) return;
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', function () {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      const filter = this.dataset.filter;
+      document.querySelectorAll('.speeddate-item').forEach(item => {
+        const badge = item.querySelector('.status-badge');
+        if (filter === 'all') {
+          item.style.display = '';
+        } else if (filter === 'goedgekeurd') {
+          item.style.display = badge && badge.classList.contains('goedgekeurd') ? '' : 'none';
+        } else if (filter === 'in-behandeling') {
+          item.style.display = badge && badge.classList.contains('in-behandeling') ? '' : 'none';
+        }
+      });
+    });
+  });
 }
 
 export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
@@ -244,7 +252,6 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
       
       <div class="bedrijf-profile-main">        <nav class="bedrijf-profile-sidebar">
           <ul>
-            <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link active">Speeddates</button></li>            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
             <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
           </ul>
@@ -283,9 +290,6 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
       import('../../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
-          case 'search-criteria':
-            Router.navigate('/bedrijf/zoek-criteria');
-            break;
           case 'speeddates':
             Router.navigate('/bedrijf/speeddates');
             break;

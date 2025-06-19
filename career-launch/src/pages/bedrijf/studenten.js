@@ -708,7 +708,6 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
       
       <div class="bedrijf-profile-main">        <nav class="bedrijf-profile-sidebar">
           <ul>
-            <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
             <li><button data-route="studenten" class="sidebar-link active">Studenten</button></li>
@@ -1045,9 +1044,6 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
       e.preventDefault();
       const route = e.currentTarget.getAttribute('data-route');
       switch (route) {
-        case 'search-criteria':
-          Router.navigate('/bedrijf/zoek-criteria');
-          break;
         case 'speeddates':
           Router.navigate('/bedrijf/speeddates');
           break;

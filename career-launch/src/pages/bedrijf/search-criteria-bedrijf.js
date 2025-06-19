@@ -19,8 +19,7 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
       
       <div class="bedrijf-profile-main">        <nav class="bedrijf-profile-sidebar">
           <ul>
-            <li><button data-route="search-criteria" class="sidebar-link active">Zoek-criteria</button></li>
-            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
+            <li><button data-route="speeddates" class="sidebar-link">Mijn speeddates</button></li>            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
             <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
           </ul>
         </nav>
@@ -1490,9 +1489,9 @@ async function updateAndRenderSkills() {
 
   // Terug naar profiel knop
   document.getElementById('back-to-profile-btn')?.addEventListener('click', () => {
-    import('../../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/bedrijf/bedrijf-profiel');
+    import('../../pages/student/student-profiel.js').then((module) => {
+      const { renderStudentProfiel } = module;
+      renderStudentProfiel(document.getElementById('app'));
     });
   });
 }

@@ -104,13 +104,8 @@ export function renderStudentProfiel(
           </ul>
         </nav>
         <div class="student-profile-content">
-          <div class="student-profile-form-container" style="position:relative;">            <button id="btn-search-criteria" type="button" class="skills-btn" style="position:absolute;top:0;right:0;margin:0.5em 1em 0 0;z-index:2;" aria-label="Mijn skills en voorkeuren beheren" title="Beheer je skills en voorkeuren">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-                <circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="2"/>
-                <line x1="14.2" y1="14.2" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-              </svg>
-              <span>Mijn skills en voorkeuren</span>
-            </button>
+          <div class="student-profile-form-container" style="position:relative;">
+            <button id="to-search-criteria-btn" class="to-search-criteria-btn" type="button">Zoekcriteria</button>
             <h1 class="student-profile-title">Profiel</h1>
             <form id="profileForm" class="student-profile-form" autocomplete="off" enctype="multipart/form-data">
               <div class="student-profile-avatar-section">
@@ -339,7 +334,7 @@ export function renderStudentProfiel(
   // Event handlers voor profiel bewerken
   const form = document.getElementById('profileForm');
   // Knop naar zoekcriteria (skills/voorkeuren)
-  const searchCriteriaBtn = document.getElementById('btn-search-criteria');
+  const searchCriteriaBtn = document.getElementById('to-search-criteria-btn');
   if (searchCriteriaBtn) {
     searchCriteriaBtn.addEventListener('click', () => {
       import('../../router.js').then((module) => {
