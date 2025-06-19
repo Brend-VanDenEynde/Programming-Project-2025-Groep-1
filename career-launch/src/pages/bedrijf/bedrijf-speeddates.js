@@ -3,7 +3,7 @@ import { authenticatedFetch } from '../../utils/auth-api.js';
 
 // Functie om speeddate data op te halen van de API
 async function fetchSpeeddateData(bedrijfId, token) {
-  const url = `https://api.ehb-match.me/speeddates/accepted?id=${bedrijfId}`;
+  const url = `https://api.ehb-match.me/speeddates`;
   const headers = {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
@@ -18,8 +18,11 @@ async function fetchSpeeddateData(bedrijfId, token) {
 
     const data = await response.json();
 
+    // Filter out unaccepted speeddate requests made by other users
+    const filteredData = data.filter((item) => item.akkoord !== 0 || item.asked_by === bedrijfId);
+
     // Structureer de data voor eenvoudige rendering
-    return formatSpeeddateData(data);
+    return formatSpeeddateData(filteredData);
   } catch (error) {
     console.error('Fout bij ophalen van speeddate data:', error);
     throw error;
@@ -69,8 +72,8 @@ function formatTijdslot(beginISO, eindeISO) {
     minute: '2-digit',
   };
 
-  const beginFormatted = begin.toLocaleDateString('nl-NL', opties);
-  const eindeFormatted = einde.toLocaleTimeString('nl-NL', {
+  const beginFormatted = begin.toLocaleDateString('be-BE', opties);
+  const eindeFormatted = einde.toLocaleTimeString('be-BE', {
     hour: '2-digit',
     minute: '2-digit',
   });
