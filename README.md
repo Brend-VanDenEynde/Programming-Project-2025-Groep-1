@@ -158,25 +158,6 @@ Zie `/src/utils/api.js` en `/src/utils/auth-api.js` voor implementatie.
 - **Afbeeldingen worden niet geladen**: Controleer bestandsnamen, permissies en fallback-logica.
 - **Build errors**: Controleer Node.js-versie en npm dependencies.
 - **Login/registratie werkt niet**: Controleer API endpoint, netwerk en browserconsole op fouten.
-- **Gebruik `npm run lint`** (indien geconfigureerd) voor codekwaliteit.
-
----
-
-## Bijdragen
-
-Bijdragen zijn welkom! Volg deze stappen:
-1. Fork de repository
-2. Maak een feature branch (`git checkout -b feature/naam`)
-3. Commit en push je wijzigingen
-4. Open een pull request met duidelijke beschrijving
-
-Houd je aan de bestaande code style en documentatie.
-
----
-
-## Licentie
-
-Dit project is open source en beschikbaar onder de MIT-licentie.
 
 ---
 
