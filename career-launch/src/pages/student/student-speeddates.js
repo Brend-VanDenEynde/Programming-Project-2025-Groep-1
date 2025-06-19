@@ -386,7 +386,7 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       align-items: center;
     `;
     const profielFoto =
-      s.foto && s.foto.trim() !== '' ? s.foto : '/src/Images/defaultlogo.webp';
+      s.profiel_foto_bedrijf && s.profiel_foto_bedrijf.trim() !== '' ? s.profiel_foto_bedrijf : 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
     popup.innerHTML = `
       <button id="popup-close" style="position:absolute;top:10px;right:12px;font-size:1.4rem;background:none;border:none;cursor:pointer;">×</button>
       <img src="${profielFoto}" alt="Logo ${
