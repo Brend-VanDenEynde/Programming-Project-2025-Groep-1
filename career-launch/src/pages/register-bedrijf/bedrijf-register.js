@@ -112,6 +112,8 @@ export function renderBedrijfRegister(rootElement) {
   fileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (file) {
+      document.querySelector('.upload-icon-text').style.display = 'none';
+      
       fileStatus.textContent = file.name;
 
       const formData = new FormData();
@@ -130,7 +132,6 @@ export function renderBedrijfRegister(rootElement) {
 
       fileKey = uploadResponse.profiel_foto_key || null;
 
-      document.querySelector('.upload-icon-text').style.display = 'none';
       uploadedPhoto.style.display = '';
       uploadedPhoto.src = uploadResponse.profiel_foto_url || '';
       updateDeleteOverlay();

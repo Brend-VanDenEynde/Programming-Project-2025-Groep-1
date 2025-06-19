@@ -118,6 +118,8 @@ export function renderStudentRegister(rootElement) {
   fileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (file) {
+      document.querySelector('.upload-icon-text').style.display = 'none';
+      
       fileStatus.textContent = file.name;
 
       const formData = new FormData();
