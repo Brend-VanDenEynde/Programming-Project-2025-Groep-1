@@ -44,20 +44,28 @@ async function addSkillOrTaal(name, isTaal = 0) {
 
 // Skill/taal verwijderen van student
 async function removeSkillFromStudent(studentId, skillId) {
-  const token = sessionStorage.getItem('authToken');
-  const resp = await fetch(
-    `https://api.ehb-match.me/studenten/${studentId}/skills/${skillId}`,
-    {
-      method: 'DELETE',
-      headers: { Authorization: 'Bearer ' + token },
+  try {
+    const token = sessionStorage.getItem('authToken');
+    const resp = await fetch(
+      `https://api.ehb-match.me/studenten/${studentId}/skills/${skillId}`,
+      {
+        method: 'DELETE',
+        headers: { Authorization: 'Bearer ' + token },
+      }
+    );
+    const text = await resp.text();
+    if (!resp.ok) {
+      console.error('Fout bij verwijderen skill:', text);
+      throw new Error(`Skill met ID ${skillId} kon niet verwijderd worden: ${text}`);
     }
-  );
-  const text = await resp.text();
-  if (!resp.ok) {
-    console.error('Fout bij verwijderen skill:', text);
-    throw new Error(`Skill met ID ${skillId} kon niet verwijderd worden: ${text}`);
+    return true;
+  } catch (error) {
+    if (error.message && error.message.includes('401')) {
+      alert('Je sessie is verlopen. Log opnieuw in.');
+      import('../login.js').then(({ renderLogin }) => renderLogin(document.body));
+    }
+    throw error;
   }
-  return true;
 }
 
 // Haal alle skills/talen van de student op
@@ -248,11 +256,62 @@ async function fetchStudentFuncties(studentId) {
   return await resp.json(); // [{ id, naam }]
 }
 
+// --- GENERIC SKILL/TALEN SELECTOR VOOR STUDENT ---
+function renderSkillSelectorStudent({root, label, allSkills, selected, onAdd, onRemove, type}) {
+  root.innerHTML = `
+    <label>${label}</label>
+    <input type="text" class="skills-input" placeholder="Voeg toe..." autocomplete="off" />
+    <div class="skills-dropdown" style="display:none"></div>
+    <div class="skills-list"></div>
+  `;
+  const input = root.querySelector('.skills-input');
+  const dropdown = root.querySelector('.skills-dropdown');
+  const list = root.querySelector('.skills-list');
+  let currentFocus = -1;
+
+  function updateList() {
+    list.innerHTML = selected.map(skill =>
+      `<span class="skill-tag">${skill.naam} <button data-remove="${skill.id}">×</button></span>`
+    ).join('');
+    list.querySelectorAll('[data-remove]').forEach(btn => {
+      btn.onclick = () => onRemove(Number(btn.dataset.remove));
+    });
+  }
+  updateList();
+
+  input.addEventListener('input', () => {
+    const val = input.value.toLowerCase();
+    const matches = allSkills.filter(s =>
+      s.naam.toLowerCase().includes(val) && !selected.some(sel => sel.id === s.id) && s.type === type
+    ).slice(0, 8);
+    dropdown.style.display = matches.length ? 'block' : 'none';
+    dropdown.innerHTML = matches.map((s, i) =>
+      `<div class="skill-suggestion${i === currentFocus ? ' active' : ''}" data-add="${s.id}">${s.naam}</div>`
+    ).join('');
+    dropdown.querySelectorAll('[data-add]').forEach(el => {
+      el.onclick = () => { onAdd(el.textContent, Number(el.dataset.add)); input.value = ''; dropdown.style.display = 'none'; };
+    });
+  });
+  input.addEventListener('keydown', e => {
+    const suggestions = Array.from(dropdown.querySelectorAll('.skill-suggestion'));
+    if (e.key === 'ArrowDown') { currentFocus = (currentFocus + 1) % suggestions.length; setActive(suggestions, currentFocus); e.preventDefault(); }
+    if (e.key === 'ArrowUp') { currentFocus = (currentFocus - 1 + suggestions.length) % suggestions.length; setActive(suggestions, currentFocus); e.preventDefault(); }
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      if (currentFocus >= 0 && suggestions[currentFocus]) { suggestions[currentFocus].click(); e.preventDefault(); }
+      else if (input.value.trim()) { onAdd(input.value.trim()); input.value = ''; dropdown.style.display = 'none'; e.preventDefault(); }
+    }
+    if (e.key === 'Escape') { dropdown.style.display = 'none'; }
+  });
+  function setActive(items, idx) {
+    items.forEach((el, i) => el.classList.toggle('active', i === idx));
+    if (items[idx]) items[idx].scrollIntoView({ block: 'nearest' });
+  }
+}
+
 // ---- HOOFDFUNCTIE ----
 export async function renderSearchCriteriaStudent(
   rootElement,
-  studentData = {},
-  readonlyMode = true
+  studentData = {}
 ) {
   // AUTH CHECK: blokkeer toegang zonder geldige login
   const token = window.sessionStorage.getItem('authToken');
@@ -287,149 +346,292 @@ export async function renderSearchCriteriaStudent(
       </div>
     `;
 
-    // Declare these at the top of the function scope
     let allSkills = [],
       allTalen = [],
-      alleFuncties = [
-        { id: 1, naam: 'Fulltime' },
-        { id: 2, naam: 'Parttime' },
-        { id: 3, naam: 'Stagiair(e)' }
-      ],
-      studentFunctieIds = [];
+      studentFunctieIds = [],
+      selectedSkills = [],
+      selectedLanguages = [];
     try {
       const all = await fetchAllSkills();
       allSkills = all.filter((s) => s.type === 0); // Skills
       allTalen = all.filter((s) => s.type === 1); // Talen
-      // Functies ophalen van student
-      console.log('studentId voor fetchStudentFuncties:', studentId);
-      console.log('token voor fetchStudentFuncties:', sessionStorage.getItem('authToken'));
       studentFunctieIds = (await fetchStudentFuncties(studentId)).map(f => f.id);
+      // Skills/talen van student ophalen
+      const studentSkills = await fetchStudentSkills(studentId);
+      selectedSkills = studentSkills.filter(s => s.type === 0);
+      selectedLanguages = studentSkills.filter(s => s.type === 1);
     } catch (e) {
       rootElement.innerHTML = `<div style="color:red">Fout bij ophalen skills/talen/functies: ${e.message}</div>`;
       return;
     }
 
-    // Dynamisch radiobuttons genereren
-    const radiobuttonsHtml = alleFuncties
-      .map(
-        (f) => `
-        <label class="checkbox-option">
-          <input type="radio" name="jobType" value="${f.id}" ${
-            studentFunctieIds.includes(f.id) ? 'checked' : ''
-          } ${readonlyMode ? 'disabled' : ''}>
-          <span>${f.naam}</span>
-        </label>
-      `
-      )
-      .join('');
 
-    if (!studentData.skills) studentData.skills = [];
-    if (!studentData.talen) studentData.talen = [];
-    if (!studentData.zoekType) studentData.zoekType = '';
-
-    function isChecked(id, list) {
-      return list.map(Number).includes(Number(id));
-    }
-    function renderCheckboxes(list, checkedArr, name) {
-      return list
-        .map(
-          (item) => `
-            <label class="checkbox-option">
-              <input type="checkbox" name="${name}" value="${item.id}" ${
-            isChecked(item.id, checkedArr) ? 'checked' : ''
-          } ${readonlyMode ? 'disabled' : ''}>
-              <span>${item.naam}</span>
-            </label>
-          `
-        )
-        .join('');
-    }
-
+    // --- HTML rendering (bedrijf-style, met expliciete input/btn/dropdown zoals bij bedrijf) ---
     rootElement.innerHTML = `
-      <div class="student-profile-container">
-        <header class="student-profile-header">
+      <div class="bedrijf-profile-container">
+        <header class="bedrijf-profile-header">
           <div class="logo-section">
             <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
             <span>EhB Career Launch</span>
           </div>
-          <button id="burger-menu" class="student-profile-burger">☰</button>
-          <ul id="burger-dropdown" class="student-profile-dropdown">
+          <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
+          <ul id="burger-dropdown" class="bedrijf-profile-dropdown">
             <li><button id="nav-profile">Profiel</button></li>
             <li><button id="nav-settings">Instellingen</button></li>
             <li><button id="nav-logout">Log out</button></li>
           </ul>
         </header>
-        <div class="student-profile-main">
-          <nav class="student-profile-sidebar">
+        <div class="bedrijf-profile-main">
+          <nav class="bedrijf-profile-sidebar">
             <ul>
-              <li><button data-route="search" class="sidebar-link active">Zoek-criteria</button></li>
+              <li><button data-route="search-criteria" class="sidebar-link active">Zoek-criteria</button></li>
               <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
               <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
               <li><button data-route="bedrijven" class="sidebar-link">Bedrijven</button></li>
             </ul>
           </nav>
-          <div class="student-profile-content">
-            <div class="student-profile-form-container">
-              <h1 class="student-profile-title">Zoek-criteria</h1>
-              <form id="criteriaForm" class="criteria-form" autocomplete="off">
+          <div class="bedrijf-profile-content">
+            <div class="bedrijf-profile-form-container">
+              <h1 class="bedrijf-profile-title">Zoek-criteria</h1>
+              <form id="bedrijf-criteria-form" class="criteria-form" autocomplete="off">
                 <fieldset class="search-fieldset">
                   <legend>Ik zoek</legend>
-                  <div class="checkbox-group">
-                    ${radiobuttonsHtml}
+                  <div class="checkbox-group" id="bedrijf-functies-list">
+                    <label class="checkbox-option">
+                      <input type="checkbox" name="bedrijfFuncties" value="1" ${studentFunctieIds.includes(1) ? 'checked' : ''}>
+                      <span>Fulltime</span>
+                    </label>
+                    <label class="checkbox-option">
+                      <input type="checkbox" name="bedrijfFuncties" value="2" ${studentFunctieIds.includes(2) ? 'checked' : ''}>
+                      <span>Parttime</span>
+                    </label>
+                    <label class="checkbox-option">
+                      <input type="checkbox" name="bedrijfFuncties" value="3" ${studentFunctieIds.includes(3) ? 'checked' : ''}>
+                      <span>Stagiair(e)</span>
+                    </label>
                   </div>
                 </fieldset>
                 <fieldset class="search-fieldset">
                   <legend>Mijn Skills</legend>
-                  <div class="checkbox-group" id="skills-list">
-                    ${renderCheckboxes(allSkills, studentData.skills, 'skills')}
+                  <div id="selected-skills" class="selected-skills"></div>
+                  <div class="skills-input-container">
+                    <div class="skills-input-wrapper">
+                      <input type="text" id="skills-input" class="bedrijf-skills-input" placeholder="Voer een skill in (bijv. JavaScript, React, Python...)" autocomplete="off" />
+                      <div id="skills-dropdown" class="skills-dropdown" style="display: none;"></div>
+                    </div>
+                    <button type="button" id="add-skill-btn" class="btn">Toevoegen</button>
                   </div>
-                  ${
-                    !readonlyMode
-                      ? `<div class="add-custom-wrapper">
-                          <input type="text" id="skill-andere-text" placeholder="Andere skill..." class="form-input" style="width:180px;"/>
-                          <button id="add-skill-btn" class="add-btn" type="button">+ Toevoegen</button>
-                      </div>`
-                      : ''
-                  }
                 </fieldset>
                 <fieldset class="search-fieldset">
                   <legend>Mijn Talen</legend>
-                  <div class="checkbox-group" id="talen-list">
-                    ${renderCheckboxes(allTalen, studentData.talen, 'talen')}
+                  <div id="selected-languages" class="selected-skills"></div>
+                  <div class="languages-input-container">
+                    <div class="languages-input-wrapper">
+                      <input type="text" id="languages-input" class="bedrijf-languages-input" placeholder="Voer een taal in (bijv. Nederlands, Engels, Frans...)" autocomplete="off" />
+                      <div id="languages-dropdown" class="skills-dropdown" style="display: none;"></div>
+                    </div>
+                    <button type="button" id="add-language-btn" class="btn">Toevoegen</button>
                   </div>
-                  ${
-                    !readonlyMode
-                      ? `<div class="add-custom-wrapper">
-                          <input type="text" id="taal-andere-text" placeholder="Andere taal..." class="form-input" style="width:180px;"/>
-                          <button id="add-taal-btn" class="add-btn" type="button">+ Toevoegen</button>
-                      </div>`
-                      : ''
-                  }
                 </fieldset>
                 <div class="student-profile-buttons">
-                  ${
-                    readonlyMode
-                      ? `<button id="btn-edit" type="button" class="student-profile-btn student-profile-btn-secondary">EDIT</button>`
-                      : `
-                    <button id="btn-save" type="submit" class="student-profile-btn student-profile-btn-primary">SAVE</button>
-                    <button id="btn-reset" type="button" class="student-profile-btn student-profile-btn-secondary">RESET</button>
-                    <button id="btn-cancel" type="button" class="student-profile-btn student-profile-btn-secondary">CANCEL</button>
-                  `
-                  }
+                  <!-- Buttons verwijderd op verzoek -->
                 </div>
               </form>
             </div>
           </div>
         </div>
-        <footer class="student-profile-footer">
-          <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
-          <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
+        <footer class="bedrijf-profile-footer">
+          <div class="footer-content">
+            <span>&copy; 2025 EhB Career Launch</span>
+            <div class="footer-links">
+              <a href="/privacy" id="privacy-policy">Privacy</a>
+              <a href="/contact" id="contacteer-ons">Contact</a>
+            </div>
+          </div>
         </footer>
       </div>
     `;
 
+    // --- Skills event handlers & autocomplete (bedrijf-style, student-API) ---
+    // Verwijder dubbele let-declaraties, gebruik bestaande variabelen
+    // selectedSkills en selectedLanguages zijn al gedeclareerd bovenaan
+    // Vul ze opnieuw met API-data indien nodig, maar niet opnieuw declareren
+    async function updateAndRenderSkills() {
+      const studentSkills = await fetchStudentSkills(studentId);
+      selectedSkills = studentSkills.filter(s => s.type === 0);
+      selectedLanguages = studentSkills.filter(s => s.type === 1);
+      renderSelectedSkills();
+      renderSelectedLanguages();
+    }
+
+    function renderSelectedSkills() {
+      const container = document.getElementById('selected-skills');
+      if (!selectedSkills.length) {
+        container.innerHTML = '<p class="no-skills">Nog geen skills toegevoegd</p>';
+        return;
+      }
+      container.innerHTML = `<div class="skills-list">${selectedSkills.map(skill => `
+        <div class="skill-tag"><span>${skill.naam}</span><button type="button" class="remove-skill" data-skill-id="${skill.id}">×</button></div>
+      `).join('')}</div>`;
+      container.querySelectorAll('.remove-skill').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const skillId = parseInt(e.target.getAttribute('data-skill-id'));
+          await removeSkillFromStudent(studentId, skillId);
+          await updateAndRenderSkills();
+        });
+      });
+    }
+    renderSelectedSkills();
+    const skillsInput = document.getElementById('skills-input');
+    const addSkillBtn = document.getElementById('add-skill-btn');
+    const skillsDropdown = document.getElementById('skills-dropdown');
+    let currentFocus = -1;
+    skillsInput.addEventListener('input', function(e) {
+      const query = e.target.value.trim().toLowerCase();
+      if (!query) { skillsDropdown.style.display = 'none'; return; }
+      const suggestions = allSkills.filter(skill =>
+        skill.naam.toLowerCase().includes(query) &&
+        !selectedSkills.some(s => s.id === skill.id)
+      ).slice(0, 8);
+      if (!suggestions.length) { skillsDropdown.style.display = 'none'; return; }
+      skillsDropdown.innerHTML = suggestions.map((skill, i) =>
+        `<div class="skill-suggestion${i === currentFocus ? ' active' : ''}" data-skill-id="${skill.id}">${skill.naam}</div>`
+      ).join('');
+      skillsDropdown.style.display = 'block';
+      skillsDropdown.querySelectorAll('.skill-suggestion').forEach((el, idx) => {
+        el.addEventListener('click', async () => {
+          let skill = suggestions[idx];
+          await fetch(`https://api.ehb-match.me/studenten/${studentId}/skills`, {
+            method: 'POST',
+            headers: { Authorization: 'Bearer ' + sessionStorage.getItem('authToken'), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ skills: [skill.id] })
+          });
+          await updateAndRenderSkills();
+          skillsInput.value = '';
+          skillsDropdown.style.display = 'none';
+        });
+      });
+    });
+    skillsInput.addEventListener('keydown', function(e) {
+      const suggestions = Array.from(skillsDropdown.querySelectorAll('.skill-suggestion'));
+      if (e.key === 'ArrowDown') { currentFocus = (currentFocus + 1) % suggestions.length; setActive(suggestions, currentFocus); e.preventDefault(); }
+      if (e.key === 'ArrowUp') { currentFocus = (currentFocus - 1 + suggestions.length) % suggestions.length; setActive(suggestions, currentFocus); e.preventDefault(); }
+      if (e.key === 'Enter' || e.key === 'Tab') {
+        if (currentFocus >= 0 && suggestions[currentFocus]) { suggestions[currentFocus].click(); e.preventDefault(); }
+        else if (skillsInput.value.trim()) { addSkillBtn.click(); e.preventDefault(); }
+      }
+      if (e.key === 'Escape') { skillsDropdown.style.display = 'none'; }
+    });
+    function setActive(items, idx) {
+      items.forEach((el, i) => el.classList.toggle('active', i === idx));
+      if (items[idx]) items[idx].scrollIntoView({ block: 'nearest' });
+    }
+    addSkillBtn.addEventListener('click', async () => {
+      const value = skillsInput.value.trim();
+      if (!value) return;
+      let skill = allSkills.find(s => s.naam.toLowerCase() === value.toLowerCase());
+      if (!skill) {
+        skill = await addSkillOrTaal(value, 0);
+        allSkills.push(skill);
+      }
+      if (selectedSkills.some(s => s.id === skill.id) || skill.id == null) {
+        showFeedback('Skill al toegevoegd');
+        return;
+      }
+      await fetch(`https://api.ehb-match.me/studenten/${studentId}/skills`, {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + sessionStorage.getItem('authToken'), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ skills: [skill.id] })
+      });
+      await updateAndRenderSkills();
+      skillsInput.value = '';
+      skillsDropdown.style.display = 'none';
+    });
+
+    // --- Talen event handlers & autocomplete (bedrijf-style, student-API) ---
+    function renderSelectedLanguages() {
+      const container = document.getElementById('selected-languages');
+      if (!selectedLanguages.length) {
+        container.innerHTML = '<p class="no-skills">Nog geen talen toegevoegd</p>';
+        return;
+      }
+      container.innerHTML = `<div class="skills-list">${selectedLanguages.map(taal => `
+        <div class="skill-tag"><span>${taal.naam}</span><button type="button" class="remove-language" data-language-id="${taal.id}">×</button></div>
+      `).join('')}</div>`;
+      container.querySelectorAll('.remove-language').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const taalId = parseInt(e.target.getAttribute('data-language-id'));
+          await removeSkillFromStudent(studentId, taalId);
+          await updateAndRenderSkills();
+        });
+      });
+    }
+    renderSelectedLanguages();
+    const languagesInput = document.getElementById('languages-input');
+    const addLanguageBtn = document.getElementById('add-language-btn');
+    const languagesDropdown = document.getElementById('languages-dropdown');
+    let currentFocusLang = -1;
+    languagesInput.addEventListener('input', function(e) {
+      const query = e.target.value.trim().toLowerCase();
+      if (!query) { languagesDropdown.style.display = 'none'; return; }
+      const suggestions = allTalen.filter(taal =>
+        taal.naam.toLowerCase().includes(query) &&
+        !selectedLanguages.some(t => t.id === taal.id)
+      ).slice(0, 8);
+      if (!suggestions.length) { languagesDropdown.style.display = 'none'; return; }
+      languagesDropdown.innerHTML = suggestions.map((taal, i) =>
+        `<div class="skill-suggestion${i === currentFocusLang ? ' active' : ''}" data-language-id="${taal.id}">${taal.naam}</div>`
+      ).join('');
+      languagesDropdown.style.display = 'block';
+      languagesDropdown.querySelectorAll('.skill-suggestion').forEach((el, idx) => {
+        el.addEventListener('click', async () => {
+          let taal = suggestions[idx];
+          await fetch(`https://api.ehb-match.me/studenten/${studentId}/skills`, {
+            method: 'POST',
+            headers: { Authorization: 'Bearer ' + sessionStorage.getItem('authToken'), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ skills: [taal.id] })
+          });
+          await updateAndRenderSkills();
+          languagesInput.value = '';
+          languagesDropdown.style.display = 'none';
+        });
+      });
+    });
+    languagesInput.addEventListener('keydown', function(e) {
+      const suggestions = Array.from(languagesDropdown.querySelectorAll('.skill-suggestion'));
+      if (e.key === 'ArrowDown') { currentFocusLang = (currentFocusLang + 1) % suggestions.length; setActiveLang(suggestions, currentFocusLang); e.preventDefault(); }
+      if (e.key === 'ArrowUp') { currentFocusLang = (currentFocusLang - 1 + suggestions.length) % suggestions.length; setActiveLang(suggestions, currentFocusLang); e.preventDefault(); }
+      if (e.key === 'Enter' || e.key === 'Tab') {
+        if (currentFocusLang >= 0 && suggestions[currentFocusLang]) { suggestions[currentFocusLang].click(); e.preventDefault(); }
+        else if (languagesInput.value.trim()) { addLanguageBtn.click(); e.preventDefault(); }
+      }
+      if (e.key === 'Escape') { languagesDropdown.style.display = 'none'; }
+    });
+    function setActiveLang(items, idx) {
+      items.forEach((el, i) => el.classList.toggle('active', i === idx));
+      if (items[idx]) items[idx].scrollIntoView({ block: 'nearest' });
+    }
+    addLanguageBtn.addEventListener('click', async () => {
+      const value = languagesInput.value.trim();
+      if (!value) return;
+      let taal = allTalen.find(t => t.naam.toLowerCase() === value.toLowerCase());
+      if (!taal) {
+        taal = await addSkillOrTaal(value, 1);
+        allTalen.push(taal);
+      }
+      if (selectedLanguages.some(t => t.id === taal.id)) return;
+      await fetch(`https://api.ehb-match.me/studenten/${studentId}/skills`, {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + sessionStorage.getItem('authToken'), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ skills: [taal.id] })
+      });
+      await updateAndRenderSkills();
+      languagesInput.value = '';
+      languagesDropdown.style.display = 'none';
+    });
+
     // --- Interactie (EVENTS) ---
-    const form = document.getElementById('criteriaForm');
+    const form = document.getElementById('bedrijf-criteria-form');
     if (form) {
       // EDIT
       const editBtn = document.getElementById('btn-edit');
@@ -614,6 +816,94 @@ export async function renderSearchCriteriaStudent(
           }
         });
       }
+
+      // --- Nieuwe autocomplete en toevoegen voor skills (student, zoals bedrijf) ---
+      const skillInput = document.getElementById('skills-input');
+      const skillsDropdown = document.getElementById('skills-dropdown');
+      let skillSuggestions = [];
+      skillInput.addEventListener('input', () => {
+        const query = skillInput.value.trim().toLowerCase();
+        if (!query) {
+          skillsDropdown.style.display = 'none';
+          return;
+        }
+        skillSuggestions = allSkills.filter(skill =>
+          skill.naam.toLowerCase().includes(query) &&
+          !studentData.skills.includes(skill.id)
+        ).slice(0, 8);
+        if (skillSuggestions.length === 0) {
+          skillsDropdown.style.display = 'none';
+          return;
+        }
+        skillsDropdown.innerHTML = skillSuggestions.map((skill, idx) =>
+          `<div class="skill-suggestion" data-skill-id="${skill.id}">${skill.naam}</div>`
+        ).join('');
+        skillsDropdown.style.display = 'block';
+        skillsDropdown.querySelectorAll('.skill-suggestion').forEach((el, idx) => {
+          el.addEventListener('click', async () => {
+            // Voeg toe via student-API
+            try {
+              const studentId = studentData.id || studentData.gebruiker_id;
+              // Voeg toe aan student via API
+              await addSkillOrTaal(skillSuggestions[idx].naam, 0);
+              if (!studentData.skills.includes(skillSuggestions[idx].id)) {
+                studentData.skills.push(skillSuggestions[idx].id);
+              }
+              renderSearchCriteriaStudent(rootElement, studentData, false);
+            } catch (e) {
+              alert('Skill toevoegen mislukt: ' + e.message);
+            }
+          });
+        });
+      });
+      document.addEventListener('click', (e) => {
+        if (!skillsDropdown.contains(e.target) && e.target !== skillInput) {
+          skillsDropdown.style.display = 'none';
+        }
+      });
+      // --- Nieuwe autocomplete en toevoegen voor talen (student, zoals bedrijf) ---
+      const taalInput = document.getElementById('languages-input');
+      const talenDropdown = document.getElementById('languages-dropdown');
+      let taalSuggestions = [];
+      taalInput.addEventListener('input', () => {
+        const query = taalInput.value.trim().toLowerCase();
+        if (!query) {
+          talenDropdown.style.display = 'none';
+          return;
+        }
+        taalSuggestions = allTalen.filter(taal =>
+          taal.naam.toLowerCase().includes(query) &&
+          !studentData.talen.includes(taal.id)
+        ).slice(0, 8);
+        if (taalSuggestions.length === 0) {
+          talenDropdown.style.display = 'none';
+          return;
+        }
+        talenDropdown.innerHTML = taalSuggestions.map((taal, idx) =>
+          `<div class="skill-suggestion" data-taal-id="${taal.id}">${taal.naam}</div>`
+        ).join('');
+        talenDropdown.style.display = 'block';
+        talenDropdown.querySelectorAll('.skill-suggestion').forEach((el, idx) => {
+          el.addEventListener('click', async () => {
+            // Voeg toe via student-API
+            try {
+              const studentId = studentData.id || studentData.gebruiker_id;
+              await addSkillOrTaal(taalSuggestions[idx].naam, 1);
+              if (!studentData.talen.includes(taalSuggestions[idx].id)) {
+                studentData.talen.push(taalSuggestions[idx].id);
+              }
+              renderSearchCriteriaStudent(rootElement, studentData, false);
+            } catch (e) {
+              alert('Taal toevoegen mislukt: ' + e.message);
+            }
+          });
+        });
+      });
+      document.addEventListener('click', (e) => {
+        if (!talenDropdown.contains(e.target) && e.target !== taalInput) {
+          talenDropdown.style.display = 'none';
+        }
+      });
     }
 
     // --- Sidebar navigatie ---

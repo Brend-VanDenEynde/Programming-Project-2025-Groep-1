@@ -595,6 +595,7 @@ a:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
 
 .student-profile-title {
@@ -2630,6 +2631,10 @@ a:hover {
   margin-bottom: 8px;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-width: 420px;
+  max-width: 900px;
+  width: 100%;
+  /* Zorgt dat het item breder wordt, maar responsief blijft */
 }
 
 .speeddate-item:hover {
@@ -2798,6 +2803,8 @@ a:hover {
   transform: translateY(-1px);
 }
 
+
+
 .status-final {
   font-weight: 600;
   color: #6c757d;
@@ -2964,9 +2971,10 @@ a:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
 
-.bedrijf-profile-title {
+.student-profile-title {
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 2rem;
@@ -3190,6 +3198,9 @@ a:hover {
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-width: 420px;
+  max-width: 900px;
+  width: 100%;
 }
 
 .speeddate-item:hover {
@@ -3325,4 +3336,223 @@ a:hover {
   padding: 0.6rem 0;
   display: inline-block;
   text-align: center;
+}
+
+/* Bedrijf zoekcriteria: skill-tag styling */
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  background: #e6f0fa;
+  color: #0077b5;
+  border-radius: 16px;
+  padding: 6px 14px 6px 12px;
+  font-size: 1rem;
+  margin: 0 8px 8px 0;
+  border: 1.5px solid #b3d1f7;
+  box-shadow: 0 1px 4px rgba(0,119,181,0.07);
+  transition: background 0.18s, color 0.18s, border 0.18s;
+}
+.skill-tag .remove-skill,
+.skill-tag .remove-language {
+  border: none;
+  background: none;
+  color: #b10e1e;
+  font-size: 1.15em;
+  cursor: pointer;
+  margin-left: 0.5em;
+  padding: 0;
+  line-height: 1;
+}
+.skill-tag:hover {
+  background: #f2f2f2;
+}
+
+/* Skills-list container netjes onder elkaar */
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+}
+
+/* Zet zoekbalk en toevoegen button naast elkaar, onder de tags */
+.skills-input-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+/* Zet de input en button op 1 lijn */
+.skills-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+#skills-input {
+  width: 100%;
+  min-width: 0;
+}
+
+#add-skill-btn {
+  min-width: unset !important;
+  width: auto;
+  flex: none;
+  margin-bottom: 0;
+}
+
+.selected-skills {
+  margin-bottom: 0.7rem;
+}
+
+/* Bedrijf zoekcriteria: skills input extra styling */
+.bedrijf-skills-input {
+  font-size: 1.08rem;
+  padding: 10px 13px;
+  border-radius: 8px;
+  border: 2px solid #b3d1f7;
+  outline: none;
+  background: #fafdff;
+  transition: border 0.16s;
+  box-shadow: 0 1px 4px rgba(0,119,181,0.04);
+}
+.bedrijf-skills-input:focus {
+  border-color: #0077b5;
+  background: #f6faff;
+}
+
+/* Bedrijf zoekcriteria: languages input extra styling */
+.bedrijf-languages-input {
+  font-size: 1.08rem;
+  padding: 10px 13px;
+  border-radius: 8px;
+  border: 2px solid #b3d1f7;
+  outline: none;
+  background: #fafdff;
+  transition: border 0.16s;
+  box-shadow: 0 1px 4px rgba(0,119,181,0.04);
+}
+.bedrijf-languages-input:focus {
+  border-color: #0077b5;
+  background: #f6faff;
+}
+
+#selected-languages {
+  margin-bottom: 0.7rem;
+}
+
+.languages-input-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.languages-input-wrapper {
+  flex: 1 1 0;
+  display: flex;
+  position: relative; /* Zorgt dat .languages-dropdown correct gepositioneerd is */
+}
+
+#languages-input {
+  width: 100%;
+  min-width: 0;
+}
+
+#add-language-btn {
+  min-width: 120px;
+  margin-bottom: 0px ;
+}
+
+/* Autocomplete dropdowns styling */
+.skills-dropdown,
+.languages-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  z-index: 100;
+  border: 1px solid #d4d4d4;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 0.25rem 0;
+  margin-top: 2px;
+  font-size: 1rem;
+  animation: dropdownAppear 0.12s ease;
+}
+
+@keyframes dropdownAppear {
+  from { opacity: 0; transform: translateY(-10px);}
+  to   { opacity: 1; transform: translateY(0);}
+}
+
+.skill-suggestion {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.13s;
+}
+.skill-suggestion:hover,
+.skill-suggestion.active {
+  background: #f4f6fa;
+}
+
+.bedrijf-skills-input:focus,
+.bedrijf-languages-input:focus {
+  z-index: 101;
+  outline: 2px solid #2261e9;
+  border-radius: 8px 8px 0 0;
+}
+
+/* =============================================================================
+   BACK TO PROFILE BUTTON
+   ============================================================================= */
+
+.back-to-profile-btn,
+.to-search-criteria-btn {
+  position: absolute;
+  top: 24px;
+  z-index: 50;
+  background: #fff;
+  color: #237bbd;
+  border: 1px solid #237bbd;
+  border-radius: 2rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding: 0.5rem 1.3rem;
+  box-shadow: 0 2px 8px rgba(20,70,120,0.09);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border 0.15s;
+}
+.back-to-profile-btn {
+  left: 24px;
+}
+.to-search-criteria-btn {
+  right: 24px;
+}
+.back-to-profile-btn:hover,
+.to-search-criteria-btn:hover {
+  background: #237bbd;
+  color: #fff;
+  border-color: #237bbd;
+}
+@media (max-width: 600px) {
+  .back-to-profile-btn,
+  .to-search-criteria-btn {
+    top: 8px;
+    font-size: 1rem;
+    padding: 0.4rem 1rem;
+  }
+  .back-to-profile-btn {
+    left: 8px;
+  }
+  .to-search-criteria-btn {
+    right: 8px;
+  }
+}
+.bedrijf-profile-form-container {
+  position: relative;
 }

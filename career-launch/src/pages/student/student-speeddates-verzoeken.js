@@ -344,40 +344,6 @@ export function renderSpeeddatesRequests(rootElement, studentData = {}) {
     });
   });
 
-  // Zorg dat accept-btn en deny-btn even breed zijn
-  const style = document.createElement('style');
-  style.innerHTML = `
-    .speeddate-actions {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-    }
-    .accept-btn, .deny-btn {
-      min-width: 120px;
-      padding: 0.6rem 0;
-      border-radius: 6px;
-      border: none;
-      font-size: 1rem;
-      font-weight: 500;
-      cursor: pointer;
-      text-align: center;
-      transition: background 0.18s;
-    }
-    .accept-btn {
-      background: #22c55e;
-      color: #fff;
-    }
-    .deny-btn {
-      background: #dc2626;
-      color: #fff;
-    }
-    .accept-btn:disabled, .deny-btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-  `;
-  document.head.appendChild(style);
-
   // --- Popup met bedrijfsinfo ---
   async function createBedrijfPopup(s) {
     const overlay = document.createElement('div');

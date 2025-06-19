@@ -94,8 +94,8 @@ function renderSpeeddatesList(speeddates) {
             (afspraak) => `
           <div class="speeddate-item ${
             afspraak.akkoord ? 'goedgekeurd' : 'in-behandeling'
-          }">
-            <div class="speeddate-info">
+          }" style="min-width:600px;max-width:1200px;width:100%;display:flex;align-items:center;">
+            <div class="speeddate-info" style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:24px;">
               <div class="student-info">
                 <img src="${
                   afspraak.student.profielfoto || '/images/default.png'
@@ -107,8 +107,7 @@ function renderSpeeddatesList(speeddates) {
                   <h4>${afspraak.student.naam}</h4>
                 </div>
               </div>
-              
-              <div class="afspraak-details">
+              <div class="afspraak-details" style="display:flex;flex-direction:row;align-items:center;gap:24px;">
                 <div class="tijd-lokaal">
                   <p class="tijdslot"><strong>Tijd:</strong> ${
                     afspraak.tijdslot.geformatteerd
@@ -121,22 +120,22 @@ function renderSpeeddatesList(speeddates) {
                   <span class="status-badge ${
                     afspraak.akkoord ? 'goedgekeurd' : 'in-behandeling'
                   }">
-                    ${afspraak.status}
+                    ${afspraak.akkoord ? 'GOEDGEKEURD' : 'IN AFWACHTING'}
                   </span>
                 </div>
               </div>
+            </div>
 
-              <div class="speeddate-actions">
-                ${
-                  !afspraak.akkoord
-                    ? `
-                  <button class="action-btn cancel-btn" onclick="cancelSpeeddate(${afspraak.id})">
-                    Annuleren
-                  </button>
-                `
-                    : ''
-                }
-              </div>
+            <div class="speeddate-actions">
+              ${
+                !afspraak.akkoord
+                  ? `
+                <button class="action-btn cancel-btn" onclick="cancelSpeeddate(${afspraak.id})">
+                  Annuleren
+                </button>
+              `
+                  : ''
+              }
             </div>
           </div>
         `

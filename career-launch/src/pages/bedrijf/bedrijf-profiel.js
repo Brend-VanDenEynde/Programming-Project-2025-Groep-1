@@ -148,7 +148,8 @@ export async function renderBedrijfProfiel(
         
         <div class="bedrijf-profile-content">
           <div class="bedrijf-profile-form-container">
-            <h1 class="bedrijf-profile-title">Bedrijf Profiel</h1>
+            <button id="to-search-criteria-btn" class="to-search-criteria-btn">Zoekcriteria</button>
+            <h1 class="bedrijf-profile-title">Profiel</h1>
             <form id="bedrijfProfileForm" class="bedrijf-profile-form" autocomplete="off" enctype="multipart/form-data">
               <div class="bedrijf-profile-avatar-section">
                 <div class="bedrijf-profile-avatar-div" style="position:relative;">
@@ -537,4 +538,12 @@ export async function renderBedrijfProfiel(
       }
     });
   }
+
+  // Zoekcriteria knop
+  document.getElementById('to-search-criteria-btn')?.addEventListener('click', () => {
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/bedrijf/zoek-criteria');
+    });
+  });
 }

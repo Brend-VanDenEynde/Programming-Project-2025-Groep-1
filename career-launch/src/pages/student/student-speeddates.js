@@ -187,9 +187,9 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     <div class="speeddate-item ${
       s.akkoord ? 'goedgekeurd' : 'in-behandeling'
     } bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(
-        s
-      )}' style="cursor:pointer;">
-      <div class="speeddate-info">
+      s
+    )}' style="min-width:600px;max-width:1200px;width:100%;cursor:pointer;">
+      <div class="speeddate-info" style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:24px;">
         <div class="bedrijf-info">
           <img src="${
             s.profiel_foto_bedrijf || s.foto || '/images/defaultlogo.webp'
@@ -202,7 +202,7 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
           </div>
         </div>
         
-        <div class="afspraak-details">
+        <div class="afspraak-details" style="display:flex;flex-direction:row;align-items:center;gap:24px;">
           <div class="tijd-lokaal">
             <p class="tijdslot"><strong>Tijd:</strong> ${
               s.begin ? formatUTCTime(s.begin) : '-'
