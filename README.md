@@ -171,4 +171,4 @@ Zie `/src/utils/api.js` en `/src/utils/auth-api.js` voor implementatie.
 
 Made with ❤️ by us.
 
-© 2025 Programming Project Group 1 – EHB Match
+© 2025 Programming Project Groep 1 – EhB-Match.me
