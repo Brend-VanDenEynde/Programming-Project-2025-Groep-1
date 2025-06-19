@@ -113,7 +113,7 @@ export function renderBedrijfRegister(rootElement) {
     const file = e.target.files[0];
     if (file) {
       document.querySelector('.upload-icon-text').style.display = 'none';
-      
+
       fileStatus.textContent = file.name;
 
       const formData = new FormData();
@@ -139,7 +139,6 @@ export function renderBedrijfRegister(rootElement) {
       updateUploadedPhotoVisibility();
     } else {
       fileStatus.textContent = 'No file selected.';
-      uploadedPhoto.src = PLACEHOLDER_IMAGE; // Use placeholder if no file
       updateDeleteOverlay();
     }
   });
