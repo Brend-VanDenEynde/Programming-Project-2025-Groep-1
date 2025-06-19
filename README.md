@@ -15,8 +15,6 @@ EhB-Match is een professionele webapplicatie die studenten en bedrijven met elka
 - [API & Dataflow](#api--dataflow)
 - [Best Practices & Toegankelijkheid](#best-practices--toegankelijkheid)
 - [Probleemoplossing](#probleemoplossing)
-- [Bijdragen](#bijdragen)
-- [Licentie](#licentie)
 - [Bronnen & Credits](#bronnen--credits)
 
 ---
