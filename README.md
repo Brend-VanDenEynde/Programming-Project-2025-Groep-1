@@ -53,7 +53,7 @@ career-launch/
 ├── package.json
 ├── vite.config.js
 ├── public/
-│   └── Icons/, images/, vite.svg, ...
+│   └── icons/, images/, vite.svg, ...
 ├── src/
 │   ├── main.js, router.js
 │   ├── css/
