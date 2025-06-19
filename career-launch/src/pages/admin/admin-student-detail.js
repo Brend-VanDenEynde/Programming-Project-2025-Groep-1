@@ -96,7 +96,6 @@ export async function renderAdminStudentDetail(rootElement) {
       Router.navigate(route);
     });
   });
-
   // Fetch student data from API
   const accessToken = sessionStorage.getItem('accessToken');
   try {
@@ -115,12 +114,38 @@ export async function renderAdminStudentDetail(rootElement) {
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    }    const studentData = await response.json();
 
-    const studentData = await response.json();
+    // Also fetch student data from discover endpoint to get contactemail
+    let studentDiscoverData = null;
+    try {
+      const discoverResponse = await authenticatedFetch(
+        `https://api.ehb-match.me/discover/studenten`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          cache: 'no-store',
+        }
+      );      if (discoverResponse.ok) {
+        const allStudents = await discoverResponse.json();
+
+        // Find the specific student by ID - try both string and number comparison
+        studentDiscoverData = allStudents.find(student => {
+          return student.id == studentId || student.id === parseInt(studentId) || student.id === studentId.toString();
+        });
+      }
+    } catch (discoverError) {
+      console.warn('Could not fetch discover data:', discoverError);
+    }    // Merge the data - use contact_email from original student data or discover if available
+    const mergedStudentData = {
+      ...studentData,
+      contactemail: studentData.contact_email || studentDiscoverData?.contact_email || studentData.email
+    };
 
     // Render the full page with the fetched data
-    renderFullDetailPage(rootElement, studentData, adminUsername);
+    renderFullDetailPage(rootElement, mergedStudentData, adminUsername);
   } catch (error) {
     console.error('Error fetching student details:', error);
     // Show error state
@@ -167,10 +192,9 @@ function renderFullDetailPage(rootElement, studentData, adminUsername) {
               <label>Naam:</label>
               <span>${studentData.voornaam} ${studentData.achternaam}</span>
             </div>
-            
-            <div class="detail-field">
+              <div class="detail-field">
               <label>Contact-Email:</label>
-              <span>${studentData.email || 'Niet beschikbaar'}</span>
+              <span>${studentData.contactemail || studentData.email || 'Niet beschikbaar'}</span>
             </div>
             
             <div class="detail-field">
@@ -362,15 +386,13 @@ function closeSpeedDatesModal() {
   modal.style.display = 'none';
 }
 
-function setupEventHandlers(studentData) {
-  // Admin action buttons
+function setupEventHandlers(studentData) {  // Admin action buttons
   const contactBtn = document.getElementById('contact-student-btn');
   if (contactBtn) {
     contactBtn.addEventListener('click', () => {
-      // Create mailto link and open it using the current student data
-      const mailtoLink = `mailto:${
-        studentData.email || 'onbekend@student.ehb.be'
-      }`;
+      // Create mailto link using the contact email from the merged data
+      const email = studentData.contactemail || studentData.email || 'onbekend@student.ehb.be';
+      const mailtoLink = `mailto:${email}`;
       window.location.href = mailtoLink;
     });
   }
