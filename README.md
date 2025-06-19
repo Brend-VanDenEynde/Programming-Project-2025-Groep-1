@@ -1,6 +1,6 @@
 # EhB-Match / Career Launch
 
-EhB-Match is een professionele webapplicatie die studenten en bedrijven met elkaar verbindt om carrièremogelijkheden, stages en werving te faciliteren. Studenten kunnen hun profiel en vaardigheden presenteren, terwijl bedrijven hun open functies, gewenste opleidingen en gewenste vaardigheden plaatsen en kandidaten zoeken. Het platform bevat uitgebreide authenticatie, robuuste API-integratie, toegankelijke UX en een modern, schaalbaar frontend-ontwerp. Uniek aan EhB-Match is het gebruik van een eigen, proprietair algoritme dat studenten en bedrijven optimaal aan elkaar koppelt op basis van vaardigheden, voorkeuren en bedrijfsbehoeften.
+EhB-Match is een professionele webapplicatie die studenten en bedrijven met elkaar verbindt om carrièremogelijkheden, stages en werving te faciliteren. Studenten kunnen hun profiel en vaardigheden presenteren, terwijl bedrijven hun open functies, gewenste opleidingen en gewenste vaardigheden plaatsen en kandidaten zoeken. Het platform bevat uitgebreide authenticatie, robuuste API-integratie, toegankelijke UX en een modern, schaalbaar frontend-ontwerp. Uniek aan EhB-Match is het gebruik van een eigen, proprietair algoritme dat studenten en bedrijven optimaal aan elkaar koppelt op basis van vaardigheden, voorkeuren en bedrijfsbehoeften. Hiermee wordt het probleem van complexe ontdekking en contact tussen studenten en bedrijven opgelost: beide partijen vinden sneller en eenvoudiger de juiste match.
 
 ---
 
