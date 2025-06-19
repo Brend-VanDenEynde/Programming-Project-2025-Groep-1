@@ -83,14 +83,12 @@ export function renderAdmin(rootElement) {
         const infoData = await infoResponse.json();
 
         // Debugging: Log user info
-        console.log('User Info:', infoData.user);
-
-        // Check user type
+        console.log('User Info:', infoData.user); // Check user type
         if (infoData.user.type === 1) {
-          // User is an admin, store admin email and proceed to dashboard
+          // User is an admin, store admin email and redirect directly to ingeschreven studenten
           sessionStorage.setItem('adminUsername', infoData.user.email);
           sessionStorage.setItem('adminEmail', infoData.user.email);
-          Router.navigate('/admin-dashboard');
+          Router.navigate('/admin-dashboard/ingeschreven-studenten');
         } else {
           // User is not an admin, display error message
           errorMessage.textContent = 'Je bent geen admin!';
