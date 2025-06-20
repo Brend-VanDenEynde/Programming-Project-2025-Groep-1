@@ -111,16 +111,24 @@ function renderPendingSpeeddatesList(speeddates) {
               
               <div class="afspraak-details">
                 <div class="tijd-lokaal">
-                  <p class="tijdslot"><strong>Tijd:</strong> ${afspraak.tijdslot.geformatteerd}</p>
-                  <p class="lokaal"><strong>Lokaal:</strong> ${afspraak.lokaal}</p>
+                  <p class="tijdslot"><strong>Tijd:</strong> ${
+                    afspraak.tijdslot.geformatteerd
+                  }</p>
+                  <p class="lokaal"><strong>Lokaal:</strong> ${
+                    afspraak.lokaal
+                  }</p>
                 </div>
               </div>
               
               <div class="speeddate-actions">
-                <button class="action-btn accept-btn" data-action="accept" data-id="${afspraak.id}">
+                <button class="action-btn accept-btn" data-action="accept" data-id="${
+                  afspraak.id
+                }">
                   Accepteren
                 </button>
-                <button class="deny-btn" data-action="delete" data-id="${afspraak.id}">
+                <button class="deny-btn" data-action="delete" data-id="${
+                  afspraak.id
+                }">
                   Verwijderen
                 </button>
               </div>
@@ -137,10 +145,45 @@ function renderPendingSpeeddatesList(speeddates) {
 // Functie om een speeddate te accepteren
 async function acceptSpeeddate(afspraakId) {
   const token = window.sessionStorage.getItem('authToken');
+  const companyData = JSON.parse(
+    window.sessionStorage.getItem('companyData') || '{}'
+  );
+  const bedrijfId = companyData.id;
 
   if (!token) {
     alert('Geen geldige authenticatie. Log opnieuw in.');
     return;
+  }
+
+  if (!bedrijfId) {
+    alert('Bedrijf ID niet gevonden. Log opnieuw in.');
+    return;
+  }
+
+  // Extra veiligheidscontrole: verifieer dat het bedrijf niet zijn eigen verzoek accepteert
+  try {
+    const verifyResp = await authenticatedFetch(
+      `https://api.ehb-match.me/speeddates/pending/${afspraakId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (verifyResp.ok) {
+      const verzoekData = await verifyResp.json();
+      if (verzoekData.asked_by === bedrijfId) {
+        console.error(
+          'CRITICAL SECURITY VIOLATION: Company attempting to accept own request'
+        );
+        alert(
+          'Kritieke fout: Je kunt je eigen speeddate verzoeken niet accepteren. Dit incident is gelogd.'
+        );
+        return;
+      }
+    }
+  } catch (verifyError) {
+    console.error('Authorization verification failed:', verifyError);
+    // Als verificatie faalt, ga door maar log de poging
   }
 
   try {
@@ -210,7 +253,9 @@ function bindModalEvents() {
         // Disable buttons to prevent double click
         yesBtn.disabled = true;
         noBtn.disabled = true;
-        const result = await deleteSpeeddate(pendingDeleteAfspraakId, { showModalConfirmation: true });
+        const result = await deleteSpeeddate(pendingDeleteAfspraakId, {
+          showModalConfirmation: true,
+        });
         pendingDeleteAfspraakId = null;
         if (result === 'success') {
           if (modalMessage) {
@@ -224,7 +269,8 @@ function bindModalEvents() {
             loadPendingSpeeddateData();
             // Reset modal message and buttons for next time
             if (modalMessage) {
-              modalMessage.textContent = 'Weet je zeker dat je deze speeddate wilt afwijzen?';
+              modalMessage.textContent =
+                'Weet je zeker dat je deze speeddate wilt afwijzen?';
             }
             if (modalButtons) {
               modalButtons.style.display = 'flex';
@@ -249,10 +295,51 @@ function bindModalEvents() {
 // Functie om een speeddate te verwijderen/afwijzen
 async function deleteSpeeddate(afspraakId, opts = {}) {
   const token = window.sessionStorage.getItem('authToken');
+  const companyData = JSON.parse(
+    window.sessionStorage.getItem('companyData') || '{}'
+  );
+  const bedrijfId = companyData.id;
+
   if (!token) {
-    if (!opts.showModalConfirmation) alert('Geen geldige authenticatie. Log opnieuw in.');
+    if (!opts.showModalConfirmation)
+      alert('Geen geldige authenticatie. Log opnieuw in.');
     return;
   }
+
+  if (!bedrijfId) {
+    if (!opts.showModalConfirmation)
+      alert('Bedrijf ID niet gevonden. Log opnieuw in.');
+    return;
+  }
+
+  // Extra veiligheidscontrole: verifieer dat het bedrijf niet zijn eigen verzoek weigert
+  try {
+    const verifyResp = await authenticatedFetch(
+      `https://api.ehb-match.me/speeddates/pending/${afspraakId}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (verifyResp.ok) {
+      const verzoekData = await verifyResp.json();
+      if (verzoekData.asked_by === bedrijfId) {
+        console.error(
+          'CRITICAL SECURITY VIOLATION: Company attempting to reject own request'
+        );
+        if (!opts.showModalConfirmation) {
+          alert(
+            'Kritieke fout: Je kunt je eigen speeddate verzoeken niet weigeren. Gebruik de annuleer functie op je eigen verzoeken pagina.'
+          );
+        }
+        return;
+      }
+    }
+  } catch (verifyError) {
+    console.error('Authorization verification failed:', verifyError);
+    // Als verificatie faalt, ga door maar log de poging
+  }
+
   try {
     const response = await authenticatedFetch(
       `https://api.ehb-match.me/speeddates/reject/${afspraakId}`,
@@ -274,11 +361,16 @@ async function deleteSpeeddate(afspraakId, opts = {}) {
     }
     const errorText = await response.text();
     if (response.status === 404) {
-      if (!opts.showModalConfirmation) alert('Deze speeddate bestaat niet (meer) of is al verwerkt.');
+      if (!opts.showModalConfirmation)
+        alert('Deze speeddate bestaat niet (meer) of is al verwerkt.');
     } else if (response.status === 500) {
-      if (!opts.showModalConfirmation) alert('Afwijzen van deze speeddate is momenteel niet mogelijk. Probeer het later opnieuw of neem contact op met support als het probleem blijft.');
+      if (!opts.showModalConfirmation)
+        alert(
+          'Afwijzen van deze speeddate is momenteel niet mogelijk. Probeer het later opnieuw of neem contact op met support als het probleem blijft.'
+        );
     } else {
-      if (!opts.showModalConfirmation) alert('Er is een fout opgetreden bij het afwijzen van de speeddate.');
+      if (!opts.showModalConfirmation)
+        alert('Er is een fout opgetreden bij het afwijzen van de speeddate.');
     }
     throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
   } catch (error) {

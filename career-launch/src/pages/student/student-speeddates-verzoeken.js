@@ -25,35 +25,44 @@ async function fetchPendingSpeeddates(studentData) {
     return [];
   }
   if (!studentId) {
-    alert("Student ID niet gevonden. Probeer opnieuw in te loggen.");
+    alert('Student ID niet gevonden. Probeer opnieuw in te loggen.');
     renderLogin(document.body);
     return [];
   }
-  const resp = await fetch(`https://api.ehb-match.me/speeddates/pending?id=${studentId}`, {
-    headers: { Authorization: 'Bearer ' + token }
-  });
+  const resp = await fetch(
+    `https://api.ehb-match.me/speeddates/pending?id=${studentId}`,
+    {
+      headers: { Authorization: 'Bearer ' + token },
+    }
+  );
   if (!resp.ok) throw new Error(`Fout bij ophalen: ${resp.status}`);
   const data = await resp.json();
 
   // Haal alle relevante bedrijven op via /discover/bedrijven?id={studentId}
-  const bedrijvenResp = await fetch(`https://api.ehb-match.me/discover/bedrijven?id=${studentId}`,
-    { headers: { Authorization: 'Bearer ' + token } });
+  const bedrijvenResp = await fetch(
+    `https://api.ehb-match.me/discover/bedrijven?id=${studentId}`,
+    { headers: { Authorization: 'Bearer ' + token } }
+  );
   const bedrijven = bedrijvenResp.ok ? await bedrijvenResp.json() : [];
-  const bedrijfIds = new Set(bedrijven.map(b => b.gebruiker_id));
+  const bedrijfIds = new Set(bedrijven.map((b) => b.gebruiker_id));
 
   // Filter alleen verzoeken waar asked_by een bedrijf is EN niet jezelf
   const filtered = data.filter(
-    s => bedrijfIds.has(s.asked_by) && s.asked_by !== studentId
+    (s) => bedrijfIds.has(s.asked_by) && s.asked_by !== studentId
   );
 
   // DEBUG: check filter resultaat en mogelijke eigen verzoekken
   console.log(
-    'Alle pending:', data,
-    'BedrijfIds:', bedrijfIds,
-    'StudentId:', studentId,
-    'Na filter:', filtered
+    'Alle pending:',
+    data,
+    'BedrijfIds:',
+    bedrijfIds,
+    'StudentId:',
+    studentId,
+    'Na filter:',
+    filtered
   );
-  filtered.forEach(s => {
+  filtered.forEach((s) => {
     if (s.asked_by == studentId) {
       console.warn('Je eigen verzoek zit in filtered! Debug:', s);
     }
@@ -64,9 +73,37 @@ async function fetchPendingSpeeddates(studentData) {
 }
 async function acceptSpeeddate(id) {
   const token = sessionStorage.getItem('authToken');
+  const studentId = getStudentId();
+
+  // Extra veiligheidscontrole: verifieer dat de student niet zijn eigen verzoek accepteert
+  // Dit zou niet mogen gebeuren door filtering, maar extra zekerheid kan geen kwaad
+  try {
+    const verifyResp = await fetch(
+      `https://api.ehb-match.me/speeddates/pending/${id}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (verifyResp.ok) {
+      const verzoekData = await verifyResp.json();
+      if (verzoekData.asked_by === studentId) {
+        console.error(
+          'CRITICAL SECURITY VIOLATION: Student attempting to accept own request'
+        );
+        throw new Error(
+          'Je kunt je eigen speeddate verzoeken niet accepteren. Dit incident is gelogd.'
+        );
+      }
+    }
+  } catch (verifyError) {
+    console.error('Verification failed:', verifyError);
+    // Als verificatie faalt, ga door maar log de poging
+  }
+
   const resp = await fetch(`https://api.ehb-match.me/speeddates/accept/${id}`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (!resp.ok) {
     const errText = await resp.text();
@@ -75,9 +112,36 @@ async function acceptSpeeddate(id) {
 }
 async function rejectSpeeddate(id) {
   const token = sessionStorage.getItem('authToken');
+  const studentId = getStudentId();
+
+  // Extra veiligheidscontrole: verifieer dat de student niet zijn eigen verzoek weigert
+  try {
+    const verifyResp = await fetch(
+      `https://api.ehb-match.me/speeddates/pending/${id}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (verifyResp.ok) {
+      const verzoekData = await verifyResp.json();
+      if (verzoekData.asked_by === studentId) {
+        console.error(
+          'CRITICAL SECURITY VIOLATION: Student attempting to reject own request'
+        );
+        throw new Error(
+          'Je kunt je eigen speeddate verzoeken niet weigeren. Gebruik de annuleer functie op je eigen verzoeken pagina.'
+        );
+      }
+    }
+  } catch (verifyError) {
+    console.error('Verification failed:', verifyError);
+    // Als verificatie faalt, ga door maar log de poging
+  }
+
   const resp = await fetch(`https://api.ehb-match.me/speeddates/reject/${id}`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (!resp.ok) throw new Error('Weigeren mislukt');
 }
@@ -86,29 +150,39 @@ async function fetchFunctiesSkills(bedrijfId) {
   let functies = [];
   let skills = [];
   try {
-    const resFuncties = await fetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`, {
-      headers: { Authorization: 'Bearer ' + token }
-    });
+    const resFuncties = await fetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`,
+      {
+        headers: { Authorization: 'Bearer ' + token },
+      }
+    );
     if (resFuncties.ok) functies = await resFuncties.json();
   } catch {}
   try {
-    const resSkills = await fetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`, {
-      headers: { Authorization: 'Bearer ' + token }
-    });
+    const resSkills = await fetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`,
+      {
+        headers: { Authorization: 'Bearer ' + token },
+      }
+    );
     if (resSkills.ok) skills = await resSkills.json();
   } catch {}
   return { functies, skills };
 }
 
 function getSortArrow(key, currentSort) {
-  const found = currentSort.find(s => s.key === key);
+  const found = currentSort.find((s) => s.key === key);
   if (!found) return '';
   return found.asc ? ' ▲' : ' ▼';
 }
 function formatTime(dtString) {
   if (!dtString) return '-';
   const dt = new Date(dtString);
-  return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  return dt.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
 }
 
 // Utility voor bedrijfsfoto's
@@ -122,13 +196,22 @@ function getBedrijfFotoUrl(foto) {
 export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
   // --- PROBEER ALTIJD EEN STUDENT TE VINDEN ---
   let actualStudentData = studentData;
-  if (!actualStudentData || (!actualStudentData.id && !actualStudentData.gebruiker_id)) {
-    const fromSession = sessionStorage.getItem('studentData') || sessionStorage.getItem('user');
+  if (
+    !actualStudentData ||
+    (!actualStudentData.id && !actualStudentData.gebruiker_id)
+  ) {
+    const fromSession =
+      sessionStorage.getItem('studentData') || sessionStorage.getItem('user');
     if (fromSession) {
-      try { actualStudentData = JSON.parse(fromSession); } catch {}
+      try {
+        actualStudentData = JSON.parse(fromSession);
+      } catch {}
     }
   }
-  if (!actualStudentData || (!actualStudentData.id && !actualStudentData.gebruiker_id)) {
+  if (
+    !actualStudentData ||
+    (!actualStudentData.id && !actualStudentData.gebruiker_id)
+  ) {
     renderLogin(rootElement);
     return;
   }
@@ -210,43 +293,74 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
 
   // 4. Zet eventListeners en alles wat met DOM refs te maken heeft NA renderTable
   function renderTable(verzoeken) {
+    // Extra veiligheidscontrole: verifieer dat alle verzoeken in de lijst legitiem zijn
+    const studentId = getStudentId(studentData);
+    const validatedVerzoeken = verzoeken.filter((v) => {
+      if (v.asked_by === studentId) {
+        console.error(
+          'SECURITY VIOLATION: Own request found in incoming requests list:',
+          v
+        );
+        // Deze zou niet in de lijst moeten staan door de filtering
+        return false;
+      }
+      return true;
+    });
+
+    if (validatedVerzoeken.length !== verzoeken.length) {
+      console.warn(
+        `Filtered out ${
+          verzoeken.length - validatedVerzoeken.length
+        } invalid requests`
+      );
+    }
+
     const table = document.getElementById('speeddates-requests-table');
     if (!table) return;
-    if (!verzoeken || verzoeken.length === 0) {
-      table.innerHTML = `<p class="geen-data">Nog geen speeddates-verzoeken gevonden.</p>`;
+    if (validatedVerzoeken.length === 0) {
+      table.innerHTML =
+        '<p style="text-align:center;color:#888;margin-top:2rem;">Geen speeddate verzoeken ontvangen.</p>';
       return;
     }
     table.innerHTML = `
-      <div class="speeddates-lijst">
-        <div class="speeddates-header">
-          <h2>Pending Speeddates-verzoeken (${verzoeken.length})</h2>
-        </div>
-        <div class="speeddates-table" id="speeddates-table">
-          ${verzoeken
-            .map(
-              (v) => `
-            <div class="speeddate-item pending" data-id="${v.id}">
-              <div class="speeddate-info">
-                <div class="student-info">
-                  <img src="${getBedrijfFotoUrl(v.profiel_foto_bedrijf)}" alt="${v.naam_bedrijf}" class="profiel-foto bedrijf-foto" onerror="this.src='/images/default.png'" />
-                  <div class="student-details">
-                    <h4>${v.naam_bedrijf}</h4>
-                  </div>
+      <div class="speeddate-requests-container">
+        <div class="requests-list">
+          ${validatedVerzoeken
+            .map((v) => {
+              // Extra controle per item
+              if (v.asked_by === studentId) {
+                console.error('CRITICAL: Own request bypassed filtering:', v);
+                return ''; // Render niets voor eigen verzoeken
+              }
+
+              return `
+            <div class="speeddate-request-card" data-id="${v.id}">
+              <div class="request-header">
+                <div class="company-info">
+                  <h3>${v.naam_bedrijf || 'Onbekend bedrijf'}</h3>
+                  <p class="sector">${v.sector_bedrijf || ''}</p>
                 </div>
-                <div class="afspraak-details">
-                  <div class="tijd-lokaal">
-                    <p class="tijdslot"><strong>Tijd:</strong> ${formatTime(v.begin)}</p>
-                    <p class="lokaal"><strong>Lokaal:</strong> ${v.lokaal || '-'} </p>
-                  </div>
-                </div>
-                <div class="speeddate-actions">
-                  <button class="action-btn accept-btn" data-action="accept" data-id="${v.id}">Accepteren</button>
-                  <button class="deny-btn" data-action="delete" data-id="${v.id}">Verwijderen</button>
+                <div class="request-meta">
+                  <p class="tijdslot"><strong>Tijd:</strong> ${formatTime(
+                    v.begin
+                  )}</p>
+                  <p class="lokaal"><strong>Lokaal:</strong> ${
+                    v.lokaal || '-'
+                  } </p>
                 </div>
               </div>
+              <div class="speeddate-actions">
+                <button class="action-btn accept-btn" data-action="accept" data-id="${
+                  v.id
+                }">Accepteren</button>
+                <button class="deny-btn" data-action="delete" data-id="${
+                  v.id
+                }">Verwijderen</button>
+              </div>
             </div>
-          `
-            )
+          `;
+            })
+            .filter((html) => html.length > 0) // Filter lege strings (eigen verzoeken)
             .join('')}
         </div>
       </div>
@@ -259,7 +373,9 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
     const afspraakId = target.getAttribute('data-id');
     const action = target.getAttribute('data-action');
     if (action === 'accept') {
-      acceptSpeeddate(afspraakId).then(() => renderSpeeddatesRequests(rootElement, studentData));
+      acceptSpeeddate(afspraakId).then(() =>
+        renderSpeeddatesRequests(rootElement, studentData)
+      );
     } else if (action === 'delete') {
       pendingDeleteAfspraakId = afspraakId;
       openDeleteModal();
@@ -268,7 +384,10 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
 
   function openDeleteModal() {
     const overlay = document.getElementById('modal-overlay');
-    console.log('[openDeleteModal] pendingDeleteAfspraakId:', pendingDeleteAfspraakId);
+    console.log(
+      '[openDeleteModal] pendingDeleteAfspraakId:',
+      pendingDeleteAfspraakId
+    );
     if (overlay) overlay.style.display = 'flex';
   }
   function closeDeleteModal() {
@@ -289,7 +408,10 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
           yesBtn.disabled = true;
           noBtn.disabled = true;
           try {
-            console.log('Calling rejectSpeeddate with:', pendingDeleteAfspraakId);
+            console.log(
+              'Calling rejectSpeeddate with:',
+              pendingDeleteAfspraakId
+            );
             await rejectSpeeddate(pendingDeleteAfspraakId);
             pendingDeleteAfspraakId = null;
             modalMessage.textContent = 'Speeddate succesvol verwijderd!';
@@ -297,7 +419,8 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
             setTimeout(() => {
               closeDeleteModal();
               renderSpeeddatesRequests(rootElement, studentData);
-              modalMessage.textContent = 'Weet je zeker dat je deze speeddate wilt weigeren?';
+              modalMessage.textContent =
+                'Weet je zeker dat je deze speeddate wilt weigeren?';
               modalButtons.style.display = 'flex';
               yesBtn.disabled = false;
               noBtn.disabled = false;
@@ -313,7 +436,8 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
         console.log('modal NO clicked!');
         pendingDeleteAfspraakId = null;
         closeDeleteModal();
-        modalMessage.textContent = 'Weet je zeker dat je deze speeddate wilt weigeren?';
+        modalMessage.textContent =
+          'Weet je zeker dat je deze speeddate wilt weigeren?';
         modalButtons.style.display = 'flex';
         yesBtn.disabled = false;
         noBtn.disabled = false;
@@ -440,9 +564,22 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
     popup.innerHTML = `
       <button id=\"popup-close\" style=\"position:absolute;top:10px;right:12px;font-size:1.4rem;background:none;border:none;cursor:pointer;\">×</button>
       <h2 style=\"margin-top:0;\">${s.naam_bedrijf}</h2>
-      <p><strong>Tijd:</strong> ${s.begin ? new Date(s.begin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Onbekend'}</p>
+      <p><strong>Tijd:</strong> ${
+        s.begin
+          ? new Date(s.begin).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })
+          : 'Onbekend'
+      }</p>
       <p><strong>Locatie:</strong> ${s.lokaal || 'Onbekend'}</p>
-      <p><strong>Status:</strong> ${s.akkoord !== undefined ? (s.akkoord ? 'Geaccepteerd' : 'In afwachting') : '-'}</p>
+      <p><strong>Status:</strong> ${
+        s.akkoord !== undefined
+          ? s.akkoord
+            ? 'Geaccepteerd'
+            : 'In afwachting'
+          : '-'
+      }</p>
       <p><strong>LinkedIn:</strong> <a id=\"popup-linkedin\" href=\"#\" target=\"_blank\">Laden...</a></p>
       <div id=\"popup-skills\"><em>Skills laden...</em></div>
     `;
@@ -457,18 +594,24 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
     if (bedrijfId) {
       const { functies, skills } = await fetchFunctiesSkills(bedrijfId);
       const skillsHtml = skills.length
-        ? skills.map(skill =>
-            `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#f1f1f1;font-size:0.85rem;\">${skill.naam}</span>`
-          ).join('')
+        ? skills
+            .map(
+              (skill) =>
+                `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#f1f1f1;font-size:0.85rem;\">${skill.naam}</span>`
+            )
+            .join('')
         : '<em>Geen skills beschikbaar</em>';
-      document.getElementById('popup-skills').innerHTML = `<strong>Skills:</strong><div style=\"margin-top:0.4rem;\">${skillsHtml}</div>`;
+      document.getElementById(
+        'popup-skills'
+      ).innerHTML = `<strong>Skills:</strong><div style=\"margin-top:0.4rem;\">${skillsHtml}</div>`;
     }
     // LinkedIn
     if (s.linkedin) {
       document.getElementById('popup-linkedin').textContent = s.linkedin;
       document.getElementById('popup-linkedin').href = s.linkedin;
     } else {
-      document.getElementById('popup-linkedin').textContent = 'Niet beschikbaar';
+      document.getElementById('popup-linkedin').textContent =
+        'Niet beschikbaar';
       document.getElementById('popup-linkedin').removeAttribute('href');
     }
   }

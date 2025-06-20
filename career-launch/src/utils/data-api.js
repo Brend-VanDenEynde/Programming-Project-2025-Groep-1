@@ -171,6 +171,56 @@ export async function fetchPendingSpeeddates(companyId = null) {
  */
 export async function acceptSpeeddateRequest(speeddateId) {
   try {
+    // Extra validatie: controleer of de gebruiker geautoriseerd is om dit verzoek te accepteren
+    // Dit zou eigenlijk door de backend moeten worden gecontroleerd, maar we voegen hier
+    // een extra laag beveiliging toe
+    const pendingDetails = await apiGet(
+      `https://api.ehb-match.me/speeddates/pending/${speeddateId}`
+    );
+
+    if (pendingDetails) {
+      const userType = sessionStorage.getItem('userType');
+      const userData = JSON.parse(
+        sessionStorage.getItem('user') ||
+          sessionStorage.getItem('companyData') ||
+          '{}'
+      );
+      const currentUserId = userData.id || userData.gebruiker_id;
+
+      // Controleer of de gebruiker probeert zijn eigen verzoek te accepteren
+      if (pendingDetails.asked_by === currentUserId) {
+        console.error(
+          'SECURITY VIOLATION: User attempting to accept own request'
+        );
+        throw new Error(
+          'Je kunt je eigen speeddate verzoeken niet accepteren. Dit is een beveiligingsovertreding.'
+        );
+      }
+
+      // Controleer of het verzoek daadwerkelijk naar deze gebruiker is gericht
+      if (
+        userType === 'bedrijf' &&
+        pendingDetails.id_bedrijf !== currentUserId
+      ) {
+        console.error(
+          'SECURITY VIOLATION: Company attempting to accept request not directed to them'
+        );
+        throw new Error(
+          'Je kunt alleen speeddate verzoeken accepteren die aan jouw bedrijf zijn gericht.'
+        );
+      } else if (
+        userType === 'student' &&
+        pendingDetails.id_student !== currentUserId
+      ) {
+        console.error(
+          'SECURITY VIOLATION: Student attempting to accept request not directed to them'
+        );
+        throw new Error(
+          'Je kunt alleen speeddate verzoeken accepteren die aan jou zijn gericht.'
+        );
+      }
+    }
+
     const response = await apiPost(
       `https://api.ehb-match.me/speeddates/accept/${speeddateId}`
     );
@@ -187,6 +237,54 @@ export async function acceptSpeeddateRequest(speeddateId) {
  */
 export async function rejectSpeeddateRequest(speeddateId) {
   try {
+    // Extra validatie: controleer of de gebruiker geautoriseerd is om dit verzoek te weigeren
+    const pendingDetails = await apiGet(
+      `https://api.ehb-match.me/speeddates/pending/${speeddateId}`
+    );
+
+    if (pendingDetails) {
+      const userType = sessionStorage.getItem('userType');
+      const userData = JSON.parse(
+        sessionStorage.getItem('user') ||
+          sessionStorage.getItem('companyData') ||
+          '{}'
+      );
+      const currentUserId = userData.id || userData.gebruiker_id;
+
+      // Controleer of de gebruiker probeert zijn eigen verzoek te weigeren
+      if (pendingDetails.asked_by === currentUserId) {
+        console.error(
+          'SECURITY VIOLATION: User attempting to reject own request'
+        );
+        throw new Error(
+          'Je kunt je eigen speeddate verzoeken niet weigeren via deze functie. Gebruik de annuleer optie op je eigen verzoeken pagina.'
+        );
+      }
+
+      // Controleer of het verzoek daadwerkelijk naar deze gebruiker is gericht
+      if (
+        userType === 'bedrijf' &&
+        pendingDetails.id_bedrijf !== currentUserId
+      ) {
+        console.error(
+          'SECURITY VIOLATION: Company attempting to reject request not directed to them'
+        );
+        throw new Error(
+          'Je kunt alleen speeddate verzoeken weigeren die aan jouw bedrijf zijn gericht.'
+        );
+      } else if (
+        userType === 'student' &&
+        pendingDetails.id_student !== currentUserId
+      ) {
+        console.error(
+          'SECURITY VIOLATION: Student attempting to reject request not directed to them'
+        );
+        throw new Error(
+          'Je kunt alleen speeddate verzoeken weigeren die aan jou zijn gericht.'
+        );
+      }
+    }
+
     const response = await apiPost(
       `https://api.ehb-match.me/speeddates/reject/${speeddateId}`
     );
@@ -287,11 +385,14 @@ export async function fetchDiscoverStudenten(
  * Send a contact message to the support team
  */
 export async function sendContactMessage(contactData) {
-  const response = await authenticatedFetch('https://api.ehb-match.me/contact', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(contactData),
-  });
+  const response = await authenticatedFetch(
+    'https://api.ehb-match.me/contact',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(contactData),
+    }
+  );
 
   if (!response.ok) {
     throw new Error(`Contact verzenden mislukt: ${response.status}`);
@@ -309,6 +410,44 @@ export async function sendContactMessage(contactData) {
  */
 export async function createSpeeddate(studentId, bedrijfId, datum) {
   try {
+    // Extra validatie: controleer of de gebruiker probeert een verzoek naar zichzelf te sturen
+    const userType = sessionStorage.getItem('userType');
+    const userData = JSON.parse(
+      sessionStorage.getItem('user') ||
+        sessionStorage.getItem('companyData') ||
+        '{}'
+    );
+    const currentUserId = userData.id || userData.gebruiker_id;
+
+    if (userType === 'bedrijf' && currentUserId == studentId) {
+      console.error(
+        'SECURITY VIOLATION: Company attempting to send speeddate request to itself'
+      );
+      throw new Error('Je kunt geen speeddate verzoek naar jezelf sturen.');
+    } else if (userType === 'student' && currentUserId == bedrijfId) {
+      console.error(
+        'SECURITY VIOLATION: Student attempting to send speeddate request to itself'
+      );
+      throw new Error('Je kunt geen speeddate verzoek naar jezelf sturen.');
+    }
+
+    // Controleer of de gebruiker geautoriseerd is om namens de opgegeven partij een verzoek te sturen
+    if (userType === 'bedrijf' && currentUserId != bedrijfId) {
+      console.error(
+        'SECURITY VIOLATION: Company attempting to send request on behalf of another company'
+      );
+      throw new Error(
+        'Je kunt alleen speeddate verzoeken sturen namens je eigen bedrijf.'
+      );
+    } else if (userType === 'student' && currentUserId != studentId) {
+      console.error(
+        'SECURITY VIOLATION: Student attempting to send request on behalf of another student'
+      );
+      throw new Error(
+        'Je kunt alleen speeddate verzoeken sturen namens jezelf.'
+      );
+    }
+
     const speeddateData = {
       id_student: parseInt(studentId),
       id_bedrijf: parseInt(bedrijfId),
