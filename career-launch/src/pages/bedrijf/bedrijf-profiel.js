@@ -408,13 +408,43 @@ export async function renderBedrijfProfiel(
           }
         }
         const updateData = {
-          naam: document.getElementById('bedrijfsnaamInput').value,
-          contact_email: document.getElementById('emailInput').value,
-          plaats: document.getElementById('plaatsInput').value,
+          naam: document.getElementById('bedrijfsnaamInput').value.trim(),
+          contact_email: document.getElementById('emailInput').value.trim(),
+          plaats: document.getElementById('plaatsInput').value.trim(),
           linkedin: linkedinValue,
           id_sector: sectorID || bedrijfData.id_sector_bedrijf, // Gebruik sectorID als deze is opgehaald, anders huidige waarde
           // sector_bedrijf wordt niet geaccepteerd door de API, dus weggelaten
-        }; // Haal het bedrijf ID op uit de huidige data
+        };
+
+        // Remove empty values but keep valid null values
+        Object.keys(updateData).forEach((key) => {
+          if (
+            updateData[key] === null ||
+            updateData[key] === undefined ||
+            updateData[key] === ''
+          ) {
+            if (key === 'linkedin' || key === 'plaats') {
+              // These fields can be empty
+              updateData[key] = updateData[key] || '';
+            } else if (key !== 'id_sector') {
+              // Don't remove id_sector even if null
+              delete updateData[key];
+            }
+          }
+        });
+
+        // Validate required fields
+        if (!updateData.naam) {
+          alert('Bedrijfsnaam is verplicht.');
+          return;
+        }
+
+        if (!updateData.contact_email) {
+          alert('E-mailadres is verplicht.');
+          return;
+        }
+
+        // Haal het bedrijf ID op uit de huidige data
         const bedrijfID = bedrijfData.id || bedrijfData.gebruiker_id;
 
         console.log('Debug bedrijf ID lookup:');
@@ -507,9 +537,9 @@ export async function renderBedrijfProfiel(
           profielFotoKey = uploadResult.profiel_foto_key;
         }
         console.log('Stuur profielfoto key:', profielFotoKey);
-
         updateData.profiel_foto = profielFotoKey || DEFAULT_AVATAR_KEY; // Voeg de profielfoto key toe als deze bestaat
-        console.log('Final update data:', updateData);
+        console.log('Final update data:', JSON.stringify(updateData, null, 2));
+        console.log('Bedrijf ID for API call:', bedrijfID);
 
         // Roep de API aan om het bedrijf bij te werken
         const result = await updateBedrijfProfile(bedrijfID, updateData);
@@ -630,10 +660,12 @@ export async function renderBedrijfProfiel(
   }
 
   // Zoekcriteria knop
-  document.getElementById('to-search-criteria-btn')?.addEventListener('click', () => {
-    import('../../router.js').then((module) => {
-      const Router = module.default;
-      Router.navigate('/bedrijf/zoek-criteria');
+  document
+    .getElementById('to-search-criteria-btn')
+    ?.addEventListener('click', () => {
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/bedrijf/zoek-criteria');
+      });
     });
-  });
 }
