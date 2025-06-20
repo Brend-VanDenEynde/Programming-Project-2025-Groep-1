@@ -71,6 +71,7 @@ export async function authenticatedFetch(url, options = {}) {
         return retryResponse;
       } else {
         console.error('Token refresh failed:', refreshResult.error);
+        window.location.href = '/login'; // Redirect to login on failure
         throw new Error('Authentication failed - please log in again');
       }
     }

@@ -2,6 +2,7 @@ import Router from '../router.js';
 import { fetchAndStoreStudentProfile } from './student/student-profiel.js';
 import hideIcon from '../icons/hide.png';
 import eyeIcon from '../icons/eye.png';
+import { authenticatedFetch } from '../utils/auth-api.js';
 
 // Zet altijd light mode bij laden van login
 localStorage.setItem('darkmode', 'false');
@@ -37,11 +38,7 @@ export function renderLogin(rootElement) {
               </button>
             </div>
           </div>
-          <button type="submit" class="login-btn">Login</button>
-        </form>
-        <div class="divider">
-          <hr>
-        </div>
+          <button type="submit" class="login-btn">Login</button>        </form>
         <div class="register-link">
           <p>Heb je nog geen account? 
             <a id="register-link" data-route="/registreer" style="cursor:pointer;">Registreren</a>
@@ -54,10 +51,15 @@ export function renderLogin(rootElement) {
       </footer>
     </div>
   `;
-
-  document.getElementById('loginForm').addEventListener('submit', (e) => handleLogin(e, rootElement));
-  document.getElementById('register-link').addEventListener('click', () => Router.navigate('/registreer'));
-  document.getElementById('back-button').addEventListener('click', () => Router.navigate('/'));
+  document
+    .getElementById('loginForm')
+    .addEventListener('submit', (e) => handleLogin(e, rootElement));
+  document
+    .getElementById('register-link')
+    .addEventListener('click', () => Router.navigate('/registreer'));
+  document
+    .getElementById('back-button')
+    .addEventListener('click', () => Router.navigate('/'));
 
   // Footer links: gebruik alleen Router.navigate, geen hash of import
   const privacyLink = document.querySelector('a[href="/privacy"]');
@@ -87,7 +89,9 @@ export function renderLogin(rootElement) {
       const isVisible = passwordInput.type === 'text';
       passwordInput.type = isVisible ? 'password' : 'text';
       togglePasswordIcon.src = isVisible ? `${hideIcon}` : `${eyeIcon}`;
-      togglePasswordIcon.alt = isVisible ? 'Toon wachtwoord' : 'Verberg wachtwoord';
+      togglePasswordIcon.alt = isVisible
+        ? 'Toon wachtwoord'
+        : 'Verberg wachtwoord';
     });
   }
 }
@@ -96,10 +100,11 @@ async function loginUser(email, password) {
   const apiUrl = 'https://api.ehb-match.me/auth/login';
   const loginData = { email, password };
 
-  const response = await fetch(apiUrl, {
+  const response = await authenticatedFetch(apiUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(loginData),
+    credentials: 'include', // Include cookies in the request (for refresh token)
   });
 
   const data = await response.json();
@@ -114,7 +119,7 @@ async function loginUser(email, password) {
 
 async function fetchUserInfo(token) {
   const infoUrl = 'https://api.ehb-match.me/auth/info';
-  const response = await fetch(infoUrl, {
+  const response = await authenticatedFetch(infoUrl, {
     method: 'GET',
     headers: {
       Authorization: 'Bearer ' + token,
@@ -149,12 +154,13 @@ async function handleLogin(event, rootElement) {
     const infoRes = await fetchUserInfo(loginRes.accessToken);
     const user = infoRes.user;
 
-
     // Debug: log de volledige user-object
     console.log('USER OBJECT:', user);
 
     if (!user || !user.type) {
-      alert('Geen gebruikersinformatie ontvangen. Neem contact op met support.');
+      alert(
+        'Geen gebruikersinformatie ontvangen. Neem contact op met support.'
+      );
       throw new Error('Authentication failed: No user info');
     }
 
@@ -187,6 +193,6 @@ async function handleLogin(event, rootElement) {
     window.sessionStorage.removeItem('companyData');
     window.sessionStorage.removeItem('userType');
 
-    alert('Inloggen mislukt. Controleer je e-mailadres en wachtwoord.');
+    alert('Inloggen mislukt. Controleer uw e-mailadres en wachtwoord.\nIndien u een bedrijfsaccount heeft, kan het zijn dat uw account nog niet is goedgekeurd. Neem contact op met support als het probleem aanhoudt.');
   }
 }
