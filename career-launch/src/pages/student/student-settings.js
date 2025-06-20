@@ -1,4 +1,4 @@
-import { logoutUser } from '../../utils/auth-api.js';
+import { performLogout } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
 
 // Main renderfunctie:
@@ -134,7 +134,7 @@ export function showSettingsPopup(onClose) {
   // Logout
   document.getElementById('btn-logout').onclick = null;
   document.getElementById('btn-logout').addEventListener('click', async () => {
-    const response = await logoutUser();
+    const response = await performLogout();
     console.log('Logout API response:', response);
     window.sessionStorage.clear();
     localStorage.clear();

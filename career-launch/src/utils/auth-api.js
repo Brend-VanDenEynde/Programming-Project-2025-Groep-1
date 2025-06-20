@@ -32,10 +32,9 @@ export async function logoutUser() {
   const apiUrl = 'https://api.ehb-match.me/auth/logout';
 
   try {
-    const response = await fetch(apiUrl, {
+    const response = await authenticatedFetch(apiUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         // Include authorization header if we have a token
         ...(window.sessionStorage.getItem('authToken') && {
           Authorization: `Bearer ${window.sessionStorage.getItem('authToken')}`,
@@ -278,12 +277,8 @@ export async function fetchUserInfo() {
     window.sessionStorage.getItem('authToken') ||
     window.sessionStorage.getItem('accessToken');
 
-  if (!token) {
-    throw new Error('No authentication token found');
-  }
-
   try {
-    const response = await fetch(apiUrl, {
+    const response = await authenticatedFetch(apiUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -335,6 +330,7 @@ export async function updateBedrijfProfile(bedrijfID, updateData) {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
+        credentials: 'include',
       },
       body: JSON.stringify(updateData),
     });
@@ -461,7 +457,11 @@ export async function authenticatedFetch(url, options = {}) {
         return retryResponse;
       } else {
         console.error('Token refresh failed:', refreshResult.error);
-        window.location.href = '/login'; // Redirect to login on failure
+        console.log('Redirecting to login page...');
+        import('../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/login');
+        }); // Redirect to login on failure
         throw new Error('Authentication failed - please log in again');
       }
     }

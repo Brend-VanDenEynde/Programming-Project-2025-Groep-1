@@ -1,9 +1,8 @@
-import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
 import logoIcon from '../../icons/favicon-32x32.png';
 import { getOpleidingNaamById, opleidingen } from './student-opleidingen.js';
 import defaultAvatar from '../../images/default.png';
-import { authenticatedFetch, logoutUser } from '../../utils/auth-api.js';
+import { authenticatedFetch, performLogout } from '../../utils/auth-api.js';
 import { renderBedrijven } from './bedrijven.js';
 
 const defaultProfile = {
@@ -11,7 +10,7 @@ const defaultProfile = {
   achternaam: '',
   email: '',
   studiejaar: '1',
-  profiel_foto: defaultAvatar,
+  profiel_foto: '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4',
   linkedin: '',
   date_of_birth: '',
   opleiding_id: null,
@@ -23,7 +22,7 @@ function isoToDateString(isoString) {
 }
 
 function getProfielFotoUrl(profiel_foto) {
-  if (!profiel_foto || profiel_foto === 'null') return defaultAvatar;
+  if (!profiel_foto || profiel_foto === 'null') return 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
   if (profiel_foto.startsWith('http')) return profiel_foto;
   return 'https://gt0kk4fbet.ufs.sh/f/' + profiel_foto;
 }
@@ -38,6 +37,13 @@ export function renderStudentProfiel(
     try {
       const stored = window.sessionStorage.getItem('studentData');
       if (stored) studentData = JSON.parse(stored);
+      if (!studentData || Object.keys(studentData).length === 0) {
+        console.warn('Geen studentData gevonden in sessionStorage, ga naar login.');
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/login');
+        });
+      }
     } catch (e) {}
   }
 
@@ -281,7 +287,7 @@ export function renderStudentProfiel(
       .getElementById('nav-logout')
       .addEventListener('click', async () => {
         dropdown.classList.remove('open');
-        const response = await logoutUser();
+        const response = await performLogout();
         console.log('Logout API response:', response);
         window.sessionStorage.removeItem('studentData');
         window.sessionStorage.removeItem('authToken');
@@ -298,7 +304,7 @@ export function renderStudentProfiel(
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async () => {
-        const response = await logoutUser();
+        const response = await performLogout();
         console.log('Logout API response:', response);
         window.sessionStorage.removeItem('studentData');
         window.sessionStorage.removeItem('authToken');

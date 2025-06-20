@@ -1,4 +1,4 @@
-import { logoutUser } from '../../utils/auth-api.js';
+import { performLogout } from '../../utils/auth-api.js';
 
 // Admin Settings Popup - vergelijkbaar met student settings maar voor admin
 export function showAdminSettingsPopup(onClose) {
@@ -180,7 +180,7 @@ export function showAdminSettingsPopup(onClose) {
     .addEventListener('click', async () => {
       if (confirm('Weet je zeker dat je wilt uitloggen?')) {
         try {
-          await logoutUser();
+          await performLogout();
           window.sessionStorage.clear();
           localStorage.removeItem('adminLoggedIn');
           localStorage.removeItem('adminUsername');

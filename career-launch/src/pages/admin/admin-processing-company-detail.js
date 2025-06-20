@@ -1,6 +1,6 @@
 // Admin processing company detail pagina
 import Router from '../../router.js';
-import { performLogout, logoutUser, authenticatedFetch } from '../../utils/auth-api.js';
+import { performLogout, authenticatedFetch } from '../../utils/auth-api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 import defaultCompanyLogo from '../../images/defaultlogo.webp';
 
@@ -303,7 +303,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
   if (logoutBtn) {
     logoutBtn.onclick = null;
     logoutBtn.addEventListener('click', async () => {
-      await logoutUser();
+      await performLogout();
       window.sessionStorage.clear();
       localStorage.clear();
       Router.navigate('/');

@@ -1,6 +1,7 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
+import { performLogout } from '../../utils/auth-api.js';
 
 let pendingDeleteAfspraakId = null; // Gebruik één globale state, identiek aan bedrijven
 
@@ -389,8 +390,9 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
         renderSpeeddatesRequests(rootElement, studentData)
       );
     };
-    document.getElementById('nav-logout').onclick = () => {
+    document.getElementById('nav-logout').onclick = async () => {
       dropdown.classList.remove('open');
+      await performLogout();
       localStorage.setItem('darkmode', 'false');
       document.body.classList.remove('darkmode');
       renderLogin(rootElement);
