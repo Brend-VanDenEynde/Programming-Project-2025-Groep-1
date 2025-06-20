@@ -68,6 +68,9 @@ async function showBedrijfPopup(bedrijf, studentId) {
     if (skillsResp.ok) skills = await skillsResp.json();
   } catch {}
 
+  // Haal actuele student skills/functies op:
+  const { skills: liveStudentSkills, functies: liveStudentFuncties } = await fetchStudentSkillsAndFuncties(studentId);
+
   const popup = document.createElement('div');
   popup.id = 'bedrijf-popup-modal';
   popup.style.position = 'fixed';
@@ -193,9 +196,12 @@ async function showBedrijfPopup(bedrijf, studentId) {
     ? bedrijfSkillsType0
         .map(
           (s) =>
-            `<span class="skill-badge" style="display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${
-              studentSkills.includes(s.naam) ? '#e3f2fd' : '#f5f5f5'
-            };color:#222;font-size:0.97em;">${s.naam}</span>`
+            `<span class="skill-badge"
+               style="display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;
+               background:${liveStudentSkills.includes(s.naam) ? '#e3f2fd' : '#f5f5f5'};
+               color:#222;font-size:0.97em;"
+               title="${liveStudentSkills.includes(s.naam) ? 'Deze skill/talent matcht met jouw profiel!' : ''}"
+             >${s.naam}</span>`
         )
         .join(' ')
     : '<span style="color:#aaa;">Geen skills/talen bekend</span>';
@@ -206,9 +212,12 @@ async function showBedrijfPopup(bedrijf, studentId) {
     ? bedrijfFuncties
         .map(
           (f) =>
-            `<span class="functie-badge" style="display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${
-              studentFuncties.includes(f.naam) ? '#e3f2fd' : '#f5f5f5'
-            };color:#222;font-size:0.97em;">${f.naam}</span>`
+            `<span class="functie-badge"
+               style="display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;
+               background:${liveStudentFuncties.includes(f.naam) ? '#e3f2fd' : '#f5f5f5'};
+               color:#222;font-size:0.97em;"
+               title="${liveStudentFuncties.includes(f.naam) ? 'Deze functie matcht met jouw profiel!' : ''}"
+             >${f.naam}</span>`
         )
         .join(' ')
     : '<span style="color:#aaa;">Geen functies bekend</span>';
@@ -819,13 +828,19 @@ export async function renderBedrijven(rootElement, studentData = {}) {
   border: 1.5px solid #e1e5e9;
   color: #222;
   font-weight: 600;
-  min-width: 120px;
+  min-width: 150px;
   max-width: 100%;
   transition: background 0.2s, border 0.2s;
   box-shadow: 0 1px 4px #0001;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(0.85rem, 1.1vw, 1.05rem);
+  line-height: 1.1;
+  padding: 0.6rem 0.9rem;
 }
 #sort-percentage-btn:hover, .bedrijven-filterbar-flex .sort-group button:hover {
   background: #e1e5e9;
@@ -914,7 +929,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
     // Custom filter UI rendering
     function renderFilterOptions() {
       // Locaties
-      const locaties = getUniekeLocaties();
+      const locaties = getUniekeLocaties().sort((a, b) => a.localeCompare(b));
       const locatieDiv = document.getElementById('filter-locaties');
       locatieDiv.innerHTML = `
         <label for="locaties-popup-trigger">Locatie</label>
@@ -927,7 +942,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         }</button>
       `;
       // DOMEIN
-      const domeinen = getUniekeDomeinen();
+      const domeinen = getUniekeDomeinen().sort((a, b) => a.localeCompare(b));
       const domeinDiv = document.getElementById('filter-domein');
       domeinDiv.innerHTML = `
         <label for="domein-popup-trigger">Domein</label>
@@ -940,7 +955,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         }</button>
       `;
       // FUNCTIE
-      const functies = getUniekeFuncties();
+      const functies = getUniekeFuncties().sort((a, b) => a.localeCompare(b));
       const functieDiv = document.getElementById('filter-functie');
       functieDiv.innerHTML = `
         <label for="functie-popup-trigger">Functie</label>
@@ -953,7 +968,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         }</button>
       `;
       // SKILLS
-      const skills = getUniekeSkills();
+      const skills = getUniekeSkills().sort((a, b) => a.localeCompare(b));
       const skillsDiv = document.getElementById('filter-skills');
       skillsDiv.innerHTML = `
         <label for="skills-popup-trigger">Skills/talen</label>
@@ -969,8 +984,8 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       const sortDiv = document.getElementById('sort-group');
       sortDiv.innerHTML = `
         <label for="sort-percentage-btn">&nbsp;</label>
-        <button id="sort-percentage-btn" type="button" style="padding:0.6rem 1.2rem;border-radius:8px;border:1.5px solid #e1e5e9;background:#f5f5f5;cursor:pointer;min-width:120px;">
-          matchpercentage${sortPercentageAsc ? '▲' : '▼'}
+        <button id="sort-percentage-btn" type="button" style="padding:0.6rem 0.9rem;border-radius:8px;border:1.5px solid #e1e5e9;background:#f5f5f5;cursor:pointer;min-width:150px;max-width:100%;font-size:clamp(0.85rem,1.1vw,1.05rem);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;justify-content:center;font-weight:600;box-shadow:0 1px 4px #0001;transition:background 0.2s, border 0.2s;">
+          Matchpercentage ${sortPercentageAsc ? '▲' : '▼'}
         </button>
       `;
       // Popup triggers
@@ -1448,4 +1463,16 @@ function getMatchColor(percentage) {
   if (percentage >= 60) return '#f7b500'; // geel
   if (percentage >= 40) return '#ff9800'; // oranje
   return '#da2727'; // rood
+}
+
+// Haal altijd de actuele skills en functies van een student op
+async function fetchStudentSkillsAndFuncties(studentId) {
+  const [skillsResp, functiesResp] = await Promise.all([
+    authenticatedFetch(`https://api.ehb-match.me/studenten/${studentId}/skills`).then(r => r.ok ? r.json() : []),
+    authenticatedFetch(`https://api.ehb-match.me/studenten/${studentId}/functies`).then(r => r.ok ? r.json() : [])
+  ]);
+  return {
+    skills: skillsResp.map(s => s.naam),
+    functies: functiesResp.map(f => f.naam),
+  };
 }
