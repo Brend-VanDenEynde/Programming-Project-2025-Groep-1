@@ -13,6 +13,8 @@ import {
 } from '../../utils/favorites-storage.js';
 import { fetchAndStoreStudentProfile } from '../../utils/fetch-student-profile.js';
 import { authenticatedFetch } from '../../utils/auth-api.js';
+import { performLogout } from '../../utils/auth-api.js';
+
 
 // Globale variabelen
 let bedrijven = [];
@@ -1332,10 +1334,11 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       }
       showSettingsPopup(() => renderBedrijven(rootElement, actualStudentData));
     });
-    document.getElementById('nav-logout').addEventListener('click', () => {
+    document.getElementById('nav-logout').addEventListener('click', async () => {
       const dropdown = document.getElementById('burger-dropdown');
       if (dropdown) {
         dropdown.classList.remove('open');
+        await performLogout();
       }
       localStorage.setItem('darkmode', 'false');
       document.body.classList.remove('darkmode');

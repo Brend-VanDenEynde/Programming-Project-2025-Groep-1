@@ -32,10 +32,9 @@ export async function logoutUser() {
   const apiUrl = 'https://api.ehb-match.me/auth/logout';
 
   try {
-    const response = await fetch(apiUrl, {
+    const response = await authenticatedFetch(apiUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         // Include authorization header if we have a token
         ...(window.sessionStorage.getItem('authToken') && {
           Authorization: `Bearer ${window.sessionStorage.getItem('authToken')}`,

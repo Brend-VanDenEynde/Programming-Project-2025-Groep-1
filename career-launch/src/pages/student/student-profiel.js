@@ -3,7 +3,7 @@ import { showSettingsPopup } from './student-settings.js';
 import logoIcon from '../../icons/favicon-32x32.png';
 import { getOpleidingNaamById, opleidingen } from './student-opleidingen.js';
 import defaultAvatar from '../../images/default.png';
-import { authenticatedFetch, logoutUser } from '../../utils/auth-api.js';
+import { authenticatedFetch, performLogout } from '../../utils/auth-api.js';
 import { renderBedrijven } from './bedrijven.js';
 
 const defaultProfile = {
@@ -281,7 +281,7 @@ export function renderStudentProfiel(
       .getElementById('nav-logout')
       .addEventListener('click', async () => {
         dropdown.classList.remove('open');
-        const response = await logoutUser();
+        const response = await performLogout();
         console.log('Logout API response:', response);
         window.sessionStorage.removeItem('studentData');
         window.sessionStorage.removeItem('authToken');
@@ -298,7 +298,7 @@ export function renderStudentProfiel(
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async () => {
-        const response = await logoutUser();
+        const response = await performLogout();
         console.log('Logout API response:', response);
         window.sessionStorage.removeItem('studentData');
         window.sessionStorage.removeItem('authToken');

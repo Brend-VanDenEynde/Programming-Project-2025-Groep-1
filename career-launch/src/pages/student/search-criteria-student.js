@@ -4,6 +4,7 @@ import { renderSpeeddates } from './student-speeddates.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
+import { performLogout } from '../../utils/auth-api.js';
 
 // ... [alle utility functies uit jouw code hierboven, niet aangepast] ...
 // Skills ophalen: false = skill, true = taal
@@ -749,6 +750,7 @@ export async function renderSearchCriteriaStudent(
       }
       document.getElementById('nav-logout').addEventListener('click', async () => {
         dropdown.classList.remove('open');
+        await performLogout();
         window.sessionStorage.removeItem('studentData');
         window.sessionStorage.removeItem('authToken');
         window.sessionStorage.removeItem('userType');

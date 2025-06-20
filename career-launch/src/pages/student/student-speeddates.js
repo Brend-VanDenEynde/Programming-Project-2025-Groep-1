@@ -6,7 +6,7 @@ import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './student-settings.js';
 import { fetchStudentSpeeddates } from '../../utils/data-api.js';
-import { authenticatedFetch } from '../../utils/auth-api.js';
+import { authenticatedFetch, performLogout } from '../../utils/auth-api.js';
 
 // Nieuw: API fetch
 async function fetchSpeeddates(rootElement) {
@@ -361,8 +361,9 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       dropdown.classList.remove('open');
       showSettingsPopup(() => renderSpeeddates(rootElement, studentData));
     });
-    document.getElementById('nav-logout').addEventListener('click', () => {
+    document.getElementById('nav-logout').addEventListener('click', async () => {
       dropdown.classList.remove('open');
+      await performLogout();
       localStorage.setItem('darkmode', 'false');
       document.body.classList.remove('darkmode');
       renderLogin(rootElement);

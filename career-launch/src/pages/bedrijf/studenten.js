@@ -1,7 +1,7 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import defaultStudentAvatar from '../../images/default.png';
 import {
-  logoutUser,
+  performLogout,
   fetchUserInfo,
   authenticatedFetch,
 } from '../../utils/auth-api.js';
@@ -1053,7 +1053,7 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
 
   document.getElementById('nav-logout')?.addEventListener('click', async () => {
     dropdown.classList.remove('open');
-    const response = await logoutUser();
+    const response = await performLogout();
     console.log('Logout API response:', response);
     window.sessionStorage.removeItem('bedrijfData');
     window.sessionStorage.removeItem('authToken');
