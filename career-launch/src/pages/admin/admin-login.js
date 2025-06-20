@@ -52,15 +52,8 @@ export function renderAdmin(rootElement) {
       });
 
       // Parse JSON response
-      const responseData = await response.json();
-
-      // Debugging: Log API responses
-      console.log('Login Response:', responseData); // Display the message from the API response in the label
-
-      errorMessage.textContent =
-        responseData.message || 'Er is een fout opgetreden.';
-      errorMessage.style.display = 'block';
-      errorMessage.style.backgroundColor = 'transparent'; // Remove background styling
+      const responseData = await response.json(); // Debugging: Log API responses
+      console.log('Login Response:', responseData);
 
       if (response.ok) {
         // Store important information in session storage
@@ -94,6 +87,11 @@ export function renderAdmin(rootElement) {
           errorMessage.textContent = 'Je bent geen admin!';
           errorMessage.style.display = 'block';
         }
+      } else {
+        // Show error message only for failed requests
+        errorMessage.textContent =
+          responseData.message || 'Onjuiste inloggegevens.';
+        errorMessage.style.display = 'block';
       }
     } catch (error) {
       // Handle errors
