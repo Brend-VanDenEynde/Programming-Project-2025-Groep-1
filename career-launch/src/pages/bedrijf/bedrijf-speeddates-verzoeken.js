@@ -48,7 +48,6 @@ function formatPendingSpeeddateData(rawData) {
       id: afspraak.id_student,
       naam: `${afspraak.voornaam_student} ${afspraak.achternaam_student}`,
       profielfoto: afspraak.profiel_foto_student,
-      studiejaar: afspraak.studiejaar_student, // Voeg studiejaar toe
     },
     tijdslot: {
       begin: new Date(afspraak.begin),
@@ -104,14 +103,13 @@ function renderPendingSpeeddatesList(speeddates) {
                      onerror="this.src='/images/default.png'" />
                 <div class="student-details">
                   <h4 class="student-popup-trigger" data-student='${JSON.stringify(afspraak.student)}' style="cursor:pointer;text-decoration:none;">${afspraak.student.naam}</h4>
-                  <div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${afspraak.student.studiejaar ? `<strong>Jaar:</strong> ${afspraak.student.studiejaar}` : ''}</div>
+                  <div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${afspraak.student.studiejaar ? ` ${afspraak.student.studiejaar}` : ''}</div>
                 </div>
               </div>
               
               <div class="afspraak-details">
                 <div class="tijd-lokaal">
                   ${afspraak.tijdslot.geformatteerd}
-                  ${afspraak.lokaal && afspraak.lokaal !== 'null' && afspraak.lokaal !== null && afspraak.lokaal !== '' ? `<p class="lokaal"><strong>Lokaal:</strong> ${afspraak.lokaal}</p>` : ''}
                 </div>
               </div>
               

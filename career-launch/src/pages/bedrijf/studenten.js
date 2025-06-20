@@ -571,7 +571,7 @@ export async function showStudentInfoPopup(student) {
 
   // Toon alleen niet-lege velden
   const opleidingHtml = opleiding ? `<div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${opleiding}</div>` : '';
-  const studiejaarHtml = studiejaar ? `<div style=\"font-size:0.97rem;color:#888;margin-bottom:0.7rem;\">${studiejaar}</div>` : '';
+  const studiejaarHtml = studiejaar ? `<div style=\"font-size:0.97rem;color:#888;margin-bottom:0.7rem;\">Studiejaar: ${studiejaar}</div>` : '';
   const emailHtml = email ? `<div style=\"font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;\"><a href=\"mailto:${email}\" style=\"color:#444;\">${email}</a></div>` : '';
 
   const popup = document.createElement('div');
@@ -780,7 +780,7 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
         );
         const fullName = `${student.voornaam} ${student.achternaam}`;
         const opleiding = student.opleiding_naam || '';
-        const studiejaar = student.studiejaar ? `Jaar ${student.studiejaar}` : '';
+        const studiejaar = student.studiejaar ? `Studiejaar: ${student.studiejaar}` : '';
         const email = student.contact_email || '';
         const matchPercentage = student.match_percentage ? Number(student.match_percentage) : 0;
         const formattedMatch = Number.isFinite(matchPercentage) ? matchPercentage.toFixed(1) : '0.0';
@@ -791,14 +791,14 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
         const skillsBadges = '';
         const functiesBadges = '';
         return `
-          <div class="student-card" data-student-idx="${idx}" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;position:relative;">
+          <div class="student-card" data-student-idx="${idx}" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001, -8px 0 16px 0 ${colorScheme.background}33;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;position:relative;">
             <span class="match-badge" style="position:absolute;top:10px;left:10px;background:${colorScheme.background};color:#fff;font-weight:bold;padding:0.3em 0.8em;border-radius:16px;font-size:0.98em;z-index:3;box-shadow:0 2px 8px #0002;min-width:unset;max-width:70px;text-align:center;">${formattedMatch}%</span>
             <button class="favorite-btn" data-student-id="${student.gebruiker_id}" title="${isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'}" style="position:absolute;top:10px;right:10px;font-size:1.3rem;background:none;border:none;cursor:pointer;z-index:2;">${hartIcon}</button>
             <div class="student-card-clickable" style="width:100%;display:flex;flex-direction:column;align-items:center;" tabindex="0">
               <img src="${photo}" alt="Foto ${fullName}" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.src='${defaultStudentAvatar}'">
               <h3 style="margin-bottom:0.5rem;text-align:center;">${fullName}</h3>
               <div style="font-size:0.97rem;color:#666;margin-bottom:0.3rem;">${opleiding}</div>
-              <div style="font-size:0.97rem;color:#888;margin-bottom:0.3rem;"><p>Jaar: </p>${studiejaar}</div>
+              <div style="font-size:0.97rem;color:#888;margin-bottom:0.3rem;">${studiejaar}</div>
               <div style="font-size:0.95rem;color:#555;margin-bottom:0.3rem;">${functiesBadges}</div>
               <div style="font-size:0.95rem;color:#555;margin-bottom:0.3rem;">${skillsBadges}</div>
             </div>
@@ -1432,6 +1432,7 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
     if (navLogoutBtn && dropdown) {
       navLogoutBtn.addEventListener('click', () => {
         dropdown.classList.remove('open');
+
         localStorage.setItem('darkmode', 'false');
         document.body.classList.remove('darkmode');
                // Log uit en navigeer naar login
