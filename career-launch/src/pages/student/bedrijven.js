@@ -455,8 +455,8 @@ async function showBedrijfPopup(bedrijf, studentId) {
     ].some((s) => {
       if (!s.begin) return false;
       const dt = new Date(s.begin);
-      const slotTijd = `${dt.getUTCHours().toString().padStart(2, '0')}:${dt
-        .getUTCMinutes()
+      const slotTijd = `${dt.getHours().toString().padStart(2, '0')}:${dt
+        .getMinutes()
         .toString()
         .padStart(2, '0')}`;
       return slotTijd === tijd;
