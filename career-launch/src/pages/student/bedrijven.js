@@ -221,7 +221,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
       }">${hartIcon}</button>
       <img src="${bedrijf.foto}" alt="Logo ${
     bedrijf.naam
-  }" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='/src/images/defaultlogo.webp'">
+  }" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'">
       <h2 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h2>
       <div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${
         bedrijf.locatie
@@ -1155,7 +1155,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
               }" style="position:absolute;top:10px;right:10px;font-size:1.3rem;background:none;border:none;cursor:pointer;z-index:2;">${hartIcon}</button>
     <img src="${profielFoto}" alt="Logo ${
                 bedrijf.naam
-              }" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.onerror=null;this.src='/src/images/defaultlogo.webp'">
+              }" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.onerror=null;this.src='https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'">
     <h3 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h3>
     <div style="font-size:0.97rem;color:#666;margin-bottom:0.3rem;">${
       bedrijf.locatie
