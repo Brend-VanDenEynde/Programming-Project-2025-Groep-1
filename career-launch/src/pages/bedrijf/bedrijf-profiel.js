@@ -1,7 +1,7 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import defaultLogo from '../../images/defaultlogo.webp';
 import {
-  logoutUser,
+  performLogout,
   fetchUserInfo,
   updateBedrijfProfile,
   authenticatedFetch,
@@ -286,7 +286,7 @@ export async function renderBedrijfProfiel(
 
   document.getElementById('nav-logout')?.addEventListener('click', async () => {
     dropdown.classList.remove('open');
-    const response = await logoutUser();
+    const response = await performLogout();
     console.log('Logout API response:', response);
     window.sessionStorage.removeItem('bedrijfData');
     window.sessionStorage.removeItem('authToken');
@@ -300,7 +300,7 @@ export async function renderBedrijfProfiel(
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
-      const response = await logoutUser();
+      const response = await performLogout();
       console.log('Logout API response:', response);
       window.sessionStorage.removeItem('bedrijfData');
       window.sessionStorage.removeItem('authToken');

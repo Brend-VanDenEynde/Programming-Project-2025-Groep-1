@@ -13,6 +13,8 @@ import {
 } from '../../utils/favorites-storage.js';
 import { fetchAndStoreStudentProfile } from '../../utils/fetch-student-profile.js';
 import { authenticatedFetch } from '../../utils/auth-api.js';
+import { performLogout } from '../../utils/auth-api.js';
+
 
 // Globale variabelen
 let bedrijven = [];
@@ -160,7 +162,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
         if (status === 'pending') {
           kleur = '#fff9d1';
           disabled = true;
-          label += ' (in afwachting)';
+          label += ' (in behandeling)';
         } else if (status === 'confirmed') {
           kleur = '#ffe0e0';
           disabled = true;
@@ -471,8 +473,8 @@ async function showBedrijfPopup(bedrijf, studentId) {
     ].some((s) => {
       if (!s.begin) return false;
       const dt = new Date(s.begin);
-      const slotTijd = `${dt.getUTCHours().toString().padStart(2, '0')}:${dt
-        .getUTCMinutes()
+      const slotTijd = `${dt.getHours().toString().padStart(2, '0')}:${dt
+        .getMinutes()
         .toString()
         .padStart(2, '0')}`;
       return slotTijd === tijd;
@@ -1496,10 +1498,11 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       }
       showSettingsPopup(() => renderBedrijven(rootElement, actualStudentData));
     });
-    document.getElementById('nav-logout').addEventListener('click', () => {
+    document.getElementById('nav-logout').addEventListener('click', async () => {
       const dropdown = document.getElementById('burger-dropdown');
       if (dropdown) {
         dropdown.classList.remove('open');
+        await performLogout();
       }
       localStorage.setItem('darkmode', 'false');
       document.body.classList.remove('darkmode');

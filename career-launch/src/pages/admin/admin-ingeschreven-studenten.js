@@ -1,6 +1,6 @@
 // Admin ingeschreven studenten pagina
 import Router from '../../router.js';
-import { logoutUser } from '../../utils/auth-api.js';
+import { performLogout } from '../../utils/auth-api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 
 export async function renderAdminIngeschrevenStudenten(rootElement) {
@@ -69,7 +69,7 @@ export async function renderAdminIngeschrevenStudenten(rootElement) {
   if (logoutBtn) {
     logoutBtn.onclick = null;
     logoutBtn.addEventListener('click', async () => {
-      await logoutUser();
+      await performLogout();
       window.sessionStorage.clear();
       localStorage.clear();
       Router.navigate('/');
