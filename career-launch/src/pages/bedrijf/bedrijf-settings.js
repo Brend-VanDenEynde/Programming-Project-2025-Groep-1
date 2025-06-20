@@ -1,4 +1,4 @@
-import { logoutUser } from '../../utils/auth-api.js';
+import { performLogout } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
 
 // Main renderfunctie:
@@ -71,7 +71,7 @@ export function showBedrijfSettingsPopup(onClose) {
   });
 
   document.getElementById('logout-btn').addEventListener('click', () => {
-    logoutUser();
+    performLogout();
     window.location.reload();
   });
 

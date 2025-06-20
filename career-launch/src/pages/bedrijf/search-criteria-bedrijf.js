@@ -1,5 +1,6 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { refreshToken } from '../../utils/auth-api.js';
+import { performLogout } from '../../utils/auth-api.js';
 
 export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
   console.log('[renderSearchCriteriaBedrijf] aangeroepen', { rootElement, bedrijfData });
@@ -155,8 +156,9 @@ export function renderSearchCriteriaBedrijf(rootElement, bedrijfData = {}) {
     });
   });
 
-  document.getElementById('nav-logout')?.addEventListener('click', () => {
+  document.getElementById('nav-logout')?.addEventListener('click', async () => {
     dropdown.classList.remove('open');
+    await performLogout();
     import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/');

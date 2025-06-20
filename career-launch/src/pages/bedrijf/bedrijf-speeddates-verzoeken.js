@@ -1,6 +1,7 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { authenticatedFetch } from '../../utils/auth-api.js';
 import Router from '../../router.js';
+import { performLogout } from '../../utils/auth-api.js';
 
 // Functie om pending speeddate data op te halen van de API
 async function fetchPendingSpeeddateData(bedrijfId, token) {
@@ -475,8 +476,9 @@ export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
     });
   });
 
-  document.getElementById('nav-logout')?.addEventListener('click', () => {
+  document.getElementById('nav-logout')?.addEventListener('click', async () => {
     dropdown.classList.remove('open');
+    await performLogout();
     import('../../router.js').then((module) => {
       const Router = module.default;
       Router.navigate('/');

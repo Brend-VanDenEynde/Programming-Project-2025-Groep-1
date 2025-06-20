@@ -1,7 +1,7 @@
 // Admin company detail pagina
 import Router from '../../router.js';
 import defaultCompanyLogo from '../../images/defaultlogo.webp';
-import { authenticatedFetch, logoutUser } from '../../utils/auth-api.js';
+import { authenticatedFetch, performLogout } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 
@@ -83,7 +83,7 @@ export async function renderAdminCompanyDetail(rootElement) {
   });
 
   document.getElementById('logout-btn').addEventListener('click', async () => {
-    await logoutUser();
+    await performLogout();
     window.sessionStorage.clear();
     localStorage.clear();
     Router.navigate('/');
@@ -259,7 +259,7 @@ function setupEventHandlers(companyData) {
   if (logoutBtn) {
     logoutBtn.onclick = null;
     logoutBtn.addEventListener('click', async () => {
-      await logoutUser();
+      await performLogout();
       window.sessionStorage.clear();
       localStorage.clear();
       Router.navigate('/');

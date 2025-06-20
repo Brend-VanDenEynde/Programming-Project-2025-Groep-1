@@ -146,8 +146,8 @@ export function setupBedrijfNavbarEvents() {
   const logoutButton = document.getElementById('nav-logout');
   if (logoutButton) {
     logoutButton.addEventListener('click', async () => {
-      const { logoutUser } = await import('../utils/auth-api.js');
-      await logoutUser();
+      const { performLogout } = await import('../utils/auth-api.js');
+      await performLogout();
 
       // Clear session data
       window.sessionStorage.removeItem('companyData');

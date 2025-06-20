@@ -1,6 +1,6 @@
 // Admin contact detail pagina
 import Router from '../../router.js';
-import { logoutUser } from '../../utils/auth-api.js';
+import { performLogout } from '../../utils/auth-api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 
 export async function renderAdminContactDetail(rootElement) {
@@ -70,7 +70,7 @@ export async function renderAdminContactDetail(rootElement) {
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
-      await logoutUser();
+      await performLogout();
       window.sessionStorage.clear();
       localStorage.clear();
       Router.navigate('/');
