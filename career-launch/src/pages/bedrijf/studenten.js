@@ -354,11 +354,11 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
       companyPending,
     ] = await Promise.all([
       authenticatedFetch(
-      `https://api.ehb-match.me/speeddates/accepted?id=${studentId}`
-    ).then((r) => (r.ok ? r.json() : [])),
+        `https://api.ehb-match.me/speeddates/accepted?id=${studentId}`
+      ).then((r) => (r.ok ? r.json() : [])),
       authenticatedFetch(
-      `https://api.ehb-match.me/speeddates/accepted?id=${bedrijfId}`
-    ).then((r) => (r.ok ? r.json() : [])),
+        `https://api.ehb-match.me/speeddates/accepted?id=${bedrijfId}`
+      ).then((r) => (r.ok ? r.json() : [])),
       authenticatedFetch(
         `https://api.ehb-match.me/speeddates/pending?id=${studentId}`,
         {
@@ -378,30 +378,30 @@ async function showSpeeddateRequestPopup(student, bedrijfId) {
     // Combine all pending requests from both student and company
     const allPending = [...studentPending, ...companyPending]; // Status function - check if time slot is unavailable or pending
     function getStatusForTijd(tijd, allAccepted, allPending) {
-    const isConfirmed = allAccepted.some((s) => {
-      if (!s.begin) return false;
-      const dt = new Date(s.begin);
-      return (
-        `${dt.getHours().toString().padStart(2, '0')}:${dt
-          .getMinutes()
-          .toString()
-          .padStart(2, '0')}` === tijd
-      );
-    });
-    if (isConfirmed) return 'unavailable';
-    const isPending = allPending.some((s) => {
-      if (!s.begin) return false;
-      const dt = new Date(s.begin);
-      return (
-        `${dt.getHours().toString().padStart(2, '0')}:${dt
-          .getMinutes()
-          .toString()
-          .padStart(2, '0')}` === tijd
-      );
-    });
-    if (isPending) return 'pending';
-    return 'free';
-  }
+      const isConfirmed = allAccepted.some((s) => {
+        if (!s.begin) return false;
+        const dt = new Date(s.begin);
+        return (
+          `${dt.getHours().toString().padStart(2, '0')}:${dt
+            .getMinutes()
+            .toString()
+            .padStart(2, '0')}` === tijd
+        );
+      });
+      if (isConfirmed) return 'unavailable';
+      const isPending = allPending.some((s) => {
+        if (!s.begin) return false;
+        const dt = new Date(s.begin);
+        return (
+          `${dt.getHours().toString().padStart(2, '0')}:${dt
+            .getMinutes()
+            .toString()
+            .padStart(2, '0')}` === tijd
+        );
+      });
+      if (isPending) return 'pending';
+      return 'free';
+    }
 
     // Build time slots
     function buildTimeSlotOptions({
@@ -718,50 +718,11 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
           <div class="bedrijf-profile-form-container">            <h1 class="bedrijf-profile-title">Matched Studenten</h1>
               <!-- Filter Controls and Color Legend combined -->
             <div class="studenten-filters" style="background:#f8fafc; padding:1.2rem; border-radius:14px; margin-bottom:2.2rem; box-shadow:0 2px 8px #0001; border:1.5px solid #e1e5e9; position:relative;">
-              <button id="filter-favorieten-btn" title="Toon alleen favorieten" class="" style="position:absolute;top:8px;right:18px;font-size:1.7rem;background:none;border:none;cursor:pointer;z-index:5;transition:transform 0.3s;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;box-sizing:content-box;">🤍</button>
-              <div style="display:flex;gap:2rem;align-items:start;">
+              <button id="filter-favorieten-btn" title="Toon alleen favorieten" class="" style="position:absolute;top:8px;right:18px;font-size:1.7rem;background:none;border:none;cursor:pointer;z-index:5;transition:transform 0.3s;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;box-sizing:content-box;">🤍</button>              <div style="display:flex;gap:2rem;align-items:start;">
                 <!-- Search section -->
                 <div style="flex:1;min-width:300px;">
                   <label for="student-zoek" style="font-weight:500;font-size:0.9rem;margin-bottom:0.2rem;display:block;">Zoeken</label>
                   <input id="student-zoek" type="text" placeholder="Zoek student op naam of email..." style="width:100%;padding:0.6rem;border:1.5px solid #e1e5e9;border-radius:8px;">
-                </div>
-                
-                <!-- Color Legend section -->
-                <div style="flex:2;min-width:400px;">
-                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">
-                    <label style="font-weight:500;font-size:0.9rem;margin:0;color:#374151;">Match Percentage Legenda</label>
-                    <button id="toggle-legend" style="background:none;border:none;font-size:1rem;cursor:pointer;color:#6b7280;" title="Legenda in-/uitklappen">▼</button>
-                  </div>
-                  <div id="legend-content" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.6rem;">
-                    <div style="display:flex;align-items:center;gap:0.4rem;">
-                      <div style="width:16px;height:16px;background:#10b981;border-radius:3px;"></div>
-                      <span style="font-size:0.8rem;">90%+ Uitstekend</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:0.4rem;">
-                      <div style="width:16px;height:16px;background:#22c55e;border-radius:3px;"></div>
-                      <span style="font-size:0.8rem;">80-89% Zeer goed</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:0.4rem;">
-                      <div style="width:16px;height:16px;background:#84cc16;border-radius:3px;"></div>
-                      <span style="font-size:0.8rem;">70-79% Goed</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:0.4rem;">
-                      <div style="width:16px;height:16px;background:#eab308;border-radius:3px;"></div>
-                      <span style="font-size:0.8rem;">60-69% Redelijk</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:0.4rem;">
-                      <div style="width:16px;height:16px;background:#f97316;border-radius:3px;"></div>
-                      <span style="font-size:0.8rem;">50-59% Matig</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:0.4rem;">
-                      <div style="width:16px;height:16px;background:#ef4444;border-radius:3px;"></div>
-                      <span style="font-size:0.8rem;">30-49% Zwak</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:0.4rem;">
-                      <div style="width:16px;height:16px;background:#6b7280;border-radius:3px;"></div>
-                      <span style="font-size:0.8rem;">&lt;30% Zeer zwak</span>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -827,8 +788,7 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
     }
     .favorite-btn.animating, .popup-favorite-btn.animating {
       transform: scale(1.3);
-    }
-    #filter-favorieten-btn.animating {
+    }    #filter-favorieten-btn.animating {
       transform: scale(1.3);
     }
   `;
@@ -971,25 +931,10 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
       document.getElementById('studenten-list').innerHTML =
         '<div style="text-align:center;width:100%;color:#888;">Fout bij laden van studenten. Probeer opnieuw.</div>';
     }
-  } // Initial load
+  }  // Initial load
   loadStudents();
 
-  // Toggle legend functionality
-  document.getElementById('toggle-legend')?.addEventListener('click', () => {
-    const content = document.getElementById('legend-content');
-    const toggle = document.getElementById('toggle-legend');
-    if (content && toggle) {
-      if (content.style.display === 'none') {
-        content.style.display = 'grid';
-        toggle.textContent = '▼';
-        toggle.title = 'Legenda inklappen';
-      } else {
-        content.style.display = 'none';
-        toggle.textContent = '▶';
-        toggle.title = 'Legenda uitklappen';
-      }
-    }
-  }); // Event listeners for filters
+  // Event listeners for filters
   document.getElementById('student-zoek')?.addEventListener('input', (e) => {
     const searchTerm = e.target.value.toLowerCase();
     let filtered = studenten.filter(
