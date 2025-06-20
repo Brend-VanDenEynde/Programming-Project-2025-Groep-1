@@ -12,10 +12,6 @@ import { authenticatedFetch, performLogout } from '../../utils/auth-api.js';
 async function fetchSpeeddates(rootElement) {
   const token = sessionStorage.getItem('authToken');
   console.log('authToken:', token);
-  if (!token) {
-    renderLogin(rootElement);
-    return [];
-  }
   const resp = await authenticatedFetch('https://api.ehb-match.me/speeddates');
   if (!resp.ok) {
     if (resp.status === 401) {
