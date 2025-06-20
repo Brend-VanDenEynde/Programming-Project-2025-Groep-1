@@ -20,7 +20,6 @@ export function renderAdminSelectDashboard(rootElement) {
             <li style="margin-bottom: 15px;"><button class="select-dashboard-btn" data-target="/admin-dashboard/ingeschreven-studenten">Ingeschreven Studenten</button></li>
             <li style="margin-bottom: 15px;"><button class="select-dashboard-btn" data-target="/admin-dashboard/ingeschreven-bedrijven">Ingeschreven Bedrijven</button></li>
             <li style="margin-bottom: 15px;"><button class="select-dashboard-btn" data-target="/admin-dashboard/bedrijven-in-behandeling">Bedrijven in Behandeling</button></li>
-            <li style="margin-bottom: 15px;"><button class="select-dashboard-btn" data-target="/admin-dashboard/contacten">Contacten</button></li>
         </ul>
     </div>
     <style>

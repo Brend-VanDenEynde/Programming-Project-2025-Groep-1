@@ -41,6 +41,7 @@ export function showSettingsPopup(onClose) {
       .settings-action-btn.delete:hover { background: linear-gradient(90deg, #fd7855 0%, #fa626a 100%);}
       @keyframes popupIn { 0% { transform: scale(0.85) translateY(40px); } 100% { transform: scale(1) translateY(0); } }
       @media (max-width: 600px) { .settings-popup-card {padding:8px 2vw;} .settings-title {font-size:1.19rem;} }
+      body.darkmode, .darkmode .settings-popup-card { background: #232846 !important; color: #f3f6fa; }
     `;
     document.head.appendChild(style);
   }
@@ -55,11 +56,26 @@ export function showSettingsPopup(onClose) {
   modalRoot.className = 'settings-modal-root';
   modalRoot.style.display = 'flex';
 
+  let dark = localStorage.getItem('darkmode') === 'true';
+  document.body.classList.toggle('darkmode', dark);
+
   modalRoot.innerHTML = `
     <div class="settings-popup-card">
       <button class="settings-popup-close" id="settings-popup-close" title="Sluiten">&times;</button>
       <h2 class="settings-title">Instellingen</h2>
-      <div class="settings-row"></div>
+      <div class="settings-row">
+        <label class="settings-label">Donkere modus</label>
+        <label style="display:flex;align-items:center;gap:16px;">
+          <span style="font-size:1.22em;">🌞</span>
+          <span class="switch">
+            <input id="toggle-darkmode" type="checkbox" ${
+              dark ? 'checked' : ''
+            }/>
+            <span class="slider"></span>
+          </span>
+          <span style="font-size:1.22em;">🌙</span>
+        </label>
+      </div>
       <div class="settings-btn-row">
         <button class="settings-action-btn delete" id="btn-delete-account">Verwijder account</button>
         <button class="settings-action-btn logout" id="btn-logout">Log uit</button>
@@ -80,6 +96,11 @@ export function showSettingsPopup(onClose) {
     }
   };
 
+  // Darkmode toggle
+  document.getElementById('toggle-darkmode').addEventListener('change', (e) => {
+    localStorage.setItem('darkmode', e.target.checked);
+    document.body.classList.toggle('darkmode', e.target.checked);
+  });
   // Delete account
   document
     .getElementById('btn-delete-account')

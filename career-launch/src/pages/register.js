@@ -62,7 +62,12 @@ export function renderRegister(rootElement) {
           
           <label id="error-message" class="error-label" style="color: red; display: none;" aria-live="polite"></label>
 
-          <button type="submit" class="register-btn">Registreer</button>        </form>
+          <button type="submit" class="register-btn">Registreer</button>
+        </form>
+        
+        <div class="divider">
+          <hr>
+        </div>
         
           <div class="login-link">
           <p>Heb je al een account? 
@@ -90,6 +95,7 @@ export function renderRegister(rootElement) {
       Router.navigate('/login');
     });
   }
+  
   // FOOTER LINKS (verwijder dubbele listeners, alleen deze behouden)
   const privacyLink = document.getElementById('privacy-policy');
   if (privacyLink) {
@@ -131,11 +137,7 @@ export function renderRegister(rootElement) {
   }
 
   setupPasswordToggle('passwordInput', 'togglePassword', 'togglePasswordIcon');
-  setupPasswordToggle(
-    'confirmPasswordInput',
-    'toggleConfirmPassword',
-    'toggleConfirmPasswordIcon'
-  );
+  setupPasswordToggle('confirmPasswordInput', 'toggleConfirmPassword', 'toggleConfirmPasswordIcon');
 }
 
 // Nieuwe handleRegister functie met JSON-structurering en API-call

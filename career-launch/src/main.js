@@ -10,14 +10,13 @@ import { renderAdmin } from './pages/admin/admin-login.js';
 import { renderAdminSelectDashboard } from './pages/admin/admin-select-dashboard.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
+import { renderQRPopup } from './pages/student/student-qr-popup.js';
 import { renderSpeeddates } from './pages/student/student-speeddates.js';
 import { renderSpeeddatesRequests } from './pages/student/student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './pages/student/student-settings.js';
 import { renderAdminIngeschrevenStudenten } from './pages/admin/admin-ingeschreven-studenten.js';
 import { renderAdminIngeschrevenBedrijven } from './pages/admin/admin-ingeschreven-bedrijven.js';
 import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven-in-behandeling.js';
-import { renderAdminContacten } from './pages/admin/admin-contacten.js';
-import { renderAdminContactDetail } from './pages/admin/admin-contact-detail.js';
 import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js';
 import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
 import { renderAdminProcessingCompanyDetail } from './pages/admin/admin-processing-company-detail.js';
@@ -54,14 +53,15 @@ const routes = {
   '/admin-dashboard': renderAdminSelectDashboard,
   '/admin-dashboard/ingeschreven-studenten': renderAdminIngeschrevenStudenten,
   '/admin-dashboard/ingeschreven-bedrijven': renderAdminIngeschrevenBedrijven,
-  '/admin-dashboard/bedrijven-in-behandeling': renderAdminBedrijvenInBehandeling,
-  '/admin-dashboard/contacten': renderAdminContacten,
-  '/admin-dashboard/contact-detail': renderAdminContactDetail,
+  '/admin-dashboard/bedrijven-in-behandeling':
+    renderAdminBedrijvenInBehandeling,
   '/admin-dashboard/student-detail': renderAdminStudentDetail,
   '/admin-dashboard/company-detail': renderAdminCompanyDetail,
-  '/admin-dashboard/processing-company-detail': renderAdminProcessingCompanyDetail,
+  '/admin-dashboard/processing-company-detail':
+    renderAdminProcessingCompanyDetail,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
+  '/student/student-qr-popup': renderQRPopup,
   '/student/student-speeddates': renderSpeeddates,
   '/student/student-speeddates-verzoeken': renderSpeeddatesRequests,
   '/student/student-settings': showSettingsPopup,

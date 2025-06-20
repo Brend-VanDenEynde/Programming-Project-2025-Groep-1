@@ -1,20 +1,6 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
-
-let pendingDeleteAfspraakId = null; // Gebruik één globale state, identiek aan bedrijven
-
-// utility.js (of bovenin je bestand)
-export function getStudentId(studentData = {}) {
-  let studentId = studentData?.id || studentData?.gebruiker_id;
-  if (!studentId) {
-    try {
-      const stored = JSON.parse(sessionStorage.getItem('user') || '{}');
-      studentId = stored.id || stored.gebruiker_id;
-    } catch {}
-  }
-  return studentId;
-}
 import Router from '../../router.js';
 
 // Auth-check direct uitvoeren bij laden van deze pagina (bovenaan, vóór alles)
@@ -44,67 +30,31 @@ if (isStudentProfielPage) {
 }
 
 // API helpers
-async function fetchPendingSpeeddates(studentData) {
+async function fetchPendingSpeeddates() {
   const token = sessionStorage.getItem('authToken');
-  const studentId = getStudentId(studentData);
   if (!token) {
     renderLogin(document.body);
     return [];
   }
-  if (!studentId) {
-    alert("Student ID niet gevonden. Probeer opnieuw in te loggen.");
-    renderLogin(document.body);
-    return [];
-  }
-  const resp = await fetch(`https://api.ehb-match.me/speeddates/pending?id=${studentId}`, {
-    headers: { Authorization: 'Bearer ' + token }
+  const resp = await fetch('https://api.ehb-match.me/speeddates/pending', {
+    headers: { Authorization: 'Bearer ' + token },
   });
   if (!resp.ok) throw new Error(`Fout bij ophalen: ${resp.status}`);
-  const data = await resp.json();
-
-  // Haal alle relevante bedrijven op via /discover/bedrijven?id={studentId}
-  const bedrijvenResp = await fetch(`https://api.ehb-match.me/discover/bedrijven?id=${studentId}`,
-    { headers: { Authorization: 'Bearer ' + token } });
-  const bedrijven = bedrijvenResp.ok ? await bedrijvenResp.json() : [];
-  const bedrijfIds = new Set(bedrijven.map(b => b.gebruiker_id));
-
-  // Filter alleen verzoeken waar asked_by een bedrijf is EN niet jezelf
-  const filtered = data.filter(
-    s => bedrijfIds.has(s.asked_by) && s.asked_by !== studentId
-  );
-
-  // DEBUG: check filter resultaat en mogelijke eigen verzoekken
-  console.log(
-    'Alle pending:', data,
-    'BedrijfIds:', bedrijfIds,
-    'StudentId:', studentId,
-    'Na filter:', filtered
-  );
-  filtered.forEach(s => {
-    if (s.asked_by == studentId) {
-      console.warn('Je eigen verzoek zit in filtered! Debug:', s);
-    }
-  });
-  // Debug info
-  // console.log({ allePending: data, bedrijven, bedrijfIds: [...bedrijfIds], studentId, overgebleven: filtered });
-  return filtered;
+  return await resp.json();
 }
 async function acceptSpeeddate(id) {
   const token = sessionStorage.getItem('authToken');
   const resp = await fetch(`https://api.ehb-match.me/speeddates/accept/${id}`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   });
-  if (!resp.ok) {
-    const errText = await resp.text();
-    throw new Error('Accepteren mislukt: ' + errText);
-  }
+  if (!resp.ok) throw new Error('Accepteren mislukt');
 }
 async function rejectSpeeddate(id) {
   const token = sessionStorage.getItem('authToken');
   const resp = await fetch(`https://api.ehb-match.me/speeddates/reject/${id}`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (!resp.ok) throw new Error('Weigeren mislukt');
 }
@@ -113,54 +63,50 @@ async function fetchFunctiesSkills(bedrijfId) {
   let functies = [];
   let skills = [];
   try {
-    const resFuncties = await fetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`, {
-      headers: { Authorization: 'Bearer ' + token }
-    });
+    const resFuncties = await fetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`,
+      {
+        headers: { Authorization: 'Bearer ' + token },
+      }
+    );
     if (resFuncties.ok) functies = await resFuncties.json();
   } catch {}
   try {
-    const resSkills = await fetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`, {
-      headers: { Authorization: 'Bearer ' + token }
-    });
+    const resSkills = await fetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`,
+      {
+        headers: { Authorization: 'Bearer ' + token },
+      }
+    );
     if (resSkills.ok) skills = await resSkills.json();
   } catch {}
   return { functies, skills };
 }
 
 function getSortArrow(key, currentSort) {
-  const found = currentSort.find(s => s.key === key);
-  if (!found) return '';
-  return found.asc ? ' ▲' : ' ▼';
+  const found = currentSort.find((s) => s.key === key);
+  // Altijd ruimte voor de sorteerdriehoek
+  return `<span class="sort-arrow">${
+    found ? (found.asc ? '▲' : '▼') : ''
+  }</span>`;
 }
 function formatTime(dtString) {
   if (!dtString) return '-';
   const dt = new Date(dtString);
-  return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  return dt.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+}
+function formatUTCTime(isoString) {
+  const d = new Date(isoString);
+  let hh = d.getUTCHours().toString().padStart(2, '0');
+  let mm = d.getUTCMinutes().toString().padStart(2, '0');
+  return `${hh}:${mm}`;
 }
 
-// Utility voor bedrijfsfoto's
-function getBedrijfFotoUrl(foto) {
-  if (!foto) return '/images/default.png';
-  if (foto.startsWith('http')) return foto;
-  return `https://gt0kk4fbet.ufs.sh/f/${foto}`;
-}
-
-// export function renderSpeeddatesRequests(rootElement, studentData = {}) {
-export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
-  // --- PROBEER ALTIJD EEN STUDENT TE VINDEN ---
-  let actualStudentData = studentData;
-  if (!actualStudentData || (!actualStudentData.id && !actualStudentData.gebruiker_id)) {
-    const fromSession = sessionStorage.getItem('studentData') || sessionStorage.getItem('user');
-    if (fromSession) {
-      try { actualStudentData = JSON.parse(fromSession); } catch {}
-    }
-  }
-  if (!actualStudentData || (!actualStudentData.id && !actualStudentData.gebruiker_id)) {
-    renderLogin(rootElement);
-    return;
-  }
-
-  // 1. Zet je page structure neer
+export function renderSpeeddatesRequests(rootElement, studentData = {}) {
   rootElement.innerHTML = `
     <div class="student-profile-container">
       <header class="student-profile-header">
@@ -178,9 +124,9 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
-            <li><button data-route="speeddates" class="sidebar-link">Mijn speeddates</button></li>
-            <li><button data-route="requests" class="sidebar-link active">Speeddates-verzoeken</button></li>
-            <li><button data-route="bedrijven" class="sidebar-link">Bedrijven</button></li>
+            <li><button data-route="speeddates" class="sidebar-link" type="button">Speeddates</button></li>
+            <li><button data-route="requests" class="sidebar-link" type="button">Speeddates-verzoeken</button></li>
+            <li><button data-route="bedrijven" class="sidebar-link" type="button">Bedrijven</button></li>
           </ul>
         </nav>
         <div class="student-profile-content">
@@ -193,165 +139,186 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
         </div>
       </div>
       <footer class="student-profile-footer">
-        <div class="footer-content">
-          <span>&copy; 2025 EhB Career Launch</span>
-          <div class="footer-links">
-            <a href="/privacy" id="privacy-policy">Privacy</a>
-            <a href="/contact" id="contacteer-ons">Contact</a>
-          </div>
-        </div>
+        <a id="privacy-policy" href="#/privacy">Privacy Policy</a> |
+        <a id="contacteer-ons" href="#/contact">Contacteer Ons</a>
       </footer>
     </div>
-    <div id="modal-overlay" class="modal-overlay" style="display:none;">
-      <div class="modal">
-        <p id="modal-message">Weet je zeker dat je deze speeddate wilt weigeren?</p>
-        <div class="modal-buttons">
-          <button id="modal-yes" class="modal-yes-btn" type="button">Ja</button>
-          <button id="modal-no" class="modal-no-btn" type="button">Nee</button>
-        </div>
-      </div>
-    </div>
   `;
-  // Bind modal events direct na render
-  bindModalEvents();
 
-  // 2. Fetch de data pas NA de render!
-  let verzoeken = [];
-  try {
-    verzoeken = await fetchPendingSpeeddates(actualStudentData); // GEEN tweede filter meer hier
-  } catch (e) {
-    const el = document.getElementById('speeddates-requests-table');
-    if (el) el.innerHTML = `<p style="color:red;">Fout: ${e.message}</p>`;
-    return;
+  function getSortArrow(key) {
+    const found = currentSort.find((s) => s.key === key);
+    // Altijd ruimte voor de sorteerdriehoek
+    return `<span class="sort-arrow">${
+      found ? (found.asc ? '▲' : '▼') : ''
+    }</span>`;
   }
 
-  // 3. Render de data in de child-div
-  renderTable(verzoeken);
-
-  // Event delegation voor actions (net als bedrijven)
-  const tableDiv = document.getElementById('speeddates-table');
-  if (tableDiv) {
-    tableDiv.removeEventListener('click', handleSpeeddatesTableClick);
-    tableDiv.addEventListener('click', handleSpeeddatesTableClick);
+  function formatTimeFromBegin(begin) {
+    if (!begin) return '-';
+    const dt = new Date(begin);
+    if (isNaN(dt.getTime())) return '-';
+    return dt.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
   }
 
-  // 4. Zet eventListeners en alles wat met DOM refs te maken heeft NA renderTable
-  function renderTable(verzoeken) {
-    const table = document.getElementById('speeddates-requests-table');
-    if (!table) return;
+  function compareValues(a, b, key) {
+    let aVal = a[key];
+    let bVal = b[key];
+    if (key === 'begin') {
+      aVal = aVal ? new Date(aVal).getTime() : Number.POSITIVE_INFINITY;
+      bVal = bVal ? new Date(bVal).getTime() : Number.POSITIVE_INFINITY;
+    } else if (key === 'naam_bedrijf' || key === 'lokaal') {
+      // Alfabetisch sorteren met Nederlandse collator
+      const collator = new Intl.Collator('nl', { sensitivity: 'base' });
+      aVal = (aVal || '').toLowerCase();
+      bVal = (bVal || '').toLowerCase();
+      return collator.compare(aVal, bVal);
+    } else if (typeof aVal === 'string' && typeof bVal === 'string') {
+      aVal = aVal.toLowerCase();
+      bVal = bVal.toLowerCase();
+    }
+    if (aVal < bVal) return -1;
+    if (aVal > bVal) return 1;
+    return 0;
+  }
+  function renderRequestCards(verzoeken) {
     if (!verzoeken || verzoeken.length === 0) {
-      table.innerHTML = `<p class="geen-data">Nog geen speeddates-verzoeken gevonden.</p>`;
+      document.getElementById(
+        'speeddates-requests-table'
+      ).innerHTML = `<p style="text-align:center;">Nog geen speeddates-verzoeken gevonden.</p>`;
       return;
     }
-    table.innerHTML = `
+
+    // Sort by begin time (most recent first)
+    const sorted = [...verzoeken].sort((a, b) => {
+      const aTime = a.begin ? new Date(a.begin).getTime() : 0;
+      const bTime = b.begin ? new Date(b.begin).getTime() : 0;
+      return bTime - aTime;
+    });
+
+    // Create card-based layout similar to company requests
+    const cards = sorted
+      .map(
+        (v) => `
+      <div class="speeddate-item pending bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(
+        v
+      )}' style="cursor:pointer;">
+        <div class="speeddate-info">
+          <div class="bedrijf-info">
+            <img src="${
+              v.profiel_foto_bedrijf || v.foto || '/images/defaultlogo.webp'
+            }" 
+                 alt="${v.naam_bedrijf}" 
+                 class="profiel-foto bedrijf-foto"
+                 onerror="this.src='/images/defaultlogo.webp'" />
+            <div class="bedrijf-details">
+              <h4>${v.naam_bedrijf}</h4>
+              <p class="bedrijf-id">Bedrijf ID: ${v.id_bedrijf}</p>
+            </div>
+          </div>
+          
+          <div class="afspraak-details">
+            <div class="tijd-lokaal">
+              <p class="tijdslot"><strong>Tijd:</strong> ${formatUTCTime(
+                v.begin
+              )}</p>
+              <p class="lokaal"><strong>Lokaal:</strong> ${v.lokaal || '-'}</p>
+            </div>
+          </div>
+          
+          <div class="speeddate-actions">
+            <button class="action-btn accept-btn" data-id="${
+              v.id
+            }" onclick="event.stopPropagation();">
+              Accepteer
+            </button>
+            <button class="action-btn deny-btn" data-id="${
+              v.id
+            }" onclick="event.stopPropagation();">
+              Weiger
+            </button>
+          </div>
+        </div>
+      </div>
+    `
+      )
+      .join('');
+
+    document.getElementById('speeddates-requests-table').innerHTML = `
       <div class="speeddates-lijst">
         <div class="speeddates-header">
-          <h2>Pending Speeddates-verzoeken (${verzoeken.length})</h2>
+          <h2>Speeddate Verzoeken (${sorted.length})</h2>
         </div>
-        <div class="speeddates-table" id="speeddates-table">
-          ${verzoeken
-            .map(
-              (v) => `
-            <div class="speeddate-item pending" data-id="${v.id}">
-              <div class="speeddate-info">
-                <div class="student-info">
-                  <img src="${getBedrijfFotoUrl(v.profiel_foto_bedrijf)}" alt="${v.naam_bedrijf}" class="profiel-foto bedrijf-foto" onerror="this.src='/images/default.png'" />
-                  <div class="student-details">
-                    <h4>${v.naam_bedrijf}</h4>
-                  </div>
-                </div>
-                <div class="afspraak-details">
-                  <div class="tijd-lokaal">
-                    <p class="tijdslot"><strong>Tijd:</strong> ${formatTime(v.begin)}</p>
-                    <p class="lokaal"><strong>Lokaal:</strong> ${v.lokaal || '-'} </p>
-                  </div>
-                </div>
-                <div class="speeddate-actions">
-                  <button class="action-btn accept-btn" data-action="accept" data-id="${v.id}">Accepteren</button>
-                  <button class="deny-btn" data-action="delete" data-id="${v.id}">Verwijderen</button>
-                </div>
-              </div>
-            </div>
-          `
-            )
-            .join('')}
+        <div class="speeddates-table">
+          ${cards}
         </div>
       </div>
     `;
-  }
 
-  function handleSpeeddatesTableClick(e) {
-    const target = e.target.closest('button[data-action]');
-    if (!target) return;
-    const afspraakId = target.getAttribute('data-id');
-    const action = target.getAttribute('data-action');
-    if (action === 'accept') {
-      acceptSpeeddate(afspraakId).then(() => renderSpeeddatesRequests(rootElement, studentData));
-    } else if (action === 'delete') {
-      pendingDeleteAfspraakId = afspraakId;
-      openDeleteModal();
-    }
-  }
-
-  function openDeleteModal() {
-    const overlay = document.getElementById('modal-overlay');
-    console.log('[openDeleteModal] pendingDeleteAfspraakId:', pendingDeleteAfspraakId);
-    if (overlay) overlay.style.display = 'flex';
-  }
-  function closeDeleteModal() {
-    const overlay = document.getElementById('modal-overlay');
-    if (overlay) overlay.style.display = 'none';
-  }
-
-  function bindModalEvents() {
-    const yesBtn = document.getElementById('modal-yes');
-    const noBtn = document.getElementById('modal-no');
-    const modalMessage = document.getElementById('modal-message');
-    const modalButtons = document.querySelector('.modal-buttons');
-    console.log('[bindModalEvents]', { yesBtn, noBtn });
-    if (yesBtn && noBtn) {
-      yesBtn.onclick = async () => {
-        console.log('modal YES clicked!', pendingDeleteAfspraakId);
-        if (pendingDeleteAfspraakId) {
-          yesBtn.disabled = true;
-          noBtn.disabled = true;
-          try {
-            console.log('Calling rejectSpeeddate with:', pendingDeleteAfspraakId);
-            await rejectSpeeddate(pendingDeleteAfspraakId);
-            pendingDeleteAfspraakId = null;
-            modalMessage.textContent = 'Speeddate succesvol verwijderd!';
-            modalButtons.style.display = 'none';
-            setTimeout(() => {
-              closeDeleteModal();
-              renderSpeeddatesRequests(rootElement, studentData);
-              modalMessage.textContent = 'Weet je zeker dat je deze speeddate wilt weigeren?';
-              modalButtons.style.display = 'flex';
-              yesBtn.disabled = false;
-              noBtn.disabled = false;
-            }, 1200);
-          } catch (err) {
-            modalMessage.textContent = 'Fout bij verwijderen: ' + err.message;
-            yesBtn.disabled = false;
-            noBtn.disabled = false;
-          }
+    // Add event handlers for accept/deny buttons
+    document.querySelectorAll('.accept-btn').forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation(); // Prevent card click
+        const id = e.currentTarget.dataset.id;
+        try {
+          await acceptSpeeddate(id);
+          const updated = await fetchPendingSpeeddates();
+          const bedrijfVerzoeken = updated.filter(
+            (v) => String(v.asked_by) === String(v.id_bedrijf)
+          );
+          renderRequestCards(bedrijfVerzoeken);
+        } catch (err) {
+          alert('Fout bij accepteren: ' + err.message);
         }
-      };
-      noBtn.onclick = () => {
-        console.log('modal NO clicked!');
-        pendingDeleteAfspraakId = null;
-        closeDeleteModal();
-        modalMessage.textContent = 'Weet je zeker dat je deze speeddate wilt weigeren?';
-        modalButtons.style.display = 'flex';
-        yesBtn.disabled = false;
-        noBtn.disabled = false;
-      };
-    } else {
-      // Modal DOM is niet gevonden
-      console.error('Modal buttons niet gevonden bij het binden van events!');
-    }
+      });
+    });
+
+    document.querySelectorAll('.deny-btn').forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation(); // Prevent card click
+        const id = e.currentTarget.dataset.id;
+        try {
+          await rejectSpeeddate(id);
+          const updated = await fetchPendingSpeeddates();
+          const bedrijfVerzoeken = updated.filter(
+            (v) => String(v.asked_by) === String(v.id_bedrijf)
+          );
+          renderRequestCards(bedrijfVerzoeken);
+        } catch (err) {
+          alert('Fout bij weigeren: ' + err.message);
+        }
+      });
+    });
+
+    addBedrijfPopupListeners();
   }
 
-  // Sidebar nav
+  function addBedrijfPopupListeners() {
+    document.querySelectorAll('.bedrijf-popup-trigger').forEach((el) => {
+      el.addEventListener('click', async () => {
+        const data = JSON.parse(el.dataset.bedrijf);
+        await createBedrijfPopup(data);
+      });
+    });
+  }
+  fetchPendingSpeeddates()
+    .then((verzoeken) => {
+      // Toon alleen verzoeken gestart door bedrijven:
+      const bedrijfVerzoeken = verzoeken.filter(
+        (v) => String(v.asked_by) === String(v.id_bedrijf)
+      );
+      renderRequestCards(bedrijfVerzoeken);
+    })
+    .catch((err) => {
+      document.getElementById(
+        'speeddates-requests-table'
+      ).innerHTML = `<p style="color:red;">Fout: ${err.message}</p>`;
+    });
+
+  // --- Sidebar navigatie uniform maken ---
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -359,6 +326,7 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
       import('../../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
+          // case 'profile': // verwijderd
           case 'search':
             Router.navigate('/student/zoek-criteria');
             break;
@@ -395,12 +363,14 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
   const burger = document.getElementById('burger-menu');
   if (burger && dropdown) {
     dropdown.classList.remove('open');
-    // Fix: eerst alle oude event listeners verwijderen (eventueel), dan click event toevoegen
-    burger.onclick = (event) => {
+    burger.addEventListener('click', (event) => {
       event.stopPropagation();
-      dropdown.classList.toggle('open');
-    };
-    // Sluit dropdown als je buiten klikt
+      if (!dropdown.classList.contains('open')) {
+        dropdown.classList.add('open');
+      } else {
+        dropdown.classList.remove('open');
+      }
+    });
     document.addEventListener('click', function (event) {
       if (
         dropdown.classList.contains('open') &&
@@ -410,50 +380,42 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
         dropdown.classList.remove('open');
       }
     });
-    document.getElementById('nav-settings').onclick = () => {
+    document.getElementById('nav-settings').addEventListener('click', () => {
       dropdown.classList.remove('open');
       showSettingsPopup(() =>
         renderSpeeddatesRequests(rootElement, studentData)
       );
-    };
-    document.getElementById('nav-logout').onclick = () => {
+    });
+    document.getElementById('nav-logout').addEventListener('click', () => {
       dropdown.classList.remove('open');
       window.sessionStorage.removeItem('studentData');
       window.sessionStorage.removeItem('authToken');
       window.sessionStorage.removeItem('userType');
       localStorage.setItem('darkmode', 'false');
       document.body.classList.remove('darkmode');
-      renderLogin(rootElement);
       import('../../router.js').then((module) => {
         const Router = module.default;
         Router.navigate('/');
       });
-    };
-  }
-
-  // Privacy en contact event listeners, met null-checks
-  const privacy = document.getElementById('privacy-policy');
-  if (privacy) {
-    privacy.addEventListener('click', (e) => {
-      e.preventDefault();
-      import('../../router.js').then((module) => {
-        const Router = module.default;
-        Router.navigate('/privacy');
-      });
-    });
-  }
-  const contact = document.getElementById('contacteer-ons');
-  if (contact) {
-    contact.addEventListener('click', (e) => {
-      e.preventDefault();
-      import('../../router.js').then((module) => {
-        const Router = module.default;
-        Router.navigate('/contact');
-      });
     });
   }
 
-  // --- Popup met bedrijfsinfo ---
+  document.getElementById('privacy-policy').addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/privacy');
+    });
+  });
+  document.getElementById('contacteer-ons').addEventListener('click', (e) => {
+    e.preventDefault();
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/contact');
+    });
+  });
+
+  // --- Popup met bedrijfsinfo (compact, bedrijven-style) ---
   async function createBedrijfPopup(s) {
     const overlay = document.createElement('div');
     overlay.style.cssText = `
@@ -463,22 +425,53 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
     `;
     const popup = document.createElement('div');
     popup.style.cssText = `
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      max-width: 480px;
-      width: 90%;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      background: #fff;
+      padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+      border-radius: 14px;
+      max-width: 420px;
+      width: 96vw;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
       position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     `;
+    const profielFoto =
+      s.foto && s.foto.trim() !== '' ? s.foto : '/src/Images/defaultlogo.webp';
     popup.innerHTML = `
       <button id=\"popup-close\" style=\"position:absolute;top:10px;right:12px;font-size:1.4rem;background:none;border:none;cursor:pointer;\">×</button>
-      <h2 style=\"margin-top:0;\">${s.naam_bedrijf}</h2>
-      <p><strong>Tijd:</strong> ${s.begin ? new Date(s.begin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Onbekend'}</p>
-      <p><strong>Locatie:</strong> ${s.lokaal || 'Onbekend'}</p>
-      <p><strong>Status:</strong> ${s.akkoord !== undefined ? (s.akkoord ? 'Geaccepteerd' : 'In afwachting') : '-'}</p>
-      <p><strong>LinkedIn:</strong> <a id=\"popup-linkedin\" href=\"#\" target=\"_blank\">Laden...</a></p>
-      <div id=\"popup-skills\"><em>Skills laden...</em></div>
+      <img src=\"${profielFoto}\" alt=\"Logo ${
+      s.naam_bedrijf
+    }\" style=\"width:70px;height:70px;border-radius:50%;object-fit:contain;margin-bottom:1rem;\" onerror=\"this.onerror=null;this.src='../../Images/defaultlogo.webp'\">
+      <h2 style=\"margin-bottom:0.3rem;text-align:center;\">${
+        s.naam_bedrijf
+      }</h2>
+      <div style=\"font-size:1rem;color:#666;margin-bottom:0.2rem;\">${
+        s.locatie || ''
+      }</div>
+      <div style=\"font-size:0.97rem;color:#888;margin-bottom:0.5rem;\">${
+        s.werkdomein || ''
+      }</div>
+      <a href=\"${
+        s.linkedin || '#'
+      }\" target=\"_blank\" style=\"color:#0077b5;margin-bottom:0.7rem;\">${
+      s.linkedin ? 'LinkedIn' : ''
+    }</a>
+      <div style=\"font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;\">
+        <a href=\"mailto:${s.contact_email || ''}\" style=\"color:#444;\">${
+      s.contact_email || ''
+    }</a>
+      </div>
+      <div style=\"margin-bottom:0.7rem;width:100%;display:flex;flex-direction:row;gap:1.5rem;justify-content:center;\">
+        <div style=\"text-align:left;\">
+          <strong>Functies:</strong>
+          <div id=\"popup-functies\" style=\"margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;\"></div>
+        </div>
+        <div style=\"text-align:left;\">
+          <strong>Skills/talen:</strong>
+          <div id=\"popup-skills\" style=\"margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;\"></div>
+        </div>
+      </div>
     `;
     overlay.appendChild(popup);
     document.body.appendChild(overlay);
@@ -490,23 +483,24 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
     const bedrijfId = s.id_bedrijf || s.gebruiker_id;
     if (bedrijfId) {
       const { functies, skills } = await fetchFunctiesSkills(bedrijfId);
+      const functiesHtml = functies.length
+        ? functies
+            .map(
+              (f) =>
+                `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#e3f2fd;font-size:0.85rem;\">${f.naam}</span>`
+            )
+            .join('')
+        : '<em>Geen functies beschikbaar</em>';
+      document.getElementById('popup-functies').innerHTML = functiesHtml;
       const skillsHtml = skills.length
-        ? skills.map(skill =>
-            `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#f1f1f1;font-size:0.85rem;\">${skill.naam}</span>`
-          ).join('')
+        ? skills
+            .map(
+              (skill) =>
+                `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#f1f1f1;font-size:0.85rem;\">${skill.naam}</span>`
+            )
+            .join('')
         : '<em>Geen skills beschikbaar</em>';
-      document.getElementById('popup-skills').innerHTML = `<strong>Skills:</strong><div style=\"margin-top:0.4rem;\">${skillsHtml}</div>`;
-    }
-    // LinkedIn
-    if (s.linkedin) {
-      document.getElementById('popup-linkedin').textContent = s.linkedin;
-      document.getElementById('popup-linkedin').href = s.linkedin;
-    } else {
-      document.getElementById('popup-linkedin').textContent = 'Niet beschikbaar';
-      document.getElementById('popup-linkedin').removeAttribute('href');
+      document.getElementById('popup-skills').innerHTML = skillsHtml;
     }
   }
 }
-
-// Debug/test utility voor modal direct testen
-window.showTestModal = () => showDeleteModal(123, () => alert('Success!'));

@@ -1,7 +1,7 @@
 // Admin company detail pagina
 import Router from '../../router.js';
 import defaultCompanyLogo from '../../images/defaultlogo.webp';
-import { authenticatedFetch, logoutUser } from '../../utils/auth-api.js';
+import { logoutUser } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 
@@ -45,7 +45,6 @@ export async function renderAdminCompanyDetail(rootElement) {
               <li><button class="nav-btn" data-route="/admin-dashboard/ingeschreven-studenten">Ingeschreven studenten</button></li>
               <li><button class="nav-btn" data-route="/admin-dashboard/ingeschreven-bedrijven">Ingeschreven Bedrijven</button></li>
               <li><button class="nav-btn" data-route="/admin-dashboard/bedrijven-in-behandeling">Bedrijven in behandeling</button></li>
-              <li><button class="nav-btn" data-route="/admin-dashboard/contacten">Contacten</button></li>
             </ul>
           </nav>
         </aside>
@@ -101,7 +100,7 @@ export async function renderAdminCompanyDetail(rootElement) {
   const accessToken = sessionStorage.getItem('accessToken');
   try {
     // Fetch fresh data from the API
-    const response = await authenticatedFetch(
+    const response = await fetch(
       `https://api.ehb-match.me/bedrijven/${companyId}`,
       {
         method: 'GET',
@@ -383,7 +382,7 @@ async function openSpeedDatesModal() {
   try {
     // Fetch speeddates data from API with company ID
     const accessToken = sessionStorage.getItem('accessToken');
-    const response = await authenticatedFetch(
+    const response = await fetch(
       `https://api.ehb-match.me/speeddates?id=${companyId}`,
       {
         method: 'GET',
@@ -423,45 +422,24 @@ async function openSpeedDatesModal() {
           }" title="Annuleren">✕</button>
         `;
         speedDatesList.appendChild(speedDateItem);
-      });      // Add event listeners for cancel buttons
+      });
+
+      // Add event listeners for cancel buttons
       const cancelButtons = speedDatesList.querySelectorAll(
         '.speeddate-cancel-btn'
       );
       cancelButtons.forEach((btn) => {
-        btn.addEventListener('click', async (e) => {
+        btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const speedDateId = btn.dataset.speeddateId;
           if (confirm('Weet je zeker dat je deze speeddate wilt annuleren?')) {
-            // Disable button during processing
-            btn.disabled = true;
-            btn.textContent = '⏳';
-            
-            try {
-              // Call API to reject/delete the speeddate
-              await rejectSpeeddate(speedDateId);
-              
-              // Remove from DOM only if API call succeeded
-              btn.closest('.speeddate-item').remove();
-              console.log(`Speeddate ${speedDateId} geannuleerd`);
+            btn.closest('.speeddate-item').remove();
+            console.log(`Speeddate ${speedDateId} geannuleerd`);
 
-              // Check if list is now empty
-              if (speedDatesList.children.length === 0) {
-                speedDatesList.innerHTML =
-                  '<div class="no-speeddates">Geen speeddates gevonden</div>';
-              }
-              
-              // Close modal after successful cancellation
-              setTimeout(() => {
-                closeSpeedDatesModal();
-              }, 500);
-              
-            } catch (error) {
-              console.error('Error rejecting speeddate:', error);
-              alert('Er is een fout opgetreden bij het annuleren van de speeddate. Probeer het opnieuw.');
-              
-              // Re-enable button
-              btn.disabled = false;
-              btn.textContent = '✕';
+            // Check if list is now empty
+            if (speedDatesList.children.length === 0) {
+              speedDatesList.innerHTML =
+                '<div class="no-speeddates">Geen speeddates gevonden</div>';
             }
           }
         });
@@ -498,26 +476,4 @@ async function openSpeedDatesModal() {
 function closeSpeedDatesModal() {
   const modal = document.getElementById('speeddates-modal');
   modal.style.display = 'none';
-}
-
-// Function to reject/delete a speeddate via API
-async function rejectSpeeddate(speeddateId) {
-  const accessToken = sessionStorage.getItem('accessToken');
-  
-  const response = await fetch(
-    `https://api.ehb-match.me/speeddates/reject/${speeddateId}`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  return response;
 }

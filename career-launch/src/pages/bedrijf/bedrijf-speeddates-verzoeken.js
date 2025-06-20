@@ -1,6 +1,4 @@
 import logoIcon from '../../icons/favicon-32x32.png';
-import { authenticatedFetch } from '../../utils/auth-api.js';
-import Router from '../../router.js';
 
 // Auth-check direct uitvoeren bij laden van deze pagina (bovenaan, vóór alles)
 function checkAuthAndRedirect() {
@@ -40,18 +38,16 @@ async function fetchPendingSpeeddateData(bedrijfId, token) {
   };
 
   try {
-    const response = await authenticatedFetch(url, { headers });
+    const response = await fetch(url, { headers });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    // Filter from data where asked_by is own id
     const data = await response.json();
-    const filteredData = data.filter((item) => item.asked_by !== bedrijfId);
 
     // Structureer de data voor eenvoudige rendering
-    return formatPendingSpeeddateData(filteredData);
+    return formatPendingSpeeddateData(data);
   } catch (error) {
     console.error('Fout bij ophalen van pending speeddate data:', error);
     throw error;
@@ -120,11 +116,11 @@ function renderPendingSpeeddatesList(speeddates) {
       <div class="speeddates-header">
         <h2>Pending Speeddates-verzoeken (${speeddates.length})</h2>
       </div>
-      <div class="speeddates-table" id="speeddates-table">
+      <div class="speeddates-table">
         ${speeddates
           .map(
             (afspraak) => `
-          <div class="speeddate-item pending" data-id="${afspraak.id}">
+          <div class="speeddate-item pending">
             <div class="speeddate-info">
               <div class="student-info">
                 <img src="${
@@ -135,21 +131,30 @@ function renderPendingSpeeddatesList(speeddates) {
                      onerror="this.src='/images/default.png'" />
                 <div class="student-details">
                   <h4>${afspraak.student.naam}</h4>
+                  <p class="student-id">Student ID: ${afspraak.student.id}</p>
                 </div>
               </div>
               
               <div class="afspraak-details">
                 <div class="tijd-lokaal">
-                  <p class="tijdslot"><strong>Tijd:</strong> ${afspraak.tijdslot.geformatteerd}</p>
-                  <p class="lokaal"><strong>Lokaal:</strong> ${afspraak.lokaal}</p>
+                  <p class="tijdslot"><strong>Tijd:</strong> ${
+                    afspraak.tijdslot.geformatteerd
+                  }</p>
+                  <p class="lokaal"><strong>Lokaal:</strong> ${
+                    afspraak.lokaal
+                  }</p>
                 </div>
               </div>
               
               <div class="speeddate-actions">
-                <button class="action-btn accept-btn" data-action="accept" data-id="${afspraak.id}">
+                <button class="action-btn accept-btn" onclick="acceptSpeeddate(${
+                  afspraak.id
+                })">
                   Accepteren
                 </button>
-                <button class="deny-btn" data-action="delete" data-id="${afspraak.id}">
+                <button class="action-btn delete-btn" onclick="deleteSpeeddate(${
+                  afspraak.id
+                })">
                   Verwijderen
                 </button>
               </div>
@@ -173,7 +178,7 @@ async function acceptSpeeddate(afspraakId) {
   }
 
   try {
-    const response = await authenticatedFetch(
+    const response = await fetch(
       `https://api.ehb-match.me/speeddates/accept/${afspraakId}`,
       {
         method: 'POST',
@@ -203,87 +208,21 @@ async function acceptSpeeddate(afspraakId) {
   }
 }
 
-let pendingDeleteAfspraakId = null;
-
-function handleSpeeddatesTableClick(e) {
-  const target = e.target.closest('button[data-action]');
-  if (!target) return;
-  const afspraakId = target.getAttribute('data-id');
-  const action = target.getAttribute('data-action');
-  if (action === 'accept') {
-    acceptSpeeddate(afspraakId);
-  } else if (action === 'delete') {
-    pendingDeleteAfspraakId = afspraakId;
-    openDeleteModal();
-  }
-}
-
-function openDeleteModal() {
-  const overlay = document.getElementById('modal-overlay');
-  if (overlay) overlay.style.display = 'flex';
-}
-
-function closeDeleteModal() {
-  const overlay = document.getElementById('modal-overlay');
-  if (overlay) overlay.style.display = 'none';
-}
-
-function bindModalEvents() {
-  const yesBtn = document.getElementById('modal-yes');
-  const noBtn = document.getElementById('modal-no');
-  const modalMessage = document.getElementById('modal-message');
-  const modalButtons = document.querySelector('.modal-buttons');
-  if (yesBtn && noBtn) {
-    yesBtn.onclick = async () => {
-      if (pendingDeleteAfspraakId) {
-        // Disable buttons to prevent double click
-        yesBtn.disabled = true;
-        noBtn.disabled = true;
-        const result = await deleteSpeeddate(pendingDeleteAfspraakId, { showModalConfirmation: true });
-        pendingDeleteAfspraakId = null;
-        if (result === 'success') {
-          if (modalMessage) {
-            modalMessage.textContent = 'Speeddate succesvol verwijderd!';
-          }
-          if (modalButtons) {
-            modalButtons.style.display = 'none';
-          }
-          setTimeout(() => {
-            closeDeleteModal();
-            loadPendingSpeeddateData();
-            // Reset modal message and buttons for next time
-            if (modalMessage) {
-              modalMessage.textContent = 'Weet je zeker dat je deze speeddate wilt afwijzen?';
-            }
-            if (modalButtons) {
-              modalButtons.style.display = 'flex';
-            }
-            yesBtn.disabled = false;
-            noBtn.disabled = false;
-          }, 1200);
-        } else {
-          // Reset modal and buttons if error
-          yesBtn.disabled = false;
-          noBtn.disabled = false;
-        }
-      }
-    };
-    noBtn.onclick = () => {
-      pendingDeleteAfspraakId = null;
-      closeDeleteModal();
-    };
-  }
-}
-
 // Functie om een speeddate te verwijderen/afwijzen
-async function deleteSpeeddate(afspraakId, opts = {}) {
-  const token = window.sessionStorage.getItem('authToken');
-  if (!token) {
-    if (!opts.showModalConfirmation) alert('Geen geldige authenticatie. Log opnieuw in.');
+async function deleteSpeeddate(afspraakId) {
+  if (!confirm('Weet je zeker dat je deze speeddate wilt afwijzen?')) {
     return;
   }
+
+  const token = window.sessionStorage.getItem('authToken');
+
+  if (!token) {
+    alert('Geen geldige authenticatie. Log opnieuw in.');
+    return;
+  }
+
   try {
-    const response = await authenticatedFetch(
+    const response = await fetch(
       `https://api.ehb-match.me/speeddates/reject/${afspraakId}`,
       {
         method: 'POST',
@@ -293,25 +232,19 @@ async function deleteSpeeddate(afspraakId, opts = {}) {
         },
       }
     );
-    if (response.status === 201 || response.status === 200) {
-      if (opts.showModalConfirmation) {
-        return 'success';
-      } else {
-        alert('Speeddate succesvol verwijderd!');
-      }
-      return;
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API Error Response:', errorText);
+      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
     }
-    const errorText = await response.text();
-    if (response.status === 404) {
-      if (!opts.showModalConfirmation) alert('Deze speeddate bestaat niet (meer) of is al verwerkt.');
-    } else if (response.status === 500) {
-      if (!opts.showModalConfirmation) alert('Afwijzen van deze speeddate is momenteel niet mogelijk. Probeer het later opnieuw of neem contact op met support als het probleem blijft.');
-    } else {
-      if (!opts.showModalConfirmation) alert('Er is een fout opgetreden bij het afwijzen van de speeddate.');
-    }
-    throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+
+    // Herlaad de data na succesvolle afwijzing
+    await loadPendingSpeeddateData();
+    alert('Speeddate succesvol verwijderd!');
   } catch (error) {
     console.error('Fout bij afwijzen van speeddate:', error);
+    alert('Er is een fout opgetreden bij het afwijzen van de speeddate.');
   }
 }
 
@@ -361,14 +294,6 @@ async function loadPendingSpeeddateData() {
 
     // Render de pending speeddate lijst
     contentDiv.innerHTML = renderPendingSpeeddatesList(speeddates);
-    // Event delegation voor actieknoppen, altijd eerst oude listener verwijderen
-    const tableDiv = document.getElementById('speeddates-table');
-    if (tableDiv) {
-      tableDiv.removeEventListener('click', handleSpeeddatesTableClick);
-      tableDiv.addEventListener('click', handleSpeeddatesTableClick);
-    }
-    // Bind modal events na elke render
-    bindModalEvents();
   } catch (error) {
     console.error('Fout bij laden van pending speeddate data:', error);
     contentDiv.innerHTML =
@@ -389,14 +314,12 @@ function handleLogout() {
   });
 }
 
-// Verwijder de tweede (lagere) definitie van handleSpeeddatesTableClick zodat deze functie slechts één keer voorkomt in het bestand.
-
 export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
   checkAuthAndRedirect();
   rootElement.innerHTML = `
     <div class="bedrijf-profile-container">
       <header class="bedrijf-profile-header">
-        <div class="logo-section" id="logo-navigation">
+        <div class="logo-section">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
@@ -409,6 +332,7 @@ export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
       
       <div class="bedrijf-profile-main">        <nav class="bedrijf-profile-sidebar">
           <ul>
+            <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>            <li><button data-route="requests" class="sidebar-link active">Speeddates-verzoeken</button></li>
             <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
           </ul>
@@ -433,19 +357,7 @@ export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
         </div>
       </footer>
     </div>
-    <div id="modal-overlay" class="modal-overlay" style="display:none;">
-      <div class="modal">
-        <p id="modal-message">Weet je zeker dat je deze speeddate wilt afwijzen?</p>
-        <div class="modal-buttons">
-          <button id="modal-yes" class="modal-yes-btn">Ja</button>
-          <button id="modal-no" class="modal-no-btn">Nee</button>
-        </div>
-      </div>
-    </div>
   `;
-
-  // Modal events direct na renderen binden
-  bindModalEvents();
 
   // Sidebar navigation
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
@@ -455,6 +367,9 @@ export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
       import('../../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
+          case 'search-criteria':
+            Router.navigate('/bedrijf/zoek-criteria');
+            break;
           case 'speeddates':
             Router.navigate('/bedrijf/speeddates');
             break;
@@ -468,15 +383,6 @@ export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
       });
     });
   });
-
-  // Logo navigation event listener
-  const logoSection = document.getElementById('logo-navigation');
-  if (logoSection) {
-    logoSection.addEventListener('click', () => {
-      Router.navigate('/bedrijf/speeddates');
-    });
-  }
-
   // Burger menu and other functionality
   const burger = document.getElementById('burger-menu');
   const dropdown = document.getElementById('burger-dropdown');

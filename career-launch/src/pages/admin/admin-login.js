@@ -52,8 +52,15 @@ export function renderAdmin(rootElement) {
       });
 
       // Parse JSON response
-      const responseData = await response.json(); // Debugging: Log API responses
-      console.log('Login Response:', responseData);
+      const responseData = await response.json();
+
+      // Debugging: Log API responses
+      console.log('Login Response:', responseData); // Display the message from the API response in the label
+
+      errorMessage.textContent =
+        responseData.message || 'Er is een fout opgetreden.';
+      errorMessage.style.display = 'block';
+      errorMessage.style.backgroundColor = 'transparent'; // Remove background styling
 
       if (response.ok) {
         // Store important information in session storage
@@ -76,22 +83,19 @@ export function renderAdmin(rootElement) {
         const infoData = await infoResponse.json();
 
         // Debugging: Log user info
-        console.log('User Info:', infoData.user); // Check user type
+        console.log('User Info:', infoData.user);
+
+        // Check user type
         if (infoData.user.type === 1) {
-          // User is an admin, store admin email and redirect directly to ingeschreven studenten
+          // User is an admin, store admin email and proceed to dashboard
           sessionStorage.setItem('adminUsername', infoData.user.email);
           sessionStorage.setItem('adminEmail', infoData.user.email);
-          Router.navigate('/admin-dashboard/ingeschreven-studenten');
+          Router.navigate('/admin-dashboard');
         } else {
           // User is not an admin, display error message
           errorMessage.textContent = 'Je bent geen admin!';
           errorMessage.style.display = 'block';
         }
-      } else {
-        // Show error message only for failed requests
-        errorMessage.textContent =
-          responseData.message || 'Onjuiste inloggegevens.';
-        errorMessage.style.display = 'block';
       }
     } catch (error) {
       // Handle errors

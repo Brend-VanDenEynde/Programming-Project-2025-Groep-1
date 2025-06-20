@@ -1,7 +1,7 @@
 // Admin student detail pagina
 import Router from '../../router.js';
 import defaultAvatar from '../../images/default.png';
-import { performLogout, logoutUser, authenticatedFetch } from '../../utils/auth-api.js';
+import { performLogout, logoutUser } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 
@@ -45,7 +45,6 @@ export async function renderAdminStudentDetail(rootElement) {
               <li><button class="nav-btn" data-route="/admin-dashboard/ingeschreven-studenten">Ingeschreven studenten</button></li>
               <li><button class="nav-btn" data-route="/admin-dashboard/ingeschreven-bedrijven">Ingeschreven Bedrijven</button></li>
               <li><button class="nav-btn" data-route="/admin-dashboard/bedrijven-in-behandeling">Bedrijven in behandeling</button></li>
-              <li><button class="nav-btn" data-route="/admin-dashboard/contacten">Contacten</button></li>
             </ul>
           </nav>
         </aside>
@@ -96,11 +95,12 @@ export async function renderAdminStudentDetail(rootElement) {
       Router.navigate(route);
     });
   });
+
   // Fetch student data from API
   const accessToken = sessionStorage.getItem('accessToken');
   try {
     // Fetch fresh data from the API
-    const response = await authenticatedFetch(
+    const response = await fetch(
       `https://api.ehb-match.me/studenten/${studentId}`,
       {
         method: 'GET',
@@ -114,38 +114,12 @@ export async function renderAdminStudentDetail(rootElement) {
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
-    }    const studentData = await response.json();
+    }
 
-    // Also fetch student data from discover endpoint to get contactemail
-    let studentDiscoverData = null;
-    try {
-      const discoverResponse = await authenticatedFetch(
-        `https://api.ehb-match.me/discover/studenten`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-          cache: 'no-store',
-        }
-      );      if (discoverResponse.ok) {
-        const allStudents = await discoverResponse.json();
-
-        // Find the specific student by ID - try both string and number comparison
-        studentDiscoverData = allStudents.find(student => {
-          return student.id == studentId || student.id === parseInt(studentId) || student.id === studentId.toString();
-        });
-      }
-    } catch (discoverError) {
-      console.warn('Could not fetch discover data:', discoverError);
-    }    // Merge the data - use contact_email from original student data or discover if available
-    const mergedStudentData = {
-      ...studentData,
-      contactemail: studentData.contact_email || studentDiscoverData?.contact_email || studentData.email
-    };
+    const studentData = await response.json();
 
     // Render the full page with the fetched data
-    renderFullDetailPage(rootElement, mergedStudentData, adminUsername);
+    renderFullDetailPage(rootElement, studentData, adminUsername);
   } catch (error) {
     console.error('Error fetching student details:', error);
     // Show error state
@@ -192,9 +166,10 @@ function renderFullDetailPage(rootElement, studentData, adminUsername) {
               <label>Naam:</label>
               <span>${studentData.voornaam} ${studentData.achternaam}</span>
             </div>
-              <div class="detail-field">
+            
+            <div class="detail-field">
               <label>Contact-Email:</label>
-              <span>${studentData.contactemail || studentData.email || 'Niet beschikbaar'}</span>
+              <span>${studentData.email || 'Niet beschikbaar'}</span>
             </div>
             
             <div class="detail-field">
@@ -273,7 +248,7 @@ async function openSpeedDatesModal() {
   try {
     // Fetch speeddates data from API with student ID
     const accessToken = sessionStorage.getItem('accessToken');
-    const response = await authenticatedFetch(
+    const response = await fetch(
       `https://api.ehb-match.me/speeddates?id=${studentId}`,
       {
         method: 'GET',
@@ -310,44 +285,24 @@ async function openSpeedDatesModal() {
           }" title="Annuleren">✕</button>
         `;
         speedDatesList.appendChild(speedDateItem);
-      });      // Add event listeners for cancel buttons
+      });
+
+      // Add event listeners for cancel buttons
       const cancelButtons = speedDatesList.querySelectorAll(
         '.speeddate-cancel-btn'
       );
       cancelButtons.forEach((btn) => {
-        btn.addEventListener('click', async (e) => {
+        btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const speedDateId = btn.dataset.speeddateId;
           if (confirm('Weet je zeker dat je deze speeddate wilt annuleren?')) {
-            // Disable button during processing
-            btn.disabled = true;
-            btn.textContent = '⏳';
-              try {
-              // Call API to reject/delete the speeddate
-              await rejectSpeeddate(speedDateId);
-              
-              // Remove from DOM only if API call succeeded
-              btn.closest('.speeddate-item').remove();
-              console.log(`Speeddate ${speedDateId} geannuleerd`);
+            btn.closest('.speeddate-item').remove();
+            console.log(`Speeddate ${speedDateId} geannuleerd`);
 
-              // Check if list is now empty
-              if (speedDatesList.children.length === 0) {
-                speedDatesList.innerHTML =
-                  '<div class="no-speeddates">Geen speeddates gevonden</div>';
-              }
-              
-              // Close modal after successful cancellation
-              setTimeout(() => {
-                closeSpeedDatesModal();
-              }, 500);
-              
-            } catch (error) {
-              console.error('Error rejecting speeddate:', error);
-              alert('Er is een fout opgetreden bij het annuleren van de speeddate. Probeer het opnieuw.');
-              
-              // Re-enable button
-              btn.disabled = false;
-              btn.textContent = '✕';
+            // Check if list is now empty
+            if (speedDatesList.children.length === 0) {
+              speedDatesList.innerHTML =
+                '<div class="no-speeddates">Geen speeddates gevonden</div>';
             }
           }
         });
@@ -386,13 +341,15 @@ function closeSpeedDatesModal() {
   modal.style.display = 'none';
 }
 
-function setupEventHandlers(studentData) {  // Admin action buttons
+function setupEventHandlers(studentData) {
+  // Admin action buttons
   const contactBtn = document.getElementById('contact-student-btn');
   if (contactBtn) {
     contactBtn.addEventListener('click', () => {
-      // Create mailto link using the contact email from the merged data
-      const email = studentData.contactemail || studentData.email || 'onbekend@student.ehb.be';
-      const mailtoLink = `mailto:${email}`;
+      // Create mailto link and open it using the current student data
+      const mailtoLink = `mailto:${
+        studentData.email || 'onbekend@student.ehb.be'
+      }`;
       window.location.href = mailtoLink;
     });
   }
@@ -451,30 +408,9 @@ function setupEventHandlers(studentData) {  // Admin action buttons
     e.preventDefault();
     Router.navigate('/privacy');
   });
+
   document.getElementById('contacteer-ons').addEventListener('click', (e) => {
     e.preventDefault();
     Router.navigate('/contact');
   });
-}
-
-// Function to reject/delete a speeddate via API
-async function rejectSpeeddate(speeddateId) {
-  const accessToken = sessionStorage.getItem('accessToken');
-  
-  const response = await fetch(
-    `https://api.ehb-match.me/speeddates/reject/${speeddateId}`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  return response;
 }

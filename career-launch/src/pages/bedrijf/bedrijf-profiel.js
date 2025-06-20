@@ -4,22 +4,8 @@ import {
   logoutUser,
   fetchUserInfo,
   updateBedrijfProfile,
-  authenticatedFetch,
 } from '../../utils/auth-api.js';
 import Router from '../../router.js';
-
-// Consistente logo helper
-function getBedrijfLogoUrl(foto, url) {
-  // Gebruik altijd defaultLogo als alles ontbreekt of ongeldig is
-  if (!foto || foto === 'null' || foto === 'undefined') return defaultLogo;
-  if (typeof foto === 'string' && foto.startsWith('http')) return foto;
-  if (url && typeof url === 'string' && url.startsWith('http')) return url;
-  // Als het een key is, plak achter base-url
-  if (typeof foto === 'string' && foto.length > 10) {
-    return 'https://gt0kk4fbet.ufs.sh/f/' + foto;
-  }
-  return defaultLogo;
-}
 
 const BASE_AVATAR_URL = 'https://gt0kk4fbet.ufs.sh/f/';
 const DEFAULT_AVATAR_KEY = '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
@@ -34,7 +20,6 @@ const defaultBedrijfProfile = {
   plaats: '',
   linkedin: '',
   sector_bedrijf: '',
-  id_sector_bedrijf: null,
 };
 
 // Auth-check direct uitvoeren bij laden van deze pagina (bovenaan, vóór alles)
@@ -63,6 +48,12 @@ if (isBedrijfProfielPage) {
   });
 }
 
+function getBedrijfLogoUrl(foto) {
+  if (!foto || foto === 'null') return DEFAULT_AVATAR_URL;
+  if (foto.startsWith('http')) return foto;
+  return BASE_AVATAR_URL + foto;
+}
+
 // Pas logout overal aan (in nav-logout, profiel-formulier, etc.)
 function handleLogout() {
   window.sessionStorage.removeItem('bedrijfData');
@@ -89,7 +80,7 @@ export async function renderBedrijfProfiel(
     try {
       const stored = window.sessionStorage.getItem('bedrijfData');
       if (stored) bedrijfData = JSON.parse(stored);
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // Probeer echte data van de API op te halen als geen data beschikbaar is
@@ -109,14 +100,12 @@ export async function renderBedrijfProfiel(
             apiUser.bedrijfsnaam ||
             apiUser.company_name ||
             'Mijn Bedrijf',
-          profiel_foto_key:
-            apiUser.profiel_foto_key || apiUser.logo_key || DEFAULT_AVATAR_KEY,
+          profiel_foto_key: apiUser.profiel_foto_key || apiUser.logo_key || DEFAULT_AVATAR_KEY,
           profiel_foto_url:
-            apiUser.profiel_foto_url || apiUser.logo_url || DEFAULT_AVATAR_URL,
+            apiUser.profiel_foto_url || apiUser.logo_url || defaultLogo,
           plaats: apiUser.plaats || apiUser.locatie || apiUser.location || '',
           linkedin: apiUser.linkedin || '',
           sector_bedrijf: apiUser.sector_bedrijf || apiUser.sector || '',
-          id_sector_bedrijf: apiUser.id_sector_bedrijf || null,
         };
 
         // Log de gemapte bedrijf data voor debugging
@@ -138,8 +127,7 @@ export async function renderBedrijfProfiel(
           profiel_foto_url: DEFAULT_AVATAR_URL,
           plaats: 'Brussel',
           linkedin: 'https://www.linkedin.com/company/techcorp-belgium',
-          sector_bedrijf: 'Informatica',
-          id_sector_bedrijf: 4, // Dummy sector ID
+          sector_bedrijf: 'IT & Technology',
         };
       }
     } catch (error) {
@@ -152,8 +140,7 @@ export async function renderBedrijfProfiel(
         profiel_foto_url: DEFAULT_AVATAR_URL,
         plaats: 'Brussel',
         linkedin: 'https://www.linkedin.com/company/techcorp-belgium',
-        sector_bedrijf: 'Informatica',
-        id_sector_bedrijf: 4, // Dummy sector ID
+        sector_bedrijf: 'IT & Technology',
       };
     }
   } // Gebruik ENKEL de huidige API velden
@@ -165,19 +152,18 @@ export async function renderBedrijfProfiel(
     plaats = defaultBedrijfProfile.plaats,
     linkedin = defaultBedrijfProfile.linkedin,
     sector_bedrijf = defaultBedrijfProfile.sector_bedrijf,
-    id_sector_bedrijf = defaultBedrijfProfile.id_sector_bedrijf,
   } = bedrijfData;
 
   // Gebruik default als foto null, leeg of undefined is
-  const foto = getBedrijfLogoUrl(profiel_foto_key, profiel_foto_url);
+  const foto = getBedrijfLogoUrl(profiel_foto_key);
+
   rootElement.innerHTML = `
     <div class="bedrijf-profile-container">
       <header class="bedrijf-profile-header">
-        <div class="logo-section" id="logo-navigation">
+        <div class="logo-section">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
-        </div>
-        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
+        </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
         <ul id="burger-dropdown" class="bedrijf-profile-dropdown">
           <li><button id="nav-profile">Profiel</button></li>
           <li><button id="nav-settings">Instellingen</button></li>
@@ -185,27 +171,25 @@ export async function renderBedrijfProfiel(
         </ul>
       </header>
       
-      <div class="bedrijf-profile-main">
-        <nav class="bedrijf-profile-sidebar">
+      <div class="bedrijf-profile-main">        <nav class="bedrijf-profile-sidebar">
           <ul>
-            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
-            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
+            <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
+            <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
             <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
           </ul>
         </nav>
         
         <div class="bedrijf-profile-content">
           <div class="bedrijf-profile-form-container">
-            <button id="to-search-criteria-btn" class="to-search-criteria-btn">Zoekcriteria</button>
-            <h1 class="bedrijf-profile-title">Profiel</h1>
+            <h1 class="bedrijf-profile-title">Bedrijf Profiel</h1>
             <form id="bedrijfProfileForm" class="bedrijf-profile-form" autocomplete="off" enctype="multipart/form-data">
               <div class="bedrijf-profile-avatar-section">
                 <div class="bedrijf-profile-avatar-div" style="position:relative;">
                   <img
-                    id="logo-preview"
-                    class="bedrijf-profile-avatar"
                     src="${foto}"
                     alt="Logo ${naam}"
+                    id="logo-preview"
+                    class="bedrijf-profile-avatar"
                   />
                   <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
                 </div>
@@ -216,37 +200,37 @@ export async function renderBedrijfProfiel(
               
               <div class="bedrijf-profile-form-group">
                 <label for="bedrijfsnaamInput">Bedrijfsnaam</label>
-                <input type="text" id="bedrijfsnaamInput" placeholder="Bedrijfsnaam" required ${
-                  readonlyMode ? 'disabled' : ''
-                }>
+                <input type="text" id="bedrijfsnaamInput" value="${naam}" placeholder="Bedrijfsnaam" required ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               
               <div class="bedrijf-profile-form-group">
                 <label for="emailInput">E-mailadres</label>
-                <input type="email" id="emailInput" placeholder="contact@bedrijf.be" required ${
-                  readonlyMode ? 'disabled' : ''
-                }>
+                <input type="email" id="emailInput" value="${contact_email}" placeholder="contact@bedrijf.be" required ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               
               <div class="bedrijf-profile-form-group">
                 <label for="plaatsInput">Plaats</label>
-                <input type="text" id="plaatsInput" placeholder="Brussel" ${
-                  readonlyMode ? 'disabled' : ''
-                }>
+                <input type="text" id="plaatsInput" value="${plaats}" placeholder="Brussel" ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               
               <div class="bedrijf-profile-form-group">
                 <label for="linkedinInput">LinkedIn</label>
-                <input type="url" id="linkedinInput" placeholder="https://www.linkedin.com/company/bedrijf" ${
-                  readonlyMode ? 'disabled' : ''
-                }>
+                <input type="url" id="linkedinInput" value="${linkedin ? linkedin : ''}" placeholder="https://www.linkedin.com/company/bedrijf" ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               
               <div class="bedrijf-profile-form-group">
                 <label for="sectorInput">Sector</label>
-                <input type="text" id="sectorInput" placeholder="IT & Technology" ${
-                  readonlyMode ? 'disabled' : ''
-                }>
+                <input type="text" id="sectorInput" value="${sector_bedrijf}" placeholder="IT & Technology" ${
+    readonlyMode ? 'disabled' : ''
+  }>
               </div>
               
               <div class="bedrijf-profile-buttons">
@@ -274,15 +258,6 @@ export async function renderBedrijfProfiel(
       </footer>
     </div>
   `;
-
-  // Set user-controlled values safely after rendering
-  document.getElementById('logo-preview').src = foto;
-  document.getElementById('logo-preview').alt = `Logo ${naam}`;
-  document.getElementById('bedrijfsnaamInput').value = naam;
-  document.getElementById('emailInput').value = contact_email;
-  document.getElementById('plaatsInput').value = plaats;
-  document.getElementById('linkedinInput').value = linkedin ? linkedin : '';
-  document.getElementById('sectorInput').value = sector_bedrijf;
   // Event listeners
 
   // Burger menu
@@ -341,34 +316,30 @@ export async function renderBedrijfProfiel(
   }
 
   // Delete overlay voor profielfoto
-  const profileAvatar = document.querySelector('.bedrijf-profile-avatar-div');
-  const photoInput = document.getElementById('logoInput');
-  const deleteOverlay = document.querySelector('.delete-overlay');
-  const bedrijfAvatar = document.getElementById('logo-preview');
+    const profileAvatar = document.querySelector('.bedrijf-profile-avatar-div');
+    const photoInput = document.getElementById('logoInput');
+    const deleteOverlay = document.querySelector('.delete-overlay');
+    const bedrijfAvatar = document.getElementById('logo-preview');
 
-  let deleteProfilePicture = false;
-  let savedProfilePicture = bedrijfAvatar.src; // Bewaar de originele profielfoto URL
+    let deleteProfilePicture = false;
+    let savedProfilePicture = bedrijfAvatar.src; // Bewaar de originele profielfoto URL
 
-  profileAvatar.addEventListener('mouseenter', () => {
-    if (
-      !readonlyMode &&
-      !deleteProfilePicture &&
-      bedrijfAvatar.src !== DEFAULT_AVATAR_URL
-    ) {
-      deleteOverlay.style.display = 'flex';
-    }
-  });
-  profileAvatar.addEventListener('mouseleave', () => {
-    deleteOverlay.style.display = 'none';
-  });
+    profileAvatar.addEventListener('mouseenter', () => {
+      if (!readonlyMode && !deleteProfilePicture && bedrijfAvatar.src !== DEFAULT_AVATAR_URL) {
+        deleteOverlay.style.display = 'flex';
+      }
+    });
+    profileAvatar.addEventListener('mouseleave', () => {
+      deleteOverlay.style.display = 'none';
+    });
 
-  deleteOverlay.addEventListener('click', async (e) => {
-    if (!readonlyMode && bedrijfAvatar.src !== DEFAULT_AVATAR_URL) {
-      photoInput.value = ''; // Reset file input
-      bedrijfAvatar.src = DEFAULT_AVATAR_URL; // Reset to default avatar
-      deleteProfilePicture = true; // Set flag to delete profile picture
-    }
-  });
+    deleteOverlay.addEventListener('click', async (e) => {
+      if (!readonlyMode && bedrijfAvatar.src !== DEFAULT_AVATAR_URL) {
+        photoInput.value = ''; // Reset file input
+        bedrijfAvatar.src = DEFAULT_AVATAR_URL; // Reset to default avatar
+        deleteProfilePicture = true; // Set flag to delete profile picture
+      }
+    });
 
   // SAVE knop
   const saveBtn = document.getElementById('btn-save-bedrijf');
@@ -383,10 +354,7 @@ export async function renderBedrijfProfiel(
         if (linkedinInput && linkedinInput.trim() !== '') {
           linkedinInput = linkedinInput.trim();
           // Remove both 'https://www.linkedin.com' and 'https://linkedin.com' from the start
-          linkedinInput = linkedinInput.replace(
-            /^(https?:\/\/)?(www\.)?linkedin\.com/i,
-            ''
-          );
+          linkedinInput = linkedinInput.replace(/^(https?:\/\/)?(www\.)?linkedin\.com/i, '');
           // Accept if it starts with '/company/'
           if (linkedinInput.startsWith('/company/')) {
             linkedinValue = linkedinInput;
@@ -394,78 +362,13 @@ export async function renderBedrijfProfiel(
             linkedinValue = null;
           }
         }
-
-        let sectorID = null;
-        if (document.getElementById('sectorInput').value) {
-          try {
-            console.log(
-              'Sector input value:',
-              document.getElementById('sectorInput').value
-            );
-            const currentToken = window.sessionStorage.getItem('authToken');
-            const response = await authenticatedFetch(
-              'https://api.ehb-match.me/sectoren',
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: 'Bearer ' + currentToken,
-                },
-                body: JSON.stringify({
-                  naam: document.getElementById('sectorInput').value,
-                }),
-              }
-            );
-            if (!response.ok) {
-              throw new Error(
-                'Fout bij het ophalen van sector ID: ' + response.statusText
-              );
-            }
-            const data = await response.json();
-            console.log('Sector ID opgehaald:', data);
-            sectorID = data.sector.id;
-          } catch (error) {
-            console.error('Error fetching sector ID:', error);
-          }
-        }
         const updateData = {
-          naam: document.getElementById('bedrijfsnaamInput').value.trim(),
-          contact_email: document.getElementById('emailInput').value.trim(),
-          plaats: document.getElementById('plaatsInput').value.trim(),
+          naam: document.getElementById('bedrijfsnaamInput').value,
+          contact_email: document.getElementById('emailInput').value,
+          plaats: document.getElementById('plaatsInput').value,
           linkedin: linkedinValue,
-          id_sector: sectorID || bedrijfData.id_sector_bedrijf, // Gebruik sectorID als deze is opgehaald, anders huidige waarde
           // sector_bedrijf wordt niet geaccepteerd door de API, dus weggelaten
-        };
-
-        // Remove empty values but keep valid null values
-        Object.keys(updateData).forEach((key) => {
-          if (
-            updateData[key] === null ||
-            updateData[key] === undefined ||
-            updateData[key] === ''
-          ) {
-            if (key === 'linkedin' || key === 'plaats') {
-              // These fields can be empty
-              updateData[key] = updateData[key] || '';
-            } else if (key !== 'id_sector') {
-              // Don't remove id_sector even if null
-              delete updateData[key];
-            }
-          }
-        });
-
-        // Validate required fields
-        if (!updateData.naam) {
-          alert('Bedrijfsnaam is verplicht.');
-          return;
-        }
-
-        if (!updateData.contact_email) {
-          alert('E-mailadres is verplicht.');
-          return;
-        }
-
-        // Haal het bedrijf ID op uit de huidige data
+        }; // Haal het bedrijf ID op uit de huidige data
         const bedrijfID = bedrijfData.id || bedrijfData.gebruiker_id;
 
         console.log('Debug bedrijf ID lookup:');
@@ -488,82 +391,66 @@ export async function renderBedrijfProfiel(
 
         // Voeg de profiel foto toe als deze is gewijzigd
         let profielFotoKey = null;
-        if (
-          bedrijfData.profiel_foto_url &&
-          typeof bedrijfData.profiel_foto_url === 'string' &&
-          !deleteProfilePicture
-        ) {
-          if (bedrijfData.profiel_foto_url.startsWith('http')) {
-            const parts = bedrijfData.profiel_foto_url.split('/');
-            profielFotoKey = parts[parts.length - 1];
-          } else if (bedrijfData.profiel_foto_url !== 'null') {
-            profielFotoKey = bedrijfData.profiel_foto_url;
+          if (bedrijfData.profiel_foto_url && typeof bedrijfData.profiel_foto_url === 'string' && !deleteProfilePicture) {
+            if (bedrijfData.profiel_foto_url.startsWith('http')) {
+              const parts = bedrijfData.profiel_foto_url.split('/');
+              profielFotoKey = parts[parts.length - 1];
+            } else if (bedrijfData.profiel_foto_url !== 'null') {
+              profielFotoKey = bedrijfData.profiel_foto_url;
+            }
           }
-        }
-        if (
-          deleteProfilePicture &&
-          savedProfilePicture &&
-          savedProfilePicture !== DEFAULT_AVATAR_URL
-        ) {
-          // remove https://gt0kk4fbet.ufs.sh/f/ prefix if present
-          profielFotoKey = savedProfilePicture.replace(BASE_AVATAR_URL, '');
-          const currentToken = window.sessionStorage.getItem('authToken');
-          const deleteResp = await authenticatedFetch(
-            `https://api.ehb-match.me/profielfotos/${profielFotoKey}`,
-            {
+          if (deleteProfilePicture && savedProfilePicture && savedProfilePicture !== DEFAULT_AVATAR_URL) {
+            // remove https://gt0kk4fbet.ufs.sh/f/ prefix if present
+            profielFotoKey = savedProfilePicture.replace(BASE_AVATAR_URL, '');
+            const currentToken = window.sessionStorage.getItem('authToken');
+            const deleteResp = await fetch(`https://api.ehb-match.me/profielfotos/${profielFotoKey}`, {
               method: 'DELETE',
               headers: {
-                Authorization: 'Bearer ' + currentToken,
+                'Authorization': 'Bearer ' + currentToken,
               },
+            });
+            console.log('Profielfoto verwijderd:', deleteResp);
+            profielFotoKey = DEFAULT_AVATAR_KEY; // Reset de profielfoto key
+          }
+          const photoInput = document.getElementById('logoInput');
+          if (photoInput && photoInput.files && photoInput.files.length > 0) {
+            const file = photoInput.files[0];
+            // Controleer bestandstype en grootte
+            if (!file.type.match(/^image\/(jpeg|png|gif)$/)) {
+              alert('Ongeldig bestandstype. Kies een jpg, png of gif afbeelding.');
+              return;
             }
-          );
-          console.log('Profielfoto verwijderd:', deleteResp);
-          profielFotoKey = DEFAULT_AVATAR_KEY; // Reset de profielfoto key
-        }
-        const photoInput = document.getElementById('logoInput');
-        if (photoInput && photoInput.files && photoInput.files.length > 0) {
-          const file = photoInput.files[0];
-          // Controleer bestandstype en grootte
-          // Controleer bestandstype en grootte
-          if (!file.type.match(/^image\/(jpeg|png|gif)$/)) {
-            alert(
-              'Ongeldig bestandstype. Kies een jpg, png of gif afbeelding.'
-            );
-            return;
-          }
-          if (file.size > 2 * 1024 * 1024) {
-            alert('Bestand is te groot. Maximaal 2 MB toegestaan.');
-            return;
-          }
-          // Gebruik altijd 'image' als veldnaam
-          const fileForm = new FormData();
-          fileForm.append('image', file);
-          const currentToken = window.sessionStorage.getItem('authToken');
-          const uploadResp = await authenticatedFetch(
-            'https://api.ehb-match.me/profielfotos',
-            {
+            if (file.size > 2 * 1024 * 1024) {
+              alert('Bestand is te groot. Maximaal 2 MB toegestaan.');
+              return;
+            }
+            // Gebruik altijd 'image' als veldnaam
+            const fileForm = new FormData();
+            fileForm.append('image', file);
+            const currentToken = window.sessionStorage.getItem('authToken');
+            const uploadResp = await fetch('https://api.ehb-match.me/profielfotos', {
               method: 'POST',
               headers: {
-                Authorization: 'Bearer ' + currentToken,
+                'Authorization': 'Bearer ' + currentToken,
               },
               body: fileForm,
+            });
+            if (!uploadResp.ok) {
+              const errText = await uploadResp.text();
+              console.error('Upload response for key "image":', errText);
+              throw new Error('Foto uploaden mislukt: ' + errText);
             }
-          );
-          if (!uploadResp.ok) {
-            const errText = await uploadResp.text();
-            console.error('Upload response for key "image":', errText);
-            throw new Error('Foto uploaden mislukt: ' + errText);
+            const uploadResult = await uploadResp.json();
+            profielFotoKey = uploadResult.profiel_foto_key;
           }
-          const uploadResult = await uploadResp.json();
-          profielFotoKey = uploadResult.profiel_foto_key;
-        }
-        console.log('Stuur profielfoto key:', profielFotoKey);
-        updateData.profiel_foto = profielFotoKey || DEFAULT_AVATAR_KEY; // Voeg de profielfoto key toe als deze bestaat
-        console.log('Final update data:', JSON.stringify(updateData, null, 2));
-        console.log('Bedrijf ID for API call:', bedrijfID);
+          console.log('Stuur profielfoto key:', profielFotoKey);
+
+          updateData.profiel_foto = profielFotoKey || DEFAULT_AVATAR_KEY; // Voeg de profielfoto key toe als deze bestaat
+          console.log('Final update data:', updateData);
 
         // Roep de API aan om het bedrijf bij te werken
         const result = await updateBedrijfProfile(bedrijfID, updateData);
+
 
         if (result.success) {
           alert('Bedrijfsprofiel succesvol opgeslagen!');
@@ -571,15 +458,8 @@ export async function renderBedrijfProfiel(
           const updatedBedrijfData = {
             ...bedrijfData,
             ...updateData,
-            sector_bedrijf:
-              result.bedrijf?.sector_bedrijf &&
-              result.bedrijf.sector_bedrijf.length > 0
-                ? result.bedrijf.sector_bedrijf.charAt(0).toUpperCase() +
-                  result.bedrijf.sector_bedrijf.slice(1)
-                : bedrijfData.sector_bedrijf,
-            id_sector_bedrijf:
-              result.bedrijf?.id_sector_bedrijf ||
-              bedrijfData.id_sector_bedrijf,
+            // Behoud sector_bedrijf omdat dit niet via API wordt geüpdatet
+            sector_bedrijf: document.getElementById('sectorInput').value,
             profiel_foto_key:
               result.bedrijf?.profiel_foto_key || bedrijfData.profiel_foto_key,
             profiel_foto_url:
@@ -620,14 +500,6 @@ export async function renderBedrijfProfiel(
   if (cancelBtn) {
     cancelBtn.addEventListener('click', () => {
       renderBedrijfProfiel(rootElement, bedrijfData, true);
-    });
-  }
-
-  // Logo navigation event listener
-  const logoSection = document.getElementById('logo-navigation');
-  if (logoSection) {
-    logoSection.addEventListener('click', () => {
-      Router.navigate('/bedrijf/speeddates');
     });
   }
 
@@ -679,14 +551,4 @@ export async function renderBedrijfProfiel(
       }
     });
   }
-
-  // Zoekcriteria knop
-  document
-    .getElementById('to-search-criteria-btn')
-    ?.addEventListener('click', () => {
-      import('../../router.js').then((module) => {
-        const Router = module.default;
-        Router.navigate('/bedrijf/zoek-criteria');
-      });
-    });
 }

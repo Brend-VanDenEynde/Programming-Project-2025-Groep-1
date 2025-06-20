@@ -1,10 +1,9 @@
 import '../../css/consolidated-style.css';
 import Router from '../../router.js';
-import { authenticatedFetch } from "../../utils/auth-api.js";
 
 // Skills ophalen uit de API
 async function fetchSkills() {
-  const resp = await authenticatedFetch('https://api.ehb-match.me/skills');
+  const resp = await fetch('https://api.ehb-match.me/skills');
   if (!resp.ok) throw new Error('Skills ophalen mislukt');
   return await resp.json(); // [{id: 1, skill: 'JavaScript'}, ...]
 }

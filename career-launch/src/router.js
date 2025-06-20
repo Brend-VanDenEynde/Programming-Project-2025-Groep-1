@@ -14,9 +14,9 @@ import { renderAdminBedrijvenInBehandeling } from './pages/admin/admin-bedrijven
 import { renderAdminStudentDetail } from './pages/admin/admin-student-detail.js';
 import { renderAdminCompanyDetail } from './pages/admin/admin-company-detail.js';
 import { renderAdminProcessingCompanyDetail } from './pages/admin/admin-processing-company-detail.js';
-import { renderAdminContacten } from './pages/admin/admin-contacten.js';
 import { renderPrivacy } from './pages/privacy.js';
 import { renderContact } from './pages/contact.js';
+import { renderQRPopup } from './pages/student/student-qr-popup.js';
 import { renderSpeeddates } from './pages/student/student-speeddates.js';
 import { renderSpeeddatesRequests } from './pages/student/student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './pages/student/student-settings.js';
@@ -48,6 +48,7 @@ const routes = {
   '/login': renderLogin,
   '/student/student-profiel': renderStudentProfiel,
   '/student/zoek-criteria': renderSearchCriteriaStudent,
+  '/student/student-qr-popup': renderQRPopup,
   '/student/student-speeddates': renderSpeeddates,
   '/student/student-speeddates-verzoeken': renderSpeeddatesRequests,
   '/student/student-settings': showSettingsPopup,
@@ -60,12 +61,11 @@ const routes = {
   '/admin': renderAdmin,
   '/admin-login': renderAdmin,
   '/admin-select-dashboard': renderAdminSelectDashboard,
-  '/admin-dashboard': renderAdminIngeschrevenStudenten,
+  '/admin-dashboard': renderAdminSelectDashboard,
   '/admin-dashboard/ingeschreven-studenten': renderAdminIngeschrevenStudenten,
   '/admin-dashboard/ingeschreven-bedrijven': renderAdminIngeschrevenBedrijven,
   '/admin-dashboard/bedrijven-in-behandeling':
     renderAdminBedrijvenInBehandeling,
-  '/admin-dashboard/contacten': renderAdminContacten,
   '/admin-dashboard/student-detail': renderAdminStudentDetail,
   '/admin-dashboard/company-detail': renderAdminCompanyDetail,
   '/admin-dashboard/processing-company-detail':
@@ -78,24 +78,9 @@ const routes = {
     );
     await renderBedrijfProfiel(rootElement, bedrijfData, true);
   },
-  '/bedrijf/zoek-criteria': (rootElement) => {
-    const bedrijfData = JSON.parse(
-      window.sessionStorage.getItem('bedrijfData') || '{}'
-    );
-    renderSearchCriteriaBedrijf(rootElement, bedrijfData);
-  },
-  '/bedrijf/speeddates': (rootElement) => {
-    const bedrijfData = JSON.parse(
-      window.sessionStorage.getItem('bedrijfData') || '{}'
-    );
-    renderBedrijfSpeeddates(rootElement, bedrijfData);
-  },
-  '/bedrijf/speeddates-verzoeken': (rootElement) => {
-    const bedrijfData = JSON.parse(
-      window.sessionStorage.getItem('bedrijfData') || '{}'
-    );
-    renderBedrijfSpeeddatesRequests(rootElement, bedrijfData);
-  },
+  '/bedrijf/zoek-criteria': renderSearchCriteriaBedrijf,
+  '/bedrijf/speeddates': renderBedrijfSpeeddates,
+  '/bedrijf/speeddates-verzoeken': renderBedrijfSpeeddatesRequests,
   '/bedrijf/studenten': (rootElement) => {
     const bedrijfData = JSON.parse(
       window.sessionStorage.getItem('bedrijfData') || '{}'
@@ -183,6 +168,7 @@ class Router {
       '/login': 'Inloggen - Career Launch 2025',
       '/student/student-profiel': 'Student Profiel - Career Launch 2025',
       '/student/zoek-criteria': 'Zoek Criteria - Career Launch 2025',
+      '/student/student-qr-popup': 'Jouw QR-code - Career Launch 2025',
       '/student/student-speeddates': 'Jouw Speeddates - Career Launch 2025',
       '/student/student-speeddates-verzoeken':
         'Speeddate Verzoeken - Career Launch 2025',
@@ -190,7 +176,7 @@ class Router {
       '/student/bedrijven': 'Bedrijven - Career Launch 2025',
       '/admin': 'Admin - Career Launch 2025',
       '/admin-login': 'Admin Login - Career Launch 2025',
-      '/admin-dashboard': 'Ingeschreven Studenten - Admin - Career Launch 2025',
+      '/admin-dashboard': 'Admin Dashboard - Career Launch 2025',
       '/contact': 'Contacteer ons - Career Launch 2025',
       '/privacy': 'Privacy Beleid - Career Launch 2025',
       '/404': 'Pagina niet gevonden - Career Launch 2025',

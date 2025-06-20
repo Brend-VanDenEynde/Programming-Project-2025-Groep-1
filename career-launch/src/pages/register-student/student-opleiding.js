@@ -4,7 +4,6 @@ import Router from '../../router.js';
 import { apiGet, apiPost } from '../../utils/api.js';
 
 import { mergedData } from './student-register.js';
-import { authenticatedFetch } from '../../utils/auth-api.js';
 
 export function renderStudentOpleiding(rootElement) {
   rootElement.innerHTML = `
@@ -92,7 +91,7 @@ async function loadOpleidingen() {
 
     let opleidingen;
     try {
-      const response = await authenticatedFetch('https://api.ehb-match.me/opleidingen/', {
+      const response = await fetch('https://api.ehb-match.me/opleidingen/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -269,7 +268,7 @@ async function handleJaarRegister(event) {
       console.warn('apiPost failed, falling back to fetch:', apiPostError);
     }
 
-    const response = await authenticatedFetch(
+    const response = await fetch(
       'https://api.ehb-match.me/auth/register/student',
       {
         method: 'POST',

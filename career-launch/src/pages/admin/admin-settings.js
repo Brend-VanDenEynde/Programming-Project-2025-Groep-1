@@ -135,6 +135,10 @@ export function showAdminSettingsPopup(onClose) {
         .admin-settings-popup-card {padding:8px 2vw;} 
         .admin-settings-title {font-size:1.19rem;} 
       }
+      body.darkmode, .darkmode .admin-settings-popup-card { 
+        background: #232846 !important; 
+        color: #f3f6fa; 
+      }
     `;
     document.head.appendChild(style);
   }
@@ -149,11 +153,26 @@ export function showAdminSettingsPopup(onClose) {
   modalRoot.className = 'admin-settings-modal-root';
   modalRoot.style.display = 'flex';
 
+  let dark = localStorage.getItem('darkmode') === 'true';
+  document.body.classList.toggle('darkmode', dark);
+
   modalRoot.innerHTML = `
     <div class="admin-settings-popup-card">
       <button class="admin-settings-popup-close" id="admin-settings-popup-close" title="Sluiten">&times;</button>
       <h2 class="admin-settings-title">Admin Instellingen</h2>
-      <div class="admin-settings-row"></div>
+      <div class="admin-settings-row">
+        <label class="admin-settings-label">Donkere modus</label>
+        <label style="display:flex;align-items:center;gap:16px;">
+          <span style="font-size:1.22em;">🌞</span>
+          <span class="admin-switch">
+            <input id="admin-toggle-darkmode" type="checkbox" ${
+              dark ? 'checked' : ''
+            }/>
+            <span class="admin-slider"></span>
+          </span>
+          <span style="font-size:1.22em;">🌙</span>
+        </label>
+      </div>
       <div class="admin-settings-btn-row">
         <button class="admin-settings-action-btn logout" id="admin-btn-logout">Log uit</button>
       </div>
@@ -173,6 +192,14 @@ export function showAdminSettingsPopup(onClose) {
       if (typeof onClose === 'function') onClose();
     }
   };
+
+  // Darkmode toggle
+  document
+    .getElementById('admin-toggle-darkmode')
+    .addEventListener('change', (e) => {
+      localStorage.setItem('darkmode', e.target.checked);
+      document.body.classList.toggle('darkmode', e.target.checked);
+    });
 
   // Logout functionality
   document

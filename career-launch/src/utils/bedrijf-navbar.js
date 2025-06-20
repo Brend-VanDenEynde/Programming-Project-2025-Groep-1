@@ -5,7 +5,7 @@ export function createBedrijfNavbar(activeRoute = '') {
   return `
     <div class="bedrijf-profile-container">
       <header class="bedrijf-profile-header">
-        <div class="logo-section" id="logo-navigation">
+        <div class="logo-section">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
@@ -81,18 +81,6 @@ export function setupBedrijfNavbarEvents() {
       });
     });
   });
-
-  // Logo navigation event listener
-  const logoSection = document.getElementById('logo-navigation');
-  if (logoSection) {
-    logoSection.addEventListener('click', () => {
-      import('../router.js').then((module) => {
-        const Router = module.default;
-        Router.navigate('/bedrijf/speeddates');
-      });
-    });
-  }
-
   // Burger menu functionality
   const burger = document.getElementById('burger-menu');
   const dropdown = document.getElementById('burger-dropdown');

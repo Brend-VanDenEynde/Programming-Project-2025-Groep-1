@@ -1,4 +1,4 @@
-import Router from "../router.js";
+import Router from '../router.js';
 
 export function renderPrivacy(rootElement) {
   rootElement.innerHTML = `
@@ -9,47 +9,87 @@ export function renderPrivacy(rootElement) {
           <h1>Privacy Policy</h1>
         </div>
           <div class="content">
-          <h2>Privacy Policy</h2>
+          <h2>Privacy Beleid - Career Launch 2025</h2>
+          <p class="intro">Bij Career Launch respecteren we je privacy. Deze policy legt uit welke gegevens we verzamelen, waarom we dat doen, en welke rechten je hebt. Simpel en transparant.</p>
           
-          <p class="intro">Voor alle informatie over hoe de Erasmushogeschool Brussel omgaat met je persoonlijke gegevens, verwijzen we je naar onze officiële privacy policy.</p>
-          
-          <!-- Officiële Privacy Policy Link -->
-          <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin: 2rem 0; text-align: center; border: 2px solid #e9ecef;">
-            <h3 style="margin-top: 0;">Privacy Policy</h3>
-            <p style="margin-bottom: 1rem;">Career Launch valt onder het privacy beleid van de EhB</p>
-            <a href="https://press.ehb.be/privacy-policy" target="_blank" style="display: inline-block; background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: 500;">
-              Bekijk Privacy Policy
-            </a>
-          </div>
-
-          <h3>Contact</h3>
-          <p>Voor vragen over privacy kun je contact opnemen met:</p>
+          <h3>🔍 Welke gegevens verzamelen we?</h3>
+          <p><strong>Account informatie:</strong></p>
           <ul>
-            <li><strong>E-mail:</strong> <a href="mailto:privacy@ehb.be">privacy@ehb.be</a></li>
-            <li><strong>Adres:</strong> Erasmushogeschool Brussel, Nijverheidskaai 170, 1070 Anderlecht</li>
+            <li>Naam en e-mailadres</li>
+            <li>Studierichting en graduatiejaar</li>
+            <li>Wachtwoord (versleuteld opgeslagen)</li>
           </ul>
-
           
+          <p><strong>Profiel informatie:</strong></p>
+          <ul>
+            <li>CV en portfolio documenten</li>
+            <li>Vaardigheden en competenties</li>
+            <li>Voorkeuren voor stages en jobs</li>
+            <li>Profielfoto (optioneel)</li>
+          </ul>
+          
+          <p><strong>Gebruik informatie:</strong></p>
+          <ul>
+            <li>Wanneer je inlogt en welke pagina's je bezoekt</li>
+            <li>Welke vacatures je bekijkt of waarop je solliciteert</li>
+          </ul>
+          
+          <h3>🎯 Waarom gebruiken we je gegevens?</h3>
+          <ul>
+            <li><strong>Matching:</strong> Je koppelen aan relevante stage- en jobmogelijkheden</li>
+            <li><strong>Communicatie:</strong> Je informeren over nieuwe kansen en updates</li>
+            <li><strong>Verbetering:</strong> Het platform beter maken op basis van gebruik</li>
+            <li><strong>Veiligheid:</strong> Je account en gegevens beschermen</li>
+          </ul>
+          
+          <h3>🤝 Delen we je gegevens?</h3>
+          <p><strong>Met werkgevers:</strong> Alleen je publieke profielinformatie, en alleen als je expliciet solliciteert of interest toont.</p>
+          <p><strong>Met anderen:</strong> Nooit. We verkopen of verhuren je gegevens niet aan derden.</p>
+          <p><strong>Bij overnames:</strong> Als Career Launch wordt overgenomen, informeren we je vooraf.</p>
+          
+          <h3>🔒 Hoe beschermen we je gegevens?</h3>
+          <ul>
+            <li>Versleutelde verbindingen (HTTPS)</li>
+            <li>Veilige servers binnen de EU</li>
+            <li>Beperkte toegang voor medewerkers</li>
+            <li>Regelmatige veiligheidsupdates</li>
+          </ul>
+          
+          <h3>⚡ Jouw rechten</h3>
+          <p>Je hebt altijd de controle over je gegevens:</p>
+          <ul>
+            <li><strong>Inzien:</strong> Vraag een overzicht van al je gegevens</li>
+            <li><strong>Corrigeren:</strong> Pas onjuiste informatie aan</li>
+            <li><strong>Verwijderen:</strong> Laat je account en gegevens volledig verwijderen</li>
+            <li><strong>Beperken:</strong> Tijdelijk stoppen met bepaalde verwerkingen</li>
+            <li><strong>Overdragen:</strong> Krijg je gegevens in een leesbaar formaat</li>
+            <li><strong>Bezwaar:</strong> Stop bepaalde verwerkingen van je gegevens</li>
+          </ul>
+          
+          <h3>🍪 Cookies</h3>
+          <p>We gebruiken alleen essentiële cookies om je ingelogd te houden en het platform te laten werken. Geen tracking, geen advertenties.</p>
+          
+          <h3>📅 Bewaarperiode</h3>
+          <p>We bewaren je gegevens zolang je account actief is. Na 2 jaar inactiviteit nemen we contact op. Wil je weg? Alles wordt binnen 30 dagen verwijderd.</p>
+          
+          <h3>📞 Vragen of klachten?</h3>
+          <p>Contact opnemen kan altijd:</p>
+          <ul>
+            <li><strong>E-mail:</strong> privacy@ehb.be</li>
+            <li><strong>Post:</strong> Erasmushogeschool Brussel, Nijverheidskaai 170, 1070 Anderlecht</li>
+          </ul>
+          <p>Niet tevreden? Je kunt ook een klacht indienen bij de <a href="https://www.gegevensbeschermingsautoriteit.be" target="_blank">Gegevensbeschermingsautoriteit</a>.</p>
+          
+          <p class="last-updated"><strong>Laatste update:</strong> 5 juni 2025</p>
         </div>
       </div>
-      
-      <!-- FOOTER -->
-      <footer class="student-profile-footer">
-        <a id="privacy-policy" href="/privacy">Privacy Policy</a> |
-        <a id="contacteer-ons" href="/contact">Contacteer Ons</a>
-      </footer>
-    </div>
-  `;
-  const backBtn = document.getElementById("back-button");
+    </div>  `;
+
+  // Back button - same technique as login and register pages
+  const backBtn = document.getElementById('back-button');
   if (backBtn) {
-    backBtn.addEventListener("click", () => {
-      // Check if there's history to go back to
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        // If no history, go to home page
-        Router.navigate('/');
-      }
+    backBtn.addEventListener('click', () => {
+      window.history.back();
     });
   }
 }

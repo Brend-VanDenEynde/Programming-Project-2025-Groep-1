@@ -1,6 +1,6 @@
 // Admin ingeschreven bedrijven pagina
 import Router from '../../router.js';
-import { authenticatedFetch, logoutUser } from '../../utils/auth-api.js';
+import { logoutUser } from '../../utils/auth-api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 
 export async function renderAdminIngeschrevenBedrijven(rootElement) {
@@ -26,13 +26,13 @@ export async function renderAdminIngeschrevenBedrijven(rootElement) {
         </div>
       </header>
       
-      <div class="admin-main-layout">        <aside class="admin-sidebar-clean">
+      <div class="admin-main-layout">
+        <aside class="admin-sidebar-clean">
           <nav class="admin-nav">
             <ul>
               <li><button class="nav-btn" data-route="/admin-dashboard/ingeschreven-studenten">Ingeschreven studenten</button></li>
               <li><button class="nav-btn active" data-route="/admin-dashboard/ingeschreven-bedrijven">Ingeschreven Bedrijven</button></li>
               <li><button class="nav-btn" data-route="/admin-dashboard/bedrijven-in-behandeling">Bedrijven in behandeling</button></li>
-              <li><button class="nav-btn" data-route="/admin-dashboard/contacten">Contacten</button></li>
             </ul>
           </nav>
         </aside>
@@ -107,7 +107,7 @@ export async function renderAdminIngeschrevenBedrijven(rootElement) {
   let allCompanies = []; // Store all companies for filtering
 
   try {
-    const response = await authenticatedFetch(
+    const response = await fetch(
       'https://api.ehb-match.me/bedrijven/goedgekeurd',
       {
         method: 'GET',
