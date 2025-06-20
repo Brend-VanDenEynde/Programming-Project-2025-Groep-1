@@ -3,7 +3,6 @@
  * This file contains functions for login, logout, and authentication management
  */
 
-
 // Global refresh lock (race-condition safe)
 let refreshPromise = null;
 
@@ -24,7 +23,6 @@ function getRefreshPromise() {
     });
   return refreshPromise;
 }
-
 
 /**
  * Calls the logout endpoint to log the user out
@@ -340,12 +338,23 @@ export async function updateBedrijfProfile(bedrijfID, updateData) {
       },
       body: JSON.stringify(updateData),
     });
-
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.message || `Failed to update company: ${response.status}`
-      );
+      let errorMessage = `Failed to update company: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+        console.error('API Error Details:', errorData);
+      } catch (e) {
+        // If response is not JSON, try to get text
+        try {
+          const errorText = await response.text();
+          errorMessage = errorText || errorMessage;
+          console.error('API Error Text:', errorText);
+        } catch (textError) {
+          console.error('Could not read error response:', textError);
+        }
+      }
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
@@ -366,7 +375,6 @@ export async function updateBedrijfProfile(bedrijfID, updateData) {
     };
   }
 }
-
 
 /**
  * Makes an authenticated API call with automatic token refresh on 401 errors
@@ -394,9 +402,17 @@ export async function authenticatedFetch(url, options = {}) {
     headers,
     ...options,
   };
-
   // Only add default Content-Type if not already present and body is a plain object (JSON)
   if (
+    !headers['Content-Type'] &&
+    !headers['content-type'] &&
+    requestOptions['body'] &&
+    typeof requestOptions['body'] === 'string' &&
+    requestOptions['method'] &&
+    ['POST', 'PUT', 'PATCH'].includes(requestOptions['method'].toUpperCase())
+  ) {
+    headers['Content-Type'] = 'application/json';
+  } else if (
     !headers['Content-Type'] &&
     !headers['content-type'] &&
     requestOptions['body'] &&

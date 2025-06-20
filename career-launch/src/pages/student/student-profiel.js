@@ -434,6 +434,9 @@ export function renderStudentProfiel(
               `https://api.ehb-match.me/user/${userID}`,
               {
                 method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({ email: nieuweEmail }),
               }
             );
@@ -498,30 +501,103 @@ export function renderStudentProfiel(
           console.log('Stuur profielfoto key:', profielFotoKey);
           // 3. Overige profielinfo via /studenten/{studentID} (JSON)
           const payload = {
-            voornaam: document.getElementById('firstNameInput').value,
-            achternaam: document.getElementById('lastNameInput').value,
+            voornaam: document.getElementById('firstNameInput').value.trim(),
+            achternaam: document.getElementById('lastNameInput').value.trim(),
             studiejaar: parseInt(
               document.getElementById('yearInput').value,
               10
             ),
             date_of_birth: document.getElementById('birthDateInput').value, // <-- correct!
-            linkedin: document.getElementById('linkedinInput').value,
+            linkedin: document.getElementById('linkedinInput').value.trim(),
             opleiding_id: parseInt(newOpleidingId, 10),
             profiel_foto: profielFotoKey,
           };
+
+          // Remove empty or null values
+          Object.keys(payload).forEach((key) => {
+            if (
+              payload[key] === null ||
+              payload[key] === undefined ||
+              payload[key] === ''
+            ) {
+              if (key === 'profiel_foto') {
+                // Keep profiel_foto even if null to maintain consistency
+                payload[key] = profielFotoKey || null;
+              } else if (key === 'linkedin') {
+                // LinkedIn can be empty
+                payload[key] = payload[key] || '';
+              } else if (key !== 'studiejaar' && key !== 'opleiding_id') {
+                // Don't remove numeric fields
+                delete payload[key];
+              }
+            }
+          });
+
           console.log('Payload met profielfoto key:', payload);
+
+          // Validate required fields
+          if (!payload.voornaam || !payload.achternaam) {
+            alert('Voor- en achternaam zijn verplicht.');
+            return;
+          }
+
+          if (!payload.date_of_birth) {
+            alert('Geboortedatum is verplicht.');
+            return;
+          }
+
+          if (
+            isNaN(payload.studiejaar) ||
+            payload.studiejaar < 1 ||
+            payload.studiejaar > 5
+          ) {
+            alert('Selecteer een geldig studiejaar (1-5).');
+            return;
+          }
+          if (isNaN(payload.opleiding_id) || payload.opleiding_id <= 0) {
+            alert('Selecteer een geldige opleiding.');
+            return;
+          }
+
+          console.log(
+            'Sending payload to API:',
+            JSON.stringify(payload, null, 2)
+          );
+          console.log(
+            'API endpoint:',
+            `https://api.ehb-match.me/studenten/${studentID}`
+          );
           const respStudent = await authenticatedFetch(
             `https://api.ehb-match.me/studenten/${studentID}`,
             {
               method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
               body: JSON.stringify(payload),
             }
           );
-
           if (!respStudent.ok) {
             const errText = await respStudent.text();
             console.error('Backend response (student):', errText);
-            throw new Error('Profiel bijwerken mislukt: ' + errText);
+            console.error('Response status:', respStudent.status);
+            console.error(
+              'Response headers:',
+              Object.fromEntries(respStudent.headers.entries())
+            );
+
+            // Try to parse JSON error if possible
+            let errorMessage = 'Profiel bijwerken mislukt';
+            try {
+              const errorData = JSON.parse(errText);
+              errorMessage =
+                errorData.message || errorData.error || errorMessage;
+            } catch (e) {
+              // If not JSON, use the raw text
+              errorMessage = errText || errorMessage;
+            }
+
+            throw new Error(errorMessage);
           }
           const result = await respStudent.json();
           // Backend geeft { message, student } terug
