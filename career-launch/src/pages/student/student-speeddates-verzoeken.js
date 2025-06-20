@@ -1,6 +1,8 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
+import { showBedrijfInfoPopup } from './bedrijven.js';
+import { formatTijdslotStudent } from './student-speeddates.js';
 
 let pendingDeleteAfspraakId = null; // Gebruik één globale state, identiek aan bedrijven
 
@@ -230,12 +232,12 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
                 <div class="student-info">
                   <img src="${getBedrijfFotoUrl(v.profiel_foto_bedrijf)}" alt="${v.naam_bedrijf}" class="profiel-foto bedrijf-foto" onerror="this.src='/images/default.png'" />
                   <div class="student-details">
-                    <h4>${v.naam_bedrijf}</h4>
+                    <h4 class="bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(v)}' style="cursor:pointer;text-decoration:none;">${v.naam_bedrijf}</h4>
                   </div>
                 </div>
                 <div class="afspraak-details">
                   <div class="tijd-lokaal">
-                    <p class="tijdslot"><strong>Tijd:</strong> ${formatTime(v.begin)}</p>
+                    <p class="tijdslot">${v.begin ? formatTijdslotStudent(v.begin, v.einde) : '-'}</p>
                     <p class="lokaal"><strong>Lokaal:</strong> ${v.lokaal || '-'} </p>
                   </div>
                 </div>
@@ -251,6 +253,15 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
         </div>
       </div>
     `;
+    // Bind popup triggers after rendering
+    setTimeout(() => {
+      document.querySelectorAll('.bedrijf-popup-trigger').forEach((el) => {
+        el.addEventListener('click', async () => {
+          const data = JSON.parse(el.getAttribute('data-bedrijf'));
+          await showBedrijfInfoPopup(data);
+        });
+      });
+    }, 0);
   }
 
   function handleSpeeddatesTableClick(e) {
@@ -476,3 +487,17 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
 
 // Debug/test utility voor modal direct testen
 window.showTestModal = () => showDeleteModal(123, () => alert('Success!'));
+// Vervang in addBedrijfPopupListeners of soortgelijke plek:
+// document.querySelectorAll('.bedrijf-popup-trigger').forEach((el) => {
+//   el.addEventListener('click', async () => {
+//     const data = JSON.parse(el.dataset.bedrijf);
+//     await createBedrijfPopup(data);
+//   });
+// });
+// Door:
+document.querySelectorAll('.bedrijf-popup-trigger').forEach((el) => {
+  el.addEventListener('click', async () => {
+    const data = JSON.parse(el.dataset.bedrijf);
+    await showBedrijfInfoPopup(data);
+  });
+});

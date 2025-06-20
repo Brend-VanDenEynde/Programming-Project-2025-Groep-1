@@ -450,6 +450,13 @@ async function showBedrijfPopup(bedrijf, studentId) {
   // Speeddate aanvraag knop (API-call)
   aanvraagBtn.onclick = async () => {
     const status = document.getElementById('speeddates-aanvraag-status');
+    // Disable all popup controls immediately when request is sent
+    const popupControls = Array.from(popup.querySelectorAll('button, input, select'));
+    popupControls.forEach((el) => {
+      el.disabled = true;
+      el.style.pointerEvents = 'none';
+      el.style.opacity = '0.7';
+    });
     aanvraagBtn.disabled = true;
     slotsList.disabled = true;
     status.textContent = 'Aanvraag wordt verstuurd...';
@@ -474,6 +481,12 @@ async function showBedrijfPopup(bedrijf, studentId) {
       status.textContent =
         'Je hebt al een speeddate op dit tijdstip! Kies een ander slot.';
       status.style.color = '#da2727';
+      // Re-enable controls if booking is invalid
+      popupControls.forEach((el) => {
+        el.disabled = false;
+        el.style.pointerEvents = '';
+        el.style.opacity = '';
+      });
       aanvraagBtn.disabled = false;
       slotsList.disabled = false;
       return;
@@ -498,17 +511,19 @@ async function showBedrijfPopup(bedrijf, studentId) {
         }
       );
       if (req.status === 201) {
+        // Highlight het gekozen tijdslot direct lichtgeel
+        if (gekozenDatum) {
+          const slotBtn = slotsList.querySelector(`.slot-btn[data-slot="${gekozenDatum}"]`);
+          if (slotBtn) {
+            slotBtn.style.background = '#fff9d1';
+            slotBtn.style.borderColor = '#ffe9a0';
+            slotBtn.style.opacity = '1';
+          }
+        }
         status.textContent = `✅ Speeddate succesvol aangevraagd voor ${tijd}!`;
         status.style.color = '#2aa97b';
         aanvraagBtn.disabled = true;
-        // Alles in de popup on-click uitzetten (read-only)
-        Array.from(popup.querySelectorAll('button, input, select')).forEach(
-          (el) => {
-            el.disabled = true;
-            el.style.pointerEvents = 'none';
-            el.style.opacity = '0.7';
-          }
-        );
+        // Alles in de popup blijft disabled
         setTimeout(() => {
           const popupEl = document.getElementById('bedrijf-popup-modal');
           if (popupEl) popupEl.remove();
@@ -517,16 +532,148 @@ async function showBedrijfPopup(bedrijf, studentId) {
         const err = await req.json();
         status.textContent = err.message || 'Er ging iets mis!';
         status.style.color = '#da2727';
+        // Re-enable controls if request fails
+        popupControls.forEach((el) => {
+          el.disabled = false;
+          el.style.pointerEvents = '';
+          el.style.opacity = '';
+        });
         aanvraagBtn.disabled = false;
         slotsList.disabled = false;
       }
     } catch (e) {
       status.textContent = 'Er ging iets mis bij het verzenden!';
       status.style.color = '#da2727';
+      // Re-enable controls if request fails
+      popupControls.forEach((el) => {
+        el.disabled = false;
+        el.style.pointerEvents = '';
+        el.style.opacity = '';
+      });
       aanvraagBtn.disabled = false;
       slotsList.disabled = false;
     }
   };
+}
+
+// Toon bedrijfsinfo popup zonder timetable/speeddate aanvraag
+export async function showBedrijfInfoPopup(bedrijf) {
+  // Remove any existing popup
+  const existing = document.getElementById('bedrijf-popup-modal');
+  if (existing) existing.remove();
+
+  // Haal altijd de meest actuele bedrijfsinfo op via API
+  let bedrijfId = bedrijf.gebruiker_id || bedrijf.id_bedrijf;
+  let bedrijfData = { ...bedrijf };
+  if (bedrijfId) {
+    try {
+      const resp = await authenticatedFetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}`);
+      if (resp.ok) {
+        const apiData = await resp.json();
+        bedrijfData = { ...bedrijfData, ...apiData };
+      }
+    } catch {}
+  }
+
+  // Haal functies en skills op
+  let functies = [];
+  let skills = [];
+  try {
+    const functiesResp = await authenticatedFetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`
+    );
+    if (functiesResp.ok) functies = await functiesResp.json();
+  } catch {}
+  try {
+    const skillsResp = await authenticatedFetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`
+    );
+    if (skillsResp.ok) skills = await skillsResp.json();
+  } catch {}
+
+  // Haal student skills/functies uit API (altijd up-to-date)
+  let userSkills = [], userFuncties = [];
+  try {
+    // Probeer studentId te bepalen
+    let studentId = null;
+    const studentData = JSON.parse(sessionStorage.getItem('studentData') || sessionStorage.getItem('user') || '{}');
+    studentId = studentData.id || studentData.gebruiker_id;
+    if (studentId) {
+      // Haal functies van student op
+      const functiesResp = await authenticatedFetch(`https://api.ehb-match.me/studenten/${studentId}/functies`);
+      if (functiesResp.ok) {
+        const functiesArr = await functiesResp.json();
+        userFuncties = Array.isArray(functiesArr) ? functiesArr.map(f => (typeof f === 'string' ? f : f.naam)).filter(Boolean).map(f => f.toLowerCase()) : [];
+      }
+      // Haal skills van student op
+      const skillsResp = await authenticatedFetch(`https://api.ehb-match.me/studenten/${studentId}/skills`);
+      if (skillsResp.ok) {
+        const skillsArr = await skillsResp.json();
+        userSkills = Array.isArray(skillsArr) ? skillsArr.map(s => (typeof s === 'string' ? s : s.naam)).filter(Boolean).map(s => s.toLowerCase()) : [];
+      }
+    }
+  } catch {}
+
+  // Vul ontbrekende velden aan met fallback keys uit bedrijfData
+  const naam = bedrijfData.naam || bedrijfData.naam_bedrijf || '';
+  const locatie = bedrijfData.locatie || bedrijfData.plaats || '';
+  const werkdomein = bedrijfData.werkdomein || bedrijfData.sector_bedrijf || '';
+  const linkedin = bedrijfData.linkedin || '';
+  const contact_email = bedrijfData.contact_email || bedrijfData.email || '';
+
+  // Toon alleen locatie, werkdomein, linkedin, email als ze niet leeg zijn
+  const locatieHtml = locatie ? `<div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${locatie}</div>` : '';
+  const werkdomeinHtml = werkdomein ? `<div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${werkdomein}</div>` : '';
+  const linkedinHtml = linkedin ? `<a href="${linkedin}" target="_blank" style="color:#0077b5;margin-bottom:1rem;">LinkedIn</a>` : '';
+  const emailHtml = contact_email ? `<div style="font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;"><a href="mailto:${contact_email}" style="color:#444;">${contact_email}</a></div>` : '';
+
+  const profielFoto = bedrijfData.foto || bedrijfData.profiel_foto_bedrijf || bedrijfData.profiel_foto_url || 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
+  const popup = document.createElement('div');
+  popup.id = 'bedrijf-popup-modal';
+  popup.style.position = 'fixed';
+  popup.style.top = '0';
+  popup.style.left = '0';
+  popup.style.width = '100vw';
+  popup.style.height = '100vh';
+  popup.style.background = 'rgba(0,0,0,0.5)';
+  popup.style.display = 'flex';
+  popup.style.alignItems = 'center';
+  popup.style.justifyContent = 'center';
+  popup.style.zIndex = '2000';
+  popup.innerHTML = `
+    <div id="bedrijf-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:600px;width:98vw;min-width:340px;position:relative;display:flex;flex-direction:column;align-items:center;">
+      <button id="bedrijf-popup-close" style="position:absolute;top:10px;right:14px;font-size:1.7rem;background:none;border:none;cursor:pointer;color:#888;">&times;</button>
+      <img src="${profielFoto}" alt="Logo ${naam}" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'">
+      <h2 style="margin-bottom:0.5rem;text-align:center;">${naam}</h2>
+      ${locatieHtml}
+      ${werkdomeinHtml}
+      ${linkedinHtml}
+      ${emailHtml}
+      <div style="margin-bottom:0.7rem;width:100%;display:flex;flex-direction:row;gap:1.5rem;justify-content:center;">
+        <div style="text-align:left;">
+          <strong>Functies:</strong>
+          <div style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;">
+            ${Array.isArray(functies) && functies.length ? functies.map(f => {
+              const isMatch = userFuncties.includes((f.naam||'').toLowerCase());
+              return `<span class='functie-badge' style='display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${isMatch ? '#e3f2fd' : '#f5f5f5'};color:${isMatch ? '#1565c0' : '#222'};font-size:0.97em;'>${f.naam}</span>`;
+            }).join(' ') : '<span style="color:#aaa;">Geen functies bekend</span>'}
+          </div>
+        </div>
+        <div style="text-align:left;">
+          <strong>Skills/talen:</strong>
+          <div style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;">
+            ${Array.isArray(skills) && skills.length ? skills.map(s => {
+              const isMatch = userSkills.includes((s.naam||'').toLowerCase());
+              return `<span class='skill-badge' style='display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${isMatch ? '#e3f2fd' : '#f5f5f5'};color:${isMatch ? '#1565c0' : '#222'};font-size:0.97em;'>${s.naam}</span>`;
+            }).join(' ') : '<span style=\"color:#aaa;\">Geen skills/talen bekend</span>'}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(popup);
+  document.getElementById('bedrijf-popup-close').onclick = () => popup.remove();
+  popup.addEventListener('click', (e) => { if (e.target === popup) popup.remove(); });
 }
 
 // Haal alle skills op uit de algemene skills API
@@ -773,7 +920,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
   align-items: stretch;
   gap: 1.1rem;
   background: #f8fafc;
-  padding: 0.7rem 1.2rem 0.7rem 1.2rem;
+  padding: 19.2px 1.2rem 19.2px 1.2rem;
   border-radius: 14px;
   margin-bottom: 2.2rem;
   box-shadow: 0 2px 8px #0001;
@@ -814,6 +961,10 @@ export async function renderBedrijven(rootElement, studentData = {}) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: background 0.18s, border 0.18s, box-shadow 0.18s, color 0.18s, transform 0.12s;
+}
+.bedrijven-filterbar-flex input[type="text"] {
+  cursor: text;
 }
 .bedrijven-filterbar-flex button:not(#filter-favorieten-btn) {
   display: flex;
@@ -830,7 +981,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
   font-weight: 600;
   min-width: 150px;
   max-width: 100%;
-  transition: background 0.2s, border 0.2s;
+  transition: background 0.2s, border 0.2s, box-shadow 0.18s, color 0.18s, transform 0.12s;
   box-shadow: 0 1px 4px #0001;
   white-space: nowrap;
   overflow: hidden;
@@ -842,9 +993,36 @@ export async function renderBedrijven(rootElement, studentData = {}) {
   line-height: 1.1;
   padding: 0.6rem 0.9rem;
 }
-#sort-percentage-btn:hover, .bedrijven-filterbar-flex .sort-group button:hover {
+#sort-percentage-btn:hover, .bedrijven-filterbar-flex .sort-group button:hover,
+.bedrijven-filterbar-flex button:not(#filter-favorieten-btn):hover {
   background: #e1e5e9;
   border-color: #b7b7ff;
+  color: #1a237e;
+  box-shadow: 0 2px 8px #b7b7ff33;
+}
+#sort-percentage-btn:active, .bedrijven-filterbar-flex .sort-group button:active,
+.bedrijven-filterbar-flex button:not(#filter-favorieten-btn):active {
+  background: #dde3f7;
+  border-color: #4e7bfa;
+  color: #0d47a1;
+  box-shadow: 0 1px 2px #4e7bfa33;
+  transform: scale(0.97);
+}
+.bedrijven-filterbar-flex input[type="text"]:hover {
+  border-color: #b7b7ff;
+  background: #f5f7fa;
+  box-shadow: 0 2px 8px #b7b7ff22;
+}
+.bedrijven-filterbar-flex input[type="text"]:focus {
+  border-color: #4e7bfa;
+  background: #fff;
+  box-shadow: 0 2px 8px #4e7bfa33;
+  outline: none;
+}
+.bedrijven-filterbar-flex input[type="text"]:active {
+  border-color: #4e7bfa;
+  background: #eef1fa;
+  box-shadow: 0 1px 2px #4e7bfa22;
 }
 #filter-favorieten-btn {
   position: absolute;
@@ -855,13 +1033,22 @@ export async function renderBedrijven(rootElement, studentData = {}) {
   border: none;
   cursor: pointer;
   z-index: 5;
-  transition: transform 0.3s;
+  transition: transform 0.3s, color 0.18s;
   min-width: 0;
   min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   box-sizing: content-box;
+  color: #b7b7ff;
+}
+#filter-favorieten-btn:hover {
+  color: #4e7bfa;
+  transform: scale(1.13);
+}
+#filter-favorieten-btn:active {
+  color: #1a237e;
+  transform: scale(0.97);
 }
 #filter-favorieten-btn.animating {
   transform: scale(1.3);
@@ -884,46 +1071,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
 .popup-favorite-btn.animating {
   transform: scale(1.3);
 }
-@media (max-width: 1100px) {
-  .bedrijven-filterbar-flex {
-    flex-wrap: wrap;
-  }
-  .bedrijven-filterbar-flex .filter-group,
-  .bedrijven-filterbar-flex .zoek-group,
-  .bedrijven-filterbar-flex .sort-group,
-  .bedrijven-filterbar-flex .reset-group {
-    flex: 1 1 100%;
-    min-width: 0;
-    max-width: 100%;
-  }
-}
-@media (max-width: 900px) {
-  #filter-favorieten-btn {
-    top: 8px;
-    left: 10px;
-  }
-}
-@media (max-width: 700px) {
-  .bedrijven-filterbar-flex {
-    flex-direction: column;
-    align-items: stretch;
-    flex-wrap: wrap;
-    gap: 0.7rem 0;
-    min-width: 0;
-  }
-  .bedrijven-filterbar-flex .filter-group,
-  .bedrijven-filterbar-flex .zoek-group,
-  .bedrijven-filterbar-flex .sort-group,
-  .bedrijven-filterbar-flex .reset-group {
-    flex: 1 1 100%;
-    min-width: 0;
-    max-width: 100%;
-  }
-  #filter-favorieten-btn {
-    top: 8px;
-    left: 10px;
-  }
-}
+/* GEEN media queries die left:10px zetten, zodat de button altijd rechtsboven blijft */
 `;
     document.head.appendChild(style);
     // Custom filter UI rendering
@@ -984,7 +1132,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       const sortDiv = document.getElementById('sort-group');
       sortDiv.innerHTML = `
         <label for="sort-percentage-btn">&nbsp;</label>
-        <button id="sort-percentage-btn" type="button" style="padding:0.6rem 0.9rem;border-radius:8px;border:1.5px solid #e1e5e9;background:#f5f5f5;cursor:pointer;min-width:150px;max-width:100%;font-size:clamp(0.85rem,1.1vw,1.05rem);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;justify-content:center;font-weight:600;box-shadow:0 1px 4px #0001;transition:background 0.2s, border 0.2s;">
+        <button id="sort-percentage-btn" type="button">
           Matchpercentage ${sortPercentageAsc ? '▲' : '▼'}
         </button>
       `;
@@ -1080,6 +1228,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
           <div class="student-profile-form-container" style="padding:2.5rem 2.2rem 2.2rem 2.2rem; border-radius:18px; background:#fff; box-shadow:0 4px 24px #0001; max-width:1200px; margin:auto;">
             <h1 class="student-profile-title" style="margin: 0 0 1.4rem 0;">Bedrijven</h1>
             <div id="bedrijven-filterbar" class="bedrijven-filterbar-flex">
+              <button id="filter-favorieten-btn" title="Toon alleen favorieten" class="">🤍</button>
               <div class="zoek-group">
                 <label for="bedrijf-zoek">Zoeken</label>
                 <input id="bedrijf-zoek" type="text" placeholder="Zoek bedrijf of locatie...">
@@ -1093,7 +1242,6 @@ export async function renderBedrijven(rootElement, studentData = {}) {
                 <label for="reset-filters">&nbsp;</label>
                 <button id="reset-filters" title="Reset filters">Reset filters</button>
               </div>
-              <button id="filter-favorieten-btn" title="Toon alleen favorieten" class="" style="padding-bottom:20px;">🤍</button>
             </div>
             <div style="height:24px;width:100%;padding-bottom:40px"></div>
             <div style="height:1px;width:100%;background:#e1e5e9;margin-bottom:2.2rem;"></div>
@@ -1258,6 +1406,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         huidigeSkills = [];
         huidigeDomeinen = [];
         huidigeFuncties = [];
+        sortPercentageAsc = true;
         document.getElementById('bedrijf-zoek').value = '';
         renderFilterOptions();
         setupEventListeners();

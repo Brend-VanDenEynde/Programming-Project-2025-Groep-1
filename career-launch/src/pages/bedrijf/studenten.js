@@ -473,6 +473,13 @@ async function showStudentPopup(student) {
 
   aanvraagBtn.addEventListener('click', async () => {
     if (!gekozenTijd) return;
+    // Disable all popup controls immediately when request is sent
+    const popupControls = Array.from(popup.querySelectorAll('button, input, select'));
+    popupControls.forEach((el) => {
+      el.disabled = true;
+      el.style.pointerEvents = 'none';
+      el.style.opacity = '0.7';
+    });
     const datetime = `${speeddateDate} ${gekozenTijd}:00`;
     try {
       aanvraagBtn.disabled = true;
@@ -481,12 +488,27 @@ async function showStudentPopup(student) {
       statusDiv.style.color = '#666';
       statusDiv.textContent = 'Speeddate aanvraag wordt verstuurd...';
       const response = await createSpeeddate(student.gebruiker_id, currentBedrijfId, datetime);
+      // Highlight het gekozen tijdslot direct lichtgeel
+      if (gekozenTijd) {
+        const slotBtn = slotsList.querySelector(`.slot-btn[data-slot="${gekozenTijd}"]`);
+        if (slotBtn) {
+          slotBtn.style.background = '#fff9d1';
+          slotBtn.style.borderColor = '#ffe9a0';
+          slotBtn.style.opacity = '1';
+        }
+      }
       statusDiv.style.color = '#28a745';
       statusDiv.textContent = `Speeddate aanvraag succesvol verstuurd naar ${fullName}!`;
       setTimeout(() => { popup.remove(); }, 2000);
     } catch (error) {
       statusDiv.style.color = '#dc3545';
       statusDiv.textContent = 'Er is een fout opgetreden bij het aanvragen van de speeddate. Probeer het opnieuw.';
+      // Re-enable controls if request fails
+      popupControls.forEach((el) => {
+        el.disabled = false;
+        el.style.pointerEvents = '';
+        el.style.opacity = '';
+      });
       aanvraagBtn.disabled = false;
       aanvraagBtn.textContent = 'Confirmeer aanvraag';
     }
@@ -790,6 +812,11 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: background 0.18s, border 0.18s, box-shadow 0.18s, color 0.18s, transform 0.12s;
+}
+.bedrijven-filterbar-flex input[type="text"],
+.studenten-filterbar-flex input[type="text"] {
+  cursor: text;
 }
 .bedrijven-filterbar-flex button:not(#filter-favorieten-btn),
 .studenten-filterbar-flex button:not(#filter-favorieten-btn) {
@@ -805,17 +832,55 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
   border: 1.5px solid #e1e5e9;
   color: #222;
   font-weight: 600;
-  min-width: 120px;
+  min-width: 150px;
   max-width: 100%;
-  transition: background 0.2s, border 0.2s;
+  transition: background 0.2s, border 0.2s, box-shadow 0.18s, color 0.18s, transform 0.12s;
   box-shadow: 0 1px 4px #0001;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(0.85rem, 1.1vw, 1.05rem);
+  line-height: 1.1;
+  padding: 0.6rem 0.9rem;
 }
-#sort-percentage-btn:hover, .bedrijven-filterbar-flex .sort-group button:hover, .studenten-filterbar-flex .sort-group button:hover {
+#sort-percentage-btn:hover, .bedrijven-filterbar-flex .sort-group button:hover, .studenten-filterbar-flex .sort-group button:hover,
+.bedrijven-filterbar-flex button:not(#filter-favorieten-btn):hover,
+.studenten-filterbar-flex button:not(#filter-favorieten-btn):hover {
   background: #e1e5e9;
   border-color: #b7b7ff;
+  color: #1a237e;
+  box-shadow: 0 2px 8px #b7b7ff33;
+}
+#sort-percentage-btn:active, .bedrijven-filterbar-flex .sort-group button:active, .studenten-filterbar-flex .sort-group button:active,
+.bedrijven-filterbar-flex button:not(#filter-favorieten-btn):active,
+.studenten-filterbar-flex button:not(#filter-favorieten-btn):active {
+  background: #dde3f7;
+  border-color: #4e7bfa;
+  color: #0d47a1;
+  box-shadow: 0 1px 2px #4e7bfa33;
+  transform: scale(0.97);
+}
+.bedrijven-filterbar-flex input[type="text"]:hover,
+.studenten-filterbar-flex input[type="text"]:hover {
+  border-color: #b7b7ff;
+  background: #f5f7fa;
+  box-shadow: 0 2px 8px #b7b7ff22;
+}
+.bedrijven-filterbar-flex input[type="text"]:focus,
+.studenten-filterbar-flex input[type="text"]:focus {
+  border-color: #4e7bfa;
+  background: #fff;
+  box-shadow: 0 2px 8px #4e7bfa33;
+  outline: none;
+}
+.bedrijven-filterbar-flex input[type="text"]:active,
+.studenten-filterbar-flex input[type="text"]:active {
+  border-color: #4e7bfa;
+  background: #eef1fa;
+  box-shadow: 0 1px 2px #4e7bfa22;
 }
 #filter-favorieten-btn {
   position: absolute;
@@ -826,13 +891,22 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
   border: none;
   cursor: pointer;
   z-index: 5;
-  transition: transform 0.3s;
+  transition: transform 0.3s, color 0.18s;
   min-width: 0;
   min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   box-sizing: content-box;
+  color: #b7b7ff;
+}
+#filter-favorieten-btn:hover {
+  color: #4e7bfa;
+  transform: scale(1.13);
+}
+#filter-favorieten-btn:active {
+  color: #1a237e;
+  transform: scale(0.97);
 }
 #filter-favorieten-btn.animating {
   transform: scale(1.3);
@@ -1035,7 +1109,7 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
     if (sortDiv) {
       sortDiv.innerHTML = `
         <label for="sort-percentage-btn">&nbsp;</label>
-        <button id="sort-percentage-btn" type="button" style="padding:0.6rem 0.9rem;border-radius:8px;border:1.5px solid #e1e5e9;background:#f5f5f5;cursor:pointer;min-width:150px;max-width:100%;font-size:clamp(0.85rem,1.1vw,1.05rem);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;justify-content:center;font-weight:600;box-shadow:0 1px 4px #0001;transition:background 0.2s, border 0.2s;">
+        <button id="sort-percentage-btn" type="button">
           Matchpercentage ${sortPercentageAsc ? '▲' : '▼'}
         </button>
       `;
@@ -1048,7 +1122,34 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
         };
       }
     }
-    setupFilterbarEvents();
+    // Reset button
+    const resetBtn = document.getElementById('reset-filters');
+    if (resetBtn) {
+      resetBtn.className = '';
+      resetBtn.style.padding = '';
+      resetBtn.style.background = '';
+      resetBtn.style.color = '';
+      resetBtn.style.border = '';
+      resetBtn.style.borderRadius = '';
+      resetBtn.style.cursor = '';
+      resetBtn.style.fontWeight = '';
+      resetBtn.style.minHeight = '';
+      resetBtn.style.minWidth = '';
+      resetBtn.style.fontSize = '';
+      resetBtn.style.boxShadow = '';
+      resetBtn.style.transition = '';
+      resetBtn.onclick = () => {
+        huidigeZoek = '';
+        huidigeSkills = [];
+        huidigeOpleidingen = [];
+        huidigeStudiejaren = [];
+        huidigeFuncties = [];
+        sortPercentageAsc = false;
+        document.getElementById('student-zoek').value = '';
+        renderFilterOptions();
+        rerenderStudentenList();
+      };
+    }
   }
 
   // --- FILTERBAR EVENTS ---
@@ -1075,7 +1176,7 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
     // Reset button
     const resetBtn = document.getElementById('reset-filters');
     if (resetBtn) {
-      resetBtn.addEventListener('click', () => {
+      resetBtn.onclick = () => {
         huidigeZoek = '';
         huidigeSkills = [];
         huidigeOpleidingen = [];
@@ -1085,7 +1186,7 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
         document.getElementById('student-zoek').value = '';
         renderFilterOptions();
         rerenderStudentenList();
-      });
+      };
     }
   }
 
@@ -1145,7 +1246,19 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
   // --- In je renderStudenten functie, na het renderen van de filterbar ---
   renderFilterOptions();
 
-  // --- Sidebar navigatie en hamburger menu identiek aan search criteria bedrijf ---
+  // --- FILTERBAR EVENTS: favorieten button ---
+  const favorietenBtn = document.getElementById('filter-favorieten-btn');
+  if (favorietenBtn) {
+    favorietenBtn.addEventListener('click', () => {
+      toonAlleFavorieten = !toonAlleFavorieten;
+      favorietenBtn.innerHTML = toonAlleFavorieten ? '❤️' : '🤍';
+      favorietenBtn.classList.add('animating');
+      rerenderStudentenList();
+      setTimeout(() => favorietenBtn.classList.remove('animating'), 400);
+    });
+  }
+
+  // --- SIDEBAR EN MENU NAVIGATIE (IDENTIEK AAN BEDRIJVEN.JS) ---
   function setupSidebarAndMenuNavigation() {
     // Sidebar links
     document.querySelectorAll('.sidebar-link').forEach((btn) => {

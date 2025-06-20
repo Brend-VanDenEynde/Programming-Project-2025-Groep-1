@@ -7,6 +7,7 @@ import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './student-settings.js';
 import { fetchStudentSpeeddates } from '../../utils/data-api.js';
 import { authenticatedFetch } from '../../utils/auth-api.js';
+import { showBedrijfInfoPopup } from './bedrijven.js';
 
 // Nieuw: API fetch
 async function fetchSpeeddates(rootElement) {
@@ -108,7 +109,8 @@ function formatUTCTime(isoString) {
   return `${hh}:${mm}`;
 }
 
-function formatTijdslotStudent(beginISO, eindeISO) {
+// Exporteer de tijdslot-functie zodat deze bruikbaar is in andere modules
+export function formatTijdslotStudent(beginISO, eindeISO) {
   const begin = new Date(beginISO);
   const einde = new Date(eindeISO);
   // Dag en datum
@@ -280,7 +282,9 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     document.querySelectorAll('.bedrijf-popup-trigger').forEach((el) => {
       el.addEventListener('click', async () => {
         const data = JSON.parse(el.dataset.bedrijf);
-        await createBedrijfPopup(data);
+        // Zorg dat we altijd een bedrijf-id of gebruiker_id meegeven
+        if (!data.gebruiker_id && data.id_bedrijf) data.gebruiker_id = data.id_bedrijf;
+        await showBedrijfInfoPopup(data);
       });
     });
   }
