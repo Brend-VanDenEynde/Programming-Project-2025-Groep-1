@@ -1,6 +1,7 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { authenticatedFetch } from '../../utils/auth-api.js';
 import Router from '../../router.js';
+import { showStudentInfoPopup } from './studenten.js';
 
 // Functie om speeddate data op te halen van de API
 async function fetchSpeeddateData(bedrijfId, token) {
@@ -107,10 +108,12 @@ function renderSpeeddatesList(speeddates) {
                   afspraak.student.profielfoto || '/images/default.png'
                 }" 
                      alt="${afspraak.student.naam}" 
-                     class="profiel-foto student-foto"
+                     class="profiel-foto student-foto student-popup-trigger"
+                     data-student='${JSON.stringify(afspraak.student)}'
+                     style="cursor:pointer;"
                      onerror="this.src='/images/default.png'" />
                 <div class="student-details">
-                  <h4>${afspraak.student.naam}</h4>
+                  <h4 class="student-popup-trigger" data-student='${JSON.stringify(afspraak.student)}' style="cursor:pointer;text-decoration:none;">${afspraak.student.naam}</h4>
                 </div>
               </div>
               <div class="afspraak-details" style="display:flex;flex-direction:row;align-items:center;gap:24px;">
@@ -205,6 +208,7 @@ async function loadSpeeddateData() {
     // Render de speeddate lijst
     contentDiv.innerHTML = renderSpeeddatesList(speeddates);
     initSpeeddatesFilter();
+    bindStudentPopupTriggers();
   } catch (error) {
     console.error('Fout bij laden van speeddate data:', error);
     contentDiv.innerHTML =
@@ -233,6 +237,41 @@ function initSpeeddatesFilter() {
       });
     });
   });
+}
+
+// Voeg event binding toe voor student popup trigger in de speeddate lijst
+function bindStudentPopupTriggers() {
+  setTimeout(() => {
+    document.querySelectorAll('.student-popup-trigger').forEach((el) => {
+      el.addEventListener('click', async () => {
+        // Haal altijd de meest actuele bedrijf skills/functies op vóór popup
+        try {
+          const companyDataString = window.sessionStorage.getItem('companyData');
+          let bedrijfId;
+          if (companyDataString) {
+            const companyData = JSON.parse(companyDataString);
+            bedrijfId = companyData.id;
+          }
+          if (!bedrijfId) return;
+          // Fetch actuele skills en functies
+          const [skillsResp, functiesResp] = await Promise.all([
+            authenticatedFetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`).then(r => r.ok ? r.json() : []),
+            authenticatedFetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`).then(r => r.ok ? r.json() : [])
+          ]);
+          // Zet in sessionStorage zodat popup altijd up-to-date vergelijkt
+          const nieuweCompanyData = {
+            ...(JSON.parse(window.sessionStorage.getItem('companyData') || '{}')),
+            skills: skillsResp.map(s => s.naam),
+            functies: functiesResp.map(f => f.naam)
+          };
+          window.sessionStorage.setItem('companyData', JSON.stringify(nieuweCompanyData));
+          window.sessionStorage.setItem('bedrijfData', JSON.stringify(nieuweCompanyData)); // <-- fix: ook onder bedrijfData opslaan
+        } catch (e) { console.error('Kon bedrijf skills/functies niet verversen:', e); }
+        const student = JSON.parse(el.getAttribute('data-student'));
+        await showStudentInfoPopup(student);
+      });
+    });
+  }, 0);
 }
 
 export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {

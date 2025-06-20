@@ -515,6 +515,112 @@ async function showStudentPopup(student) {
   });
 }
 
+// Toon studentinfo popup met actuele info en matching skills/functies
+export async function showStudentInfoPopup(student) {
+  // Remove any existing popup
+  const existing = document.getElementById('student-popup-modal');
+  if (existing) existing.remove();
+
+  // Haal altijd de meest actuele studentinfo op via API
+  let studentId = student.gebruiker_id || student.id_student || student.id;
+  let studentData = { ...student };
+  if (studentId) {
+    try {
+      const resp = await authenticatedFetch(`https://api.ehb-match.me/studenten/${studentId}`);
+      if (resp.ok) {
+        const apiData = await resp.json();
+        studentData = { ...studentData, ...apiData };
+      }
+    } catch {}
+  }
+
+  // Haal functies en skills op
+  let functies = [];
+  let skills = [];
+  try {
+    const functiesResp = await authenticatedFetch(
+      `https://api.ehb-match.me/studenten/${studentId}/functies`
+    );
+    if (functiesResp.ok) functies = await functiesResp.json();
+  } catch {}
+  try {
+    const skillsResp = await authenticatedFetch(
+      `https://api.ehb-match.me/studenten/${studentId}/skills`
+    );
+    if (skillsResp.ok) skills = await skillsResp.json();
+  } catch {}
+
+  // Haal bedrijf skills/functies uit sessionStorage (voor matching)
+  let bedrijfSkills = [], bedrijfFuncties = [];
+  try {
+    const bedrijfData = JSON.parse(sessionStorage.getItem('bedrijfData') || sessionStorage.getItem('user') || '{}');
+    if (bedrijfData.skills && Array.isArray(bedrijfData.skills)) {
+      bedrijfSkills = bedrijfData.skills.map(s => (typeof s === 'string' ? s : s.naam)).filter(Boolean).map(s => s.toLowerCase());
+    }
+    if (bedrijfData.functies && Array.isArray(bedrijfData.functies)) {
+      bedrijfFuncties = bedrijfData.functies.map(f => (typeof f === 'string' ? f : f.naam)).filter(Boolean).map(f => f.toLowerCase());
+    }
+  } catch {}
+
+  // Vul ontbrekende velden aan met fallback keys uit studentData
+  const naam = (studentData.voornaam || '') + ' ' + (studentData.achternaam || '');
+  const opleiding = studentData.opleiding_naam || studentData.opleiding || '';
+  const email = studentData.contact_email || studentData.email || '';
+  const studiejaar = studentData.studiejaar || '';
+  const profielFoto = getStudentPhotoUrl(studentData.profiel_foto_key, studentData.profiel_foto_url);
+
+  // Toon alleen niet-lege velden
+  const opleidingHtml = opleiding ? `<div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${opleiding}</div>` : '';
+  const studiejaarHtml = studiejaar ? `<div style=\"font-size:0.97rem;color:#888;margin-bottom:0.7rem;\">${studiejaar}</div>` : '';
+  const emailHtml = email ? `<div style=\"font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;\"><a href=\"mailto:${email}\" style=\"color:#444;\">${email}</a></div>` : '';
+
+  const popup = document.createElement('div');
+  popup.id = 'student-popup-modal';
+  popup.style.position = 'fixed';
+  popup.style.top = '0';
+  popup.style.left = '0';
+  popup.style.width = '100vw';
+  popup.style.height = '100vh';
+  popup.style.background = 'rgba(0,0,0,0.5)';
+  popup.style.display = 'flex';
+  popup.style.alignItems = 'center';
+  popup.style.justifyContent = 'center';
+  popup.style.zIndex = '2000';
+  popup.innerHTML = `
+    <div id=\"student-popup-content\" style=\"background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:600px;width:98vw;min-width:340px;position:relative;display:flex;flex-direction:column;align-items:center;\">
+      <button id=\"student-popup-close\" style=\"position:absolute;top:10px;right:14px;font-size:1.7rem;background:none;border:none;cursor:pointer;color:#888;\">&times;</button>
+      <img src=\"${profielFoto}\" alt=\"Profielfoto ${naam}\" style=\"width:90px;height:90px;object-fit:cover;margin-bottom:1.2rem;\" onerror=\"this.onerror=null;this.src='${defaultStudentAvatar}'">
+      <h2 style=\"margin-bottom:0.5rem;text-align:center;\">${naam}</h2>
+      ${opleidingHtml}
+      ${studiejaarHtml}
+      ${emailHtml}
+      <div style=\"margin-bottom:0.7rem;width:100%;display:flex;flex-direction:row;gap:1.5rem;justify-content:center;\">
+        <div style=\"text-align:left;\">
+          <strong>Functies:</strong>
+          <div style=\"margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;\">
+            ${Array.isArray(functies) && functies.length ? functies.map(f => {
+              const isMatch = bedrijfFuncties.includes((f.naam||'').toLowerCase());
+              return `<span class='functie-badge' style='display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${isMatch ? '#e3f2fd' : '#f5f5f5'};color:${isMatch ? '#1565c0' : '#222'};font-size:0.97em;'>${f.naam}</span>`;
+            }).join(' ') : '<span style=\"color:#aaa;\">Geen functies bekend</span>'}
+          </div>
+        </div>
+        <div style=\"text-align:left;\">
+          <strong>Skills/talen:</strong>
+          <div style=\"margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;\">
+            ${Array.isArray(skills) && skills.length ? skills.map(s => {
+              const isMatch = bedrijfSkills.includes((s.naam||'').toLowerCase());
+              return `<span class='skill-badge' style='display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${isMatch ? '#e3f2fd' : '#f5f5f5'};color:${isMatch ? '#1565c0' : '#222'};font-size:0.97em;'>${s.naam}</span>`;
+            }).join(' ') : '<span style=\"color:#aaa;\">Geen skills/talen bekend</span>'}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(popup);
+  document.getElementById('student-popup-close').onclick = () => popup.remove();
+  popup.addEventListener('click', (e) => { if (e.target === popup) popup.remove(); });
+}
+
 // --- HOOFDFUNCTIE: renderStudenten ---
 export async function renderStudenten(rootElement, bedrijfData = {}) {
   // Laad bedrijfData uit sessionStorage indien leeg
@@ -692,7 +798,7 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
               <img src="${photo}" alt="Foto ${fullName}" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.src='${defaultStudentAvatar}'">
               <h3 style="margin-bottom:0.5rem;text-align:center;">${fullName}</h3>
               <div style="font-size:0.97rem;color:#666;margin-bottom:0.3rem;">${opleiding}</div>
-              <div style="font-size:0.97rem;color:#888;margin-bottom:0.3rem;">${studiejaar}</div>
+              <div style="font-size:0.97rem;color:#888;margin-bottom:0.3rem;"><p>Jaar: </p>${studiejaar}</div>
               <div style="font-size:0.95rem;color:#555;margin-bottom:0.3rem;">${functiesBadges}</div>
               <div style="font-size:0.95rem;color:#555;margin-bottom:0.3rem;">${skillsBadges}</div>
             </div>
@@ -1328,7 +1434,7 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
         dropdown.classList.remove('open');
         localStorage.setItem('darkmode', 'false');
         document.body.classList.remove('darkmode');
-        // Log uit en navigeer naar login
+               // Log uit en navigeer naar login
         import('../../router.js').then((module) => {
           const Router = module.default;
           Router.navigate('/login');

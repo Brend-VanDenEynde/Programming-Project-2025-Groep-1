@@ -1,6 +1,7 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import { authenticatedFetch } from '../../utils/auth-api.js';
 import Router from '../../router.js';
+import { showStudentInfoPopup } from './studenten.js';
 
 // Functie om pending speeddate data op te halen van de API
 async function fetchPendingSpeeddateData(bedrijfId, token) {
@@ -47,6 +48,7 @@ function formatPendingSpeeddateData(rawData) {
       id: afspraak.id_student,
       naam: `${afspraak.voornaam_student} ${afspraak.achternaam_student}`,
       profielfoto: afspraak.profiel_foto_student,
+      studiejaar: afspraak.studiejaar_student, // Voeg studiejaar toe
     },
     tijdslot: {
       begin: new Date(afspraak.begin),
@@ -63,21 +65,17 @@ function formatTijdslot(beginISO, eindeISO) {
   const begin = new Date(beginISO);
   const einde = new Date(eindeISO);
 
-  const opties = {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  };
+  // Dag en datum
+  const dagOpties = { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' };
+  const dagDatum = begin.toLocaleDateString('nl-BE', dagOpties);
 
-  const beginFormatted = begin.toLocaleDateString('nl-NL', opties);
-  const eindeFormatted = einde.toLocaleTimeString('nl-NL', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  // Uur
+  const tijdOpties = { hour: '2-digit', minute: '2-digit' };
+  const beginTijd = begin.toLocaleTimeString('nl-BE', tijdOpties);
+  const eindeTijd = einde.toLocaleTimeString('nl-BE', tijdOpties);
 
-  return `${beginFormatted} - ${eindeFormatted}`;
+  // Output: dag: datum\n uur: tijd-tijd
+  return `<span class="speeddate-dag"><strong>Dag:</strong> ${dagDatum}</span><br><span class="speeddate-uur"><strong>Uur:</strong> ${beginTijd} - ${eindeTijd}</span>`;
 }
 
 // Functie om pending speeddate lijst te renderen
@@ -98,21 +96,22 @@ function renderPendingSpeeddatesList(speeddates) {
           <div class="speeddate-item pending" data-id="${afspraak.id}">
             <div class="speeddate-info">
               <div class="student-info">
-                <img src="${
-                  afspraak.student.profielfoto || '/images/default.png'
-                }" 
+                <img src="${afspraak.student.profielfoto || '/images/default.png'}" 
                      alt="${afspraak.student.naam}" 
-                     class="profiel-foto student-foto"
+                     class="profiel-foto student-foto student-popup-trigger"
+                     data-student='${JSON.stringify(afspraak.student)}'
+                     style="cursor:pointer;"
                      onerror="this.src='/images/default.png'" />
                 <div class="student-details">
-                  <h4>${afspraak.student.naam}</h4>
+                  <h4 class="student-popup-trigger" data-student='${JSON.stringify(afspraak.student)}' style="cursor:pointer;text-decoration:none;">${afspraak.student.naam}</h4>
+                  <div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${afspraak.student.studiejaar ? `<strong>Jaar:</strong> ${afspraak.student.studiejaar}` : ''}</div>
                 </div>
               </div>
               
               <div class="afspraak-details">
                 <div class="tijd-lokaal">
-                  <p class="tijdslot"><strong>Tijd:</strong> ${afspraak.tijdslot.geformatteerd}</p>
-                  <p class="lokaal"><strong>Lokaal:</strong> ${afspraak.lokaal}</p>
+                  ${afspraak.tijdslot.geformatteerd}
+                  ${afspraak.lokaal && afspraak.lokaal !== 'null' && afspraak.lokaal !== null && afspraak.lokaal !== '' ? `<p class="lokaal"><strong>Lokaal:</strong> ${afspraak.lokaal}</p>` : ''}
                 </div>
               </div>
               
@@ -340,6 +339,8 @@ async function loadPendingSpeeddateData() {
     }
     // Bind modal events na elke render
     bindModalEvents();
+    // Voeg event binding toe voor student popup trigger in de pending speeddate lijst
+    bindStudentPopupTriggers();
   } catch (error) {
     console.error('Fout bij laden van pending speeddate data:', error);
     contentDiv.innerHTML =
@@ -347,7 +348,42 @@ async function loadPendingSpeeddateData() {
   }
 }
 
-// Verwijder de tweede (lagere) definitie van handleSpeeddatesTableClick zodat deze functie slechts één keer voorkomt in het bestand.
+// Verwijderde lokale definitie van showStudentInfoPopup omdat deze nu wordt geïmporteerd uit studenten.js
+
+// Voeg event binding toe voor student popup trigger in de pending speeddate lijst
+function bindStudentPopupTriggers() {
+  setTimeout(() => {
+    document.querySelectorAll('.student-popup-trigger').forEach((el) => {
+      el.addEventListener('click', async () => {
+        // Haal altijd de meest actuele bedrijf skills/functies op vóór popup
+        try {
+          const companyDataString = window.sessionStorage.getItem('companyData');
+          let bedrijfId;
+          if (companyDataString) {
+            const companyData = JSON.parse(companyDataString);
+            bedrijfId = companyData.id;
+          }
+          if (!bedrijfId) return;
+          // Fetch actuele skills en functies
+          const [skillsResp, functiesResp] = await Promise.all([
+            authenticatedFetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`).then(r => r.ok ? r.json() : []),
+            authenticatedFetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`).then(r => r.ok ? r.json() : [])
+          ]);
+          // Zet in sessionStorage zodat popup altijd up-to-date vergelijkt
+          const nieuweCompanyData = {
+            ...(JSON.parse(window.sessionStorage.getItem('companyData') || '{}')),
+            skills: skillsResp.map(s => s.naam),
+            functies: functiesResp.map(f => f.naam)
+          };
+          window.sessionStorage.setItem('companyData', JSON.stringify(nieuweCompanyData));
+          window.sessionStorage.setItem('bedrijfData', JSON.stringify(nieuweCompanyData)); // <-- fix: ook onder bedrijfData opslaan
+        } catch (e) { console.error('Kon bedrijf skills/functies niet verversen:', e); }
+        const student = JSON.parse(el.getAttribute('data-student'));
+        await showStudentInfoPopup(student);
+      });
+    });
+  }, 0);
+}
 
 export function renderBedrijfSpeeddatesRequests(rootElement, bedrijfData = {}) {
   rootElement.innerHTML = `

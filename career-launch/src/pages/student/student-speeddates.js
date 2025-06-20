@@ -456,11 +456,24 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     const bedrijfId = s.id_bedrijf || s.gebruiker_id;
     if (bedrijfId) {
       const { functies, skills } = await fetchFunctiesSkills(bedrijfId);
+      // Haal student skills/functies uit sessionStorage (voor matching)
+      let studentSkills = [], studentFuncties = [];
+      try {
+        const studentData = JSON.parse(sessionStorage.getItem('studentData') || sessionStorage.getItem('user') || '{}');
+        if (studentData.skills && Array.isArray(studentData.skills)) {
+          studentSkills = studentData.skills.map(s => (typeof s === 'string' ? s : s.naam)).filter(Boolean).map(s => s.toLowerCase());
+        }
+        if (studentData.functies && Array.isArray(studentData.functies)) {
+          studentFuncties = studentData.functies.map(f => (typeof f === 'string' ? f : f.naam)).filter(Boolean).map(f => f.toLowerCase());
+        }
+      } catch {}
       const functiesHtml = functies.length
         ? functies
             .map(
-              (f) =>
-                `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#e3f2fd;font-size:0.85rem;\">${f.naam}</span>`
+              (f) => {
+                const isMatch = studentFuncties.includes((f.naam||'').toLowerCase());
+                return `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:${isMatch ? '#e3f2fd' : '#f1f1f1'};color:${isMatch ? '#1565c0' : '#222'};font-size:0.85rem;\">${f.naam}</span>`;
+              }
             )
             .join('')
         : '<em>Geen functies beschikbaar</em>';
@@ -468,8 +481,10 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       const skillsHtml = skills.length
         ? skills
             .map(
-              (skill) =>
-                `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#f1f1f1;font-size:0.85rem;\">${skill.naam}</span>`
+              (skill) => {
+                const isMatch = studentSkills.includes((skill.naam||'').toLowerCase());
+                return `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:${isMatch ? '#e3f2fd' : '#f1f1f1'};color:${isMatch ? '#1565c0' : '#222'};font-size:0.85rem;\">${skill.naam}</span>`;
+              }
             )
             .join('')
         : '<em>Geen skills beschikbaar</em>';
