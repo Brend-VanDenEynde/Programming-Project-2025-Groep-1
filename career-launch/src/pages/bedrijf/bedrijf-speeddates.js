@@ -121,7 +121,7 @@ function renderSpeeddatesList(speeddates) {
                   <span class="status-badge ${
                     afspraak.akkoord ? 'goedgekeurd' : 'in-behandeling'
                   }">
-                    ${afspraak.akkoord ? 'GOEDGEKEURD' : 'IN AFWACHTING'}
+                    ${afspraak.akkoord ? 'GOEDGEKEURD' : 'IN BEHANDELING'}
                   </span>
                 </div>
               </div>

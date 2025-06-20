@@ -157,7 +157,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
         if (status === 'pending') {
           kleur = '#fff9d1';
           disabled = true;
-          label += ' (in afwachting)';
+          label += ' (in behandeling)';
         } else if (status === 'confirmed') {
           kleur = '#ffe0e0';
           disabled = true;
