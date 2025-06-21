@@ -441,11 +441,9 @@ export async function renderSearchCriteriaStudent(
         <div class="loading-text">Zoekcriteria laden...</div>
       </div>
     `;
-
     let allSkills = [],
       allTalen = [],
       allFuncties = [],
-      studentFunctieIds = [],
       selectedSkills = [],
       selectedLanguages = [];
     try {
@@ -453,9 +451,6 @@ export async function renderSearchCriteriaStudent(
       allSkills = all.filter((s) => s.type === 0); // Skills
       allTalen = all.filter((s) => s.type === 1); // Talen
       allFuncties = await fetchAllFuncties(); // Alle beschikbare functies
-      studentFunctieIds = (await fetchStudentFuncties(studentId)).map(
-        (f) => f.id
-      );
       // Skills/talen van student ophalen
       const studentSkills = await fetchStudentSkills(studentId);
       selectedSkills = studentSkills.filter((s) => s.type === 0);
@@ -493,19 +488,12 @@ export async function renderSearchCriteriaStudent(
               <button id="back-to-profile-btn" class="back-to-profile-btn">⬅ Profiel</button>
               <h1 class="bedrijf-profile-title">Zoek-criteria</h1>
               <form id="bedrijf-criteria-form" class="criteria-form" autocomplete="off">                <fieldset class="search-fieldset">
-                  <legend>Ik zoek</legend>
-                  <div class="checkbox-group" id="bedrijf-functies-list">
+                  <legend>Ik zoek</legend>                  <div class="checkbox-group" id="bedrijf-functies-list">
                     ${allFuncties
                       .map(
                         (functie) => `
                       <label class="checkbox-option">
-                        <input type="checkbox" name="bedrijfFuncties" value="${
-                          functie.id
-                        }" ${
-                          studentFunctieIds.includes(functie.id)
-                            ? 'checked'
-                            : ''
-                        }>
+                        <input type="checkbox" name="bedrijfFuncties" value="${functie.id}">
                         <span>${functie.naam}</span>
                       </label>
                     `
@@ -551,8 +539,7 @@ export async function renderSearchCriteriaStudent(
             </div>
           </div>
         </footer>
-      </div>
-    `;
+      </div>    `;
 
     // Profiel terugknop event (moet direct na HTML rendering!)
     const backToProfileBtn = document.getElementById('back-to-profile-btn');
@@ -564,7 +551,143 @@ export async function renderSearchCriteriaStudent(
           Router.navigate('/student/student-profiel');
         });
       });
+    } // Definieer functieCheckboxes direct na HTML rendering (net zoals bedrijf-code)
+    const functieCheckboxes = document.querySelectorAll(
+      'input[name="bedrijfFuncties"]'
+    );
+
+    // Functie om EEN functie toe te voegen (net zoals bedrijf-code)
+    async function addFunctieToStudent(functieId) {
+      try {
+        console.log('addFunctieToStudent called with:', functieId);
+        const token = sessionStorage.getItem('authToken');
+        // First, fetch current functies to get the complete list
+        console.log('Fetching current functies before adding new one...');
+        const currentFuncties = await fetchStudentFuncties(studentId);
+        console.log('Current functies:', currentFuncties);
+
+        // Create array of current functie IDs
+        const currentFunctieIds = currentFuncties.map((f) => f.id);
+        console.log('Current functie IDs:', currentFunctieIds);
+
+        // Add the new functie if not already present
+        if (!currentFunctieIds.includes(functieId)) {
+          currentFunctieIds.push(functieId);
+        }
+        console.log('Updated functie IDs:', currentFunctieIds);
+
+        const requestBody = { functies: currentFunctieIds };
+        console.log('Request body:', requestBody);
+
+        const response = await fetch(
+          `https://api.ehb-match.me/studenten/${studentId}/functies`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: 'Bearer ' + token,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+          }
+        );
+
+        console.log('Response status:', response.status);
+        const responseText = await response.text();
+        console.log('Response text:', responseText);
+
+        if (!response.ok) {
+          console.error('Error response voor functie toevoegen:', responseText);
+
+          // Check of functie al bestaat
+          if (
+            response.status === 400 &&
+            (responseText.includes('already') ||
+              responseText.includes('duplicate'))
+          ) {
+            console.log('Functie bestaat al, returning true');
+            return true; // Functie bestaat al, dat is OK
+          }
+
+          throw new Error(
+            `HTTP error! status: ${response.status}, body: ${responseText}`
+          );
+        }
+
+        console.log('addFunctieToStudent successful');
+        return true;
+      } catch (error) {
+        console.error('Fout bij toevoegen functie:', error);
+        return false;
+      }
     }
+
+    // Functie om EEN functie te verwijderen (net zoals bedrijf-code)
+    async function removeFunctieFromStudent(functieId) {
+      try {
+        const token = sessionStorage.getItem('authToken');
+
+        const response = await fetch(
+          `https://api.ehb-match.me/studenten/${studentId}/functies/${functieId}`,
+          {
+            method: 'DELETE',
+            headers: {
+              Authorization: 'Bearer ' + token,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Error response voor functie verwijderen:', errorText);
+          throw new Error(
+            `HTTP error! status: ${response.status}, body: ${errorText}`
+          );
+        }
+
+        return true;
+      } catch (error) {
+        console.error('Fout bij verwijderen functie:', error);
+        return false;
+      }
+    }
+
+    // Event listeners voor functies checkboxes (net zoals bedrijf-code)
+    functieCheckboxes.forEach((checkbox) => {
+      checkbox.addEventListener('change', async (e) => {
+        const functieId = parseInt(e.target.value, 10);
+        console.log('Checkbox changed:', {
+          functieId,
+          checked: e.target.checked,
+        });
+
+        if (!functieId) {
+          alert('Functie-ID ontbreekt!');
+          return;
+        }
+
+        if (e.target.checked) {
+          // Voeg functie toe - gebruik individuele API call
+          console.log('Adding functie:', functieId);
+          const success = await addFunctieToStudent(functieId);
+          console.log('Add functie result:', success);
+          if (!success) {
+            alert('Kon functie niet toevoegen. Probeer het opnieuw.');
+            // Reset checkbox als opslaan mislukt
+            e.target.checked = false;
+          }
+        } else {
+          // Verwijder functie - gebruik individuele API call
+          console.log('Removing functie:', functieId);
+          const success = await removeFunctieFromStudent(functieId);
+          console.log('Remove functie result:', success);
+          if (!success) {
+            alert('Kon functie niet verwijderen. Probeer het opnieuw.');
+            // Reset checkbox als verwijderen mislukt
+            e.target.checked = true;
+          }
+        }
+      });
+    });
 
     // --- Skills event handlers & autocomplete (bedrijf-style, student-API) ---
     // Verwijder dubbele let-declaraties, gebruik bestaande variabelen
@@ -875,6 +998,41 @@ export async function renderSearchCriteriaStudent(
       }
     });
 
+    // Functie om bestaande student functies te laden en checkboxes in te stellen
+    async function loadStudentWerktypes() {
+      try {
+        console.log('loadStudentWerktypes: studentId =', studentId);
+        const studentFuncties = await fetchStudentFuncties(studentId);
+        console.log('loadStudentWerktypes: studentFuncties =', studentFuncties);
+
+        if (Array.isArray(studentFuncties) && studentFuncties.length > 0) {
+          console.log(
+            'loadStudentWerktypes: Setting checkboxes for functies:',
+            studentFuncties.map((f) => f.id)
+          );
+          studentFuncties.forEach((functie) => {
+            const checkbox = document.querySelector(
+              `input[name="bedrijfFuncties"][value="${functie.id}"]`
+            );
+            console.log(
+              `loadStudentWerktypes: Looking for checkbox with value ${functie.id}, found:`,
+              checkbox
+            );
+            if (checkbox) {
+              checkbox.checked = true;
+              console.log(
+                `loadStudentWerktypes: Set checkbox ${functie.id} to checked`
+              );
+            }
+          });
+        } else {
+          console.log('loadStudentWerktypes: No functies found or empty array');
+        }
+      } catch (error) {
+        console.error('Fout bij laden student functies:', error);
+      }
+    }
+
     // --- Navigatie events toevoegen (identiek aan student-profiel.js) ---
     // Sidebar nav
     document.querySelectorAll('.sidebar-link').forEach((btn) => {
@@ -988,6 +1146,11 @@ export async function renderSearchCriteriaStudent(
       });
     }
     // --- EINDE navigatie events ---
+    // Laad bestaande student data bij het laden van de pagina (net zoals bedrijf-code)
+    Promise.allSettled([loadStudentWerktypes()]).then(() => {
+      console.log('Student functies geladen');
+    });
+
     // END setTimeout
   }, 200);
 }
