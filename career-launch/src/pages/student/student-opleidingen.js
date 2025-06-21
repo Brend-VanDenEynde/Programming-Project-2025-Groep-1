@@ -3,13 +3,11 @@
 
 export const opleidingen = [
   { id: 1, naam: 'Toegepaste Informatica' },
-  { id: 2, naam: 'Biomedische Laboratoriumtechnologie' },
-  { id: 3, naam: 'Chemie' },
-  { id: 4, naam: 'Elektromechanica' },
-  { id: 5, naam: 'Elektronica-ICT' },
-  { id: 6, naam: 'Ontwerp- en Productietechnologie' },
-  { id: 7, naam: 'Multimedia en Creatieve Technologie' },
-  { id: 8, naam: 'Energietechnologie' },
+  { id: 2, naam: 'Multimedia & Creative Technologies' },
+  { id: 3, naam: 'Programmeren' },
+  { id: 4, naam: 'Systeem- & Netwerkbeheer' },
+  { id: 5, naam: 'Internet of Things' },
+  { id: 6, naam: 'Elektromechanische Systemen' },
 ];
 
 // Helper: geef de naam van de opleiding op basis van id
