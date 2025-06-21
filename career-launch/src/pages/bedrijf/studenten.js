@@ -258,7 +258,6 @@ async function showStudentPopup(student) {
   }
 
   // Speeddate slotconfiguratie
-  const uren = [12, 13, 14, 15, 16, 17];
   const slotDuur = 10;
   const slotsPerUur = 6;
   const speeddateDate = '2025-10-01';
@@ -314,7 +313,7 @@ async function showStudentPopup(student) {
     });
     return slots;
   }
-  const allSlots = buildTimeSlotOptions({ uren, slotDuur, slotsPerUur, allAccepted, allPending });
+  let allSlots = buildTimeSlotOptions({ uren: [], slotDuur, slotsPerUur, allAccepted, allPending });
 
   const photo = getStudentPhotoUrl(student.profiel_foto_key, student.profiel_foto_url);
   const fullName = `${student.voornaam} ${student.achternaam}`;
@@ -359,6 +358,49 @@ async function showStudentPopup(student) {
         .join(' ')
     : '<span style="color:#aaa;">Geen functies bekend</span>';
 
+  // --- Datepicker and dynamic slot calculation ---
+  // Fetch events for this bedrijf (days with begin/einde)
+  const eventsResp = await authenticatedFetch(`https://api.ehb-match.me/bedrijven/${currentBedrijfId}/events`);
+  const events = eventsResp.ok ? await eventsResp.json() : [];
+  // Map: { 'YYYY-MM-DD': { begin, einde } }
+  const dateMap = {};
+  events.forEach(ev => {
+    if (ev.begin && ev.einde) {
+      const dateStr = new Date(new Date(ev.begin).toLocaleString('en-US', { timeZone: 'Europe/Brussels' })).toISOString().slice(0, 10);
+      dateMap[dateStr] = { begin: ev.begin, einde: ev.einde };
+    }
+  });
+  const availableDates = Object.keys(dateMap).sort();
+  let selectedDate = availableDates[0] || null;
+
+  // Helper to get hours array from event window (Europe/Brussels)
+  function getUrenForEvent(dateStr) {
+    const event = dateMap[dateStr];
+    if (!event) return [];
+    const startParts = event.begin.split('T')[1].split(':');
+    const endParts = event.einde.split('T')[1].split(':');
+    let startHour = parseInt(startParts[0], 10);
+    let endHour = parseInt(endParts[0], 10);
+    if (parseInt(endParts[1], 10) === 0) endHour -= 1;
+    const uren = [];
+    for (let h = startHour; h <= endHour; h++) {
+      uren.push(h);
+    }
+    return uren;
+  }
+
+  // Datepicker HTML
+  let datePickerHTML = '';
+  if (availableDates.length > 0) {
+    datePickerHTML = `<label for="popup-date-picker" style="font-weight:500;display:block;margin-bottom:0.3em;">Kies een datum:</label><select id="popup-date-picker" style="margin-bottom:1em;width:100%;padding:0.5em 0.7em;border-radius:8px;border:1.5px solid #e1e5e9;font-size:1rem;">${availableDates.map(date => `<option value="${date}">${date}</option>`).join('')}</select>`;
+  } else {
+    datePickerHTML = '<div class="info">Geen beschikbare data voor speeddates.</div>';
+  }
+
+  // Dynamisch uren genereren op basis van geselecteerde datum
+  let uren = getUrenForEvent(selectedDate);
+  allSlots = buildTimeSlotOptions({ uren, slotDuur, slotsPerUur, allAccepted, allPending });
+
   popup.innerHTML = `
     <div id="student-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:600px;width:98vw;min-width:340px;position:relative;display:flex;flex-direction:column;align-items:center;">
       <button id="student-popup-close" style="position:absolute;top:10px;right:14px;font-size:1.7rem;background:none;border:none;cursor:pointer;color:#888;">×</button>
@@ -381,6 +423,7 @@ async function showStudentPopup(student) {
           <span style="background:#ffe0e0;border:1px solid #ffbdbd;padding:0.1rem 0.5rem;border-radius:5px;margin-left:0.5rem;">Bezet</span>
         </div>
       </div>
+      ${datePickerHTML}
       <div id="uren-list" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; justify-content: center;"></div>
       <div id="slots-list" style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;justify-content:center;"></div>
       <button id="speeddates-aanvraag-btn" style="background:#00bcd4;color:#fff;border:none;padding:0.7rem 1.5rem;border-radius:8px;font-size:1rem;cursor:pointer;" disabled>Confirmeer aanvraag</button>
@@ -418,6 +461,55 @@ async function showStudentPopup(student) {
   let geselecteerdUur = null;
   let gekozenTijd = '';
   aanvraagBtn.disabled = true;
+
+  // Datepicker change event: update uren, allSlots, and UI
+  const datePicker = popup.querySelector('#popup-date-picker');
+  if (datePicker) {
+    datePicker.addEventListener('change', (e) => {
+      selectedDate = e.target.value;
+      uren = getUrenForEvent(selectedDate);
+      allSlots = buildTimeSlotOptions({ uren, slotDuur, slotsPerUur, allAccepted, allPending });
+      // Clear and rebuild urenLijst
+      urenLijst.innerHTML = '';
+      uren.forEach((uur) => {
+        const slotsForHour = allSlots.filter((slot) => parseInt(slot.value.split(':')[0], 10) === uur);
+        const vrijeSlots = slotsForHour.filter((slot) => slot.status === 'free').length;
+        const btn = document.createElement('button');
+        const isUnavailable = vrijeSlots === 0;
+        const backgroundColor = isUnavailable ? '#ffebee' : '#eef1fa';
+        const borderColor = isUnavailable ? '#f44336' : '#b7b7ff';
+        const textColor = isUnavailable ? '#c62828' : '#4e7bfa';
+        const spanBackground = isUnavailable ? '#ffcdd2' : '#fff';
+        const spanBorderColor = isUnavailable ? '#f44336' : '#b7b7ff';
+        const spanTextColor = isUnavailable ? '#c62828' : '#4e7bfa';
+        btn.innerHTML = `${uur}u <span style="background:${spanBackground};border-radius:8px;padding:0.1rem 0.7rem;font-size:0.92em;margin-left:0.5em;border:1px solid ${spanBorderColor};color:${spanTextColor};" title="Aantal beschikbare tijdslots">${vrijeSlots}</span>`;
+        btn.style.cssText = `background:${backgroundColor};border:1.5px solid ${borderColor};border-radius:8px;padding:0.5rem 1.2rem;font-size:1.05rem;cursor:${isUnavailable ? 'not-allowed' : 'pointer'};margin:0;transition:box-shadow .2s;display:flex;align-items:center;gap:0.4em;color:${textColor};opacity:${isUnavailable ? '0.7' : '1'};`;
+        if (isUnavailable) {
+          btn.disabled = true;
+          btn.title = 'Geen tijdslots beschikbaar voor dit uur';
+        } else {
+          btn.title = `${vrijeSlots} beschikbare tijdslots voor ${uur}:00 uur`;
+        }
+        btn.addEventListener('click', () => {
+          if (isUnavailable) return;
+          geselecteerdUur = uur;
+          urenLijst.querySelectorAll('button').forEach((b) => (b.style.boxShadow = ''));
+          btn.style.boxShadow = '0 0 0 2.5px #4e7bfa';
+          renderSlotsForHour(uur);
+        });
+        urenLijst.appendChild(btn);
+      });
+      // Auto-selecteer eerste beschikbare uur
+      geselecteerdUur = null;
+      const firstAvailableButton = urenLijst.querySelector('button:not([disabled])');
+      if (firstAvailableButton) {
+        firstAvailableButton.click();
+      } else {
+        slotsList.innerHTML = '<div style="color:#888;">Geen tijdslots beschikbaar voor deze dag.</div>';
+        aanvraagBtn.disabled = true;
+      }
+    });
+  }
 
   uren.forEach((uur) => {
     const slotsForHour = allSlots.filter((slot) => parseInt(slot.value.split(':')[0], 10) === uur);
@@ -480,7 +572,8 @@ async function showStudentPopup(student) {
       el.style.pointerEvents = 'none';
       el.style.opacity = '0.7';
     });
-    const datetime = `${speeddateDate} ${gekozenTijd}:00`;
+    // Use selectedDate instead of static speeddateDate
+    const datetime = `${selectedDate} ${gekozenTijd}:00`;
     try {
       aanvraagBtn.disabled = true;
       aanvraagBtn.textContent = 'Aanvragen...';
@@ -1350,6 +1443,7 @@ export async function renderStudenten(rootElement, bedrijfData = {}) {
   }
 
   // --- In je renderStudenten functie, na het renderen van de filterbar ---
+
   renderFilterOptions();
 
   // --- FILTERBAR EVENTS: favorieten button ---
