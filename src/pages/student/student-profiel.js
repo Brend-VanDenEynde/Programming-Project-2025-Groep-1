@@ -353,6 +353,7 @@ export function renderStudentProfiel(
     if (saveBtn) {
       form.addEventListener('submit', async (e) => {
         saveBtn.innerHTML = '<div class="loader"></div>'
+        saveBtn.disabled = true; // Disable button to prevent multiple clicks
         e.preventDefault();
         // Haal token op voor API-calls
         let token = sessionStorage.getItem('authToken');

@@ -362,6 +362,7 @@ export async function renderBedrijfProfiel(
   if (saveBtn) {
     saveBtn.addEventListener('click', async (e) => {
       saveBtn.innerHTML = '<div class="loader"></div>'
+      saveBtn.disabled = true; // Disable the button to prevent multiple clicks
       e.preventDefault();
 
       try {
