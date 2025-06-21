@@ -113,7 +113,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
   const allPending = [...pendingStudentDates, ...pendingCompanyDates];
 
   // Status functie
-  function getStatusForTijd(tijd, allAccepted, allPending) {
+  function getStatusForTijd(tijd, allAccepted, allPending, selectedDate) {
     // Also check the selected date
     const isConfirmed = allAccepted.some((s) => {
       if (!s.begin) return false;
@@ -152,6 +152,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
     slotsPerUur,
     allAccepted,
     allPending,
+    selectedDate,
   }) {
     const slots = [];
     uren.forEach((uur) => {
@@ -159,7 +160,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
         const min = i * slotDuur;
         const mm = min < 10 ? `0${min}` : `${min}`;
         const tijd = `${uur < 10 ? '0' : ''}${uur}:${mm}`;
-        const status = getStatusForTijd(tijd, allAccepted, allPending);
+        const status = getStatusForTijd(tijd, allAccepted, allPending, selectedDate);
         let kleur = '#fff',
           disabled = false,
           label = `${uur}u${mm}`;
@@ -232,6 +233,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
     slotsPerUur,
     allAccepted,
     allPending,
+    selectedDate,
   });
 
   // Favoriet status bepalen vóór HTML genereren
@@ -325,6 +327,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
     slotsPerUur,
     allAccepted,
     allPending,
+    selectedDate: selectedDate2,
   });
 
   popup.innerHTML = `
@@ -439,6 +442,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
         slotsPerUur,
         allAccepted,
         allPending,
+        selectedDate,
       });
       buildUrenLijst();
       geselecteerdUur = null;
