@@ -55,12 +55,14 @@ const routes = {
   '/admin-dashboard': renderAdminSelectDashboard,
   '/admin-dashboard/ingeschreven-studenten': renderAdminIngeschrevenStudenten,
   '/admin-dashboard/ingeschreven-bedrijven': renderAdminIngeschrevenBedrijven,
-  '/admin-dashboard/bedrijven-in-behandeling': renderAdminBedrijvenInBehandeling,
+  '/admin-dashboard/bedrijven-in-behandeling':
+    renderAdminBedrijvenInBehandeling,
   '/admin-dashboard/contacten': renderAdminContacten,
   '/admin-dashboard/contact-detail': renderAdminContactDetail,
   '/admin-dashboard/student-detail': renderAdminStudentDetail,
   '/admin-dashboard/company-detail': renderAdminCompanyDetail,
-  '/admin-dashboard/processing-company-detail': renderAdminProcessingCompanyDetail,
+  '/admin-dashboard/processing-company-detail':
+    renderAdminProcessingCompanyDetail,
   '/privacy': renderPrivacy,
   '/contact': renderContact,
   '/student/student-qr-popup': renderQRPopup,
@@ -72,7 +74,12 @@ const routes = {
   '/registreer-bedrijf': renderBedrijfRegister,
   '/bedrijf/speeddates': renderBedrijfSpeeddates,
   '/bedrijf/speeddates-verzoeken': renderBedrijfSpeeddatesRequests,
-  '/bedrijf/zoek-criteria': renderSearchCriteriaBedrijf,
+  '/bedrijf/zoek-criteria': async (rootElement) => {
+    const bedrijfData = JSON.parse(
+      window.sessionStorage.getItem('bedrijfData') || '{}'
+    );
+    await renderSearchCriteriaBedrijf(rootElement, bedrijfData);
+  },
   '/bedrijf/studenten': renderStudenten,
   '/bedrijf/bedrijf-settings': showSettingsPopup,
 };
