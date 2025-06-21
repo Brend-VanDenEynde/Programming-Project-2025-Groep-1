@@ -1285,28 +1285,12 @@ export async function renderBedrijven(rootElement, studentData = {}) {
                 : false;
               const hartIcon = isFavoriet ? '❤️' : '🤍';
               let matchPercentage = bedrijf.match_percentage;
-              let badgeColor = '#e74c3c';
-              if (typeof matchPercentage === 'number' && matchPercentage >= 80)
-                badgeColor = '#2ecc40';
-              else if (
-                typeof matchPercentage === 'number' &&
-                matchPercentage >= 60
-              )
-                badgeColor = '#f1c40f';
-              else if (
-                typeof matchPercentage === 'number' &&
-                matchPercentage >= 40
-              )
-                badgeColor = '#ff9800';
-              const profielFoto =
-                bedrijf.foto && bedrijf.foto.trim() !== ''
-                  ? bedrijf.foto
-                  : defaultBedrijfLogo;
+              const colorScheme = getMatchColorScheme(matchPercentage);
               return `
-  <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001, -8px 0 16px 0 ${badgeColor}33;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;position:relative;" data-bedrijf-idx="${bedrijven.indexOf(
+  <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001, -8px 0 16px 0 ${colorScheme.background}33;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;position:relative;" data-bedrijf-idx="${bedrijven.indexOf(
     bedrijf
   )}">
-    <span class="match-badge" style="position:absolute;top:10px;left:10px;background:${badgeColor};color:#fff;font-weight:bold;padding:0.3em 0.8em;border-radius:16px;font-size:0.98em;z-index:3;box-shadow:0 2px 8px #0002;">${
+    <span class="match-badge" style="position:absolute;top:10px;left:10px;background:${colorScheme.background};color:#fff;font-weight:bold;padding:0.3em 0.8em;border-radius:16px;font-size:0.98em;z-index:3;box-shadow:0 2px 8px #0002;">${
                 typeof matchPercentage === 'number'
                   ? matchPercentage.toFixed(1)
                   : '?'
@@ -1615,6 +1599,69 @@ function getMatchColor(percentage) {
   if (percentage >= 60) return '#f7b500'; // geel
   if (percentage >= 40) return '#ff9800'; // oranje
   return '#da2727'; // rood
+}
+
+// Function to get color scheme based on match percentage
+function getMatchColorScheme(percentage) {
+  const num = Number(percentage) || 0;
+
+  if (num >= 90) {
+    return {
+      background: '#10b981', // emerald-500
+      color: '#ffffff',
+      borderColor: '#059669', // emerald-600
+      cardBorder: '#10b981',
+      label: 'Uitstekende match',
+    };
+  } else if (num >= 80) {
+    return {
+      background: '#22c55e', // green-500
+      color: '#ffffff',
+      borderColor: '#16a34a', // green-600
+      cardBorder: '#22c55e',
+      label: 'Zeer goede match',
+    };
+  } else if (num >= 70) {
+    return {
+      background: '#84cc16', // lime-500
+      color: '#ffffff',
+      borderColor: '#65a30d', // lime-600
+      cardBorder: '#84cc16',
+      label: 'Goede match',
+    };
+  } else if (num >= 60) {
+    return {
+      background: '#eab308', // yellow-500
+      color: '#ffffff',
+      borderColor: '#ca8a04', // yellow-600
+      cardBorder: '#eab308',
+      label: 'Redelijke match',
+    };
+  } else if (num >= 50) {
+    return {
+      background: '#f97316', // orange-500
+      color: '#ffffff',
+      borderColor: '#ea580c', // orange-600
+      cardBorder: '#f97316',
+      label: 'Matige match',
+    };
+  } else if (num >= 30) {
+    return {
+      background: '#ef4444', // red-500
+      color: '#ffffff',
+      borderColor: '#dc2626', // red-600
+      cardBorder: '#ef4444',
+      label: 'Zwakke match',
+    };
+  } else {
+    return {
+      background: '#6b7280', // gray-500
+      color: '#ffffff',
+      borderColor: '#4b5563', // gray-600
+      cardBorder: '#6b7280',
+      label: 'Zeer zwakke match',
+    };
+  }
 }
 
 // Haal altijd de actuele skills en functies van een student op
