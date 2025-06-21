@@ -44,6 +44,25 @@ export async function renderBedrijfProfiel(
   bedrijfData = {},
   readonlyMode = true
 ) {
+  // Explicit auth check before proceeding
+  const authToken = window.sessionStorage.getItem('authToken');
+  const userType = window.sessionStorage.getItem('userType');
+  
+  if (!authToken) {
+    console.warn('No auth token found, redirecting to login');
+    Router.navigate('/login');
+    return;
+  }
+    if (userType !== 'company') {
+    console.warn('User is not a company, redirecting to appropriate page');
+    if (userType === 'student') {
+      Router.navigate('/student/student-profiel');
+    } else {
+      Router.navigate('/login');
+    }
+    return;
+  }
+
   // Laad uit sessionStorage als leeg
   if (!bedrijfData || Object.keys(bedrijfData).length === 0) {
     try {

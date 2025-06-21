@@ -44,6 +44,34 @@ export async function renderSearchCriteriaBedrijf(
     bedrijfData,
   });
 
+  // Explicit auth check before proceeding
+  const authToken = sessionStorage.getItem('authToken');
+  const userType = sessionStorage.getItem('userType');
+
+  if (!authToken) {
+    console.warn('No auth token found, redirecting to login');
+    import('../../router.js').then((module) => {
+      const Router = module.default;
+      Router.navigate('/login');
+    });
+    return;
+  }
+  if (userType !== 'company') {
+    console.warn('User is not a company, redirecting to appropriate page');
+    if (userType === 'student') {
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/student/student-profiel');
+      });
+    } else {
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/login');
+      });
+    }
+    return;
+  }
+
   // Show loading state while fetching functions
   rootElement.innerHTML = `
     <div class="loading-container">
@@ -1751,14 +1779,13 @@ export async function renderSearchCriteriaBedrijf(
       }
     });
   }
-
   // Terug naar profiel knop
   document
     .getElementById('back-to-profile-btn')
     ?.addEventListener('click', () => {
-      import('../../pages/student/student-profiel.js').then((module) => {
-        const { renderStudentProfiel } = module;
-        renderStudentProfiel(document.getElementById('app'));
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/bedrijf/bedrijf-profiel');
       });
     });
 }
