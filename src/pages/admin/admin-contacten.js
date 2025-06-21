@@ -1,7 +1,7 @@
 // Admin contacten pagina
 import Router from '../../router.js';
 import { performLogout } from '../../utils/auth-api.js';
-import ehbLogo from '../../images/EhB-logo-transparant.png';
+import ehbLogo from '/images/EhB-logo-transparant.png';
 
 export async function renderAdminContacten(rootElement) {
   // Check if user is logged in

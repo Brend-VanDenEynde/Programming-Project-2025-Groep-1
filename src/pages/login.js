@@ -1,7 +1,7 @@
 import Router from '../router.js';
 import { fetchAndStoreStudentProfile } from './student/student-profiel.js';
-import hideIcon from '../icons/hide.png';
-import eyeIcon from '../icons/eye.png';
+import hideIcon from '/icons/hide.png';
+import eyeIcon from '/icons/eye.png';
 import { authenticatedFetch } from '../utils/auth-api.js';
 
 // Zet altijd light mode bij laden van login

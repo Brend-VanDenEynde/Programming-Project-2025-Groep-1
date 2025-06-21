@@ -1,8 +1,8 @@
-import logoIcon from '../../icons/favicon-32x32.png';
+import logoIcon from '/icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
 // Gebruik GEEN fetchCompanies uit data-api.js, maar direct de Discover API
-import defaultBedrijfLogo from '../../images/defaultlogo.webp';
+import defaultBedrijfLogo from '/images/defaultlogo.webp';
 import {
   getFavoriteCompanies,
   addFavoriteCompany,

@@ -1,4 +1,4 @@
-import logoIcon from '../../icons/favicon-32x32.png';
+import logoIcon from '/icons/favicon-32x32.png';
 import { renderLogin } from '../login.js';
 import { showSettingsPopup } from './student-settings.js';
 import { showBedrijfInfoPopup } from './bedrijven.js';

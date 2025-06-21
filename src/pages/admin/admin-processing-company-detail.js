@@ -1,8 +1,8 @@
 // Admin processing company detail pagina
 import Router from '../../router.js';
 import { performLogout, authenticatedFetch } from '../../utils/auth-api.js';
-import ehbLogo from '../../images/EhB-logo-transparant.png';
-import defaultCompanyLogo from '../../images/defaultlogo.webp';
+import ehbLogo from '/images/EhB-logo-transparant.png';
+import defaultCompanyLogo from '/images/defaultlogo.webp';
 
 // Make the render function async to support await
 export async function renderAdminProcessingCompanyDetail(rootElement) {

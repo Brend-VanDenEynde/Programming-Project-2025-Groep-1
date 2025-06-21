@@ -2,8 +2,8 @@ import { renderStudentRegister } from './student-register.js';
 import { renderBedrijfRegister } from './bedrijf-register.js';
 import Router from '../router.js';
 import { renderLogin } from './login.js';
-import hideIcon from '../icons/hide.png';
-import eyeIcon from '../icons/eye.png';
+import hideIcon from '/icons/hide.png';
+import eyeIcon from '/icons/eye.png';
 
 export let previousData = null;
 

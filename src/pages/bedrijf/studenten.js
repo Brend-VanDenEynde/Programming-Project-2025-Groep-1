@@ -1,5 +1,5 @@
-import logoIcon from '../../icons/favicon-32x32.png';
-import defaultStudentAvatar from '../../images/default.png';
+import logoIcon from '/icons/favicon-32x32.png';
+import defaultStudentAvatar from '/images/default.png';
 import {
   logoutUser,
   fetchUserInfo,

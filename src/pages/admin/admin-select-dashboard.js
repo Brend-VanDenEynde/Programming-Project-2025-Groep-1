@@ -1,6 +1,6 @@
 // Admin select dashboard page
 import Router from '../../router.js';
-import ehbLogo from '../../images/EhB-logo-transparant.png';
+import ehbLogo from '/images/EhB-logo-transparant.png';
 
 export function renderAdminSelectDashboard(rootElement) {
   // Check if user is logged in

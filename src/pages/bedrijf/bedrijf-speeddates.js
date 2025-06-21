@@ -1,4 +1,4 @@
-import logoIcon from '../../icons/favicon-32x32.png';
+import logoIcon from '/icons/favicon-32x32.png';
 import { authenticatedFetch } from '../../utils/auth-api.js';
 import Router from '../../router.js';
 import { showStudentInfoPopup } from './studenten.js';

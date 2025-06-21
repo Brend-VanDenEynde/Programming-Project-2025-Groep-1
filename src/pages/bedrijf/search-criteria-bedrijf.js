@@ -1,4 +1,4 @@
-import logoIcon from '../../icons/favicon-32x32.png';
+import logoIcon from '/icons/favicon-32x32.png';
 import { refreshToken } from '../../utils/auth-api.js';
 import { performLogout } from '../../utils/auth-api.js';
 

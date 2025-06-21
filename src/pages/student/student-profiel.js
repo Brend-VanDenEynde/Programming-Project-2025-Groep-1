@@ -1,7 +1,7 @@
 import { showSettingsPopup } from './student-settings.js';
-import logoIcon from '../../icons/favicon-32x32.png';
+import logoIcon from '/icons/favicon-32x32.png';
 import { getOpleidingNaamById, opleidingen } from './student-opleidingen.js';
-import defaultAvatar from '../../images/default.png';
+import defaultAvatar from '/images/default.png';
 import { authenticatedFetch, performLogout } from '../../utils/auth-api.js';
 import { renderBedrijven } from './bedrijven.js';
 

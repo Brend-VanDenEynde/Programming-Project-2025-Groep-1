@@ -1,13 +1,13 @@
 // Admin student detail pagina
 import Router from '../../router.js';
-import defaultAvatar from '../../images/default.png';
+import defaultAvatar from '/images/default.png';
 import {
   performLogout,
   logoutUser,
   authenticatedFetch,
 } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
-import ehbLogo from '../../images/EhB-logo-transparant.png';
+import ehbLogo from '/images/EhB-logo-transparant.png';
 
 export async function renderAdminStudentDetail(rootElement) {
   // Check if user is logged in

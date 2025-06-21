@@ -1,9 +1,9 @@
 // Admin company detail pagina
 import Router from '../../router.js';
-import defaultCompanyLogo from '../../images/defaultlogo.webp';
+import defaultCompanyLogo from '/images/defaultlogo.webp';
 import { authenticatedFetch, performLogout } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
-import ehbLogo from '../../images/EhB-logo-transparant.png';
+import ehbLogo from '/images/EhB-logo-transparant.png';
 
 export async function renderAdminCompanyDetail(rootElement) {
   // Check if user is logged in

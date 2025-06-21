@@ -1,5 +1,5 @@
-import logoIcon from '../../icons/favicon-32x32.png';
-import defaultLogo from '../../images/defaultlogo.webp';
+import logoIcon from '/icons/favicon-32x32.png';
+import defaultLogo from '/images/defaultlogo.webp';
 import {
   performLogout,
   fetchUserInfo,
