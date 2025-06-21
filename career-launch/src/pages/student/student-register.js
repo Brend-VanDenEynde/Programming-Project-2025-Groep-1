@@ -54,7 +54,9 @@ export function renderStudentRegister(rootElement) {
   }
 
   // Footer links: gebruik alleen Router.navigate, geen hash of import, en selecteer alleen de lokale footer links
-  const privacyLink = document.querySelector('.footer-links a[data-route="/privacy"]');
+  const privacyLink = document.querySelector(
+    '.footer-links a[data-route="/privacy"]'
+  );
   if (privacyLink) {
     privacyLink.setAttribute('href', '#');
     privacyLink.addEventListener('click', (e) => {
@@ -63,7 +65,9 @@ export function renderStudentRegister(rootElement) {
       Router.navigate('/privacy');
     });
   }
-  const contactLink = document.querySelector('.footer-links a[data-route="/contact"]');
+  const contactLink = document.querySelector(
+    '.footer-links a[data-route="/contact"]'
+  );
   if (contactLink) {
     contactLink.setAttribute('href', '#');
     contactLink.addEventListener('click', (e) => {
@@ -89,7 +93,7 @@ function handleNaamRegister(event) {
   };
 
   // Data naar server sturen (voorbeeld)
-  console.log('Registratie data:', data);
+
   alert(`Welkom ${data.voornaam}! Je account is aangemaakt.`);
 
   renderStudentOpleiding(document.getElementById('app'));

@@ -39,11 +39,6 @@ export async function renderSearchCriteriaBedrijf(
   rootElement,
   bedrijfData = {}
 ) {
-  console.log('[renderSearchCriteriaBedrijf] aangeroepen', {
-    rootElement,
-    bedrijfData,
-  });
-
   // Explicit auth check before proceeding
   const authToken = sessionStorage.getItem('authToken');
   const userType = sessionStorage.getItem('userType');
@@ -175,10 +170,6 @@ export async function renderSearchCriteriaBedrijf(
       </footer>
     </div>
   `;
-  console.log(
-    '[renderSearchCriteriaBedrijf] innerHTML gezet:',
-    rootElement.innerHTML.slice(0, 300)
-  );
 
   // Sidebar navigation
   document.querySelectorAll('.sidebar-link').forEach((btn) => {

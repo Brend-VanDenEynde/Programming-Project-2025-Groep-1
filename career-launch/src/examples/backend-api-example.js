@@ -38,10 +38,6 @@ router.post(
       }
 
       const registrationData = req.body;
-      console.log(
-        'Ontvangen registratie data:',
-        JSON.stringify(registrationData, null, 2)
-      );
 
       // Controleer of e-mail al bestaat
       const existingUser = await checkEmailExists(registrationData.user.email);
@@ -356,9 +352,6 @@ async function checkEmailExists(email) {
 async function sendVerificationEmail(email, userId) {
   // Implementatie voor het versturen van verificatie e-mail
   // Bijv. met nodemailer, SendGrid, etc.
-  console.log(
-    `Stuur verificatie e-mail naar ${email} voor gebruiker ${userId}`
-  );
 }
 
 async function getDBConnection() {

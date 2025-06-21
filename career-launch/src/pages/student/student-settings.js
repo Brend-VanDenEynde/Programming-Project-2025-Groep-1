@@ -135,7 +135,7 @@ export function showSettingsPopup(onClose) {
   document.getElementById('btn-logout').onclick = null;
   document.getElementById('btn-logout').addEventListener('click', async () => {
     const response = await performLogout();
-    console.log('Logout API response:', response);
+
     window.sessionStorage.clear();
     localStorage.clear();
     window.location.href = '/';

@@ -47,15 +47,9 @@ export async function authenticatedFetch(url, options = {}) {
 
     // If it's a 401 (Unauthorized), try to refresh the token and retry
     if (response.status === 401) {
-      console.log('401 error detected, attempting token refresh...');
-
       const refreshResult = await refreshToken();
 
       if (refreshResult.success) {
-        console.log(
-          'Token refreshed successfully, retrying original request...'
-        );
-
         // Update the Authorization header with the new token
         const newHeaders = {
           ...headers,
@@ -70,7 +64,6 @@ export async function authenticatedFetch(url, options = {}) {
 
         return retryResponse;
       } else {
-        console.error('Token refresh failed:', refreshResult.error);
         window.location.href = '/login'; // Redirect to login on failure
         throw new Error('Authentication failed - please log in again');
       }
@@ -79,7 +72,6 @@ export async function authenticatedFetch(url, options = {}) {
     // For other errors, just return the response
     return response;
   } catch (error) {
-    console.error('API call error:', error);
     throw error;
   }
 }
@@ -95,25 +87,15 @@ export async function apiGet(url, options = {}) {
     method: 'GET',
     ...options,
   });
-
   if (!response.ok) {
     const errorText = await response.text();
-    console.error(
-      `API GET error for ${url}:`,
-      response.status,
-      response.statusText,
-      errorText
-    );
     throw new Error(`API GET error: ${response.status} ${response.statusText}`);
   }
 
   const contentType = response.headers.get('content-type');
   if (!contentType || !contentType.includes('application/json')) {
     const responseText = await response.text();
-    console.error(
-      `Expected JSON but got ${contentType} for ${url}:`,
-      responseText
-    );
+
     throw new Error(`Expected JSON response but got ${contentType}`);
   }
 
@@ -236,27 +218,17 @@ export async function publicApiPost(url, data = null, options = {}) {
     body: data ? JSON.stringify(data) : null,
     ...options,
   });
-
   if (!response.ok) {
     const errorText = await response.text();
-    console.error(
-      `Public API POST error for ${url}:`,
-      response.status,
-      response.statusText,
-      errorText
-    );
+
     throw new Error(
       `API POST error: ${response.status} ${response.statusText}`
     );
   }
-
   const contentType = response.headers.get('content-type');
   if (!contentType || !contentType.includes('application/json')) {
     const responseText = await response.text();
-    console.error(
-      `Expected JSON but got ${contentType} for ${url}:`,
-      responseText
-    );
+
     throw new Error(`Expected JSON response but got ${contentType}`);
   }
 

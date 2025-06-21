@@ -51,7 +51,6 @@ export async function logoutUser() {
     }
 
     const data = await response.json();
-    console.log('Logout API response:', data);
 
     return {
       success: response.ok,
@@ -87,12 +86,10 @@ export async function refreshToken() {
     }
 
     const data = await response.json();
-    console.log('Token refresh successful:', data);
 
     // Update the stored auth token if a new one was provided
     if (data.accessToken) {
       window.sessionStorage.setItem('authToken', data.accessToken);
-      console.log('Auth token updated in session storage');
     }
 
     return {
@@ -124,8 +121,6 @@ export function clearAuthData() {
   window.sessionStorage.removeItem('userType');
   window.sessionStorage.removeItem('adminLoggedIn');
   window.sessionStorage.removeItem('adminUsername');
-
-  console.log('Authentication data cleared');
 }
 
 /**
@@ -203,8 +198,6 @@ export async function retryWithTokenRefresh(apiCall, ...args) {
         error: 'Token refresh failed',
       };
     }
-
-    console.log('Token refreshed successfully, retrying API call');
 
     // Retry the original API call with the new token
     return await apiCall(...args);
@@ -291,7 +284,6 @@ export async function fetchUserInfo() {
     }
 
     const data = await response.json();
-    console.log('User info fetched:', data);
 
     return {
       success: true,
@@ -354,7 +346,6 @@ export async function updateBedrijfProfile(bedrijfID, updateData) {
     }
 
     const data = await response.json();
-    console.log('Company updated successfully:', data);
 
     return {
       success: true,
@@ -431,17 +422,11 @@ export async function authenticatedFetch(url, options = {}) {
 
     // If it's a 401 (Unauthorized), try to refresh the token and retry
     if (response.status === 401) {
-      console.log('401 error detected, attempting token refresh...');
-
       // --- BEGIN RACE-CONDITION SAFE REFRESH LOCK ---
       const refreshResult = await getRefreshPromise();
       // --- END REFRESH LOCK ---
 
       if (refreshResult.success) {
-        console.log(
-          'Token refreshed successfully, retrying original request...'
-        );
-
         // Update the Authorization header with the new token
         const newHeaders = {
           ...headers,
@@ -457,7 +442,7 @@ export async function authenticatedFetch(url, options = {}) {
         return retryResponse;
       } else {
         console.error('Token refresh failed:', refreshResult.error);
-        console.log('Redirecting to login page...');
+
         import('../router.js').then((module) => {
           const Router = module.default;
           Router.navigate('/login');
