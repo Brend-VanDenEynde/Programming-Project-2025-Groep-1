@@ -522,11 +522,14 @@ async function showBedrijfPopup(bedrijf, studentId) {
     ].some((s) => {
       if (!s.begin) return false;
       const dt = new Date(s.begin);
+      const slotDate = `${dt.getFullYear()}-${(dt.getMonth() + 1)
+        .toString()
+        .padStart(2, '0')}-${dt.getDate().toString().padStart(2, '0')}`;
       const slotTijd = `${dt.getHours().toString().padStart(2, '0')}:${dt
         .getMinutes()
         .toString()
         .padStart(2, '0')}`;
-      return slotTijd === tijd;
+      return slotDate === selectedDate && slotTijd === tijd;
     });
     if (alreadyBooked) {
       status.textContent =
