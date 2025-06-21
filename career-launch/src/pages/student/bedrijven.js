@@ -198,15 +198,16 @@ async function showBedrijfPopup(bedrijf, studentId) {
   function getUrenForEvent(dateStr) {
     const event = dateMap[dateStr];
     if (!event) return [];
-    // Use the event's begin/einde directly (assume already in Europe/Brussels)
-    const start = new Date(event.begin);
-    const end = new Date(event.einde);
+    // Extract hours directly from the ISO string to force Europe/Brussels time
+    const startParts = event.begin.split('T')[1].split(':');
+    const endParts = event.einde.split('T')[1].split(':');
+    let startHour = parseInt(startParts[0], 10);
+    let endHour = parseInt(endParts[0], 10);
+    // If end is exactly on the hour, don't include that hour
+    if (parseInt(endParts[1], 10) === 0) endHour -= 1;
     const uren = [];
-    let h = start.getHours();
-    const endHour = end.getMinutes() === 0 ? end.getHours() - 1 : end.getHours();
-    while (h <= endHour) {
+    for (let h = startHour; h <= endHour; h++) {
       uren.push(h);
-      h++;
     }
     return uren;
   }
