@@ -202,11 +202,11 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
           <img src="${
             s.profiel_foto_bedrijf ||
             s.foto ||
-            'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'
+            '/images/defaultlogo.webp'
           }" 
                alt="${s.naam_bedrijf}" 
                class="profiel-foto bedrijf-foto"
-               onerror="this.src='https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'" />
+               onerror="this.src='/images/defaultlogo.webp'" />
           <div class="bedrijf-details">
             <h4>${s.naam_bedrijf}</h4>
           </div>
@@ -417,12 +417,12 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     const profielFoto =
       s.profiel_foto_bedrijf && s.profiel_foto_bedrijf.trim() !== ''
         ? s.profiel_foto_bedrijf
-        : 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
+        : '/images/defaultlogo.webp';
     popup.innerHTML = `
       <button id="popup-close" style="position:absolute;top:10px;right:12px;font-size:1.4rem;background:none;border:none;cursor:pointer;">×</button>
       <img src="${profielFoto}" alt="Logo ${
       s.naam_bedrijf
-    }" style="width:70px;height:70px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.onerror=null;this.src='../../Images/defaultlogo.webp'">
+    }" style="width:70px;height:70px;border-radius:50%;object-fit:contain;margin-bottom:1rem;" onerror="this.onerror=null;this.src='../../images/defaultlogo.webp'">
       <h2 style="margin-bottom:0.3rem;text-align:center;">${s.naam_bedrijf}</h2>
       <div style="font-size:1rem;color:#666;margin-bottom:0.2rem;">${
         s.locatie || ''

@@ -10,7 +10,7 @@ const defaultProfile = {
   achternaam: '',
   email: '',
   studiejaar: '1',
-  profiel_foto: '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4',
+  profiel_foto: null,
   linkedin: '',
   date_of_birth: '',
   opleiding_id: null,
@@ -22,7 +22,7 @@ function isoToDateString(isoString) {
 }
 
 function getProfielFotoUrl(profiel_foto) {
-  if (!profiel_foto || profiel_foto === 'null') return 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
+  if (!profiel_foto || profiel_foto === 'null') return defaultAvatar;
   if (profiel_foto.startsWith('http')) return profiel_foto;
   return 'https://gt0kk4fbet.ufs.sh/f/' + profiel_foto;
 }
@@ -439,7 +439,7 @@ export function renderStudentProfiel(
           }
 
           // 2. Profielfoto uploaden indien geselecteerd
-          // Altijd alleen de key, nooit de URL of null!
+          // may be null
           let profielFotoKey = null;
           if (
             studentData.profiel_foto &&
@@ -448,7 +448,7 @@ export function renderStudentProfiel(
             if (studentData.profiel_foto.startsWith('http')) {
               const parts = studentData.profiel_foto.split('/');
               profielFotoKey = parts[parts.length - 1];
-            } else if (studentData.profiel_foto !== 'null') {
+            } else {
               profielFotoKey = studentData.profiel_foto;
             }
           }

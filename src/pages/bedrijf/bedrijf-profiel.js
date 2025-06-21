@@ -14,23 +14,15 @@ function getBedrijfLogoUrl(foto, url) {
   if (!foto || foto === 'null' || foto === 'undefined') return defaultLogo;
   if (typeof foto === 'string' && foto.startsWith('http')) return foto;
   if (url && typeof url === 'string' && url.startsWith('http')) return url;
-  // Als het een key is, plak achter base-url
-  if (typeof foto === 'string' && foto.length > 10) {
-    return 'https://gt0kk4fbet.ufs.sh/f/' + foto;
-  }
-  return defaultLogo;
+  return 'https://gt0kk4fbet.ufs.sh/f/' + foto; // Basis URL voor de profielfoto's
 }
-
-const BASE_AVATAR_URL = 'https://gt0kk4fbet.ufs.sh/f/';
-const DEFAULT_AVATAR_KEY = '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
-const DEFAULT_AVATAR_URL = BASE_AVATAR_URL + DEFAULT_AVATAR_KEY;
 
 // Default bedrijf profiel data (using API field names)
 const defaultBedrijfProfile = {
   contact_email: '',
   naam: '',
-  profiel_foto_key: DEFAULT_AVATAR_KEY,
-  profiel_foto_url: DEFAULT_AVATAR_URL,
+  profiel_foto_key: null,
+  profiel_foto_url: '/images/defaultlogo.webp',
   plaats: '',
   linkedin: '',
   sector_bedrijf: '',
@@ -88,9 +80,9 @@ export async function renderBedrijfProfiel(
             apiUser.company_name ||
             'Mijn Bedrijf',
           profiel_foto_key:
-            apiUser.profiel_foto_key || apiUser.logo_key || DEFAULT_AVATAR_KEY,
+            apiUser.profiel_foto_key || apiUser.logo_key || null,
           profiel_foto_url:
-            apiUser.profiel_foto_url || apiUser.logo_url || DEFAULT_AVATAR_URL,
+            apiUser.profiel_foto_url || apiUser.logo_url || '/images/defaultlogo.webp',
           plaats: apiUser.plaats || apiUser.locatie || apiUser.location || '',
           linkedin: apiUser.linkedin || '',
           sector_bedrijf: apiUser.sector_bedrijf || apiUser.sector || '',
@@ -108,8 +100,8 @@ export async function renderBedrijfProfiel(
         bedrijfData = {
           contact_email: 'info@techcorp.be',
           naam: 'TechCorp Belgium',
-          profiel_foto_key: DEFAULT_AVATAR_KEY,
-          profiel_foto_url: DEFAULT_AVATAR_URL,
+          profiel_foto_key: null,
+          profiel_foto_url: '/images/defaultlogo.webp',
           plaats: 'Brussel',
           linkedin: 'https://www.linkedin.com/company/techcorp-belgium',
           sector_bedrijf: 'Informatica',
@@ -122,8 +114,8 @@ export async function renderBedrijfProfiel(
       bedrijfData = {
         contact_email: 'info@techcorp.be',
         naam: 'TechCorp Belgium',
-        profiel_foto_key: DEFAULT_AVATAR_KEY,
-        profiel_foto_url: DEFAULT_AVATAR_URL,
+        profiel_foto_key: null,
+        profiel_foto_url: '/images/defaultlogo.webp',
         plaats: 'Brussel',
         linkedin: 'https://www.linkedin.com/company/techcorp-belgium',
         sector_bedrijf: 'Informatica',
@@ -346,7 +338,7 @@ export async function renderBedrijfProfiel(
     if (
       !readonlyMode &&
       !deleteProfilePicture &&
-      bedrijfAvatar.src !== DEFAULT_AVATAR_URL
+      bedrijfAvatar.src !== '/images/defaultlogo.webp'
     ) {
       deleteOverlay.style.display = 'flex';
     }
@@ -356,9 +348,9 @@ export async function renderBedrijfProfiel(
   });
 
   deleteOverlay.addEventListener('click', async (e) => {
-    if (!readonlyMode && bedrijfAvatar.src !== DEFAULT_AVATAR_URL) {
+    if (!readonlyMode && bedrijfAvatar.src !== '/images/defaultlogo.webp') {
       photoInput.value = ''; // Reset file input
-      bedrijfAvatar.src = DEFAULT_AVATAR_URL; // Reset to default avatar
+      bedrijfAvatar.src = '/images/defaultlogo.webp'; // Reset to default avatar
       deleteProfilePicture = true; // Set flag to delete profile picture
     }
   });
@@ -479,7 +471,7 @@ export async function renderBedrijfProfiel(
         if (
           deleteProfilePicture &&
           savedProfilePicture &&
-          savedProfilePicture !== DEFAULT_AVATAR_URL
+          savedProfilePicture !== 'defaultlogo.webp'
         ) {
           // remove https://gt0kk4fbet.ufs.sh/f/ prefix if present
           profielFotoKey = savedProfilePicture.replace(BASE_AVATAR_URL, '');
@@ -494,7 +486,7 @@ export async function renderBedrijfProfiel(
             }
           );
 
-          profielFotoKey = DEFAULT_AVATAR_KEY; // Reset de profielfoto key
+          profielFotoKey = null; // Reset de profielfoto key
         }
         const photoInput = document.getElementById('logoInput');
         if (photoInput && photoInput.files && photoInput.files.length > 0) {
@@ -534,7 +526,7 @@ export async function renderBedrijfProfiel(
           profielFotoKey = uploadResult.profiel_foto_key;
         }
 
-        updateData.profiel_foto = profielFotoKey || DEFAULT_AVATAR_KEY; // Voeg de profielfoto key toe als deze bestaat
+        updateData.profiel_foto = profielFotoKey || null; // Voeg de profielfoto key toe als deze bestaat
 
         // Roep de API aan om het bedrijf bij te werken
         const result = await updateBedrijfProfile(bedrijfID, updateData);
