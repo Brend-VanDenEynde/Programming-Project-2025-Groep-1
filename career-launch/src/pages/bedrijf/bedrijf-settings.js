@@ -1,4 +1,4 @@
-import { logoutUser } from '../../utils/auth-api.js';
+import { performLogout } from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
 
 // Main renderfunctie:
@@ -71,7 +71,7 @@ export function showBedrijfSettingsPopup(onClose) {
   });
 
   document.getElementById('logout-btn').addEventListener('click', () => {
-    logoutUser();
+    performLogout();
     window.location.reload();
   });
 
@@ -83,16 +83,6 @@ export function showBedrijfSettingsPopup(onClose) {
         window.location.reload();
       }
     });
-
-  // Donkere modus toggle functionaliteit
-  const darkToggle = document.getElementById('dark-mode-toggle');
-  // Zet de toggle op basis van localStorage
-  darkToggle.checked = localStorage.getItem('darkmode') === 'true';
-  document.body.classList.toggle('darkmode', darkToggle.checked);
-  darkToggle.addEventListener('change', (e) => {
-    localStorage.setItem('darkmode', e.target.checked);
-    document.body.classList.toggle('darkmode', e.target.checked);
-  });
 }
 
 function renderSidebar() {

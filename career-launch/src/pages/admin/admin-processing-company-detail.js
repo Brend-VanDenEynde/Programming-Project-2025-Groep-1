@@ -1,6 +1,6 @@
 // Admin processing company detail pagina
 import Router from '../../router.js';
-import { performLogout, logoutUser } from '../../utils/auth-api.js';
+import { performLogout, authenticatedFetch } from '../../utils/auth-api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 import defaultCompanyLogo from '../../images/defaultlogo.webp';
 
@@ -39,6 +39,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
               <li><button class="nav-btn" data-route="/admin-dashboard/ingeschreven-studenten">Ingeschreven studenten</button></li>
               <li><button class="nav-btn" data-route="/admin-dashboard/ingeschreven-bedrijven">Ingeschreven Bedrijven</button></li>
               <li><button class="nav-btn active" data-route="/admin-dashboard/bedrijven-in-behandeling">Bedrijven in behandeling</button></li>
+              <li><button class="nav-btn" data-route="/admin-dashboard/contacten">Contacten</button></li>
             </ul>
           </nav>
         </aside>
@@ -102,7 +103,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
   // Fetch company data from API
   const accessToken = sessionStorage.getItem('accessToken');
   try {
-    const response = await fetch(
+    const response = await authenticatedFetch(
       `https://api.ehb-match.me/bedrijven/${companyId}`,
       {
         method: 'GET',
@@ -162,7 +163,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
 
           // Call the API to approve the company
           const accessToken = sessionStorage.getItem('accessToken');
-          const response = await fetch(
+          const response = await authenticatedFetch(
             `https://api.ehb-match.me/bedrijven/keur/${companyId}`,
             {
               method: 'POST',
@@ -174,7 +175,6 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
           );
           if (response.ok) {
             const result = await response.json();
-            console.log('Company approved successfully:', result);
 
             alert(
               `${company.naam} is geaccepteerd en toegevoegd aan ingeschreven bedrijven.`
@@ -231,7 +231,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
 
           // Call the DELETE user endpoint to reject/delete the company
           const accessToken = sessionStorage.getItem('accessToken');
-          const response = await fetch(
+          const response = await authenticatedFetch(
             `https://api.ehb-match.me/user/${companyId}`,
             {
               method: 'DELETE',
@@ -244,7 +244,6 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
 
           if (response.status === 204) {
             // 204 No Content - successful deletion
-            console.log('Company deleted successfully');
 
             alert(
               `${company.naam} is geweigerd en permanent verwijderd uit het systeem.`
@@ -302,7 +301,7 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
   if (logoutBtn) {
     logoutBtn.onclick = null;
     logoutBtn.addEventListener('click', async () => {
-      await logoutUser();
+      await performLogout();
       window.sessionStorage.clear();
       localStorage.clear();
       Router.navigate('/');

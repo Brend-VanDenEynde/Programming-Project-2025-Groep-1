@@ -1,9 +1,10 @@
 import logoIcon from '../../icons/favicon-32x32.png';
 import defaultLogo from '../../images/defaultlogo.webp';
 import {
-  logoutUser,
+  performLogout,
   fetchUserInfo,
   updateBedrijfProfile,
+  authenticatedFetch,
 } from '../../utils/auth-api.js';
 import Router from '../../router.js';
 
@@ -43,12 +44,31 @@ export async function renderBedrijfProfiel(
   bedrijfData = {},
   readonlyMode = true
 ) {
+  // Explicit auth check before proceeding
+  const authToken = window.sessionStorage.getItem('authToken');
+  const userType = window.sessionStorage.getItem('userType');
+
+  if (!authToken) {
+    console.warn('No auth token found, redirecting to login');
+    Router.navigate('/login');
+    return;
+  }
+  if (userType !== 'company') {
+    console.warn('User is not a company, redirecting to appropriate page');
+    if (userType === 'student') {
+      Router.navigate('/student/student-profiel');
+    } else {
+      Router.navigate('/login');
+    }
+    return;
+  }
+
   // Laad uit sessionStorage als leeg
   if (!bedrijfData || Object.keys(bedrijfData).length === 0) {
     try {
       const stored = window.sessionStorage.getItem('bedrijfData');
       if (stored) bedrijfData = JSON.parse(stored);
-    } catch (e) { }
+    } catch (e) {}
   }
 
   // Probeer echte data van de API op te halen als geen data beschikbaar is
@@ -58,8 +78,7 @@ export async function renderBedrijfProfiel(
       if (userInfoResult.success) {
         const apiUser = userInfoResult.user;
         // Log de ruwe API data voor debugging
-        console.log('Raw API user data:', userInfoResult);
-        console.log('USER OBJECT:', apiUser); // Map API data naar bedrijf profiel velden (gebruik API veldnamen)
+
         bedrijfData = {
           id: apiUser.id || apiUser.gebruiker_id,
           contact_email: apiUser.contact_email || apiUser.email || '',
@@ -68,7 +87,8 @@ export async function renderBedrijfProfiel(
             apiUser.bedrijfsnaam ||
             apiUser.company_name ||
             'Mijn Bedrijf',
-          profiel_foto_key: apiUser.profiel_foto_key || apiUser.logo_key || DEFAULT_AVATAR_KEY,
+          profiel_foto_key:
+            apiUser.profiel_foto_key || apiUser.logo_key || DEFAULT_AVATAR_KEY,
           profiel_foto_url:
             apiUser.profiel_foto_url || apiUser.logo_url || DEFAULT_AVATAR_URL,
           plaats: apiUser.plaats || apiUser.locatie || apiUser.location || '',
@@ -76,10 +96,6 @@ export async function renderBedrijfProfiel(
           sector_bedrijf: apiUser.sector_bedrijf || apiUser.sector || '',
           id_sector_bedrijf: apiUser.id_sector_bedrijf || null,
         };
-
-        // Log de gemapte bedrijf data voor debugging
-        console.log('Mapped bedrijf data:', bedrijfData);
-        console.log('Bedrijf ID voor API call:', bedrijfData.id);
 
         // Sla de gegevens op in sessionStorage voor toekomstig gebruik
         window.sessionStorage.setItem(
@@ -128,11 +144,10 @@ export async function renderBedrijfProfiel(
 
   // Gebruik default als foto null, leeg of undefined is
   const foto = getBedrijfLogoUrl(profiel_foto_key, profiel_foto_url);
-
   rootElement.innerHTML = `
     <div class="bedrijf-profile-container">
       <header class="bedrijf-profile-header">
-        <div class="logo-section">
+        <div class="logo-section" id="logo-navigation">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>
@@ -147,7 +162,6 @@ export async function renderBedrijfProfiel(
       <div class="bedrijf-profile-main">
         <nav class="bedrijf-profile-sidebar">
           <ul>
-            <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link">Speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
             <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
@@ -156,7 +170,8 @@ export async function renderBedrijfProfiel(
         
         <div class="bedrijf-profile-content">
           <div class="bedrijf-profile-form-container">
-            <h1 class="bedrijf-profile-title">Bedrijf Profiel</h1>
+            <button id="to-search-criteria-btn" class="to-search-criteria-btn">Zoekcriteria</button>
+            <h1 class="bedrijf-profile-title">Profiel</h1>
             <form id="bedrijfProfileForm" class="bedrijf-profile-form" autocomplete="off" enctype="multipart/form-data">
               <div class="bedrijf-profile-avatar-section">
                 <div class="bedrijf-profile-avatar-div" style="position:relative;">
@@ -168,32 +183,44 @@ export async function renderBedrijfProfiel(
                   />
                   <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
                 </div>
-                <input type="file" accept="image/*" id="logoInput" style="display:${readonlyMode ? 'none' : 'block'};margin-top:10px;">
+                <input type="file" accept="image/*" id="logoInput" style="display:${
+                  readonlyMode ? 'none' : 'block'
+                };margin-top:10px;">
               </div>
               
               <div class="bedrijf-profile-form-group">
                 <label for="bedrijfsnaamInput">Bedrijfsnaam</label>
-                <input type="text" id="bedrijfsnaamInput" placeholder="Bedrijfsnaam" required ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="bedrijfsnaamInput" placeholder="Bedrijfsnaam" required ${
+                  readonlyMode ? 'disabled' : ''
+                }>
               </div>
               
               <div class="bedrijf-profile-form-group">
                 <label for="emailInput">E-mailadres</label>
-                <input type="email" id="emailInput" placeholder="contact@bedrijf.be" required ${readonlyMode ? 'disabled' : ''}>
+                <input type="email" id="emailInput" placeholder="contact@bedrijf.be" required ${
+                  readonlyMode ? 'disabled' : ''
+                }>
               </div>
               
               <div class="bedrijf-profile-form-group">
                 <label for="plaatsInput">Plaats</label>
-                <input type="text" id="plaatsInput" placeholder="Brussel" ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="plaatsInput" placeholder="Brussel" ${
+                  readonlyMode ? 'disabled' : ''
+                }>
               </div>
               
               <div class="bedrijf-profile-form-group">
                 <label for="linkedinInput">LinkedIn</label>
-                <input type="url" id="linkedinInput" placeholder="https://www.linkedin.com/company/bedrijf" ${readonlyMode ? 'disabled' : ''}>
+                <input type="url" id="linkedinInput" placeholder="https://www.linkedin.com/company/bedrijf" ${
+                  readonlyMode ? 'disabled' : ''
+                }>
               </div>
               
               <div class="bedrijf-profile-form-group">
                 <label for="sectorInput">Sector</label>
-                <input type="text" id="sectorInput" placeholder="IT & Technology" ${readonlyMode ? 'disabled' : ''}>
+                <input type="text" id="sectorInput" placeholder="IT & Technology" ${
+                  readonlyMode ? 'disabled' : ''
+                }>
               </div>
               
               <div class="bedrijf-profile-buttons">
@@ -273,8 +300,8 @@ export async function renderBedrijfProfiel(
 
   document.getElementById('nav-logout')?.addEventListener('click', async () => {
     dropdown.classList.remove('open');
-    const response = await logoutUser();
-    console.log('Logout API response:', response);
+    const response = await performLogout();
+
     window.sessionStorage.removeItem('bedrijfData');
     window.sessionStorage.removeItem('authToken');
     window.sessionStorage.removeItem('userType');
@@ -287,8 +314,8 @@ export async function renderBedrijfProfiel(
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
-      const response = await logoutUser();
-      console.log('Logout API response:', response);
+      const response = await performLogout();
+
       window.sessionStorage.removeItem('bedrijfData');
       window.sessionStorage.removeItem('authToken');
       window.sessionStorage.removeItem('userType');
@@ -307,30 +334,34 @@ export async function renderBedrijfProfiel(
   }
 
   // Delete overlay voor profielfoto
-    const profileAvatar = document.querySelector('.bedrijf-profile-avatar-div');
-    const photoInput = document.getElementById('logoInput');
-    const deleteOverlay = document.querySelector('.delete-overlay');
-    const bedrijfAvatar = document.getElementById('logo-preview');
+  const profileAvatar = document.querySelector('.bedrijf-profile-avatar-div');
+  const photoInput = document.getElementById('logoInput');
+  const deleteOverlay = document.querySelector('.delete-overlay');
+  const bedrijfAvatar = document.getElementById('logo-preview');
 
-    let deleteProfilePicture = false;
-    let savedProfilePicture = bedrijfAvatar.src; // Bewaar de originele profielfoto URL
+  let deleteProfilePicture = false;
+  let savedProfilePicture = bedrijfAvatar.src; // Bewaar de originele profielfoto URL
 
-    profileAvatar.addEventListener('mouseenter', () => {
-      if (!readonlyMode && !deleteProfilePicture && bedrijfAvatar.src !== DEFAULT_AVATAR_URL) {
-        deleteOverlay.style.display = 'flex';
-      }
-    });
-    profileAvatar.addEventListener('mouseleave', () => {
-      deleteOverlay.style.display = 'none';
-    });
+  profileAvatar.addEventListener('mouseenter', () => {
+    if (
+      !readonlyMode &&
+      !deleteProfilePicture &&
+      bedrijfAvatar.src !== DEFAULT_AVATAR_URL
+    ) {
+      deleteOverlay.style.display = 'flex';
+    }
+  });
+  profileAvatar.addEventListener('mouseleave', () => {
+    deleteOverlay.style.display = 'none';
+  });
 
-    deleteOverlay.addEventListener('click', async (e) => {
-      if (!readonlyMode && bedrijfAvatar.src !== DEFAULT_AVATAR_URL) {
-        photoInput.value = ''; // Reset file input
-        bedrijfAvatar.src = DEFAULT_AVATAR_URL; // Reset to default avatar
-        deleteProfilePicture = true; // Set flag to delete profile picture
-      }
-    });
+  deleteOverlay.addEventListener('click', async (e) => {
+    if (!readonlyMode && bedrijfAvatar.src !== DEFAULT_AVATAR_URL) {
+      photoInput.value = ''; // Reset file input
+      bedrijfAvatar.src = DEFAULT_AVATAR_URL; // Reset to default avatar
+      deleteProfilePicture = true; // Set flag to delete profile picture
+    }
+  });
 
   // SAVE knop
   const saveBtn = document.getElementById('btn-save-bedrijf');
@@ -345,7 +376,10 @@ export async function renderBedrijfProfiel(
         if (linkedinInput && linkedinInput.trim() !== '') {
           linkedinInput = linkedinInput.trim();
           // Remove both 'https://www.linkedin.com' and 'https://linkedin.com' from the start
-          linkedinInput = linkedinInput.replace(/^(https?:\/\/)?(www\.)?linkedin\.com/i, '');
+          linkedinInput = linkedinInput.replace(
+            /^(https?:\/\/)?(www\.)?linkedin\.com/i,
+            ''
+          );
           // Accept if it starts with '/company/'
           if (linkedinInput.startsWith('/company/')) {
             linkedinValue = linkedinInput;
@@ -357,118 +391,153 @@ export async function renderBedrijfProfiel(
         let sectorID = null;
         if (document.getElementById('sectorInput').value) {
           try {
-            console.log('Sector input value:', document.getElementById('sectorInput').value);
             const currentToken = window.sessionStorage.getItem('authToken');
-            const response = await fetch('https://api.ehb-match.me/sectoren', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + currentToken,
-              },
-              body: JSON.stringify({
-                naam: document.getElementById('sectorInput').value
-              })
-            });
+            const response = await authenticatedFetch(
+              'https://api.ehb-match.me/sectoren',
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: 'Bearer ' + currentToken,
+                },
+                body: JSON.stringify({
+                  naam: document.getElementById('sectorInput').value,
+                }),
+              }
+            );
             if (!response.ok) {
-              throw new Error('Fout bij het ophalen van sector ID: ' + response.statusText);
+              throw new Error(
+                'Fout bij het ophalen van sector ID: ' + response.statusText
+              );
             }
             const data = await response.json();
-            console.log('Sector ID opgehaald:', data);
+
             sectorID = data.sector.id;
           } catch (error) {
             console.error('Error fetching sector ID:', error);
           }
         }
         const updateData = {
-          naam: document.getElementById('bedrijfsnaamInput').value,
-          contact_email: document.getElementById('emailInput').value,
-          plaats: document.getElementById('plaatsInput').value,
+          naam: document.getElementById('bedrijfsnaamInput').value.trim(),
+          contact_email: document.getElementById('emailInput').value.trim(),
+          plaats: document.getElementById('plaatsInput').value.trim(),
           linkedin: linkedinValue,
           id_sector: sectorID || bedrijfData.id_sector_bedrijf, // Gebruik sectorID als deze is opgehaald, anders huidige waarde
           // sector_bedrijf wordt niet geaccepteerd door de API, dus weggelaten
-        }; // Haal het bedrijf ID op uit de huidige data
-        const bedrijfID = bedrijfData.id || bedrijfData.gebruiker_id;
+        };
 
-        console.log('Debug bedrijf ID lookup:');
-        console.log('bedrijfData:', bedrijfData);
-        console.log('bedrijfData.id:', bedrijfData.id);
-        console.log('bedrijfData.gebruiker_id:', bedrijfData.gebruiker_id);
-        console.log('Final bedrijfID:', bedrijfID);
+        // Remove empty values but keep valid null values
+        Object.keys(updateData).forEach((key) => {
+          if (
+            updateData[key] === null ||
+            updateData[key] === undefined ||
+            updateData[key] === ''
+          ) {
+            if (key === 'linkedin' || key === 'plaats') {
+              // These fields can be empty
+              updateData[key] = updateData[key] || '';
+            } else if (key !== 'id_sector') {
+              // Don't remove id_sector even if null
+              delete updateData[key];
+            }
+          }
+        });
+
+        // Validate required fields
+        if (!updateData.naam) {
+          alert('Bedrijfsnaam is verplicht.');
+          return;
+        }
+
+        if (!updateData.contact_email) {
+          alert('E-mailadres is verplicht.');
+          return;
+        }
+
+        // Haal het bedrijf ID op uit de huidige data
+        const bedrijfID = bedrijfData.id || bedrijfData.gebruiker_id;
 
         if (!bedrijfID) {
           alert('Kon bedrijf ID niet vinden. Probeer opnieuw in te loggen.');
           return;
         }
 
-        console.log(
-          'Updating bedrijf with ID:',
-          bedrijfID,
-          'Data:',
-          updateData
-        );
-
         // Voeg de profiel foto toe als deze is gewijzigd
         let profielFotoKey = null;
-          if (bedrijfData.profiel_foto_url && typeof bedrijfData.profiel_foto_url === 'string' && !deleteProfilePicture) {
-            if (bedrijfData.profiel_foto_url.startsWith('http')) {
-              const parts = bedrijfData.profiel_foto_url.split('/');
-              profielFotoKey = parts[parts.length - 1];
-            } else if (bedrijfData.profiel_foto_url !== 'null') {
-              profielFotoKey = bedrijfData.profiel_foto_url;
-            }
+        if (
+          bedrijfData.profiel_foto_url &&
+          typeof bedrijfData.profiel_foto_url === 'string' &&
+          !deleteProfilePicture
+        ) {
+          if (bedrijfData.profiel_foto_url.startsWith('http')) {
+            const parts = bedrijfData.profiel_foto_url.split('/');
+            profielFotoKey = parts[parts.length - 1];
+          } else if (bedrijfData.profiel_foto_url !== 'null') {
+            profielFotoKey = bedrijfData.profiel_foto_url;
           }
-          if (deleteProfilePicture && savedProfilePicture && savedProfilePicture !== DEFAULT_AVATAR_URL) {
-            // remove https://gt0kk4fbet.ufs.sh/f/ prefix if present
-            profielFotoKey = savedProfilePicture.replace(BASE_AVATAR_URL, '');
-            const currentToken = window.sessionStorage.getItem('authToken');
-            const deleteResp = await fetch(`https://api.ehb-match.me/profielfotos/${profielFotoKey}`, {
+        }
+        if (
+          deleteProfilePicture &&
+          savedProfilePicture &&
+          savedProfilePicture !== DEFAULT_AVATAR_URL
+        ) {
+          // remove https://gt0kk4fbet.ufs.sh/f/ prefix if present
+          profielFotoKey = savedProfilePicture.replace(BASE_AVATAR_URL, '');
+          const currentToken = window.sessionStorage.getItem('authToken');
+          const deleteResp = await authenticatedFetch(
+            `https://api.ehb-match.me/profielfotos/${profielFotoKey}`,
+            {
               method: 'DELETE',
               headers: {
-                'Authorization': 'Bearer ' + currentToken,
+                Authorization: 'Bearer ' + currentToken,
               },
-            });
-            console.log('Profielfoto verwijderd:', deleteResp);
-            profielFotoKey = DEFAULT_AVATAR_KEY; // Reset de profielfoto key
+            }
+          );
+
+          profielFotoKey = DEFAULT_AVATAR_KEY; // Reset de profielfoto key
+        }
+        const photoInput = document.getElementById('logoInput');
+        if (photoInput && photoInput.files && photoInput.files.length > 0) {
+          const file = photoInput.files[0];
+          // Controleer bestandstype en grootte
+          // Controleer bestandstype en grootte
+          if (!file.type.match(/^image\/(jpeg|png|gif)$/)) {
+            alert(
+              'Ongeldig bestandstype. Kies een jpg, png of gif afbeelding.'
+            );
+            return;
           }
-          const photoInput = document.getElementById('logoInput');
-          if (photoInput && photoInput.files && photoInput.files.length > 0) {
-            const file = photoInput.files[0];
-            // Controleer bestandstype en grootte
-            if (!file.type.match(/^image\/(jpeg|png|gif)$/)) {
-              alert('Ongeldig bestandstype. Kies een jpg, png of gif afbeelding.');
-              return;
-            }
-            if (file.size > 2 * 1024 * 1024) {
-              alert('Bestand is te groot. Maximaal 2 MB toegestaan.');
-              return;
-            }
-            // Gebruik altijd 'image' als veldnaam
-            const fileForm = new FormData();
-            fileForm.append('image', file);
-            const currentToken = window.sessionStorage.getItem('authToken');
-            const uploadResp = await fetch('https://api.ehb-match.me/profielfotos', {
+          if (file.size > 2 * 1024 * 1024) {
+            alert('Bestand is te groot. Maximaal 2 MB toegestaan.');
+            return;
+          }
+          // Gebruik altijd 'image' als veldnaam
+          const fileForm = new FormData();
+          fileForm.append('image', file);
+          const currentToken = window.sessionStorage.getItem('authToken');
+          const uploadResp = await authenticatedFetch(
+            'https://api.ehb-match.me/profielfotos',
+            {
               method: 'POST',
               headers: {
-                'Authorization': 'Bearer ' + currentToken,
+                Authorization: 'Bearer ' + currentToken,
               },
               body: fileForm,
-            });
-            if (!uploadResp.ok) {
-              const errText = await uploadResp.text();
-              console.error('Upload response for key "image":', errText);
-              throw new Error('Foto uploaden mislukt: ' + errText);
             }
-            const uploadResult = await uploadResp.json();
-            profielFotoKey = uploadResult.profiel_foto_key;
+          );
+          if (!uploadResp.ok) {
+            const errText = await uploadResp.text();
+            console.error('Upload response for key "image":', errText);
+            throw new Error('Foto uploaden mislukt: ' + errText);
           }
-          console.log('Stuur profielfoto key:', profielFotoKey);
+          const uploadResult = await uploadResp.json();
+          profielFotoKey = uploadResult.profiel_foto_key;
+        }
 
-          updateData.profiel_foto = profielFotoKey || DEFAULT_AVATAR_KEY; // Voeg de profielfoto key toe als deze bestaat
-          console.log('Final update data:', updateData);
+        updateData.profiel_foto = profielFotoKey || DEFAULT_AVATAR_KEY; // Voeg de profielfoto key toe als deze bestaat
 
         // Roep de API aan om het bedrijf bij te werken
         const result = await updateBedrijfProfile(bedrijfID, updateData);
-
 
         if (result.success) {
           alert('Bedrijfsprofiel succesvol opgeslagen!');
@@ -476,10 +545,15 @@ export async function renderBedrijfProfiel(
           const updatedBedrijfData = {
             ...bedrijfData,
             ...updateData,
-            sector_bedrijf: (result.bedrijf?.sector_bedrijf && result.bedrijf.sector_bedrijf.length > 0)
-              ? result.bedrijf.sector_bedrijf.charAt(0).toUpperCase() + result.bedrijf.sector_bedrijf.slice(1)
-              : bedrijfData.sector_bedrijf,
-            id_sector_bedrijf: result.bedrijf?.id_sector_bedrijf || bedrijfData.id_sector_bedrijf,
+            sector_bedrijf:
+              result.bedrijf?.sector_bedrijf &&
+              result.bedrijf.sector_bedrijf.length > 0
+                ? result.bedrijf.sector_bedrijf.charAt(0).toUpperCase() +
+                  result.bedrijf.sector_bedrijf.slice(1)
+                : bedrijfData.sector_bedrijf,
+            id_sector_bedrijf:
+              result.bedrijf?.id_sector_bedrijf ||
+              bedrijfData.id_sector_bedrijf,
             profiel_foto_key:
               result.bedrijf?.profiel_foto_key || bedrijfData.profiel_foto_key,
             profiel_foto_url:
@@ -520,6 +594,14 @@ export async function renderBedrijfProfiel(
   if (cancelBtn) {
     cancelBtn.addEventListener('click', () => {
       renderBedrijfProfiel(rootElement, bedrijfData, true);
+    });
+  }
+
+  // Logo navigation event listener
+  const logoSection = document.getElementById('logo-navigation');
+  if (logoSection) {
+    logoSection.addEventListener('click', () => {
+      Router.navigate('/bedrijf/speeddates');
     });
   }
 
@@ -571,4 +653,14 @@ export async function renderBedrijfProfiel(
       }
     });
   }
+
+  // Zoekcriteria knop
+  document
+    .getElementById('to-search-criteria-btn')
+    ?.addEventListener('click', () => {
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/bedrijf/zoek-criteria');
+      });
+    });
 }

@@ -6,18 +6,18 @@ import { renderSearchCriteriaStudent } from './search-criteria-student.js';
 import { renderSpeeddatesRequests } from './student-speeddates-verzoeken.js';
 import { showSettingsPopup } from './student-settings.js';
 import { fetchStudentSpeeddates } from '../../utils/data-api.js';
+import { authenticatedFetch } from '../../utils/auth-api.js';
+import { showBedrijfInfoPopup } from './bedrijven.js';
 
 // Nieuw: API fetch
 async function fetchSpeeddates(rootElement) {
   const token = sessionStorage.getItem('authToken');
-  console.log('authToken:', token);
+
   if (!token) {
     renderLogin(rootElement);
     return [];
   }
-  const resp = await fetch('https://api.ehb-match.me/speeddates', {
-    headers: { Authorization: 'Bearer ' + token },
-  });
+  const resp = await authenticatedFetch('https://api.ehb-match.me/speeddates');
   if (!resp.ok) {
     if (resp.status === 401) {
       sessionStorage.removeItem('authToken');
@@ -36,20 +36,14 @@ async function fetchFunctiesSkills(bedrijfId) {
   let functies = [];
   let skills = [];
   try {
-    const resFuncties = await fetch(
-      `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`,
-      {
-        headers: { Authorization: 'Bearer ' + token },
-      }
+    const resFuncties = await authenticatedFetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`
     );
     if (resFuncties.ok) functies = await resFuncties.json();
   } catch {}
   try {
-    const resSkills = await fetch(
-      `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`,
-      {
-        headers: { Authorization: 'Bearer ' + token },
-      }
+    const resSkills = await authenticatedFetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`
     );
     if (resSkills.ok) skills = await resSkills.json();
   } catch {}
@@ -59,7 +53,7 @@ async function fetchFunctiesSkills(bedrijfId) {
 function getStatusBadge(akkoord) {
   return akkoord
     ? '<span class="status-badge badge-accepted">Geaccepteerd</span>'
-    : '<span class="status-badge badge-waiting">In afwachting</span>';
+    : '<span class="status-badge badge-waiting">In behandeling</span>';
 }
 
 function renderSpeeddatesError(root, err) {
@@ -93,11 +87,9 @@ async function fetchSpeeddatesWithStatus(
   const token = sessionStorage.getItem('authToken');
   let url = 'https://api.ehb-match.me/speeddates';
   if (status === 'Geaccepteerd') url += '/accepted';
-  else if (status === 'In afwachting') url += '/pending';
+  else if (status === 'In behandeling') url += '/pending';
   if (studentId) url += (url.includes('?') ? '&' : '?') + 'id=' + studentId;
-  const resp = await fetch(url, {
-    headers: { Authorization: 'Bearer ' + token },
-  });
+  const resp = await authenticatedFetch(url);
   if (!resp.ok) {
     if (resp.status === 401) {
       sessionStorage.removeItem('authToken');
@@ -117,6 +109,25 @@ function formatUTCTime(isoString) {
   return `${hh}:${mm}`;
 }
 
+// Exporteer de tijdslot-functie zodat deze bruikbaar is in andere modules
+export function formatTijdslotStudent(beginISO, eindeISO) {
+  const begin = new Date(beginISO);
+  const einde = new Date(eindeISO);
+  // Dag en datum
+  const dagOpties = {
+    weekday: 'long',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  };
+  const dagDatum = begin.toLocaleDateString('nl-BE', dagOpties);
+  // Uur
+  const tijdOpties = { hour: '2-digit', minute: '2-digit' };
+  const beginTijd = begin.toLocaleTimeString('nl-BE', tijdOpties);
+  const eindeTijd = einde.toLocaleTimeString('nl-BE', tijdOpties);
+  return `<span class=\"speeddate-dag\"><strong>Dag:</strong> ${dagDatum}</span><br><span class=\"speeddate-uur\"><strong>Uur:</strong> ${beginTijd} - ${eindeTijd}</span>`;
+}
+
 export async function renderSpeeddates(rootElement, studentData = {}) {
   // Sorteervolgorde behouden als er al gesorteerd is, anders default op tijd
   if (!currentSort || !Array.isArray(currentSort) || currentSort.length === 0) {
@@ -125,7 +136,6 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
   let speeddates = [];
   try {
     speeddates = await fetchSpeeddates(rootElement);
-    console.log('Alle opgehaalde speeddates:', speeddates);
   } catch (e) {
     if (e.message.includes('401')) {
       renderLogin(rootElement);
@@ -134,13 +144,11 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     console.error(e);
     speeddates = []; // Fallback: leeg array bij API-fout
   }
-  // DEBUG: Toon studentData en studentId
-  console.log('studentData:', studentData);
-  console.log('sessionStorage.user:', sessionStorage.getItem('user'));
+
   let studentId = studentData?.id || studentData?.gebruiker_id;
   if (!studentId) {
     const stored = JSON.parse(sessionStorage.getItem('user') || '{}');
-    console.log('Gevonden stored user:', stored);
+
     studentId = stored.id || stored.gebruiker_id;
   }
   if (!studentId && speeddates && speeddates.length) {
@@ -149,7 +157,7 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
   } // Haal speeddates op
   try {
     speeddates = await fetchSpeeddates(rootElement);
-    console.log('Alle opgehaalde speeddates:', speeddates);
+
     // Verwijder deze filter zodat ALLE speeddates (zowel inkomend als uitgaand) zichtbaar zijn
     // speeddates = speeddates.filter(s => s.asked_by !== studentId);
   } catch (e) {
@@ -188,33 +196,30 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       s.akkoord ? 'goedgekeurd' : 'in-behandeling'
     } bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(
         s
-      )}' style="cursor:pointer;">
-      <div class="speeddate-info">
+      )}' style="min-width:600px;max-width:1200px;width:100%;cursor:pointer;">
+      <div class="speeddate-info" style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:24px;">
         <div class="bedrijf-info">
           <img src="${
-            s.profiel_foto_bedrijf || s.foto || '/images/defaultlogo.webp'
+            s.profiel_foto_bedrijf ||
+            s.foto ||
+            'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'
           }" 
                alt="${s.naam_bedrijf}" 
                class="profiel-foto bedrijf-foto"
-               onerror="this.src='/src/images/defaultlogo.webp'" />
+               onerror="this.src='https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'" />
           <div class="bedrijf-details">
             <h4>${s.naam_bedrijf}</h4>
-            <p class="bedrijf-id">Bedrijf ID: ${s.id_bedrijf}</p>
           </div>
         </div>
-        
-        <div class="afspraak-details">
+        <div class="afspraak-details" style="display:flex;flex-direction:row;align-items:center;gap:24px;">
           <div class="tijd-lokaal">
-            <p class="tijdslot"><strong>Tijd:</strong> ${
-              s.begin ? formatUTCTime(s.begin) : '-'
-            }</p>
-            <p class="lokaal"><strong>Lokaal:</strong> ${s.lokaal || '-'}</p>
+            ${s.begin ? formatTijdslotStudent(s.begin, s.einde) : '-'}
           </div>
           <div class="status">
             <span class="status-badge ${
               s.akkoord ? 'goedgekeurd' : 'in-behandeling'
             }">
-              ${s.akkoord ? 'GOEDGEKEURD' : 'IN AFWACHTING'}
+              ${s.akkoord ? 'GOEDGEKEURD' : 'IN BEHANDLING'}
             </span>
           </div>
         </div>
@@ -223,12 +228,11 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
   `
     )
     .join('');
-
   // Now render the complete page with the fetched data
   rootElement.innerHTML = `
     <div class="student-profile-container">
       <header class="student-profile-header">
-        <div class="logo-section">
+        <div class="logo-section" id="logo-navigation">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>
@@ -242,7 +246,7 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       <div class="student-profile-main">
         <nav class="student-profile-sidebar">
           <ul>
-            <li><button data-route="speeddates" class="sidebar-link" type="button">Speeddates</button></li>
+            <li><button data-route="speeddates" class="sidebar-link" type="button">Mijn speeddates</button></li>
             <li><button data-route="requests" class="sidebar-link" type="button">Speeddates-verzoeken</button></li>
             <li><button data-route="bedrijven" class="sidebar-link" type="button">Bedrijven</button></li>
           </ul>
@@ -257,6 +261,11 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
                     <div class="speeddates-lijst">
                       <div class="speeddates-header">
                         <h2>Geplande Speeddates (${sorted.length})</h2>
+                        <div class="speeddates-filter-group">
+                          <button class="speeddates-filter-btn active" data-filter="all">Alle speeddates</button>
+                          <button class="speeddates-filter-btn" data-filter="goedgekeurd">Goedgekeurd</button>
+                          <button class="speeddates-filter-btn" data-filter="in-behandeling">In behandeling</button>
+                        </div>
                       </div>
                       <div class="speeddates-table">
                         ${speeddateCards}
@@ -277,13 +286,19 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     document.querySelectorAll('.bedrijf-popup-trigger').forEach((el) => {
       el.addEventListener('click', async () => {
         const data = JSON.parse(el.dataset.bedrijf);
-        await createBedrijfPopup(data);
+        // Zorg dat we altijd een bedrijf-id of gebruiker_id meegeven
+        if (!data.gebruiker_id && data.id_bedrijf)
+          data.gebruiker_id = data.id_bedrijf;
+        await showBedrijfInfoPopup(data);
       });
     });
   }
 
   // Popup event listeners voor bedrijfsnaam
   addBedrijfPopupListeners();
+
+  // Filter functionaliteit voor speeddates (student)
+  initSpeeddatesFilter();
 
   // Sidebar nav - gebruik de router voor echte URL navigatie
   document.querySelectorAll('.sidebar-link').forEach((btn) => {
@@ -293,10 +308,6 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       import('../../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
-          // case 'profile': // verwijderd
-          case 'search':
-            Router.navigate('/student/zoek-criteria');
-            break;
           case 'speeddates':
             Router.navigate('/student/student-speeddates');
             break;
@@ -306,13 +317,21 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
           case 'bedrijven':
             Router.navigate('/student/bedrijven');
             break;
-          case 'qr':
-            Router.navigate('/student/student-qr-popup');
-            break;
         }
       });
     });
   });
+
+  // Logo navigation event listener
+  const logoSection = document.getElementById('logo-navigation');
+  if (logoSection) {
+    logoSection.addEventListener('click', () => {
+      import('../../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/student/student-speeddates');
+      });
+    });
+  }
 
   // Hamburger menu Profiel knop
   const navProfileBtn = document.getElementById('nav-profile');
@@ -396,7 +415,9 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       align-items: center;
     `;
     const profielFoto =
-      s.foto && s.foto.trim() !== '' ? s.foto : '/src/Images/defaultlogo.webp';
+      s.profiel_foto_bedrijf && s.profiel_foto_bedrijf.trim() !== ''
+        ? s.profiel_foto_bedrijf
+        : 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
     popup.innerHTML = `
       <button id="popup-close" style="position:absolute;top:10px;right:12px;font-size:1.4rem;background:none;border:none;cursor:pointer;">×</button>
       <img src="${profielFoto}" alt="Logo ${
@@ -440,24 +461,85 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     const bedrijfId = s.id_bedrijf || s.gebruiker_id;
     if (bedrijfId) {
       const { functies, skills } = await fetchFunctiesSkills(bedrijfId);
+      // Haal student skills/functies uit sessionStorage (voor matching)
+      let studentSkills = [],
+        studentFuncties = [];
+      try {
+        const studentData = JSON.parse(
+          sessionStorage.getItem('studentData') ||
+            sessionStorage.getItem('user') ||
+            '{}'
+        );
+        if (studentData.skills && Array.isArray(studentData.skills)) {
+          studentSkills = studentData.skills
+            .map((s) => (typeof s === 'string' ? s : s.naam))
+            .filter(Boolean)
+            .map((s) => s.toLowerCase());
+        }
+        if (studentData.functies && Array.isArray(studentData.functies)) {
+          studentFuncties = studentData.functies
+            .map((f) => (typeof f === 'string' ? f : f.naam))
+            .filter(Boolean)
+            .map((f) => f.toLowerCase());
+        }
+      } catch {}
       const functiesHtml = functies.length
         ? functies
-            .map(
-              (f) =>
-                `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#e3f2fd;font-size:0.85rem;\">${f.naam}</span>`
-            )
+            .map((f) => {
+              const isMatch = studentFuncties.includes(
+                (f.naam || '').toLowerCase()
+              );
+              return `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:${
+                isMatch ? '#e3f2fd' : '#f1f1f1'
+              };color:${isMatch ? '#1565c0' : '#222'};font-size:0.85rem;\">${
+                f.naam
+              }</span>`;
+            })
             .join('')
         : '<em>Geen functies beschikbaar</em>';
       document.getElementById('popup-functies').innerHTML = functiesHtml;
       const skillsHtml = skills.length
         ? skills
-            .map(
-              (skill) =>
-                `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:#f1f1f1;font-size:0.85rem;\">${skill.naam}</span>`
-            )
+            .map((skill) => {
+              const isMatch = studentSkills.includes(
+                (skill.naam || '').toLowerCase()
+              );
+              return `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:${
+                isMatch ? '#e3f2fd' : '#f1f1f1'
+              };color:${isMatch ? '#1565c0' : '#222'};font-size:0.85rem;\">${
+                skill.naam
+              }</span>`;
+            })
             .join('')
         : '<em>Geen skills beschikbaar</em>';
       document.getElementById('popup-skills').innerHTML = skillsHtml;
     }
   }
 }
+
+// Filter functionaliteit voor speeddates (student)
+function initSpeeddatesFilter() {
+  const filterBtns = document.querySelectorAll('.speeddates-filter-btn');
+  if (!filterBtns.length) return;
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', function () {
+      filterBtns.forEach((b) => b.classList.remove('active'));
+      this.classList.add('active');
+      const filter = this.dataset.filter;
+      document.querySelectorAll('.speeddate-item').forEach((item) => {
+        const badge = item.querySelector('.status-badge');
+        if (filter === 'all') {
+          item.style.display = '';
+        } else if (filter === 'goedgekeurd') {
+          item.style.display =
+            badge && badge.classList.contains('goedgekeurd') ? '' : 'none';
+        } else if (filter === 'in-behandeling') {
+          item.style.display =
+            badge && badge.classList.contains('in-behandeling') ? '' : 'none';
+        }
+      });
+    });
+  });
+}
+setTimeout(initSpeeddatesFilter, 0);
+document.addEventListener('DOMContentLoaded', initSpeeddatesFilter);

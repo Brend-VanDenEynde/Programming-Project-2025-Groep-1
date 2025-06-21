@@ -29,7 +29,7 @@ export async function renderStudentProfiel(rootElement, studentData = {}) {
   if (!studentData.id && window.sessionStorage.getItem('currentStudentId')) {
     try {
       const studentId = window.sessionStorage.getItem('currentStudentId');
-      console.log('Fetching student profile from API...');
+
       profileData = await fetchStudentById(studentId);
     } catch (error) {
       console.error('Failed to fetch student profile:', error);
@@ -91,11 +91,9 @@ export async function renderStudentProfiel(rootElement, studentData = {}) {
       try {
         // API call met automatische token refresh
         const studentId = window.sessionStorage.getItem('currentStudentId');
-        console.log('Updating student profile via API...');
 
         const response = await updateStudentProfile(studentId, updatedData);
 
-        console.log('Profile updated successfully:', response);
         alert('Profiel succesvol bijgewerkt!');
 
         // Re-render met nieuwe data

@@ -5,7 +5,7 @@ export function createBedrijfNavbar(activeRoute = '') {
   return `
     <div class="bedrijf-profile-container">
       <header class="bedrijf-profile-header">
-        <div class="logo-section">
+        <div class="logo-section" id="logo-navigation">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
@@ -50,17 +50,13 @@ export function closeBedrijfNavbar() {
 }
 
 export function setupBedrijfNavbarEvents() {
-  console.log('Setting up bedrijf navbar events...');
-
   // Sidebar navigation
   const sidebarLinks = document.querySelectorAll('.sidebar-link');
-  console.log('Found sidebar links:', sidebarLinks.length);
 
   sidebarLinks.forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       const route = e.currentTarget.getAttribute('data-route');
-      console.log('Clicking route:', route);
 
       import('../router.js').then((module) => {
         const Router = module.default;
@@ -81,6 +77,18 @@ export function setupBedrijfNavbarEvents() {
       });
     });
   });
+
+  // Logo navigation event listener
+  const logoSection = document.getElementById('logo-navigation');
+  if (logoSection) {
+    logoSection.addEventListener('click', () => {
+      import('../router.js').then((module) => {
+        const Router = module.default;
+        Router.navigate('/bedrijf/speeddates');
+      });
+    });
+  }
+
   // Burger menu functionality
   const burger = document.getElementById('burger-menu');
   const dropdown = document.getElementById('burger-dropdown');
@@ -134,8 +142,8 @@ export function setupBedrijfNavbarEvents() {
   const logoutButton = document.getElementById('nav-logout');
   if (logoutButton) {
     logoutButton.addEventListener('click', async () => {
-      const { logoutUser } = await import('../utils/auth-api.js');
-      await logoutUser();
+      const { performLogout } = await import('../utils/auth-api.js');
+      await performLogout();
 
       // Clear session data
       window.sessionStorage.removeItem('companyData');

@@ -1,15 +1,18 @@
 import logoIcon from '../../icons/favicon-32x32.png';
+import { authenticatedFetch } from '../../utils/auth-api.js';
+import Router from '../../router.js';
+import { showStudentInfoPopup } from './studenten.js';
 
 // Functie om speeddate data op te halen van de API
 async function fetchSpeeddateData(bedrijfId, token) {
-  const url = `https://api.ehb-match.me/speeddates/accepted?id=${bedrijfId}`;
+  const url = `https://api.ehb-match.me/speeddates`;
   const headers = {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
   };
 
   try {
-    const response = await fetch(url, { headers });
+    const response = await authenticatedFetch(url, { headers });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -17,8 +20,13 @@ async function fetchSpeeddateData(bedrijfId, token) {
 
     const data = await response.json();
 
+    // Filter out unaccepted speeddate requests made by other users
+    const filteredData = data.filter(
+      (item) => item.akkoord !== 0 || item.asked_by === bedrijfId
+    );
+
     // Structureer de data voor eenvoudige rendering
-    return formatSpeeddateData(data);
+    return formatSpeeddateData(filteredData);
   } catch (error) {
     console.error('Fout bij ophalen van speeddate data:', error);
     throw error;
@@ -60,21 +68,22 @@ function formatTijdslot(beginISO, eindeISO) {
   const begin = new Date(beginISO);
   const einde = new Date(eindeISO);
 
-  const opties = {
+  // Dag en datum
+  const dagOpties = {
+    weekday: 'long',
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
   };
+  const dagDatum = begin.toLocaleDateString('nl-BE', dagOpties);
 
-  const beginFormatted = begin.toLocaleDateString('nl-NL', opties);
-  const eindeFormatted = einde.toLocaleTimeString('nl-NL', {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  // Uur
+  const tijdOpties = { hour: '2-digit', minute: '2-digit' };
+  const beginTijd = begin.toLocaleTimeString('nl-BE', tijdOpties);
+  const eindeTijd = einde.toLocaleTimeString('nl-BE', tijdOpties);
 
-  return `${beginFormatted} - ${eindeFormatted}`;
+  // Output: dag: datum\n uur: tijd-tijd
+  return `<span class="speeddate-dag"><strong>Dag:</strong> ${dagDatum}</span><br><span class="speeddate-uur"><strong>Uur:</strong> ${beginTijd} - ${eindeTijd}</span>`;
 }
 
 // Functie om speeddate lijst te renderen
@@ -87,6 +96,11 @@ function renderSpeeddatesList(speeddates) {
     <div class="speeddates-lijst">
       <div class="speeddates-header">
         <h2>Geplande Speeddates (${speeddates.length})</h2>
+        <div class="speeddates-filter-group">
+          <button class="speeddates-filter-btn active" data-filter="all">Alle speeddates</button>
+          <button class="speeddates-filter-btn" data-filter="goedgekeurd">Goedgekeurd</button>
+          <button class="speeddates-filter-btn" data-filter="in-behandeling">In behandeling</button>
+        </div>
       </div>
       <div class="speeddates-table">
         ${speeddates
@@ -94,49 +108,36 @@ function renderSpeeddatesList(speeddates) {
             (afspraak) => `
           <div class="speeddate-item ${
             afspraak.akkoord ? 'goedgekeurd' : 'in-behandeling'
-          }">
-            <div class="speeddate-info">
+          }" style="min-width:600px;max-width:1200px;width:100%;display:flex;align-items:center;">
+            <div class="speeddate-info" style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:24px;">
               <div class="student-info">
                 <img src="${
                   afspraak.student.profielfoto || '/images/default.png'
                 }" 
                      alt="${afspraak.student.naam}" 
-                     class="profiel-foto student-foto"
+                     class="profiel-foto student-foto student-popup-trigger"
+                     data-student='${JSON.stringify(afspraak.student)}'
+                     style="cursor:pointer;"
                      onerror="this.src='/images/default.png'" />
                 <div class="student-details">
-                  <h4>${afspraak.student.naam}</h4>
-                  <p class="student-id">Student ID: ${afspraak.student.id}</p>
+                  <h4 class="student-popup-trigger" data-student='${JSON.stringify(
+                    afspraak.student
+                  )}' style="cursor:pointer;text-decoration:none;">${
+              afspraak.student.naam
+            }</h4>
                 </div>
               </div>
-              
-              <div class="afspraak-details">
+              <div class="afspraak-details" style="display:flex;flex-direction:row;align-items:center;gap:24px;">
                 <div class="tijd-lokaal">
-                  <p class="tijdslot"><strong>Tijd:</strong> ${
-                    afspraak.tijdslot.geformatteerd
-                  }</p>
-                  <p class="lokaal"><strong>Lokaal:</strong> ${
-                    afspraak.lokaal
-                  }</p>
+                  ${afspraak.tijdslot.geformatteerd}
                 </div>
                 <div class="status">
                   <span class="status-badge ${
                     afspraak.akkoord ? 'goedgekeurd' : 'in-behandeling'
                   }">
-                    ${afspraak.status}
+                    ${afspraak.akkoord ? 'GOEDGEKEURD' : 'IN BEHANDELING'}
                   </span>
                 </div>
-              </div>
-
-              <div class="speeddate-actions">
-                ${
-                  !afspraak.akkoord
-                    ? `
-                  <button class="action-btn cancel-btn" onclick="cancelSpeeddate(${afspraak.id})">
-                    Annuleren
-                  </button>
-                `
-                    : ''
-                }
               </div>
             </div>
           </div>
@@ -193,7 +194,6 @@ async function loadSpeeddateData() {
       try {
         const companyData = JSON.parse(companyDataString);
         bedrijfId = companyData.id;
-        console.log('Company data gevonden:', companyData);
       } catch (parseError) {
         console.error('Fout bij parsen companyData:', parseError);
       }
@@ -207,16 +207,13 @@ async function loadSpeeddateData() {
       bedrijfId = '24'; // Test ID uit je API voorbeeld
     }
 
-    console.log('Gebruikte credentials:', {
-      token: token ? 'Token beschikbaar' : 'Geen token',
-      bedrijfId: bedrijfId,
-    });
-
     // Haal speeddate data op
     const speeddates = await fetchSpeeddateData(bedrijfId, token);
 
     // Render de speeddate lijst
     contentDiv.innerHTML = renderSpeeddatesList(speeddates);
+    initSpeeddatesFilter();
+    bindStudentPopupTriggers();
   } catch (error) {
     console.error('Fout bij laden van speeddate data:', error);
     contentDiv.innerHTML =
@@ -224,11 +221,84 @@ async function loadSpeeddateData() {
   }
 }
 
+// Filter functionaliteit voor speeddates (bedrijf/student)
+function initSpeeddatesFilter() {
+  const filterBtns = document.querySelectorAll('.speeddates-filter-btn');
+  if (!filterBtns.length) return;
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', function () {
+      filterBtns.forEach((b) => b.classList.remove('active'));
+      this.classList.add('active');
+      const filter = this.dataset.filter;
+      document.querySelectorAll('.speeddate-item').forEach((item) => {
+        const badge = item.querySelector('.status-badge');
+        if (filter === 'all') {
+          item.style.display = '';
+        } else if (filter === 'goedgekeurd') {
+          item.style.display =
+            badge && badge.classList.contains('goedgekeurd') ? '' : 'none';
+        } else if (filter === 'in-behandeling') {
+          item.style.display =
+            badge && badge.classList.contains('in-behandeling') ? '' : 'none';
+        }
+      });
+    });
+  });
+}
+
+// Voeg event binding toe voor student popup trigger in de speeddate lijst
+function bindStudentPopupTriggers() {
+  setTimeout(() => {
+    document.querySelectorAll('.student-popup-trigger').forEach((el) => {
+      el.addEventListener('click', async () => {
+        // Haal altijd de meest actuele bedrijf skills/functies op vóór popup
+        try {
+          const companyDataString =
+            window.sessionStorage.getItem('companyData');
+          let bedrijfId;
+          if (companyDataString) {
+            const companyData = JSON.parse(companyDataString);
+            bedrijfId = companyData.id;
+          }
+          if (!bedrijfId) return;
+          // Fetch actuele skills en functies
+          const [skillsResp, functiesResp] = await Promise.all([
+            authenticatedFetch(
+              `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`
+            ).then((r) => (r.ok ? r.json() : [])),
+            authenticatedFetch(
+              `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`
+            ).then((r) => (r.ok ? r.json() : [])),
+          ]);
+          // Zet in sessionStorage zodat popup altijd up-to-date vergelijkt
+          const nieuweCompanyData = {
+            ...JSON.parse(window.sessionStorage.getItem('companyData') || '{}'),
+            skills: skillsResp.map((s) => s.naam),
+            functies: functiesResp.map((f) => f.naam),
+          };
+          window.sessionStorage.setItem(
+            'companyData',
+            JSON.stringify(nieuweCompanyData)
+          );
+          window.sessionStorage.setItem(
+            'bedrijfData',
+            JSON.stringify(nieuweCompanyData)
+          ); // <-- fix: ook onder bedrijfData opslaan
+        } catch (e) {
+          console.error('Kon bedrijf skills/functies niet verversen:', e);
+        }
+        const student = JSON.parse(el.getAttribute('data-student'));
+        await showStudentInfoPopup(student);
+      });
+    });
+  }, 0);
+}
+
 export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
   rootElement.innerHTML = `
     <div class="bedrijf-profile-container">
       <header class="bedrijf-profile-header">
-        <div class="logo-section">
+        <div class="logo-section" id="logo-navigation">
           <img src="${logoIcon}" alt="Logo EhB Career Launch" width="32" height="32" />
           <span>EhB Career Launch</span>
         </div>        <button id="burger-menu" class="bedrijf-profile-burger">☰</button>
@@ -241,7 +311,6 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
       
       <div class="bedrijf-profile-main">        <nav class="bedrijf-profile-sidebar">
           <ul>
-            <li><button data-route="search-criteria" class="sidebar-link">Zoek-criteria</button></li>
             <li><button data-route="speeddates" class="sidebar-link active">Speeddates</button></li>            <li><button data-route="requests" class="sidebar-link">Speeddates-verzoeken</button></li>
             <li><button data-route="studenten" class="sidebar-link">Studenten</button></li>
           </ul>
@@ -280,9 +349,6 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
       import('../../router.js').then((module) => {
         const Router = module.default;
         switch (route) {
-          case 'search-criteria':
-            Router.navigate('/bedrijf/zoek-criteria');
-            break;
           case 'speeddates':
             Router.navigate('/bedrijf/speeddates');
             break;
@@ -296,6 +362,15 @@ export function renderBedrijfSpeeddates(rootElement, bedrijfData = {}) {
       });
     });
   });
+
+  // Logo navigation event listener
+  const logoSection = document.getElementById('logo-navigation');
+  if (logoSection) {
+    logoSection.addEventListener('click', () => {
+      Router.navigate('/bedrijf/speeddates');
+    });
+  }
+
   // Burger menu and other functionality
   const burger = document.getElementById('burger-menu');
   const dropdown = document.getElementById('burger-dropdown');

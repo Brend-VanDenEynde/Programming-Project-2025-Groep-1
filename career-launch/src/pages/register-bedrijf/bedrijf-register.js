@@ -1,6 +1,7 @@
 // import { renderStudentOpleiding } from '../register-student/student-opleiding.js';
 import '../../css/consolidated-style.css';
 import Router from '../../router.js';
+import { authenticatedFetch } from '../../utils/auth-api.js';
 import { registerCompany } from '../../utils/data-api.js';
 
 import { previousData } from '../register.js';
@@ -15,7 +16,8 @@ export function renderBedrijfRegister(rootElement) {
       <button class="back-button" id="back-button">← Terug</button>
       <div class="upload-section">
         <div class="upload-icon" data-alt="⬆" style="position:relative;">
-          <img src="" alt="⬆" class="uploaded-photo" />
+          <img class="uploaded-photo" src="" style="display:none;" alt="" />
+          <div class="upload-icon-text">⬆</div>
           <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
         </div>
         <label for="profielFoto" class="upload-label">Logo</label>
@@ -71,6 +73,17 @@ export function renderBedrijfRegister(rootElement) {
     deleteOverlay.style.display = 'none';
   }
 
+  function updateUploadedPhotoVisibility() {
+    if (
+      uploadedPhoto.hasAttribute('src') &&
+      uploadedPhoto.getAttribute('src')
+    ) {
+      uploadedPhoto.style.display = '';
+    } else {
+      uploadedPhoto.style.display = 'none';
+    }
+  }
+
   uploadIcon.addEventListener('mouseenter', () => {
     if (hasUploadedPhoto) {
       deleteOverlay.style.display = 'flex';
@@ -83,15 +96,16 @@ export function renderBedrijfRegister(rootElement) {
   deleteOverlay.addEventListener('click', handlePhotoClick);
 
   async function handlePhotoClick() {
-    fetch(`https://api.ehb-match.me/profielfotos/${fileKey}`, {
+    authenticatedFetch(`https://api.ehb-match.me/profielfotos/${fileKey}`, {
       method: 'DELETE',
     }).then((response) => {
       if (!response.ok) {
         console.error(`Failed to delete photo: ${response.status}`);
       }
     });
-    uploadedPhoto.alt = '⬆';
+    uploadedPhoto.style.display = 'none';
     uploadedPhoto.src = '';
+    document.querySelector('.upload-icon-text').style.display = '';
     fileStatus.textContent = 'No file selected.'; // Reset file status
     uploadedPhoto.removeEventListener('click', handlePhotoClick);
     fileKey = null; // Reset file key
@@ -101,15 +115,20 @@ export function renderBedrijfRegister(rootElement) {
   fileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (file) {
+      document.querySelector('.upload-icon-text').style.display = 'none';
+
       fileStatus.textContent = file.name;
 
       const formData = new FormData();
 
       formData.append('image', file);
-      const uploadResponse = await fetch('https://api.ehb-match.me/profielfotos', {
-        method: 'POST',
-        body: formData,
-      }).then((response) => {
+      const uploadResponse = await authenticatedFetch(
+        'https://api.ehb-match.me/profielfotos',
+        {
+          method: 'POST',
+          body: formData,
+        }
+      ).then((response) => {
         if (!response.ok) {
           throw new Error(`Upload failed: ${response.status}`);
         } else {
@@ -119,10 +138,11 @@ export function renderBedrijfRegister(rootElement) {
 
       fileKey = uploadResponse.profiel_foto_key || null;
 
-      uploadedPhoto.alt = '';
+      uploadedPhoto.style.display = '';
       uploadedPhoto.src = uploadResponse.profiel_foto_url || '';
       updateDeleteOverlay();
       uploadedPhoto.addEventListener('click', handlePhotoClick);
+      updateUploadedPhotoVisibility();
     } else {
       fileStatus.textContent = 'No file selected.';
       updateDeleteOverlay();
@@ -164,7 +184,6 @@ async function handleBedrijfRegister(event) {
   const errorLabel = document.getElementById('error-label');
   errorLabel.style.display = 'none';
 
-
   // Validate required fields
   const bedrijfnaam = formData.get('bedrijfnaam');
   const plaats = formData.get('plaats');
@@ -189,7 +208,10 @@ async function handleBedrijfRegister(event) {
   if (linkedinInput && linkedinInput.trim() !== '') {
     linkedinInput = linkedinInput.trim();
     // Remove both 'https://www.linkedin.com' and 'https://linkedin.com' from the start
-    linkedinInput = linkedinInput.replace(/^(https?:\/\/)?(www\.)?linkedin\.com/i, '');
+    linkedinInput = linkedinInput.replace(
+      /^(https?:\/\/)?(www\.)?linkedin\.com/i,
+      ''
+    );
     // Accept if it starts with '/company/'
     if (linkedinInput.startsWith('/company/')) {
       linkedinValue = linkedinInput;
@@ -210,17 +232,18 @@ async function handleBedrijfRegister(event) {
   };
   try {
     const result = await registerCompany(data);
-    console.log('Bedrijf registratie succesvol:', result);
 
     // Clear stored user data
 
-    alert('Je bedrijf account is succesvol aangemaakt! Je kunt nu inloggen.');
+    alert(
+      'Uw bedrijfsaccount is succesvol aangemaakt! Gelieve te wachten tot ons team uw account bevestigt.'
+    );
     Router.navigate('/login');
   } catch (error) {
     console.error('Fout bij het aanmaken van bedrijf account:', error);
     errorLabel.textContent =
       error.message ||
-      'Er is een fout opgetreden bij het aanmaken van je account.';
+      'Er is een fout opgetreden bij het aanmaken van uw account.';
     errorLabel.style.display = 'block';
   }
 }

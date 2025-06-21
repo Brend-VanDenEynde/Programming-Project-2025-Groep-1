@@ -4,6 +4,7 @@ import Router from '../../router.js';
 import { apiGet, apiPost } from '../../utils/api.js';
 
 import { mergedData } from './student-register.js';
+import { authenticatedFetch } from '../../utils/auth-api.js';
 
 export function renderStudentOpleiding(rootElement) {
   rootElement.innerHTML = `
@@ -61,7 +62,9 @@ export function renderStudentOpleiding(rootElement) {
     });
   }
   // Footer links: gebruik alleen Router.navigate, geen hash of import, en selecteer alleen de lokale footer links
-  const privacyLink = document.querySelector('.footer-links a[data-route="/privacy"]');
+  const privacyLink = document.querySelector(
+    '.footer-links a[data-route="/privacy"]'
+  );
   if (privacyLink) {
     privacyLink.setAttribute('href', '#');
     privacyLink.addEventListener('click', (e) => {
@@ -70,7 +73,9 @@ export function renderStudentOpleiding(rootElement) {
       Router.navigate('/privacy');
     });
   }
-  const contactLink = document.querySelector('.footer-links a[data-route="/contact"]');
+  const contactLink = document.querySelector(
+    '.footer-links a[data-route="/contact"]'
+  );
   if (contactLink) {
     contactLink.setAttribute('href', '#');
     contactLink.addEventListener('click', (e) => {
@@ -87,26 +92,24 @@ export function renderStudentOpleiding(rootElement) {
 async function loadOpleidingen() {
   try {
     // Try direct fetch first since this might be a public endpoint
-    console.log('Fetching opleidingen from API...');
 
     let opleidingen;
     try {
-      const response = await fetch('https://api.ehb-match.me/opleidingen/', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await authenticatedFetch(
+        'https://api.ehb-match.me/opleidingen/',
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       opleidingen = await response.json();
-      console.log(
-        'Successfully fetched opleidingen with direct fetch:',
-        opleidingen
-      );
     } catch (fetchError) {
       console.warn('Direct fetch failed, trying with apiGet:', fetchError);
       // Fallback to apiGet in case authentication is required
@@ -239,36 +242,21 @@ async function handleJaarRegister(event) {
   }
 
   try {
-    console.log('Sending data to API:', JSON.stringify(data, null, 2));
-
-    // Log environment info for debugging
-    console.log('Current hostname:', window.location.hostname);
-    console.log('User agent:', navigator.userAgent);
-    console.log(
-      'LocalStorage userData keys:',
-      Object.keys(
-        localStorage.getItem('userData')
-          ? JSON.parse(localStorage.getItem('userData'))
-          : {}
-      )
-    );
-
     // Alternative approach: Try using the existing apiPost utility
     // which might handle CORS or other production issues better
     try {
-      console.log('Attempting registration with apiPost utility...');
       const result = await apiPost(
         'https://api.ehb-match.me/auth/register/student',
         data
       );
-      console.log('Registration successful with apiPost:', result);
+
       Router.navigate('/login');
       return;
     } catch (apiPostError) {
       console.warn('apiPost failed, falling back to fetch:', apiPostError);
     }
 
-    const response = await fetch(
+    const response = await authenticatedFetch(
       'https://api.ehb-match.me/auth/register/student',
       {
         method: 'POST',
@@ -277,12 +265,6 @@ async function handleJaarRegister(event) {
         },
         body: JSON.stringify(data),
       }
-    );
-
-    console.log('Response status:', response.status);
-    console.log(
-      'Response headers:',
-      Object.fromEntries(response.headers.entries())
     );
 
     if (!response.ok) {
@@ -328,7 +310,7 @@ async function handleJaarRegister(event) {
     }
 
     const result = await response.json();
-    console.log('Registration successful:', result);
+
     Router.navigate('/login');
   } catch (error) {
     console.error('Fout bij het aanmaken van account:', error);

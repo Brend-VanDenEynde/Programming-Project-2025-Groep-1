@@ -43,7 +43,9 @@ export async function renderStudentSkills(rootElement) {
   });
 
   // Footer links: gebruik alleen Router.navigate, geen hash of import, en selecteer alleen de lokale footer links
-  const privacyLink = document.querySelector('.footer-links a[data-route="/privacy"]');
+  const privacyLink = document.querySelector(
+    '.footer-links a[data-route="/privacy"]'
+  );
   if (privacyLink) {
     privacyLink.setAttribute('href', '#');
     privacyLink.addEventListener('click', (e) => {
@@ -52,7 +54,9 @@ export async function renderStudentSkills(rootElement) {
       Router.navigate('/privacy');
     });
   }
-  const contactLink = document.querySelector('.footer-links a[data-route="/contact"]');
+  const contactLink = document.querySelector(
+    '.footer-links a[data-route="/contact"]'
+  );
   if (contactLink) {
     contactLink.setAttribute('href', '#');
     contactLink.addEventListener('click', (e) => {
@@ -77,7 +81,7 @@ function handleSkillsRegister(event) {
   };
 
   // Data naar server sturen (voorbeeld)
-  console.log('Registratie data:', data);
+
   alert(`Je account is nu in orde.`);
 
   // Navigeren naar de juiste profielpagina
