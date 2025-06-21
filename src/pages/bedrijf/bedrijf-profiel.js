@@ -361,6 +361,8 @@ export async function renderBedrijfProfiel(
   const saveBtn = document.getElementById('btn-save-bedrijf');
   if (saveBtn) {
     saveBtn.addEventListener('click', async (e) => {
+      saveBtn.innerHTML = '<div class="loader"></div>'
+      saveBtn.disabled = true; // Disable the button to prevent multiple clicks
       e.preventDefault();
 
       try {
@@ -568,6 +570,8 @@ export async function renderBedrijfProfiel(
       } catch (error) {
         console.error('Error updating bedrijf profile:', error);
         alert('Er is een fout opgetreden bij het opslaan. Probeer opnieuw.');
+        saveBtn.innerHTML = 'SAVE';
+        saveBtn.disabled = false;
       }
     });
   } // RESET knop

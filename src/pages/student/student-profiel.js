@@ -352,6 +352,8 @@ export function renderStudentProfiel(
     const saveBtn = document.getElementById('btn-save-profile');
     if (saveBtn) {
       form.addEventListener('submit', async (e) => {
+        saveBtn.innerHTML = '<div class="loader"></div>'
+        saveBtn.disabled = true; // Disable button to prevent multiple clicks
         e.preventDefault();
         // Haal token op voor API-calls
         let token = sessionStorage.getItem('authToken');
@@ -599,6 +601,8 @@ export function renderStudentProfiel(
           }
         } catch (err) {
           alert('Fout bij opslaan profiel: ' + err.message);
+          saveBtn.innerHTML = 'SAVE';
+          saveBtn.disabled = false;
         }
       });
     }
