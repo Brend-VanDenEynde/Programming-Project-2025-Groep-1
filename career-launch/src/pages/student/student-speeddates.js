@@ -198,11 +198,11 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       <div class="speeddate-info" style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:24px;">
         <div class="bedrijf-info">
           <img src="${
-            s.profiel_foto_bedrijf || s.foto || '/images/defaultlogo.webp'
+            s.profiel_foto_bedrijf || s.foto || 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'
           }" 
                alt="${s.naam_bedrijf}" 
                class="profiel-foto bedrijf-foto"
-               onerror="this.src='/src/images/defaultlogo.webp'" />
+               onerror="this.src='https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'" />
           <div class="bedrijf-details">
             <h4>${s.naam_bedrijf}</h4>
           </div>
