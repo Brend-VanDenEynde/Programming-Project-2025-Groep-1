@@ -78,11 +78,11 @@ const routes = {
     );
     await renderBedrijfProfiel(rootElement, bedrijfData, true);
   },
-  '/bedrijf/zoek-criteria': (rootElement) => {
+  '/bedrijf/zoek-criteria': async (rootElement) => {
     const bedrijfData = JSON.parse(
       window.sessionStorage.getItem('bedrijfData') || '{}'
     );
-    renderSearchCriteriaBedrijf(rootElement, bedrijfData);
+    await renderSearchCriteriaBedrijf(rootElement, bedrijfData);
   },
   '/bedrijf/speeddates': (rootElement) => {
     const bedrijfData = JSON.parse(
