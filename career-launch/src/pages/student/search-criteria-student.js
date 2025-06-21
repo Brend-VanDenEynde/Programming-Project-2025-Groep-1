@@ -57,17 +57,13 @@ async function removeSkillFromStudent(studentId, skillId) {
     const text = await resp.text();
     if (!resp.ok) {
       console.error('Fout bij verwijderen skill:', text);
-      throw new Error(
-        `Skill met ID ${skillId} kon niet verwijderd worden: ${text}`
-      );
+      throw new Error(`Skill met ID ${skillId} kon niet verwijderd worden: ${text}`);
     }
     return true;
   } catch (error) {
     if (error.message && error.message.includes('401')) {
       alert('Je sessie is verlopen. Log opnieuw in.');
-      import('../login.js').then(({ renderLogin }) =>
-        renderLogin(document.body)
-      );
+      import('../login.js').then(({ renderLogin }) => renderLogin(document.body));
     }
     throw error;
   }
@@ -172,42 +168,12 @@ async function debugSetStudentSkillsIndividueel(studentId, skillIds) {
 async function syncStudentSkills(studentId, checkedSkillIds, checkedTaalIds) {
   // Debug: toon alle ID's en types
   const allIds = [...checkedSkillIds, ...checkedTaalIds].map(Number);
-  console.log(
-    'All IDs naar API:',
-    allIds,
-    allIds.map((x) => typeof x)
-  );
+  console.log('All IDs naar API:', allIds, allIds.map(x => typeof x));
   await setStudentSkills(studentId, allIds);
-
-  // Update opgeslagen criteria na synchronisatie
-  setTimeout(() => {
-    const criteria = collectCurrentCriteria(studentId);
-    saveSearchCriteria(studentId, criteria);
-  }, 100);
 }
 
-// Functies uit API ophalen
-async function fetchAlleFuncties() {
-  try {
-    const token = sessionStorage.getItem('authToken');
-    const resp = await fetch('https://api.ehb-match.me/functies', {
-      headers: { Authorization: 'Bearer ' + token },
-    });
-    if (!resp.ok) throw new Error('Kan functies niet ophalen');
-    return await resp.json(); // [{id, naam}]
-  } catch (error) {
-    console.error('Fout bij ophalen functies:', error);
-    // Fallback naar hardcoded functies
-    return [
-      { id: 1, naam: 'Fulltime' },
-      { id: 2, naam: 'Parttime' },
-      { id: 3, naam: 'Stage' },
-    ];
-  }
-}
-
-// Functies (wordt dynamisch geladen uit API)
-let functies = [
+// Functies (API-conform: id = 1,2,3)
+const functies = [
   { id: 1, naam: 'Fulltime' },
   { id: 2, naam: 'Parttime' },
   { id: 3, naam: 'Stage' },
@@ -230,12 +196,8 @@ async function updateFunctiesForStudent(studentId, selectedFunctieIds) {
   const huidigeFuncties = await resp.json();
   const huidigeIds = huidigeFuncties.map((f) => f.id);
   // Bepaal toe te voegen en te verwijderen functies
-  const toeTeVoegen = selectedFunctieIds.filter(
-    (id) => !huidigeIds.includes(id)
-  );
-  const teVerwijderen = huidigeIds.filter(
-    (id) => !selectedFunctieIds.includes(id)
-  );
+  const toeTeVoegen = selectedFunctieIds.filter((id) => !huidigeIds.includes(id));
+  const teVerwijderen = huidigeIds.filter((id) => !selectedFunctieIds.includes(id));
   // Verwijder oude
   for (const id of teVerwijderen) {
     await fetch(
@@ -253,13 +215,11 @@ async function updateFunctiesForStudent(studentId, selectedFunctieIds) {
   console.log('Type van toeTeVoegen:', Array.isArray(toeTeVoegen), toeTeVoegen);
   if (toeTeVoegen.length > 0) {
     // Flatten als het een nested array is
-    const functiesBody = {
-      functies: Array.isArray(toeTeVoegen[0]) ? toeTeVoegen[0] : toeTeVoegen,
-    };
+    const functiesBody = { functies: Array.isArray(toeTeVoegen[0]) ? toeTeVoegen[0] : toeTeVoegen };
     console.log('Functies body =', JSON.stringify(functiesBody));
     console.log('Verstuur naar API:', {
       studentId,
-      functiesBody,
+      functiesBody
     });
     const resp = await fetch(
       `https://api.ehb-match.me/studenten/${studentId}/functies`,
@@ -277,12 +237,6 @@ async function updateFunctiesForStudent(studentId, selectedFunctieIds) {
   } else {
     console.log('Geen functies om toe te voegen, POST wordt niet uitgevoerd.');
   }
-
-  // Update opgeslagen criteria na functie-wijziging
-  setTimeout(() => {
-    const criteria = collectCurrentCriteria(studentId);
-    saveSearchCriteria(studentId, criteria);
-  }, 100);
 }
 
 // Functies ophalen van student
@@ -292,12 +246,9 @@ async function fetchStudentFuncties(studentId) {
     console.warn('GEEN token gevonden in sessionStorage!');
   }
   console.log('fetchStudentFuncties: studentId:', studentId, 'token:', token);
-  const resp = await fetch(
-    `https://api.ehb-match.me/studenten/${studentId}/functies`,
-    {
-      headers: { Authorization: 'Bearer ' + token },
-    }
-  );
+  const resp = await fetch(`https://api.ehb-match.me/studenten/${studentId}/functies`, {
+    headers: { Authorization: 'Bearer ' + token },
+  });
   if (!resp.ok) {
     const errText = await resp.text();
     console.error(`Fout bij ophalen functies: ${resp.status} - ${errText}`);
@@ -307,15 +258,7 @@ async function fetchStudentFuncties(studentId) {
 }
 
 // --- GENERIC SKILL/TALEN SELECTOR VOOR STUDENT ---
-function renderSkillSelectorStudent({
-  root,
-  label,
-  allSkills,
-  selected,
-  onAdd,
-  onRemove,
-  type,
-}) {
+function renderSkillSelectorStudent({root, label, allSkills, selected, onAdd, onRemove, type}) {
   root.innerHTML = `
     <label>${label}</label>
     <input type="text" class="skills-input" placeholder="Voeg toe..." autocomplete="off" />
@@ -328,13 +271,10 @@ function renderSkillSelectorStudent({
   let currentFocus = -1;
 
   function updateList() {
-    list.innerHTML = selected
-      .map(
-        (skill) =>
-          `<span class="skill-tag">${skill.naam} <button data-remove="${skill.id}">×</button></span>`
-      )
-      .join('');
-    list.querySelectorAll('[data-remove]').forEach((btn) => {
+    list.innerHTML = selected.map(skill =>
+      `<span class="skill-tag">${skill.naam} <button data-remove="${skill.id}">×</button></span>`
+    ).join('');
+    list.querySelectorAll('[data-remove]').forEach(btn => {
       btn.onclick = () => onRemove(Number(btn.dataset.remove));
     });
   }
@@ -342,140 +282,30 @@ function renderSkillSelectorStudent({
 
   input.addEventListener('input', () => {
     const val = input.value.toLowerCase();
-    const matches = allSkills
-      .filter(
-        (s) =>
-          s.naam.toLowerCase().includes(val) &&
-          !selected.some((sel) => sel.id === s.id) &&
-          s.type === type
-      )
-      .slice(0, 8);
+    const matches = allSkills.filter(s =>
+      s.naam.toLowerCase().includes(val) && !selected.some(sel => sel.id === s.id) && s.type === type
+    ).slice(0, 8);
     dropdown.style.display = matches.length ? 'block' : 'none';
-    dropdown.innerHTML = matches
-      .map(
-        (s, i) =>
-          `<div class="skill-suggestion${
-            i === currentFocus ? ' active' : ''
-          }" data-add="${s.id}">${s.naam}</div>`
-      )
-      .join('');
-    dropdown.querySelectorAll('[data-add]').forEach((el) => {
-      el.onclick = () => {
-        onAdd(el.textContent, Number(el.dataset.add));
-        input.value = '';
-        dropdown.style.display = 'none';
-      };
+    dropdown.innerHTML = matches.map((s, i) =>
+      `<div class="skill-suggestion${i === currentFocus ? ' active' : ''}" data-add="${s.id}">${s.naam}</div>`
+    ).join('');
+    dropdown.querySelectorAll('[data-add]').forEach(el => {
+      el.onclick = () => { onAdd(el.textContent, Number(el.dataset.add)); input.value = ''; dropdown.style.display = 'none'; };
     });
   });
-  input.addEventListener('keydown', (e) => {
-    const suggestions = Array.from(
-      dropdown.querySelectorAll('.skill-suggestion')
-    );
-    if (e.key === 'ArrowDown') {
-      currentFocus = (currentFocus + 1) % suggestions.length;
-      setActive(suggestions, currentFocus);
-      e.preventDefault();
-    }
-    if (e.key === 'ArrowUp') {
-      currentFocus =
-        (currentFocus - 1 + suggestions.length) % suggestions.length;
-      setActive(suggestions, currentFocus);
-      e.preventDefault();
-    }
+  input.addEventListener('keydown', e => {
+    const suggestions = Array.from(dropdown.querySelectorAll('.skill-suggestion'));
+    if (e.key === 'ArrowDown') { currentFocus = (currentFocus + 1) % suggestions.length; setActive(suggestions, currentFocus); e.preventDefault(); }
+    if (e.key === 'ArrowUp') { currentFocus = (currentFocus - 1 + suggestions.length) % suggestions.length; setActive(suggestions, currentFocus); e.preventDefault(); }
     if (e.key === 'Enter' || e.key === 'Tab') {
-      if (currentFocus >= 0 && suggestions[currentFocus]) {
-        suggestions[currentFocus].click();
-        e.preventDefault();
-      } else if (input.value.trim()) {
-        onAdd(input.value.trim());
-        input.value = '';
-        dropdown.style.display = 'none';
-        e.preventDefault();
-      }
+      if (currentFocus >= 0 && suggestions[currentFocus]) { suggestions[currentFocus].click(); e.preventDefault(); }
+      else if (input.value.trim()) { onAdd(input.value.trim()); input.value = ''; dropdown.style.display = 'none'; e.preventDefault(); }
     }
-    if (e.key === 'Escape') {
-      dropdown.style.display = 'none';
-    }
+    if (e.key === 'Escape') { dropdown.style.display = 'none'; }
   });
   function setActive(items, idx) {
     items.forEach((el, i) => el.classList.toggle('active', i === idx));
     if (items[idx]) items[idx].scrollIntoView({ block: 'nearest' });
-  }
-}
-
-// Zoek-criteria opslaan en laden
-function saveSearchCriteria(studentId, criteria) {
-  const storageKey = `searchCriteria_student_${studentId}`;
-  try {
-    sessionStorage.setItem(storageKey, JSON.stringify(criteria));
-  } catch (error) {
-    console.error('Fout bij opslaan zoek-criteria:', error);
-  }
-}
-
-function loadSearchCriteria(studentId) {
-  const storageKey = `searchCriteria_student_${studentId}`;
-  try {
-    const stored = sessionStorage.getItem(storageKey);
-    return stored ? JSON.parse(stored) : null;
-  } catch (error) {
-    console.error('Fout bij laden zoek-criteria:', error);
-    return null;
-  }
-}
-
-function collectCurrentCriteria(studentId) {
-  const selectedFuncties = Array.from(
-    document.querySelectorAll('input[name="bedrijfFuncties"]:checked')
-  ).map((cb) => parseInt(cb.value));
-
-  const selectedSkills = Array.from(
-    document.querySelectorAll('#selected-skills .skill-item')
-  ).map((item) => ({
-    id: parseInt(item.dataset.id),
-    naam: item.textContent.replace('×', '').trim(),
-  }));
-
-  const selectedLanguages = Array.from(
-    document.querySelectorAll('#selected-languages .skill-item')
-  ).map((item) => ({
-    id: parseInt(item.dataset.id),
-    naam: item.textContent.replace('×', '').trim(),
-  }));
-
-  return {
-    functies: selectedFuncties,
-    skills: selectedSkills,
-    languages: selectedLanguages,
-    timestamp: Date.now(),
-  };
-}
-
-function setupAutoSave(studentId) {
-  // Save criteria when checkboxes change
-  document
-    .querySelectorAll('input[name="bedrijfFuncties"]')
-    .forEach((checkbox) => {
-      checkbox.addEventListener('change', () => {
-        const criteria = collectCurrentCriteria(studentId);
-        saveSearchCriteria(studentId, criteria);
-      });
-    });
-
-  // Save criteria when skills/languages are added or removed
-  const observer = new MutationObserver(() => {
-    const criteria = collectCurrentCriteria(studentId);
-    saveSearchCriteria(studentId, criteria);
-  });
-
-  const skillsContainer = document.getElementById('selected-skills');
-  const languagesContainer = document.getElementById('selected-languages');
-
-  if (skillsContainer) {
-    observer.observe(skillsContainer, { childList: true });
-  }
-  if (languagesContainer) {
-    observer.observe(languagesContainer, { childList: true });
   }
 }
 
@@ -516,42 +346,26 @@ export async function renderSearchCriteriaStudent(
         <div class="loading-text">Zoekcriteria laden...</div>
       </div>
     `;
+
     let allSkills = [],
       allTalen = [],
       studentFunctieIds = [],
       selectedSkills = [],
       selectedLanguages = [];
     try {
-      // Laad functies uit API
-      functies = await fetchAlleFuncties();
-
       const all = await fetchAllSkills();
       allSkills = all.filter((s) => s.type === 0); // Skills
       allTalen = all.filter((s) => s.type === 1); // Talen
-
-      // Probeer eerst opgeslagen criteria te laden
-      const savedCriteria = loadSearchCriteria(studentId);
-
-      if (savedCriteria) {
-        // Gebruik opgeslagen criteria
-        studentFunctieIds = savedCriteria.functies || [];
-        selectedSkills = savedCriteria.skills || [];
-        selectedLanguages = savedCriteria.languages || [];
-        console.log('Opgeslagen zoek-criteria geladen:', savedCriteria);
-      } else {
-        // Fallback: haal huidige criteria op uit API
-        studentFunctieIds = (await fetchStudentFuncties(studentId)).map(
-          (f) => f.id
-        );
-        // Skills/talen van student ophalen
-        const studentSkills = await fetchStudentSkills(studentId);
-        selectedSkills = studentSkills.filter((s) => s.type === 0);
-        selectedLanguages = studentSkills.filter((s) => s.type === 1);
-      }
+      studentFunctieIds = (await fetchStudentFuncties(studentId)).map(f => f.id);
+      // Skills/talen van student ophalen
+      const studentSkills = await fetchStudentSkills(studentId);
+      selectedSkills = studentSkills.filter(s => s.type === 0);
+      selectedLanguages = studentSkills.filter(s => s.type === 1);
     } catch (e) {
       rootElement.innerHTML = `<div style="color:red">Fout bij ophalen skills/talen/functies: ${e.message}</div>`;
       return;
     }
+
 
     // --- HTML rendering (bedrijf-style, met expliciete input/btn/dropdown zoals bij bedrijf) ---
     rootElement.innerHTML = `
@@ -580,25 +394,22 @@ export async function renderSearchCriteriaStudent(
             <div class="bedrijf-profile-form-container">
               <button id="back-to-profile-btn" class="back-to-profile-btn">⬅ Profiel</button>
               <h1 class="bedrijf-profile-title">Zoek-criteria</h1>
-              <form id="bedrijf-criteria-form" class="criteria-form" autocomplete="off">                <fieldset class="search-fieldset">
+              <form id="bedrijf-criteria-form" class="criteria-form" autocomplete="off">
+                <fieldset class="search-fieldset">
                   <legend>Ik zoek</legend>
                   <div class="checkbox-group" id="bedrijf-functies-list">
-                    ${functies
-                      .map(
-                        (functie) => `
-                      <label class="checkbox-option">
-                        <input type="checkbox" name="bedrijfFuncties" value="${
-                          functie.id
-                        }" ${
-                          studentFunctieIds.includes(functie.id)
-                            ? 'checked'
-                            : ''
-                        }>
-                        <span>${functie.naam}</span>
-                      </label>
-                    `
-                      )
-                      .join('')}
+                    <label class="checkbox-option">
+                      <input type="checkbox" name="bedrijfFuncties" value="1" ${studentFunctieIds.includes(1) ? 'checked' : ''}>
+                      <span>Fulltime</span>
+                    </label>
+                    <label class="checkbox-option">
+                      <input type="checkbox" name="bedrijfFuncties" value="2" ${studentFunctieIds.includes(2) ? 'checked' : ''}>
+                      <span>Parttime</span>
+                    </label>
+                    <label class="checkbox-option">
+                      <input type="checkbox" name="bedrijfFuncties" value="3" ${studentFunctieIds.includes(3) ? 'checked' : ''}>
+                      <span>Stagiair(e)</span>
+                    </label>
                   </div>
                 </fieldset>
                 <fieldset class="search-fieldset">
@@ -660,8 +471,8 @@ export async function renderSearchCriteriaStudent(
     // Vul ze opnieuw met API-data indien nodig, maar niet opnieuw declareren
     async function updateAndRenderSkills() {
       const studentSkills = await fetchStudentSkills(studentId);
-      selectedSkills = studentSkills.filter((s) => s.type === 0);
-      selectedLanguages = studentSkills.filter((s) => s.type === 1);
+      selectedSkills = studentSkills.filter(s => s.type === 0);
+      selectedLanguages = studentSkills.filter(s => s.type === 1);
       renderSelectedSkills();
       renderSelectedLanguages();
     }
@@ -669,18 +480,13 @@ export async function renderSearchCriteriaStudent(
     function renderSelectedSkills() {
       const container = document.getElementById('selected-skills');
       if (!selectedSkills.length) {
-        container.innerHTML =
-          '<p class="no-skills">Nog geen skills toegevoegd</p>';
+        container.innerHTML = '<p class="no-skills">Nog geen skills toegevoegd</p>';
         return;
       }
-      container.innerHTML = `<div class="skills-list">${selectedSkills
-        .map(
-          (skill) => `
+      container.innerHTML = `<div class="skills-list">${selectedSkills.map(skill => `
         <div class="skill-tag"><span>${skill.naam}</span><button type="button" class="remove-skill" data-skill-id="${skill.id}">×</button></div>
-      `
-        )
-        .join('')}</div>`;
-      container.querySelectorAll('.remove-skill').forEach((btn) => {
+      `).join('')}</div>`;
+      container.querySelectorAll('.remove-skill').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const skillId = parseInt(e.target.getAttribute('data-skill-id'));
           await removeSkillFromStudent(studentId, skillId);
@@ -694,85 +500,44 @@ export async function renderSearchCriteriaStudent(
     const skillsDropdown = document.getElementById('skills-dropdown');
     let currentFocus = -1;
     if (skillsInput) {
-      skillsInput.addEventListener('input', function (e) {
+      skillsInput.addEventListener('input', function(e) {
         const query = e.target.value.trim().toLowerCase();
-        if (!query) {
-          if (skillsDropdown) skillsDropdown.style.display = 'none';
-          return;
-        }
-        const suggestions = allSkills
-          .filter(
-            (skill) =>
-              skill.naam.toLowerCase().includes(query) &&
-              !selectedSkills.some((s) => s.id === skill.id)
-          )
-          .slice(0, 8);
-        if (!suggestions.length) {
-          if (skillsDropdown) skillsDropdown.style.display = 'none';
-          return;
-        }
+        if (!query) { if (skillsDropdown) skillsDropdown.style.display = 'none'; return; }
+        const suggestions = allSkills.filter(skill =>
+          skill.naam.toLowerCase().includes(query) &&
+          !selectedSkills.some(s => s.id === skill.id)
+        ).slice(0, 8);
+        if (!suggestions.length) { if (skillsDropdown) skillsDropdown.style.display = 'none'; return; }
         if (skillsDropdown) {
-          skillsDropdown.innerHTML = suggestions
-            .map(
-              (skill, i) =>
-                `<div class="skill-suggestion${
-                  i === currentFocus ? ' active' : ''
-                }" data-skill-id="${skill.id}">${skill.naam}</div>`
-            )
-            .join('');
+          skillsDropdown.innerHTML = suggestions.map((skill, i) =>
+            `<div class="skill-suggestion${i === currentFocus ? ' active' : ''}" data-skill-id="${skill.id}">${skill.naam}</div>`
+          ).join('');
           skillsDropdown.style.display = 'block';
-          skillsDropdown
-            .querySelectorAll('.skill-suggestion')
-            .forEach((el, idx) => {
-              el.addEventListener('click', async () => {
-                let skill = suggestions[idx];
-                await fetch(
-                  `https://api.ehb-match.me/studenten/${studentId}/skills`,
-                  {
-                    method: 'POST',
-                    headers: {
-                      Authorization:
-                        'Bearer ' + sessionStorage.getItem('authToken'),
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ skills: [skill.id] }),
-                  }
-                );
-                await updateAndRenderSkills();
-                skillsInput.value = '';
-                skillsDropdown.style.display = 'none';
+          skillsDropdown.querySelectorAll('.skill-suggestion').forEach((el, idx) => {
+            el.addEventListener('click', async () => {
+              let skill = suggestions[idx];
+              await fetch(`https://api.ehb-match.me/studenten/${studentId}/skills`, {
+                method: 'POST',
+                headers: { Authorization: 'Bearer ' + sessionStorage.getItem('authToken'), 'Content-Type': 'application/json' },
+                body: JSON.stringify({ skills: [skill.id] })
               });
+              await updateAndRenderSkills();
+              skillsInput.value = '';
+              skillsDropdown.style.display = 'none';
             });
+          });
         }
       });
-      skillsInput.addEventListener('keydown', function (e) {
+      skillsInput.addEventListener('keydown', function(e) {
         if (!skillsDropdown) return;
-        const suggestions = Array.from(
-          skillsDropdown.querySelectorAll('.skill-suggestion')
-        );
-        if (e.key === 'ArrowDown') {
-          currentFocus = (currentFocus + 1) % suggestions.length;
-          setActive(suggestions, currentFocus);
-          e.preventDefault();
-        }
-        if (e.key === 'ArrowUp') {
-          currentFocus =
-            (currentFocus - 1 + suggestions.length) % suggestions.length;
-          setActive(suggestions, currentFocus);
-          e.preventDefault();
-        }
+        const suggestions = Array.from(skillsDropdown.querySelectorAll('.skill-suggestion'));
+        if (e.key === 'ArrowDown') { currentFocus = (currentFocus + 1) % suggestions.length; setActive(suggestions, currentFocus); e.preventDefault(); }
+        if (e.key === 'ArrowUp') { currentFocus = (currentFocus - 1 + suggestions.length) % suggestions.length; setActive(suggestions, currentFocus); e.preventDefault(); }
         if (e.key === 'Enter' || e.key === 'Tab') {
-          if (currentFocus >= 0 && suggestions[currentFocus]) {
-            suggestions[currentFocus].click();
-            e.preventDefault();
-          } else if (skillsInput.value.trim() && addSkillBtn) {
-            addSkillBtn.click();
-            e.preventDefault();
-          }
+          if (currentFocus >= 0 && suggestions[currentFocus]) { suggestions[currentFocus].click(); e.preventDefault(); }
+          else if (skillsInput.value.trim() && addSkillBtn) { addSkillBtn.click(); e.preventDefault(); }
         }
-        if (e.key === 'Escape') {
-          skillsDropdown.style.display = 'none';
-        }
+        if (e.key === 'Escape') { skillsDropdown.style.display = 'none'; }
       });
     }
     function setActive(items, idx) {
@@ -781,17 +546,14 @@ export async function renderSearchCriteriaStudent(
     }
     if (addSkillBtn) {
       addSkillBtn.addEventListener('click', async () => {
-        const value =
-          skillsInput && skillsInput.value ? skillsInput.value.trim() : '';
+        const value = skillsInput && skillsInput.value ? skillsInput.value.trim() : '';
         if (!value) return;
-        let skill = allSkills.find(
-          (s) => s.naam.toLowerCase() === value.toLowerCase()
-        );
+        let skill = allSkills.find(s => s.naam.toLowerCase() === value.toLowerCase());
         if (!skill) {
           skill = await addSkillOrTaal(value, 0);
           allSkills.push(skill);
         }
-        if (selectedSkills.some((s) => s.id === skill.id)) {
+        if (selectedSkills.some(s => s.id === skill.id)) {
           showFeedback('Skill al toegevoegd');
           return;
         }
@@ -799,9 +561,9 @@ export async function renderSearchCriteriaStudent(
           method: 'POST',
           headers: {
             Authorization: 'Bearer ' + sessionStorage.getItem('authToken'),
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ skills: [skill.id] }),
+          body: JSON.stringify({ skills: [skill.id] })
         });
         await updateAndRenderSkills();
         if (skillsInput) skillsInput.value = '';
@@ -813,18 +575,13 @@ export async function renderSearchCriteriaStudent(
     function renderSelectedLanguages() {
       const container = document.getElementById('selected-languages');
       if (!selectedLanguages.length) {
-        container.innerHTML =
-          '<p class="no-skills">Nog geen talen toegevoegd</p>';
+        container.innerHTML = '<p class="no-skills">Nog geen talen toegevoegd</p>';
         return;
       }
-      container.innerHTML = `<div class="skills-list">${selectedLanguages
-        .map(
-          (taal) => `
+      container.innerHTML = `<div class="skills-list">${selectedLanguages.map(taal => `
         <div class="skill-tag"><span>${taal.naam}</span><button type="button" class="remove-language" data-language-id="${taal.id}">×</button></div>
-      `
-        )
-        .join('')}</div>`;
-      container.querySelectorAll('.remove-language').forEach((btn) => {
+      `).join('')}</div>`;
+      container.querySelectorAll('.remove-language').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const taalId = parseInt(e.target.getAttribute('data-language-id'));
           await removeSkillFromStudent(studentId, taalId);
@@ -839,85 +596,50 @@ export async function renderSearchCriteriaStudent(
     let currentFocusTaal = -1;
     let taalSuggestions = [];
     if (taalInput) {
-      taalInput.addEventListener('input', function () {
+      taalInput.addEventListener('input', function() {
         const query = taalInput.value.trim().toLowerCase();
         if (!query) {
           if (talenDropdown) talenDropdown.style.display = 'none';
           return;
         }
-        taalSuggestions = allTalen
-          .filter(
-            (taal) =>
-              taal.naam.toLowerCase().includes(query) &&
-              !selectedLanguages.some((t) => t.id === taal.id)
-          )
-          .slice(0, 8);
+        taalSuggestions = allTalen.filter(taal =>
+          taal.naam.toLowerCase().includes(query) &&
+          !selectedLanguages.some(t => t.id === taal.id)
+        ).slice(0, 8);
         if (!taalSuggestions.length) {
           if (talenDropdown) talenDropdown.style.display = 'none';
           return;
         }
         if (talenDropdown) {
-          talenDropdown.innerHTML = taalSuggestions
-            .map(
-              (taal, i) =>
-                `<div class="skill-suggestion${
-                  i === currentFocusTaal ? ' active' : ''
-                }" data-taal-id="${taal.id}">${taal.naam}</div>`
-            )
-            .join('');
+          talenDropdown.innerHTML = taalSuggestions.map((taal, i) =>
+            `<div class="skill-suggestion${i === currentFocusTaal ? ' active' : ''}" data-taal-id="${taal.id}">${taal.naam}</div>`
+          ).join('');
           talenDropdown.style.display = 'block';
-          talenDropdown
-            .querySelectorAll('.skill-suggestion')
-            .forEach((el, idx) => {
-              el.addEventListener('click', async () => {
-                let taal = taalSuggestions[idx];
-                await fetch(
-                  `https://api.ehb-match.me/studenten/${studentId}/skills`,
-                  {
-                    method: 'POST',
-                    headers: {
-                      Authorization:
-                        'Bearer ' + sessionStorage.getItem('authToken'),
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ skills: [taal.id] }),
-                  }
-                );
-                await updateAndRenderSkills();
-                if (taalInput) taalInput.value = '';
-                if (talenDropdown) talenDropdown.style.display = 'none';
+          talenDropdown.querySelectorAll('.skill-suggestion').forEach((el, idx) => {
+            el.addEventListener('click', async () => {
+              let taal = taalSuggestions[idx];
+              await fetch(`https://api.ehb-match.me/studenten/${studentId}/skills`, {
+                method: 'POST',
+                headers: { Authorization: 'Bearer ' + sessionStorage.getItem('authToken'), 'Content-Type': 'application/json' },
+                body: JSON.stringify({ skills: [taal.id] })
               });
+              await updateAndRenderSkills();
+              if (taalInput) taalInput.value = '';
+              if (talenDropdown) talenDropdown.style.display = 'none';
             });
+          });
         }
       });
-      taalInput.addEventListener('keydown', function (e) {
+      taalInput.addEventListener('keydown', function(e) {
         if (!talenDropdown) return;
-        const suggestions = Array.from(
-          talenDropdown.querySelectorAll('.skill-suggestion')
-        );
-        if (e.key === 'ArrowDown') {
-          currentFocusTaal = (currentFocusTaal + 1) % suggestions.length;
-          setActiveTaal(suggestions, currentFocusTaal);
-          e.preventDefault();
-        }
-        if (e.key === 'ArrowUp') {
-          currentFocusTaal =
-            (currentFocusTaal - 1 + suggestions.length) % suggestions.length;
-          setActiveTaal(suggestions, currentFocusTaal);
-          e.preventDefault();
-        }
+        const suggestions = Array.from(talenDropdown.querySelectorAll('.skill-suggestion'));
+        if (e.key === 'ArrowDown') { currentFocusTaal = (currentFocusTaal + 1) % suggestions.length; setActiveTaal(suggestions, currentFocusTaal); e.preventDefault(); }
+        if (e.key === 'ArrowUp') { currentFocusTaal = (currentFocusTaal - 1 + suggestions.length) % suggestions.length; setActiveTaal(suggestions, currentFocusTaal); e.preventDefault(); }
         if (e.key === 'Enter' || e.key === 'Tab') {
-          if (currentFocusTaal >= 0 && suggestions[currentFocusTaal]) {
-            suggestions[currentFocusTaal].click();
-            e.preventDefault();
-          } else if (taalInput.value.trim() && addTaalBtn) {
-            addTaalBtn.click();
-            e.preventDefault();
-          }
+          if (currentFocusTaal >= 0 && suggestions[currentFocusTaal]) { suggestions[currentFocusTaal].click(); e.preventDefault(); }
+          else if (taalInput.value.trim() && addTaalBtn) { addTaalBtn.click(); e.preventDefault(); }
         }
-        if (e.key === 'Escape') {
-          talenDropdown.style.display = 'none';
-        }
+        if (e.key === 'Escape') { talenDropdown.style.display = 'none'; }
       });
     }
     function setActiveTaal(items, idx) {
@@ -928,25 +650,19 @@ export async function renderSearchCriteriaStudent(
     const addTaalBtn = document.getElementById('add-language-btn');
     if (addTaalBtn) {
       addTaalBtn.addEventListener('click', async () => {
-        const value =
-          taalInput && taalInput.value ? taalInput.value.trim() : '';
+        const value = taalInput && taalInput.value ? taalInput.value.trim() : '';
         if (!value) return;
-        let taal = allTalen.find(
-          (t) => t.naam.toLowerCase() === value.toLowerCase()
-        );
+        let taal = allTalen.find(t => t.naam.toLowerCase() === value.toLowerCase());
         if (!taal) {
           // Bestaat nog niet: toevoegen aan database
           taal = await addSkillOrTaal(value, 1);
           allTalen.push(taal);
         }
-        if (selectedLanguages.some((t) => t.id === taal.id)) return;
+        if (selectedLanguages.some(t => t.id === taal.id)) return;
         await fetch(`https://api.ehb-match.me/studenten/${studentId}/skills`, {
           method: 'POST',
-          headers: {
-            Authorization: 'Bearer ' + sessionStorage.getItem('authToken'),
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ skills: [taal.id] }),
+          headers: { Authorization: 'Bearer ' + sessionStorage.getItem('authToken'), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ skills: [taal.id] })
         });
         await updateAndRenderSkills();
         if (taalInput) taalInput.value = '';
@@ -954,11 +670,7 @@ export async function renderSearchCriteriaStudent(
       });
     }
     document.addEventListener('click', (e) => {
-      if (
-        talenDropdown &&
-        !talenDropdown.contains(e.target) &&
-        e.target !== taalInput
-      ) {
+      if (talenDropdown && !talenDropdown.contains(e.target) && e.target !== taalInput) {
         talenDropdown.style.display = 'none';
       }
     });
@@ -1013,9 +725,7 @@ export async function renderSearchCriteriaStudent(
       });
       document.getElementById('nav-settings').addEventListener('click', () => {
         dropdown.classList.remove('open');
-        showSettingsPopup(() =>
-          renderSearchCriteriaStudent(rootElement, studentData)
-        );
+        showSettingsPopup(() => renderSearchCriteriaStudent(rootElement, studentData));
       });
       // Logo navigation event listener
       const logoSection = document.querySelector('.logo-section');
@@ -1038,21 +748,19 @@ export async function renderSearchCriteriaStudent(
           });
         });
       }
-      document
-        .getElementById('nav-logout')
-        .addEventListener('click', async () => {
-          dropdown.classList.remove('open');
-          await performLogout();
-          window.sessionStorage.removeItem('studentData');
-          window.sessionStorage.removeItem('authToken');
-          window.sessionStorage.removeItem('userType');
-          localStorage.setItem('darkmode', 'false');
-          document.body.classList.remove('darkmode');
-          import('../../router.js').then((module) => {
-            const Router = module.default;
-            Router.navigate('/');
-          });
+      document.getElementById('nav-logout').addEventListener('click', async () => {
+        dropdown.classList.remove('open');
+        await performLogout();
+        window.sessionStorage.removeItem('studentData');
+        window.sessionStorage.removeItem('authToken');
+        window.sessionStorage.removeItem('userType');
+        localStorage.setItem('darkmode', 'false');
+        document.body.classList.remove('darkmode');
+        import('../../router.js').then((module) => {
+          const Router = module.default;
+          Router.navigate('/');
         });
+      });
     }
     // Footer links
     const privacyLink = document.getElementById('privacy-policy');
@@ -1076,10 +784,6 @@ export async function renderSearchCriteriaStudent(
       });
     }
     // --- EINDE navigatie events ---
-
-    // Setup auto-save voor zoek-criteria
-    setupAutoSave(studentId);
-
     // END setTimeout
   }, 200);
 }
