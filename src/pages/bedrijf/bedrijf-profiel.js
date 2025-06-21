@@ -361,6 +361,7 @@ export async function renderBedrijfProfiel(
   const saveBtn = document.getElementById('btn-save-bedrijf');
   if (saveBtn) {
     saveBtn.addEventListener('click', async (e) => {
+      saveBtn.innerHTML = '<div class="loader"></div>'
       e.preventDefault();
 
       try {

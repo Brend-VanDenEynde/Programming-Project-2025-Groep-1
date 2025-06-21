@@ -352,6 +352,7 @@ export function renderStudentProfiel(
     const saveBtn = document.getElementById('btn-save-profile');
     if (saveBtn) {
       form.addEventListener('submit', async (e) => {
+        saveBtn.innerHTML = '<div class="loader"></div>'
         e.preventDefault();
         // Haal token op voor API-calls
         let token = sessionStorage.getItem('authToken');
