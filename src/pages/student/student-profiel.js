@@ -601,6 +601,8 @@ export function renderStudentProfiel(
           }
         } catch (err) {
           alert('Fout bij opslaan profiel: ' + err.message);
+          saveBtn.innerHTML = 'SAVE';
+          saveBtn.disabled = false;
         }
       });
     }

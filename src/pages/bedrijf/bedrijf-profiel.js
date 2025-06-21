@@ -570,6 +570,8 @@ export async function renderBedrijfProfiel(
       } catch (error) {
         console.error('Error updating bedrijf profile:', error);
         alert('Er is een fout opgetreden bij het opslaan. Probeer opnieuw.');
+        saveBtn.innerHTML = 'SAVE';
+        saveBtn.disabled = false;
       }
     });
   } // RESET knop
