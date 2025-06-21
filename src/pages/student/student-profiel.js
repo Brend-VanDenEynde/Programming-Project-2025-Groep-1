@@ -16,6 +16,8 @@ const defaultProfile = {
   opleiding_id: null,
 };
 
+const BASE_AVATAR_URL = 'https://gt0kk4fbet.ufs.sh/f/';
+
 function isoToDateString(isoString) {
   if (!isoString) return '';
   return isoString.split('T')[0];
@@ -44,7 +46,7 @@ export function renderStudentProfiel(
           Router.navigate('/login');
         });
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // Gebruik altijd deze variabelen voor API-calls
@@ -81,9 +83,9 @@ export function renderStudentProfiel(
 
   const geboortedatum = isoToDateString(
     studentData.geboortedatum ||
-      studentData.birthdate ||
-      studentData.date_of_birth ||
-      defaultProfile.date_of_birth
+    studentData.birthdate ||
+    studentData.date_of_birth ||
+    defaultProfile.date_of_birth
   );
 
   const opleidingNaam = getOpleidingNaamById(resolvedOpleidingId);
@@ -115,88 +117,80 @@ export function renderStudentProfiel(
             <h1 class="student-profile-title">Profiel</h1>
             <form id="profileForm" class="student-profile-form" autocomplete="off" enctype="multipart/form-data">
               <div class="student-profile-avatar-section">
-                <img 
-                  src="${profiel_foto}" 
-                  alt="Profielfoto ${voornaam} ${achternaam}" 
-                  id="avatar-preview"
-                  class="student-profile-avatar"
-                />
-                <input type="file" accept="image/*" id="photoInput" style="display:${
-                  readonlyMode ? 'none' : 'block'
-                };margin-top:10px;">
+                <div class="student-profile-avatar-div" style="position:relative;">
+                  <img 
+                    src="${profiel_foto}" 
+                    alt="Profielfoto ${voornaam} ${achternaam}" 
+                    id="avatar-preview"
+                    class="student-profile-avatar"
+                  />
+                  <button type="button" class="delete-overlay" style="display:none;" aria-label="Verwijder geüploade foto" tabindex="0">&#10006;</button>
+                </div>
+                <input type="file" accept="image/*" id="photoInput" style="display:${readonlyMode ? 'none' : 'block'
+    };margin-top:10px;">
               </div>
               <div class="student-profile-form-group">
                 <label for="firstNameInput">Voornaam</label>
-                <input type="text" id="firstNameInput" value="${voornaam}" placeholder="voornaam" required ${
-    readonlyMode ? 'disabled' : ''
-  }>
+                <input type="text" id="firstNameInput" value="${voornaam}" placeholder="voornaam" required ${readonlyMode ? 'disabled' : ''
+    }>
               </div>
               <div class="student-profile-form-group">
                 <label for="lastNameInput">Achternaam</label>
-                <input type="text" id="lastNameInput" value="${achternaam}" placeholder="achternaam" required ${
-    readonlyMode ? 'disabled' : ''
-  }>
+                <input type="text" id="lastNameInput" value="${achternaam}" placeholder="achternaam" required ${readonlyMode ? 'disabled' : ''
+    }>
               </div>
               <div class="student-profile-form-group">
                 <label for="emailInput">E-mailadres</label>
-                <input type="email" id="emailInput" value="${email}" placeholder="e-mailadres" required ${
-    readonlyMode ? 'disabled' : ''
-  }>
+                <input type="email" id="emailInput" value="${email}" placeholder="e-mailadres" required ${readonlyMode ? 'disabled' : ''
+    }>
               </div>
               <div class="student-profile-form-group">
                 <label for="studyProgramInput">Studieprogramma</label>
                 <select id="opleidingSelect" ${readonlyMode ? 'disabled' : ''}>
                   <option value="">Selecteer opleiding</option>
                   ${opleidingen
-                    .map(
-                      (o) =>
-                        `<option value="${o.id}" ${
-                          o.id == resolvedOpleidingId ? 'selected' : ''
-                        }>${o.naam}</option>`
-                    )
-                    .join('')}
+      .map(
+        (o) =>
+          `<option value="${o.id}" ${o.id == resolvedOpleidingId ? 'selected' : ''
+          }>${o.naam}</option>`
+      )
+      .join('')}
                 </select>
               </div>
               <div class="student-profile-form-group">
                 <label for="yearInput">Opleidingsjaar</label>
                 <select id="yearInput" ${readonlyMode ? 'disabled' : ''}>
-                  <option value="1" ${
-                    studiejaar == '1' ? 'selected' : ''
-                  }>1</option>
-                  <option value="2" ${
-                    studiejaar == '2' ? 'selected' : ''
-                  }>2</option>
-                  <option value="3" ${
-                    studiejaar == '3' ? 'selected' : ''
-                  }>3</option>
+                  <option value="1" ${studiejaar == '1' ? 'selected' : ''
+    }>1</option>
+                  <option value="2" ${studiejaar == '2' ? 'selected' : ''
+    }>2</option>
+                  <option value="3" ${studiejaar == '3' ? 'selected' : ''
+    }>3</option>
                 </select>
               </div>
               <div class="student-profile-form-group">
                 <label for="birthDateInput">Geboortedatum</label>
-                <input type="date" id="birthDateInput" value="${geboortedatum}" placeholder="geboortedatum" ${
-    readonlyMode ? 'disabled' : ''
-  }>
+                <input type="date" id="birthDateInput" value="${geboortedatum}" placeholder="geboortedatum" ${readonlyMode ? 'disabled' : ''
+    }>
                 <div id="birthDateError" style="color: red; font-size: 0.9em; min-height: 1.2em;"></div>
               </div>
               <div class="student-profile-form-group">
                 <label for="linkedinInput">LinkedIn-link</label>
-                <input type="url" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/in/jouwprofiel" ${
-    readonlyMode ? 'disabled' : ''
-  }>
+                <input type="url" id="linkedinInput" value="${linkedin}" placeholder="https://www.linkedin.com/in/jouwprofiel" ${readonlyMode ? 'disabled' : ''
+    }>
               </div>
               <div class="student-profile-buttons">
-                ${
-                  readonlyMode
-                    ? `
+                ${readonlyMode
+      ? `
                       <button id="btn-edit-profile" type="button" class="student-profile-btn student-profile-btn-secondary">EDIT</button>
                       <button id="logout-btn" type="button" class="student-profile-btn student-profile-btn-secondary">LOG OUT</button>
                     `
-                    : `
+      : `
                       <button id="btn-save-profile" type="submit" class="student-profile-btn student-profile-btn-primary">SAVE</button>
                       <button id="btn-reset-profile" type="button" class="student-profile-btn student-profile-btn-secondary">RESET</button>
                       <button id="btn-cancel-profile" type="button" class="student-profile-btn student-profile-btn-secondary">CANCEL</button>
                     `
-                }
+    }
               </div>
             </form>
           </div>        </div>
@@ -284,7 +278,7 @@ export function renderStudentProfiel(
       });
     }
     document
-      .getElementById('nav-logout')      .addEventListener('click', async () => {
+      .getElementById('nav-logout').addEventListener('click', async () => {
         dropdown.classList.remove('open');
         const response = await performLogout();
         window.sessionStorage.removeItem('studentData');
@@ -300,7 +294,8 @@ export function renderStudentProfiel(
 
     // Ook de LOG OUT knop in het profiel-formulier zelf (voor desktop)
     const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {      logoutBtn.addEventListener('click', async () => {
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async () => {
         const response = await performLogout();
         window.sessionStorage.removeItem('studentData');
         window.sessionStorage.removeItem('authToken');
@@ -347,7 +342,8 @@ export function renderStudentProfiel(
   if (form) {
     // EDIT knop
     const editBtn = document.getElementById('btn-edit-profile');
-    if (editBtn) {      editBtn.addEventListener('click', () => {
+    if (editBtn) {
+      editBtn.addEventListener('click', () => {
         renderStudentProfiel(rootElement, studentData, false);
       });
     }
@@ -380,11 +376,11 @@ export function renderStudentProfiel(
           opleiding_id: parseInt(newOpleidingId, 10),
         };
         // Debug: log de payload
-        
+
         // Haal altijd de juiste ID’s uit sessionStorage
         // let studentID = studentData.gebruiker_id;
         // let userID = studentData.gebruiker_id;
-        
+
         if (!studentID || !userID) {
           alert('Student ID of gebruiker_id ontbreekt!');
           return;
@@ -438,8 +434,7 @@ export function renderStudentProfiel(
             }
           }
 
-          // 2. Profielfoto uploaden indien geselecteerd
-          // may be null
+          // 2. Profielfoto uploaden indien geselecteerd of delete
           let profielFotoKey = null;
           if (
             studentData.profiel_foto &&
@@ -451,6 +446,26 @@ export function renderStudentProfiel(
             } else {
               profielFotoKey = studentData.profiel_foto;
             }
+          }
+          if (
+            deleteProfilePicture &&
+            savedProfilePicture &&
+            savedProfilePicture !== '/images/defaultlogo.webp'
+          ) {
+            // remove https://gt0kk4fbet.ufs.sh/f/ prefix if present
+            profielFotoKey = savedProfilePicture.replace(BASE_AVATAR_URL, '');
+            const currentToken = window.sessionStorage.getItem('authToken');
+            const deleteResp = await authenticatedFetch(
+              `https://api.ehb-match.me/profielfotos/${profielFotoKey}`,
+              {
+                method: 'DELETE',
+                headers: {
+                  Authorization: 'Bearer ' + currentToken,
+                },
+              }
+            );
+
+            profielFotoKey = null; // Reset de profielfoto key
           }
           const photoInput = document.getElementById('photoInput');
           if (photoInput && photoInput.files && photoInput.files.length > 0) {
@@ -484,7 +499,7 @@ export function renderStudentProfiel(
             const uploadResult = await uploadResp.json();
             profielFotoKey = uploadResult.profiel_foto_key;
           }
-          
+
           // 3. Overige profielinfo via /studenten/{studentID} (JSON)
           const payload = {
             voornaam: document.getElementById('firstNameInput').value.trim(),
@@ -519,7 +534,7 @@ export function renderStudentProfiel(
             }
           });
 
-          
+
 
           // Validate required fields
           if (!payload.voornaam || !payload.achternaam) {
@@ -545,8 +560,8 @@ export function renderStudentProfiel(
             return;
           }
 
-          
-          
+
+
           const respStudent = await authenticatedFetch(
             `https://api.ehb-match.me/studenten/${studentID}`,
             {
@@ -556,7 +571,7 @@ export function renderStudentProfiel(
               },
               body: JSON.stringify(payload),
             }
-          );          if (!respStudent.ok) {
+          ); if (!respStudent.ok) {
             const errText = await respStudent.text();
 
             // Try to parse JSON error if possible
@@ -635,6 +650,32 @@ export function renderStudentProfiel(
           const Router = module.default;
           Router.navigate('/student/zoek-criteria');
         });
+      });
+    }
+
+    // Delete overlay voor profielfoto (bedrijf-profiel.js stijl)
+    const profileAvatar = document.querySelector('.student-profile-avatar-div');
+    const deleteOverlay = document.querySelector('.delete-overlay');
+    const studentAvatar = document.getElementById('avatar-preview');
+
+    let deleteProfilePicture = false;
+    let savedProfilePicture = studentAvatar ? studentAvatar.src : null;
+
+    if (profileAvatar && deleteOverlay && studentAvatar) {
+      profileAvatar.addEventListener('mouseenter', () => {
+        if (!readonlyMode && !deleteProfilePicture && studentAvatar.src !== defaultAvatar) {
+          deleteOverlay.style.display = 'flex';
+        }
+      });
+      profileAvatar.addEventListener('mouseleave', () => {
+        deleteOverlay.style.display = 'none';
+      });
+      deleteOverlay.addEventListener('click', (e) => {
+        if (!readonlyMode && studentAvatar.src !== defaultAvatar) {
+          if (photoInput) photoInput.value = '';
+          studentAvatar.src = defaultAvatar;
+          deleteProfilePicture = true;
+        }
       });
     }
   }

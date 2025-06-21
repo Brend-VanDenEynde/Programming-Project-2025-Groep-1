@@ -17,6 +17,8 @@ function getBedrijfLogoUrl(foto, url) {
   return 'https://gt0kk4fbet.ufs.sh/f/' + foto; // Basis URL voor de profielfoto's
 }
 
+const BASE_AVATAR_URL = 'https://gt0kk4fbet.ufs.sh/f/';
+
 // Default bedrijf profiel data (using API field names)
 const defaultBedrijfProfile = {
   contact_email: '',
@@ -471,7 +473,7 @@ export async function renderBedrijfProfiel(
         if (
           deleteProfilePicture &&
           savedProfilePicture &&
-          savedProfilePicture !== 'defaultlogo.webp'
+          savedProfilePicture !== '/images/defaultlogo.webp'
         ) {
           // remove https://gt0kk4fbet.ufs.sh/f/ prefix if present
           profielFotoKey = savedProfilePicture.replace(BASE_AVATAR_URL, '');
