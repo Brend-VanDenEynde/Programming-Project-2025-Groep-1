@@ -53,7 +53,7 @@ async function fetchFunctiesSkills(bedrijfId) {
 function getStatusBadge(akkoord) {
   return akkoord
     ? '<span class="status-badge badge-accepted">Geaccepteerd</span>'
-    : '<span class="status-badge badge-waiting">In afwachting</span>';
+    : '<span class="status-badge badge-waiting">In behandeling</span>';
 }
 
 function renderSpeeddatesError(root, err) {
@@ -87,7 +87,7 @@ async function fetchSpeeddatesWithStatus(
   const token = sessionStorage.getItem('authToken');
   let url = 'https://api.ehb-match.me/speeddates';
   if (status === 'Geaccepteerd') url += '/accepted';
-  else if (status === 'In afwachting') url += '/pending';
+  else if (status === 'In behandeling') url += '/pending';
   if (studentId) url += (url.includes('?') ? '&' : '?') + 'id=' + studentId;
   const resp = await authenticatedFetch(url);
   if (!resp.ok) {
@@ -215,7 +215,7 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
             <span class="status-badge ${
               s.akkoord ? 'goedgekeurd' : 'in-behandeling'
             }">
-              ${s.akkoord ? 'GOEDGEKEURD' : 'IN AFWACHTING'}
+              ${s.akkoord ? 'GOEDGEKEURD' : 'IN BEHANDLING'}
             </span>
           </div>
         </div>

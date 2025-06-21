@@ -453,7 +453,7 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
       <h2 style=\"margin-top:0;\">${s.naam_bedrijf}</h2>
       <p><strong>Tijd:</strong> ${s.begin ? new Date(s.begin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Onbekend'}</p>
       <p><strong>Locatie:</strong> ${s.lokaal || 'Onbekend'}</p>
-      <p><strong>Status:</strong> ${s.akkoord !== undefined ? (s.akkoord ? 'Geaccepteerd' : 'In afwachting') : '-'}</p>
+      <p><strong>Status:</strong> ${s.akkoord !== undefined ? (s.akkoord ? 'Geaccepteerd' : 'In behandeling') : '-'}</p>
       <p><strong>LinkedIn:</strong> <a id=\"popup-linkedin\" href=\"#\" target=\"_blank\">Laden...</a></p>
       <div id=\"popup-skills\"><em>Skills laden...</em></div>
     `;
