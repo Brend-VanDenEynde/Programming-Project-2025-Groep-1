@@ -1,6 +1,6 @@
 import '../../css/consolidated-style.css';
 import Router from '../../router.js';
-import { authenticatedFetch } from "../../utils/auth-api.js";
+import { authenticatedFetch } from '../../utils/auth-api.js';
 
 // Skills ophalen uit de API
 async function fetchSkills() {
@@ -105,7 +105,7 @@ function handleSkillsRegister(event) {
     job,
     skills: selectedSkills, // <-- array met ids!
   };
-  console.log('Registratie data:', data);
+
   // Hier kun je data naar server sturen...
   // Router.navigate(...) etc.
 }

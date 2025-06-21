@@ -27,48 +27,46 @@ async function fetchPendingSpeeddates(studentData) {
     return [];
   }
   if (!studentId) {
-    alert("Student ID niet gevonden. Probeer opnieuw in te loggen.");
+    alert('Student ID niet gevonden. Probeer opnieuw in te loggen.');
     renderLogin(document.body);
     return [];
   }
-  const resp = await fetch(`https://api.ehb-match.me/speeddates/pending?id=${studentId}`, {
-    headers: { Authorization: 'Bearer ' + token }
-  });
+  const resp = await fetch(
+    `https://api.ehb-match.me/speeddates/pending?id=${studentId}`,
+    {
+      headers: { Authorization: 'Bearer ' + token },
+    }
+  );
   if (!resp.ok) throw new Error(`Fout bij ophalen: ${resp.status}`);
   const data = await resp.json();
 
   // Haal alle relevante bedrijven op via /discover/bedrijven?id={studentId}
-  const bedrijvenResp = await fetch(`https://api.ehb-match.me/discover/bedrijven?id=${studentId}`,
-    { headers: { Authorization: 'Bearer ' + token } });
+  const bedrijvenResp = await fetch(
+    `https://api.ehb-match.me/discover/bedrijven?id=${studentId}`,
+    { headers: { Authorization: 'Bearer ' + token } }
+  );
   const bedrijven = bedrijvenResp.ok ? await bedrijvenResp.json() : [];
-  const bedrijfIds = new Set(bedrijven.map(b => b.gebruiker_id));
+  const bedrijfIds = new Set(bedrijven.map((b) => b.gebruiker_id));
 
   // Filter alleen verzoeken waar asked_by een bedrijf is EN niet jezelf
   const filtered = data.filter(
-    s => bedrijfIds.has(s.asked_by) && s.asked_by !== studentId
+    (s) => bedrijfIds.has(s.asked_by) && s.asked_by !== studentId
   );
 
-  // DEBUG: check filter resultaat en mogelijke eigen verzoekken
-  console.log(
-    'Alle pending:', data,
-    'BedrijfIds:', bedrijfIds,
-    'StudentId:', studentId,
-    'Na filter:', filtered
-  );
-  filtered.forEach(s => {
+  filtered.forEach((s) => {
     if (s.asked_by == studentId) {
       console.warn('Je eigen verzoek zit in filtered! Debug:', s);
     }
   });
   // Debug info
-  // console.log({ allePending: data, bedrijven, bedrijfIds: [...bedrijfIds], studentId, overgebleven: filtered });
+
   return filtered;
 }
 async function acceptSpeeddate(id) {
   const token = sessionStorage.getItem('authToken');
   const resp = await fetch(`https://api.ehb-match.me/speeddates/accept/${id}`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (!resp.ok) {
     const errText = await resp.text();
@@ -79,7 +77,7 @@ async function rejectSpeeddate(id) {
   const token = sessionStorage.getItem('authToken');
   const resp = await fetch(`https://api.ehb-match.me/speeddates/reject/${id}`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (!resp.ok) throw new Error('Weigeren mislukt');
 }
@@ -88,29 +86,39 @@ async function fetchFunctiesSkills(bedrijfId) {
   let functies = [];
   let skills = [];
   try {
-    const resFuncties = await fetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`, {
-      headers: { Authorization: 'Bearer ' + token }
-    });
+    const resFuncties = await fetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`,
+      {
+        headers: { Authorization: 'Bearer ' + token },
+      }
+    );
     if (resFuncties.ok) functies = await resFuncties.json();
   } catch {}
   try {
-    const resSkills = await fetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`, {
-      headers: { Authorization: 'Bearer ' + token }
-    });
+    const resSkills = await fetch(
+      `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`,
+      {
+        headers: { Authorization: 'Bearer ' + token },
+      }
+    );
     if (resSkills.ok) skills = await resSkills.json();
   } catch {}
   return { functies, skills };
 }
 
 function getSortArrow(key, currentSort) {
-  const found = currentSort.find(s => s.key === key);
+  const found = currentSort.find((s) => s.key === key);
   if (!found) return '';
   return found.asc ? ' ▲' : ' ▼';
 }
 function formatTime(dtString) {
   if (!dtString) return '-';
   const dt = new Date(dtString);
-  return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  return dt.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
 }
 
 // Utility voor bedrijfsfoto's
@@ -124,13 +132,22 @@ function getBedrijfFotoUrl(foto) {
 export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
   // --- PROBEER ALTIJD EEN STUDENT TE VINDEN ---
   let actualStudentData = studentData;
-  if (!actualStudentData || (!actualStudentData.id && !actualStudentData.gebruiker_id)) {
-    const fromSession = sessionStorage.getItem('studentData') || sessionStorage.getItem('user');
+  if (
+    !actualStudentData ||
+    (!actualStudentData.id && !actualStudentData.gebruiker_id)
+  ) {
+    const fromSession =
+      sessionStorage.getItem('studentData') || sessionStorage.getItem('user');
     if (fromSession) {
-      try { actualStudentData = JSON.parse(fromSession); } catch {}
+      try {
+        actualStudentData = JSON.parse(fromSession);
+      } catch {}
     }
   }
-  if (!actualStudentData || (!actualStudentData.id && !actualStudentData.gebruiker_id)) {
+  if (
+    !actualStudentData ||
+    (!actualStudentData.id && !actualStudentData.gebruiker_id)
+  ) {
     renderLogin(rootElement);
     return;
   }
@@ -230,20 +247,36 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
             <div class="speeddate-item pending" data-id="${v.id}">
               <div class="speeddate-info">
                 <div class="student-info">
-                  <img src="${getBedrijfFotoUrl(v.profiel_foto_bedrijf)}" alt="${v.naam_bedrijf}" class="profiel-foto bedrijf-foto" onerror="this.src='/images/default.png'" />
+                  <img src="${getBedrijfFotoUrl(
+                    v.profiel_foto_bedrijf
+                  )}" alt="${
+                v.naam_bedrijf
+              }" class="profiel-foto bedrijf-foto" onerror="this.src='/images/default.png'" />
                   <div class="student-details">
-                    <h4 class="bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(v)}' style="cursor:pointer;text-decoration:none;">${v.naam_bedrijf}</h4>
+                    <h4 class="bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(
+                      v
+                    )}' style="cursor:pointer;text-decoration:none;">${
+                v.naam_bedrijf
+              }</h4>
                   </div>
                 </div>
                 <div class="afspraak-details">
                   <div class="tijd-lokaal">
-                    <p class="tijdslot">${v.begin ? formatTijdslotStudent(v.begin, v.einde) : '-'}</p>
-                    <p class="lokaal"><strong>Lokaal:</strong> ${v.lokaal || '-'} </p>
+                    <p class="tijdslot">${
+                      v.begin ? formatTijdslotStudent(v.begin, v.einde) : '-'
+                    }</p>
+                    <p class="lokaal"><strong>Lokaal:</strong> ${
+                      v.lokaal || '-'
+                    } </p>
                   </div>
                 </div>
                 <div class="speeddate-actions">
-                  <button class="action-btn accept-btn" data-action="accept" data-id="${v.id}">Accepteren</button>
-                  <button class="deny-btn" data-action="delete" data-id="${v.id}">Verwijderen</button>
+                  <button class="action-btn accept-btn" data-action="accept" data-id="${
+                    v.id
+                  }">Accepteren</button>
+                  <button class="deny-btn" data-action="delete" data-id="${
+                    v.id
+                  }">Verwijderen</button>
                 </div>
               </div>
             </div>
@@ -270,7 +303,9 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
     const afspraakId = target.getAttribute('data-id');
     const action = target.getAttribute('data-action');
     if (action === 'accept') {
-      acceptSpeeddate(afspraakId).then(() => renderSpeeddatesRequests(rootElement, studentData));
+      acceptSpeeddate(afspraakId).then(() =>
+        renderSpeeddatesRequests(rootElement, studentData)
+      );
     } else if (action === 'delete') {
       pendingDeleteAfspraakId = afspraakId;
       openDeleteModal();
@@ -279,7 +314,7 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
 
   function openDeleteModal() {
     const overlay = document.getElementById('modal-overlay');
-    console.log('[openDeleteModal] pendingDeleteAfspraakId:', pendingDeleteAfspraakId);
+
     if (overlay) overlay.style.display = 'flex';
   }
   function closeDeleteModal() {
@@ -292,15 +327,13 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
     const noBtn = document.getElementById('modal-no');
     const modalMessage = document.getElementById('modal-message');
     const modalButtons = document.querySelector('.modal-buttons');
-    console.log('[bindModalEvents]', { yesBtn, noBtn });
+
     if (yesBtn && noBtn) {
       yesBtn.onclick = async () => {
-        console.log('modal YES clicked!', pendingDeleteAfspraakId);
         if (pendingDeleteAfspraakId) {
           yesBtn.disabled = true;
           noBtn.disabled = true;
           try {
-            console.log('Calling rejectSpeeddate with:', pendingDeleteAfspraakId);
             await rejectSpeeddate(pendingDeleteAfspraakId);
             pendingDeleteAfspraakId = null;
             modalMessage.textContent = 'Speeddate succesvol verwijderd!';
@@ -308,7 +341,8 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
             setTimeout(() => {
               closeDeleteModal();
               renderSpeeddatesRequests(rootElement, studentData);
-              modalMessage.textContent = 'Weet je zeker dat je deze speeddate wilt weigeren?';
+              modalMessage.textContent =
+                'Weet je zeker dat je deze speeddate wilt weigeren?';
               modalButtons.style.display = 'flex';
               yesBtn.disabled = false;
               noBtn.disabled = false;
@@ -321,10 +355,10 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
         }
       };
       noBtn.onclick = () => {
-        console.log('modal NO clicked!');
         pendingDeleteAfspraakId = null;
         closeDeleteModal();
-        modalMessage.textContent = 'Weet je zeker dat je deze speeddate wilt weigeren?';
+        modalMessage.textContent =
+          'Weet je zeker dat je deze speeddate wilt weigeren?';
         modalButtons.style.display = 'flex';
         yesBtn.disabled = false;
         noBtn.disabled = false;
@@ -451,9 +485,22 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
     popup.innerHTML = `
       <button id=\"popup-close\" style=\"position:absolute;top:10px;right:12px;font-size:1.4rem;background:none;border:none;cursor:pointer;\">×</button>
       <h2 style=\"margin-top:0;\">${s.naam_bedrijf}</h2>
-      <p><strong>Tijd:</strong> ${s.begin ? new Date(s.begin).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Onbekend'}</p>
+      <p><strong>Tijd:</strong> ${
+        s.begin
+          ? new Date(s.begin).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            })
+          : 'Onbekend'
+      }</p>
       <p><strong>Locatie:</strong> ${s.lokaal || 'Onbekend'}</p>
-      <p><strong>Status:</strong> ${s.akkoord !== undefined ? (s.akkoord ? 'Geaccepteerd' : 'In behandeling') : '-'}</p>
+      <p><strong>Status:</strong> ${
+        s.akkoord !== undefined
+          ? s.akkoord
+            ? 'Geaccepteerd'
+            : 'In behandeling'
+          : '-'
+      }</p>
       <p><strong>LinkedIn:</strong> <a id=\"popup-linkedin\" href=\"#\" target=\"_blank\">Laden...</a></p>
       <div id=\"popup-skills\"><em>Skills laden...</em></div>
     `;
@@ -468,30 +515,52 @@ export async function renderSpeeddatesRequests(rootElement, studentData = {}) {
     if (bedrijfId) {
       const { functies, skills } = await fetchFunctiesSkills(bedrijfId);
       // Haal student skills/functies uit sessionStorage (voor matching)
-      let studentSkills = [], studentFuncties = [];
+      let studentSkills = [],
+        studentFuncties = [];
       try {
-        const studentData = JSON.parse(sessionStorage.getItem('studentData') || sessionStorage.getItem('user') || '{}');
+        const studentData = JSON.parse(
+          sessionStorage.getItem('studentData') ||
+            sessionStorage.getItem('user') ||
+            '{}'
+        );
         if (studentData.skills && Array.isArray(studentData.skills)) {
-          studentSkills = studentData.skills.map(s => (typeof s === 'string' ? s : s.naam)).filter(Boolean).map(s => s.toLowerCase());
+          studentSkills = studentData.skills
+            .map((s) => (typeof s === 'string' ? s : s.naam))
+            .filter(Boolean)
+            .map((s) => s.toLowerCase());
         }
         if (studentData.functies && Array.isArray(studentData.functies)) {
-          studentFuncties = studentData.functies.map(f => (typeof f === 'string' ? f : f.naam)).filter(Boolean).map(f => f.toLowerCase());
+          studentFuncties = studentData.functies
+            .map((f) => (typeof f === 'string' ? f : f.naam))
+            .filter(Boolean)
+            .map((f) => f.toLowerCase());
         }
       } catch {}
       const skillsHtml = skills.length
-        ? skills.map(skill => {
-            const isMatch = studentSkills.includes((skill.naam||'').toLowerCase());
-            return `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:${isMatch ? '#e3f2fd' : '#f1f1f1'};color:${isMatch ? '#1565c0' : '#222'};font-size:0.85rem;\">${skill.naam}</span>`;
-          }).join('')
+        ? skills
+            .map((skill) => {
+              const isMatch = studentSkills.includes(
+                (skill.naam || '').toLowerCase()
+              );
+              return `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:${
+                isMatch ? '#e3f2fd' : '#f1f1f1'
+              };color:${isMatch ? '#1565c0' : '#222'};font-size:0.85rem;\">${
+                skill.naam
+              }</span>`;
+            })
+            .join('')
         : '<em>Geen skills beschikbaar</em>';
-      document.getElementById('popup-skills').innerHTML = `<strong>Skills:</strong><div style=\"margin-top:0.4rem;\">${skillsHtml}</div>`;
+      document.getElementById(
+        'popup-skills'
+      ).innerHTML = `<strong>Skills:</strong><div style=\"margin-top:0.4rem;\">${skillsHtml}</div>`;
     }
     // LinkedIn
     if (s.linkedin) {
       document.getElementById('popup-linkedin').textContent = s.linkedin;
       document.getElementById('popup-linkedin').href = s.linkedin;
     } else {
-      document.getElementById('popup-linkedin').textContent = 'Niet beschikbaar';
+      document.getElementById('popup-linkedin').textContent =
+        'Niet beschikbaar';
       document.getElementById('popup-linkedin').removeAttribute('href');
     }
   }

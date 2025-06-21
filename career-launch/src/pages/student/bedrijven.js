@@ -15,7 +15,6 @@ import { fetchAndStoreStudentProfile } from '../../utils/fetch-student-profile.j
 import { authenticatedFetch } from '../../utils/auth-api.js';
 import { performLogout } from '../../utils/auth-api.js';
 
-
 // Globale variabelen
 let bedrijven = [];
 let currentStudentId = null;
@@ -71,7 +70,8 @@ async function showBedrijfPopup(bedrijf, studentId) {
   } catch {}
 
   // Haal actuele student skills/functies op:
-  const { skills: liveStudentSkills, functies: liveStudentFuncties } = await fetchStudentSkillsAndFuncties(studentId);
+  const { skills: liveStudentSkills, functies: liveStudentFuncties } =
+    await fetchStudentSkillsAndFuncties(studentId);
 
   const popup = document.createElement('div');
   popup.id = 'bedrijf-popup-modal';
@@ -108,7 +108,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
     authenticatedFetch(
       `https://api.ehb-match.me/speeddates/pending?id=${bedrijf.gebruiker_id}`
     ).then((r) => (r.ok ? r.json() : [])),
-]);
+  ]);
   const allAccepted = [...acceptedStudentDates, ...acceptedCompanyDates];
   const allPending = [...pendingStudentDates, ...pendingCompanyDates];
 
@@ -160,7 +160,12 @@ async function showBedrijfPopup(bedrijf, studentId) {
         const min = i * slotDuur;
         const mm = min < 10 ? `0${min}` : `${min}`;
         const tijd = `${uur < 10 ? '0' : ''}${uur}:${mm}`;
-        const status = getStatusForTijd(tijd, allAccepted, allPending, selectedDate);
+        const status = getStatusForTijd(
+          tijd,
+          allAccepted,
+          allPending,
+          selectedDate
+        );
         let kleur = '#fff',
           disabled = false,
           label = `${uur}u${mm}`;
@@ -181,13 +186,21 @@ async function showBedrijfPopup(bedrijf, studentId) {
 
   // --- Datepicker and dynamic slot calculation ---
   // Fetch events for this bedrijf (days with begin/einde)
-  const eventsResp = await authenticatedFetch(`https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/events`);
+  const eventsResp = await authenticatedFetch(
+    `https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/events`
+  );
   const events = eventsResp.ok ? await eventsResp.json() : [];
   // Map: { 'YYYY-MM-DD': { begin, einde } }
   const dateMap = {};
-  events.forEach(ev => {
+  events.forEach((ev) => {
     if (ev.begin && ev.einde) {
-      const dateStr = new Date(new Date(ev.begin).toLocaleString('en-US', { timeZone: 'Europe/Brussels' })).toISOString().slice(0, 10);
+      const dateStr = new Date(
+        new Date(ev.begin).toLocaleString('en-US', {
+          timeZone: 'Europe/Brussels',
+        })
+      )
+        .toISOString()
+        .slice(0, 10);
       dateMap[dateStr] = { begin: ev.begin, einde: ev.einde };
     }
   });
@@ -215,9 +228,12 @@ async function showBedrijfPopup(bedrijf, studentId) {
   // Datepicker HTML
   let datePickerHTML = '';
   if (availableDates.length > 0) {
-    datePickerHTML = `<label for="popup-date-picker" style="font-weight:500;display:block;margin-bottom:0.3em;">Kies een datum:</label><select id="popup-date-picker" style="margin-bottom:1em;width:100%;padding:0.5em 0.7em;border-radius:8px;border:1.5px solid #e1e5e9;font-size:1rem;">${availableDates.map(date => `<option value="${date}">${date}</option>`).join('')}</select>`;
+    datePickerHTML = `<label for="popup-date-picker" style="font-weight:500;display:block;margin-bottom:0.3em;">Kies een datum:</label><select id="popup-date-picker" style="margin-bottom:1em;width:100%;padding:0.5em 0.7em;border-radius:8px;border:1.5px solid #e1e5e9;font-size:1rem;">${availableDates
+      .map((date) => `<option value="${date}">${date}</option>`)
+      .join('')}</select>`;
   } else {
-    datePickerHTML = '<div class="info">Geen beschikbare data voor speeddates.</div>';
+    datePickerHTML =
+      '<div class="info">Geen beschikbare data voor speeddates.</div>';
   }
 
   // Dynamisch uren genereren op basis van geselecteerde datum
@@ -250,9 +266,15 @@ async function showBedrijfPopup(bedrijf, studentId) {
           (s) =>
             `<span class="skill-badge"
                style="display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;
-               background:${liveStudentSkills.includes(s.naam) ? '#e3f2fd' : '#f5f5f5'};
+               background:${
+                 liveStudentSkills.includes(s.naam) ? '#e3f2fd' : '#f5f5f5'
+               };
                color:#222;font-size:0.97em;"
-               title="${liveStudentSkills.includes(s.naam) ? 'Deze skill/talent matcht met jouw profiel!' : ''}"
+               title="${
+                 liveStudentSkills.includes(s.naam)
+                   ? 'Deze skill/talent matcht met jouw profiel!'
+                   : ''
+               }"
              >${s.naam}</span>`
         )
         .join(' ')
@@ -266,9 +288,15 @@ async function showBedrijfPopup(bedrijf, studentId) {
           (f) =>
             `<span class="functie-badge"
                style="display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;
-               background:${liveStudentFuncties.includes(f.naam) ? '#e3f2fd' : '#f5f5f5'};
+               background:${
+                 liveStudentFuncties.includes(f.naam) ? '#e3f2fd' : '#f5f5f5'
+               };
                color:#222;font-size:0.97em;"
-               title="${liveStudentFuncties.includes(f.naam) ? 'Deze functie matcht met jouw profiel!' : ''}"
+               title="${
+                 liveStudentFuncties.includes(f.naam)
+                   ? 'Deze functie matcht met jouw profiel!'
+                   : ''
+               }"
              >${f.naam}</span>`
         )
         .join(' ')
@@ -280,13 +308,25 @@ async function showBedrijfPopup(bedrijf, studentId) {
   popup.innerHTML = `
     <div id="bedrijf-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:600px;width:98vw;min-width:340px;position:relative;display:flex;flex-direction:column;align-items:center;">
       <button id="bedrijf-popup-close" style="position:absolute;top:10px;right:14px;font-size:1.7rem;background:none;border:none;cursor:pointer;color:#888;">&times;</button>
-      <button id="popup-favorite-btn" class="popup-favorite-btn" title="${isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'}">${hartIcon}</button>
-      <img src="${bedrijf.foto}" alt="Logo ${bedrijf.naam}" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'">
+      <button id="popup-favorite-btn" class="popup-favorite-btn" title="${
+        isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'
+      }">${hartIcon}</button>
+      <img src="${bedrijf.foto}" alt="Logo ${
+    bedrijf.naam
+  }" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'">
       <h2 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h2>
-      <div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${bedrijf.locatie}</div>
-      <div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${bedrijf.werkdomein}</div>
-      <a href="${bedrijf.linkedin}" target="_blank" style="color:#0077b5;margin-bottom:1rem;">LinkedIn</a>
-      <div style="font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;"><a href="mailto:${bedrijf.contact_email}" style="color:#444;">${bedrijf.contact_email}</a></div>
+      <div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${
+        bedrijf.locatie
+      }</div>
+      <div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${
+        bedrijf.werkdomein
+      }</div>
+      <a href="${
+        bedrijf.linkedin
+      }" target="_blank" style="color:#0077b5;margin-bottom:1rem;">LinkedIn</a>
+      <div style="font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;"><a href="mailto:${
+        bedrijf.contact_email
+      }" style="color:#444;">${bedrijf.contact_email}</a></div>
       <div style="margin-bottom:0.7rem;width:100%;display:flex;flex-direction:row;gap:1.5rem;justify-content:center;">
         <div style="text-align:left;"><strong>Gezochte functies:</strong><div style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;">${functiesHTML}</div></div>
         <div style="text-align:left;"><strong>Gezochte skills/talen:</strong><div style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;">${skillsHTML}</div></div>
@@ -310,10 +350,6 @@ async function showBedrijfPopup(bedrijf, studentId) {
   let gekozenDatum = '';
   let geselecteerdUur = null;
   aanvraagBtn.disabled = true;
-
-  // DEBUG
-  console.log('allSlots', allSlots);
-  console.log('slotsList', slotsList);
 
   // Compacte urenbalk boven de slots
   let urenLijst = document.createElement('div');
@@ -393,11 +429,14 @@ async function showBedrijfPopup(bedrijf, studentId) {
       });
       buildUrenLijst();
       geselecteerdUur = null;
-      const firstAvailableButton = urenLijst.querySelector('button:not([disabled])');
+      const firstAvailableButton = urenLijst.querySelector(
+        'button:not([disabled])'
+      );
       if (firstAvailableButton) {
         firstAvailableButton.click();
       } else {
-        slotsList.innerHTML = '<div style="color:#888;">Geen tijdslots beschikbaar voor deze dag.</div>';
+        slotsList.innerHTML =
+          '<div style="color:#888;">Geen tijdslots beschikbaar voor deze dag.</div>';
         aanvraagBtn.disabled = true;
       }
     });
@@ -409,7 +448,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
       const slotHour = parseInt(slot.value.split(':')[0], 10);
       return slotHour === uur;
     });
-    // console.log(slotsForHour); // Debug
+
     slotsList.innerHTML = slotsForHour
       .map(
         (slot) => `
@@ -503,7 +542,9 @@ async function showBedrijfPopup(bedrijf, studentId) {
   aanvraagBtn.onclick = async () => {
     const status = document.getElementById('speeddates-aanvraag-status');
     // Disable all popup controls immediately when request is sent
-    const popupControls = Array.from(popup.querySelectorAll('button, input, select'));
+    const popupControls = Array.from(
+      popup.querySelectorAll('button, input, select')
+    );
     popupControls.forEach((el) => {
       el.disabled = true;
       el.style.pointerEvents = 'none';
@@ -554,7 +595,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
         id_bedrijf: Number(bedrijf.gebruiker_id),
         datum: apiDatum, // LET OP: spatie, geen T
       };
-      console.log('Speeddate aanvraag payload:', payload); // <-- LOG TOEGEVOEGD
+
       const req = await authenticatedFetch(
         'https://api.ehb-match.me/speeddates',
         {
@@ -568,7 +609,9 @@ async function showBedrijfPopup(bedrijf, studentId) {
       if (req.status === 201) {
         // Highlight het gekozen tijdslot direct lichtgeel
         if (gekozenDatum) {
-          const slotBtn = slotsList.querySelector(`.slot-btn[data-slot="${gekozenDatum}"]`);
+          const slotBtn = slotsList.querySelector(
+            `.slot-btn[data-slot="${gekozenDatum}"]`
+          );
           if (slotBtn) {
             slotBtn.style.background = '#fff9d1';
             slotBtn.style.borderColor = '#ffe9a0';
@@ -622,7 +665,9 @@ export async function showBedrijfInfoPopup(bedrijf) {
   let bedrijfData = { ...bedrijf };
   if (bedrijfId) {
     try {
-      const resp = await authenticatedFetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}`);
+      const resp = await authenticatedFetch(
+        `https://api.ehb-match.me/bedrijven/${bedrijfId}`
+      );
       if (resp.ok) {
         const apiData = await resp.json();
         bedrijfData = { ...bedrijfData, ...apiData };
@@ -647,24 +692,43 @@ export async function showBedrijfInfoPopup(bedrijf) {
   } catch {}
 
   // Haal student skills/functies uit API (altijd up-to-date)
-  let userSkills = [], userFuncties = [];
+  let userSkills = [],
+    userFuncties = [];
   try {
     // Probeer studentId te bepalen
     let studentId = null;
-    const studentData = JSON.parse(sessionStorage.getItem('studentData') || sessionStorage.getItem('user') || '{}');
+    const studentData = JSON.parse(
+      sessionStorage.getItem('studentData') ||
+        sessionStorage.getItem('user') ||
+        '{}'
+    );
     studentId = studentData.id || studentData.gebruiker_id;
     if (studentId) {
       // Haal functies van student op
-      const functiesResp = await authenticatedFetch(`https://api.ehb-match.me/studenten/${studentId}/functies`);
+      const functiesResp = await authenticatedFetch(
+        `https://api.ehb-match.me/studenten/${studentId}/functies`
+      );
       if (functiesResp.ok) {
         const functiesArr = await functiesResp.json();
-        userFuncties = Array.isArray(functiesArr) ? functiesArr.map(f => (typeof f === 'string' ? f : f.naam)).filter(Boolean).map(f => f.toLowerCase()) : [];
+        userFuncties = Array.isArray(functiesArr)
+          ? functiesArr
+              .map((f) => (typeof f === 'string' ? f : f.naam))
+              .filter(Boolean)
+              .map((f) => f.toLowerCase())
+          : [];
       }
       // Haal skills van student op
-      const skillsResp = await authenticatedFetch(`https://api.ehb-match.me/studenten/${studentId}/skills`);
+      const skillsResp = await authenticatedFetch(
+        `https://api.ehb-match.me/studenten/${studentId}/skills`
+      );
       if (skillsResp.ok) {
         const skillsArr = await skillsResp.json();
-        userSkills = Array.isArray(skillsArr) ? skillsArr.map(s => (typeof s === 'string' ? s : s.naam)).filter(Boolean).map(s => s.toLowerCase()) : [];
+        userSkills = Array.isArray(skillsArr)
+          ? skillsArr
+              .map((s) => (typeof s === 'string' ? s : s.naam))
+              .filter(Boolean)
+              .map((s) => s.toLowerCase())
+          : [];
       }
     }
   } catch {}
@@ -677,12 +741,24 @@ export async function showBedrijfInfoPopup(bedrijf) {
   const contact_email = bedrijfData.contact_email || bedrijfData.email || '';
 
   // Toon alleen locatie, werkdomein, linkedin, email als ze niet leeg zijn
-  const locatieHtml = locatie ? `<div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${locatie}</div>` : '';
-  const werkdomeinHtml = werkdomein ? `<div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${werkdomein}</div>` : '';
-  const linkedinHtml = linkedin ? `<a href="${linkedin}" target="_blank" style="color:#0077b5;margin-bottom:1rem;">LinkedIn</a>` : '';
-  const emailHtml = contact_email ? `<div style="font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;"><a href="mailto:${contact_email}" style="color:#444;">${contact_email}</a></div>` : '';
+  const locatieHtml = locatie
+    ? `<div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${locatie}</div>`
+    : '';
+  const werkdomeinHtml = werkdomein
+    ? `<div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${werkdomein}</div>`
+    : '';
+  const linkedinHtml = linkedin
+    ? `<a href="${linkedin}" target="_blank" style="color:#0077b5;margin-bottom:1rem;">LinkedIn</a>`
+    : '';
+  const emailHtml = contact_email
+    ? `<div style="font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;"><a href="mailto:${contact_email}" style="color:#444;">${contact_email}</a></div>`
+    : '';
 
-  const profielFoto = bedrijfData.foto || bedrijfData.profiel_foto_bedrijf || bedrijfData.profiel_foto_url || 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
+  const profielFoto =
+    bedrijfData.foto ||
+    bedrijfData.profiel_foto_bedrijf ||
+    bedrijfData.profiel_foto_url ||
+    'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
   const popup = document.createElement('div');
   popup.id = 'bedrijf-popup-modal';
   popup.style.position = 'fixed';
@@ -708,19 +784,43 @@ export async function showBedrijfInfoPopup(bedrijf) {
         <div style="text-align:left;">
           <strong>Functies:</strong>
           <div style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;">
-            ${Array.isArray(functies) && functies.length ? functies.map(f => {
-              const isMatch = userFuncties.includes((f.naam||'').toLowerCase());
-              return `<span class='functie-badge' style='display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${isMatch ? '#e3f2fd' : '#f5f5f5'};color:${isMatch ? '#1565c0' : '#222'};font-size:0.97em;'>${f.naam}</span>`;
-            }).join(' ') : '<span style="color:#aaa;">Geen functies bekend</span>'}
+            ${
+              Array.isArray(functies) && functies.length
+                ? functies
+                    .map((f) => {
+                      const isMatch = userFuncties.includes(
+                        (f.naam || '').toLowerCase()
+                      );
+                      return `<span class='functie-badge' style='display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${
+                        isMatch ? '#e3f2fd' : '#f5f5f5'
+                      };color:${
+                        isMatch ? '#1565c0' : '#222'
+                      };font-size:0.97em;'>${f.naam}</span>`;
+                    })
+                    .join(' ')
+                : '<span style="color:#aaa;">Geen functies bekend</span>'
+            }
           </div>
         </div>
         <div style="text-align:left;">
           <strong>Skills/talen:</strong>
           <div style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;">
-            ${Array.isArray(skills) && skills.length ? skills.map(s => {
-              const isMatch = userSkills.includes((s.naam||'').toLowerCase());
-              return `<span class='skill-badge' style='display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${isMatch ? '#e3f2fd' : '#f5f5f5'};color:${isMatch ? '#1565c0' : '#222'};font-size:0.97em;'>${s.naam}</span>`;
-            }).join(' ') : '<span style=\"color:#aaa;\">Geen skills/talen bekend</span>'}
+            ${
+              Array.isArray(skills) && skills.length
+                ? skills
+                    .map((s) => {
+                      const isMatch = userSkills.includes(
+                        (s.naam || '').toLowerCase()
+                      );
+                      return `<span class='skill-badge' style='display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${
+                        isMatch ? '#e3f2fd' : '#f5f5f5'
+                      };color:${
+                        isMatch ? '#1565c0' : '#222'
+                      };font-size:0.97em;'>${s.naam}</span>`;
+                    })
+                    .join(' ')
+                : '<span style="color:#aaa;">Geen skills/talen bekend</span>'
+            }
           </div>
         </div>
       </div>
@@ -728,7 +828,9 @@ export async function showBedrijfInfoPopup(bedrijf) {
   `;
   document.body.appendChild(popup);
   document.getElementById('bedrijf-popup-close').onclick = () => popup.remove();
-  popup.addEventListener('click', (e) => { if (e.target === popup) popup.remove(); });
+  popup.addEventListener('click', (e) => {
+    if (e.target === popup) popup.remove();
+  });
 }
 
 // Haal alle skills op uit de algemene skills API
@@ -919,7 +1021,7 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       }
       const resp = await authenticatedFetch(apiUrl);
       const companies = resp.ok ? await resp.json() : [];
-      console.log('API Companies:', companies); // DEBUG: check of match_percentage aanwezig is
+
       if (!Array.isArray(companies)) {
         bedrijven = [];
       } else {
@@ -1344,10 +1446,14 @@ export async function renderBedrijven(rootElement, studentData = {}) {
                   ? bedrijf.foto
                   : defaultBedrijfLogo;
               return `
-  <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001, -8px 0 16px 0 ${colorScheme.background}33;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;position:relative;" data-bedrijf-idx="${bedrijven.indexOf(
-    bedrijf
-  )}">
-    <span class="match-badge" style="position:absolute;top:10px;left:10px;background:${colorScheme.background};color:#fff;font-weight:bold;padding:0.3em 0.8em;border-radius:16px;font-size:0.98em;z-index:3;box-shadow:0 2px 8px #0002;">${
+  <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001, -8px 0 16px 0 ${
+    colorScheme.background
+  }33;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;position:relative;" data-bedrijf-idx="${bedrijven.indexOf(
+                bedrijf
+              )}">
+    <span class="match-badge" style="position:absolute;top:10px;left:10px;background:${
+      colorScheme.background
+    };color:#fff;font-weight:bold;padding:0.3em 0.8em;border-radius:16px;font-size:0.98em;z-index:3;box-shadow:0 2px 8px #0002;">${
                 typeof matchPercentage === 'number'
                   ? matchPercentage.toFixed(1)
                   : '?'
@@ -1539,16 +1645,18 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       }
       showSettingsPopup(() => renderBedrijven(rootElement, actualStudentData));
     });
-    document.getElementById('nav-logout').addEventListener('click', async () => {
-      const dropdown = document.getElementById('burger-dropdown');
-      if (dropdown) {
-        dropdown.classList.remove('open');
-        await performLogout();
-      }
-      localStorage.setItem('darkmode', 'false');
-      document.body.classList.remove('darkmode');
-      renderLogin(rootElement);
-    });
+    document
+      .getElementById('nav-logout')
+      .addEventListener('click', async () => {
+        const dropdown = document.getElementById('burger-dropdown');
+        if (dropdown) {
+          dropdown.classList.remove('open');
+          await performLogout();
+        }
+        localStorage.setItem('darkmode', 'false');
+        document.body.classList.remove('darkmode');
+        renderLogin(rootElement);
+      });
 
     document.getElementById('privacy-policy').addEventListener('click', (e) => {
       e.preventDefault();
@@ -1633,7 +1741,7 @@ function createPopup({
     searchInput.addEventListener('input', (e) => {
       renderOptions(e.target.value);
     });
-   }
+  }
   // Handlers
   document.getElementById(`${id}-cancel`).onclick = () => overlay.remove();
   document.getElementById(`${id}-save`).onclick = () => {
@@ -1724,11 +1832,15 @@ function getMatchColorScheme(percentage) {
 // Haal altijd de actuele skills en functies van een student op
 async function fetchStudentSkillsAndFuncties(studentId) {
   const [skillsResp, functiesResp] = await Promise.all([
-    authenticatedFetch(`https://api.ehb-match.me/studenten/${studentId}/skills`).then(r => r.ok ? r.json() : []),
-    authenticatedFetch(`https://api.ehb-match.me/studenten/${studentId}/functies`).then(r => r.ok ? r.json() : [])
+    authenticatedFetch(
+      `https://api.ehb-match.me/studenten/${studentId}/skills`
+    ).then((r) => (r.ok ? r.json() : [])),
+    authenticatedFetch(
+      `https://api.ehb-match.me/studenten/${studentId}/functies`
+    ).then((r) => (r.ok ? r.json() : [])),
   ]);
   return {
-    skills: skillsResp.map(s => s.naam),
-    functies: functiesResp.map(f => f.naam),
+    skills: skillsResp.map((s) => s.naam),
+    functies: functiesResp.map((f) => f.naam),
   };
 }

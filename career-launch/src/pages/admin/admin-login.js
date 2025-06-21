@@ -53,7 +53,6 @@ export function renderAdmin(rootElement) {
 
       // Parse JSON response
       const responseData = await response.json(); // Debugging: Log API responses
-      console.log('Login Response:', responseData);
 
       if (response.ok) {
         // Store important information in session storage
@@ -76,7 +75,7 @@ export function renderAdmin(rootElement) {
         const infoData = await infoResponse.json();
 
         // Debugging: Log user info
-        console.log('User Info:', infoData.user); // Check user type
+
         if (infoData.user.type === 1) {
           // User is an admin, store admin email and redirect directly to ingeschreven studenten
           sessionStorage.setItem('adminUsername', infoData.user.email);

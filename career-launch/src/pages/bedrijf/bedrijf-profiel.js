@@ -47,13 +47,13 @@ export async function renderBedrijfProfiel(
   // Explicit auth check before proceeding
   const authToken = window.sessionStorage.getItem('authToken');
   const userType = window.sessionStorage.getItem('userType');
-  
+
   if (!authToken) {
     console.warn('No auth token found, redirecting to login');
     Router.navigate('/login');
     return;
   }
-    if (userType !== 'company') {
+  if (userType !== 'company') {
     console.warn('User is not a company, redirecting to appropriate page');
     if (userType === 'student') {
       Router.navigate('/student/student-profiel');
@@ -78,8 +78,7 @@ export async function renderBedrijfProfiel(
       if (userInfoResult.success) {
         const apiUser = userInfoResult.user;
         // Log de ruwe API data voor debugging
-        console.log('Raw API user data:', userInfoResult);
-        console.log('USER OBJECT:', apiUser); // Map API data naar bedrijf profiel velden (gebruik API veldnamen)
+
         bedrijfData = {
           id: apiUser.id || apiUser.gebruiker_id,
           contact_email: apiUser.contact_email || apiUser.email || '',
@@ -97,10 +96,6 @@ export async function renderBedrijfProfiel(
           sector_bedrijf: apiUser.sector_bedrijf || apiUser.sector || '',
           id_sector_bedrijf: apiUser.id_sector_bedrijf || null,
         };
-
-        // Log de gemapte bedrijf data voor debugging
-        console.log('Mapped bedrijf data:', bedrijfData);
-        console.log('Bedrijf ID voor API call:', bedrijfData.id);
 
         // Sla de gegevens op in sessionStorage voor toekomstig gebruik
         window.sessionStorage.setItem(
@@ -306,7 +301,7 @@ export async function renderBedrijfProfiel(
   document.getElementById('nav-logout')?.addEventListener('click', async () => {
     dropdown.classList.remove('open');
     const response = await performLogout();
-    console.log('Logout API response:', response);
+
     window.sessionStorage.removeItem('bedrijfData');
     window.sessionStorage.removeItem('authToken');
     window.sessionStorage.removeItem('userType');
@@ -320,7 +315,7 @@ export async function renderBedrijfProfiel(
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
       const response = await performLogout();
-      console.log('Logout API response:', response);
+
       window.sessionStorage.removeItem('bedrijfData');
       window.sessionStorage.removeItem('authToken');
       window.sessionStorage.removeItem('userType');
@@ -396,10 +391,6 @@ export async function renderBedrijfProfiel(
         let sectorID = null;
         if (document.getElementById('sectorInput').value) {
           try {
-            console.log(
-              'Sector input value:',
-              document.getElementById('sectorInput').value
-            );
             const currentToken = window.sessionStorage.getItem('authToken');
             const response = await authenticatedFetch(
               'https://api.ehb-match.me/sectoren',
@@ -420,7 +411,7 @@ export async function renderBedrijfProfiel(
               );
             }
             const data = await response.json();
-            console.log('Sector ID opgehaald:', data);
+
             sectorID = data.sector.id;
           } catch (error) {
             console.error('Error fetching sector ID:', error);
@@ -466,23 +457,10 @@ export async function renderBedrijfProfiel(
         // Haal het bedrijf ID op uit de huidige data
         const bedrijfID = bedrijfData.id || bedrijfData.gebruiker_id;
 
-        console.log('Debug bedrijf ID lookup:');
-        console.log('bedrijfData:', bedrijfData);
-        console.log('bedrijfData.id:', bedrijfData.id);
-        console.log('bedrijfData.gebruiker_id:', bedrijfData.gebruiker_id);
-        console.log('Final bedrijfID:', bedrijfID);
-
         if (!bedrijfID) {
           alert('Kon bedrijf ID niet vinden. Probeer opnieuw in te loggen.');
           return;
         }
-
-        console.log(
-          'Updating bedrijf with ID:',
-          bedrijfID,
-          'Data:',
-          updateData
-        );
 
         // Voeg de profiel foto toe als deze is gewijzigd
         let profielFotoKey = null;
@@ -515,7 +493,7 @@ export async function renderBedrijfProfiel(
               },
             }
           );
-          console.log('Profielfoto verwijderd:', deleteResp);
+
           profielFotoKey = DEFAULT_AVATAR_KEY; // Reset de profielfoto key
         }
         const photoInput = document.getElementById('logoInput');
@@ -555,10 +533,8 @@ export async function renderBedrijfProfiel(
           const uploadResult = await uploadResp.json();
           profielFotoKey = uploadResult.profiel_foto_key;
         }
-        console.log('Stuur profielfoto key:', profielFotoKey);
+
         updateData.profiel_foto = profielFotoKey || DEFAULT_AVATAR_KEY; // Voeg de profielfoto key toe als deze bestaat
-        console.log('Final update data:', JSON.stringify(updateData, null, 2));
-        console.log('Bedrijf ID for API call:', bedrijfID);
 
         // Roep de API aan om het bedrijf bij te werken
         const result = await updateBedrijfProfile(bedrijfID, updateData);

@@ -20,7 +20,7 @@ async function fetchAllSkills() {
 // Skill/taal toevoegen: type is boolean: false (skill), true (taal)
 async function addSkillOrTaal(name, isTaal = 0) {
   const token = sessionStorage.getItem('authToken');
-  console.log('Toevoegen skill/taal:', { naam: name, type: isTaal });
+
   const resp = await fetch('https://api.ehb-match.me/skills', {
     method: 'POST',
     headers: {
@@ -131,7 +131,6 @@ async function setStudentSkills(studentId, skillIds) {
   );
 
   const text = await resp.text();
-  console.log('Status:', resp.status, 'Response:', text);
 
   if (!resp.ok) {
     console.error('API error response:', text);
@@ -158,7 +157,7 @@ async function debugSetStudentSkillsIndividueel(studentId, skillIds) {
         }
       );
       const text = await resp.text();
-      console.log(`Skill ${id}: status ${resp.status}`, text);
+
       if (!resp.ok) {
         alert(`Skill ${id} toevoegen faalt: ${text}`);
       }
@@ -172,11 +171,7 @@ async function debugSetStudentSkillsIndividueel(studentId, skillIds) {
 async function syncStudentSkills(studentId, checkedSkillIds, checkedTaalIds) {
   // Debug: toon alle ID's en types
   const allIds = [...checkedSkillIds, ...checkedTaalIds].map(Number);
-  console.log(
-    'All IDs naar API:',
-    allIds,
-    allIds.map((x) => typeof x)
-  );
+
   await setStudentSkills(studentId, allIds);
 }
 
@@ -224,17 +219,13 @@ async function updateFunctiesForStudent(studentId, selectedFunctieIds) {
   if (!Array.isArray(toeTeVoegen)) {
     console.warn('Toe te voegen is geen array:', toeTeVoegen);
   }
-  console.log('Type van toeTeVoegen:', Array.isArray(toeTeVoegen), toeTeVoegen);
+
   if (toeTeVoegen.length > 0) {
     // Flatten als het een nested array is
     const functiesBody = {
       functies: Array.isArray(toeTeVoegen[0]) ? toeTeVoegen[0] : toeTeVoegen,
     };
-    console.log('Functies body =', JSON.stringify(functiesBody));
-    console.log('Verstuur naar API:', {
-      studentId,
-      functiesBody,
-    });
+
     const resp = await fetch(
       `https://api.ehb-match.me/studenten/${studentId}/functies`,
       {
@@ -247,9 +238,6 @@ async function updateFunctiesForStudent(studentId, selectedFunctieIds) {
       }
     );
     const text = await resp.text();
-    console.log('API response:', resp.status, text);
-  } else {
-    console.log('Geen functies om toe te voegen, POST wordt niet uitgevoerd.');
   }
 }
 
@@ -292,7 +280,7 @@ async function fetchStudentFuncties(studentId) {
   if (!token) {
     console.warn('GEEN token gevonden in sessionStorage!');
   }
-  console.log('fetchStudentFuncties: studentId:', studentId, 'token:', token);
+
   const resp = await fetch(
     `https://api.ehb-match.me/studenten/${studentId}/functies`,
     {
@@ -559,25 +547,20 @@ export async function renderSearchCriteriaStudent(
     // Functie om EEN functie toe te voegen (net zoals bedrijf-code)
     async function addFunctieToStudent(functieId) {
       try {
-        console.log('addFunctieToStudent called with:', functieId);
         const token = sessionStorage.getItem('authToken');
         // First, fetch current functies to get the complete list
-        console.log('Fetching current functies before adding new one...');
+
         const currentFuncties = await fetchStudentFuncties(studentId);
-        console.log('Current functies:', currentFuncties);
 
         // Create array of current functie IDs
         const currentFunctieIds = currentFuncties.map((f) => f.id);
-        console.log('Current functie IDs:', currentFunctieIds);
 
         // Add the new functie if not already present
         if (!currentFunctieIds.includes(functieId)) {
           currentFunctieIds.push(functieId);
         }
-        console.log('Updated functie IDs:', currentFunctieIds);
 
         const requestBody = { functies: currentFunctieIds };
-        console.log('Request body:', requestBody);
 
         const response = await fetch(
           `https://api.ehb-match.me/studenten/${studentId}/functies`,
@@ -591,9 +574,7 @@ export async function renderSearchCriteriaStudent(
           }
         );
 
-        console.log('Response status:', response.status);
         const responseText = await response.text();
-        console.log('Response text:', responseText);
 
         if (!response.ok) {
           console.error('Error response voor functie toevoegen:', responseText);
@@ -604,7 +585,6 @@ export async function renderSearchCriteriaStudent(
             (responseText.includes('already') ||
               responseText.includes('duplicate'))
           ) {
-            console.log('Functie bestaat al, returning true');
             return true; // Functie bestaat al, dat is OK
           }
 
@@ -613,7 +593,6 @@ export async function renderSearchCriteriaStudent(
           );
         }
 
-        console.log('addFunctieToStudent successful');
         return true;
       } catch (error) {
         console.error('Fout bij toevoegen functie:', error);
@@ -655,10 +634,6 @@ export async function renderSearchCriteriaStudent(
     functieCheckboxes.forEach((checkbox) => {
       checkbox.addEventListener('change', async (e) => {
         const functieId = parseInt(e.target.value, 10);
-        console.log('Checkbox changed:', {
-          functieId,
-          checked: e.target.checked,
-        });
 
         if (!functieId) {
           alert('Functie-ID ontbreekt!');
@@ -667,9 +642,9 @@ export async function renderSearchCriteriaStudent(
 
         if (e.target.checked) {
           // Voeg functie toe - gebruik individuele API call
-          console.log('Adding functie:', functieId);
+
           const success = await addFunctieToStudent(functieId);
-          console.log('Add functie result:', success);
+
           if (!success) {
             alert('Kon functie niet toevoegen. Probeer het opnieuw.');
             // Reset checkbox als opslaan mislukt
@@ -677,9 +652,9 @@ export async function renderSearchCriteriaStudent(
           }
         } else {
           // Verwijder functie - gebruik individuele API call
-          console.log('Removing functie:', functieId);
+
           const success = await removeFunctieFromStudent(functieId);
-          console.log('Remove functie result:', success);
+
           if (!success) {
             alert('Kon functie niet verwijderen. Probeer het opnieuw.');
             // Reset checkbox als verwijderen mislukt
@@ -1001,32 +976,18 @@ export async function renderSearchCriteriaStudent(
     // Functie om bestaande student functies te laden en checkboxes in te stellen
     async function loadStudentWerktypes() {
       try {
-        console.log('loadStudentWerktypes: studentId =', studentId);
         const studentFuncties = await fetchStudentFuncties(studentId);
-        console.log('loadStudentWerktypes: studentFuncties =', studentFuncties);
 
         if (Array.isArray(studentFuncties) && studentFuncties.length > 0) {
-          console.log(
-            'loadStudentWerktypes: Setting checkboxes for functies:',
-            studentFuncties.map((f) => f.id)
-          );
           studentFuncties.forEach((functie) => {
             const checkbox = document.querySelector(
               `input[name="bedrijfFuncties"][value="${functie.id}"]`
             );
-            console.log(
-              `loadStudentWerktypes: Looking for checkbox with value ${functie.id}, found:`,
-              checkbox
-            );
+
             if (checkbox) {
               checkbox.checked = true;
-              console.log(
-                `loadStudentWerktypes: Set checkbox ${functie.id} to checked`
-              );
             }
           });
-        } else {
-          console.log('loadStudentWerktypes: No functies found or empty array');
         }
       } catch (error) {
         console.error('Fout bij laden student functies:', error);
@@ -1147,9 +1108,7 @@ export async function renderSearchCriteriaStudent(
     }
     // --- EINDE navigatie events ---
     // Laad bestaande student data bij het laden van de pagina (net zoals bedrijf-code)
-    Promise.allSettled([loadStudentWerktypes()]).then(() => {
-      console.log('Student functies geladen');
-    });
+    Promise.allSettled([loadStudentWerktypes()]).then(() => {});
 
     // END setTimeout
   }, 200);

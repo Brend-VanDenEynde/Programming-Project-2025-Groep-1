@@ -38,7 +38,7 @@ export function renderStudentProfiel(
       const stored = window.sessionStorage.getItem('studentData');
       if (stored) studentData = JSON.parse(stored);
       if (!studentData || Object.keys(studentData).length === 0) {
-        console.warn('Geen studentData gevonden in sessionStorage, ga naar login.');
+
         import('../../router.js').then((module) => {
           const Router = module.default;
           Router.navigate('/login');
@@ -284,11 +284,9 @@ export function renderStudentProfiel(
       });
     }
     document
-      .getElementById('nav-logout')
-      .addEventListener('click', async () => {
+      .getElementById('nav-logout')      .addEventListener('click', async () => {
         dropdown.classList.remove('open');
         const response = await performLogout();
-        console.log('Logout API response:', response);
         window.sessionStorage.removeItem('studentData');
         window.sessionStorage.removeItem('authToken');
         window.sessionStorage.removeItem('userType');
@@ -302,10 +300,8 @@ export function renderStudentProfiel(
 
     // Ook de LOG OUT knop in het profiel-formulier zelf (voor desktop)
     const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', async () => {
+    if (logoutBtn) {      logoutBtn.addEventListener('click', async () => {
         const response = await performLogout();
-        console.log('Logout API response:', response);
         window.sessionStorage.removeItem('studentData');
         window.sessionStorage.removeItem('authToken');
         window.sessionStorage.removeItem('userType');
@@ -336,13 +332,12 @@ export function renderStudentProfiel(
 
   // Originele data voor reset
   const originalData = { ...studentData };
-
   // Event handlers voor profiel bewerken
   const form = document.getElementById('profileForm');
   // Knop naar zoekcriteria (skills/voorkeuren)
-  const searchCriteriaBtn = document.getElementById('to-search-criteria-btn');
-  if (searchCriteriaBtn) {
-    searchCriteriaBtn.addEventListener('click', () => {
+  const toSearchCriteriaBtn = document.getElementById('to-search-criteria-btn');
+  if (toSearchCriteriaBtn) {
+    toSearchCriteriaBtn.addEventListener('click', () => {
       import('../../router.js').then((module) => {
         const Router = module.default;
         Router.navigate('/student/zoek-criteria');
@@ -352,9 +347,7 @@ export function renderStudentProfiel(
   if (form) {
     // EDIT knop
     const editBtn = document.getElementById('btn-edit-profile');
-    if (editBtn) {
-      editBtn.addEventListener('click', () => {
-        console.log('EDIT clicked', { readonlyMode, studentData });
+    if (editBtn) {      editBtn.addEventListener('click', () => {
         renderStudentProfiel(rootElement, studentData, false);
       });
     }
@@ -387,28 +380,15 @@ export function renderStudentProfiel(
           opleiding_id: parseInt(newOpleidingId, 10),
         };
         // Debug: log de payload
-        console.log(
-          'Student update payload:',
-          JSON.stringify(updatedStudentData)
-        );
+        
         // Haal altijd de juiste ID’s uit sessionStorage
         // let studentID = studentData.gebruiker_id;
         // let userID = studentData.gebruiker_id;
+        
         if (!studentID || !userID) {
           alert('Student ID of gebruiker_id ontbreekt!');
           return;
         }
-        // Debug: log de gebruikte ID's en token
-        console.log(
-          'studentData:',
-          studentData,
-          'studentID:',
-          studentID,
-          'userID:',
-          userID,
-          'token:',
-          token
-        );
         // Check geboortedatum niet in de toekomst en minstens 17 jaar oud
         const today = new Date();
         const minBirthDate = new Date(
@@ -435,7 +415,7 @@ export function renderStudentProfiel(
         try {
           // 1. E-mail gewijzigd? Eerst /user/{userID}
           if (nieuweEmail && nieuweEmail !== oudeEmail) {
-            console.debug('PUT /user/' + userID, { email: nieuweEmail });
+
             const respUser = await authenticatedFetch(
               `https://api.ehb-match.me/user/${userID}`,
               {
@@ -449,7 +429,7 @@ export function renderStudentProfiel(
 
             if (!respUser.ok) {
               const errText = await respUser.text();
-              console.error('Backend response (user):', errText);
+
               throw new Error('E-mail bijwerken mislukt: ' + errText);
             }
             const userResult = await respUser.json();
@@ -498,13 +478,13 @@ export function renderStudentProfiel(
             );
             if (!uploadResp.ok) {
               const errText = await uploadResp.text();
-              console.error('Upload response for key "image":', errText);
+
               throw new Error('Foto uploaden mislukt: ' + errText);
             }
             const uploadResult = await uploadResp.json();
             profielFotoKey = uploadResult.profiel_foto_key;
           }
-          console.log('Stuur profielfoto key:', profielFotoKey);
+          
           // 3. Overige profielinfo via /studenten/{studentID} (JSON)
           const payload = {
             voornaam: document.getElementById('firstNameInput').value.trim(),
@@ -539,7 +519,7 @@ export function renderStudentProfiel(
             }
           });
 
-          console.log('Payload met profielfoto key:', payload);
+          
 
           // Validate required fields
           if (!payload.voornaam || !payload.achternaam) {
@@ -565,14 +545,8 @@ export function renderStudentProfiel(
             return;
           }
 
-          console.log(
-            'Sending payload to API:',
-            JSON.stringify(payload, null, 2)
-          );
-          console.log(
-            'API endpoint:',
-            `https://api.ehb-match.me/studenten/${studentID}`
-          );
+          
+          
           const respStudent = await authenticatedFetch(
             `https://api.ehb-match.me/studenten/${studentID}`,
             {
@@ -582,15 +556,8 @@ export function renderStudentProfiel(
               },
               body: JSON.stringify(payload),
             }
-          );
-          if (!respStudent.ok) {
+          );          if (!respStudent.ok) {
             const errText = await respStudent.text();
-            console.error('Backend response (student):', errText);
-            console.error('Response status:', respStudent.status);
-            console.error(
-              'Response headers:',
-              Object.fromEntries(respStudent.headers.entries())
-            );
 
             // Try to parse JSON error if possible
             let errorMessage = 'Profiel bijwerken mislukt';
@@ -660,12 +627,10 @@ export function renderStudentProfiel(
           reader.readAsDataURL(file);
         }
       });
-    }
-
-    // Navigatie naar zoekcriteria/student-skills pagina
-    const searchCriteriaBtn = document.getElementById('btn-search-criteria');
-    if (searchCriteriaBtn) {
-      searchCriteriaBtn.addEventListener('click', () => {
+    }    // Navigatie naar zoekcriteria/student-skills pagina
+    const btnSearchCriteria = document.getElementById('btn-search-criteria');
+    if (btnSearchCriteria) {
+      btnSearchCriteria.addEventListener('click', () => {
         import('../../router.js').then((module) => {
           const Router = module.default;
           Router.navigate('/student/zoek-criteria');

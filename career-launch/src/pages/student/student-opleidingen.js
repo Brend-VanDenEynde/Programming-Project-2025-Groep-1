@@ -10,11 +10,10 @@ export const opleidingen = [
   { id: 6, naam: 'Ontwerp- en Productietechnologie' },
   { id: 7, naam: 'Multimedia en Creatieve Technologie' },
   { id: 8, naam: 'Energietechnologie' },
- ];
+];
 
 // Helper: geef de naam van de opleiding op basis van id
 export function getOpleidingNaamById(id) {
-  console.log('DEBUG opleiding_id:', id); // Debug: toon de ontvangen id
-  const opleiding = opleidingen.find(o => String(o.id) === String(id));
+  const opleiding = opleidingen.find((o) => String(o.id) === String(id));
   return opleiding ? opleiding.naam : 'Onbekend of niet ingevuld';
 }

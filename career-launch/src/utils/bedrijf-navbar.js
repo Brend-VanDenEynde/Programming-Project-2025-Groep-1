@@ -50,17 +50,13 @@ export function closeBedrijfNavbar() {
 }
 
 export function setupBedrijfNavbarEvents() {
-  console.log('Setting up bedrijf navbar events...');
-
   // Sidebar navigation
   const sidebarLinks = document.querySelectorAll('.sidebar-link');
-  console.log('Found sidebar links:', sidebarLinks.length);
 
   sidebarLinks.forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       const route = e.currentTarget.getAttribute('data-route');
-      console.log('Clicking route:', route);
 
       import('../router.js').then((module) => {
         const Router = module.default;

@@ -64,7 +64,6 @@ function handleJaarRegister(event) {
   };
 
   // Data naar server sturen (voorbeeld)
-  console.log('Registratie data:', data);
 
   renderStudentSkills(document.getElementById('app'));
 }

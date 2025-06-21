@@ -74,7 +74,10 @@ export function renderBedrijfRegister(rootElement) {
   }
 
   function updateUploadedPhotoVisibility() {
-    if (uploadedPhoto.hasAttribute('src') && uploadedPhoto.getAttribute('src')) {
+    if (
+      uploadedPhoto.hasAttribute('src') &&
+      uploadedPhoto.getAttribute('src')
+    ) {
       uploadedPhoto.style.display = '';
     } else {
       uploadedPhoto.style.display = 'none';
@@ -119,10 +122,13 @@ export function renderBedrijfRegister(rootElement) {
       const formData = new FormData();
 
       formData.append('image', file);
-      const uploadResponse = await authenticatedFetch('https://api.ehb-match.me/profielfotos', {
-        method: 'POST',
-        body: formData,
-      }).then((response) => {
+      const uploadResponse = await authenticatedFetch(
+        'https://api.ehb-match.me/profielfotos',
+        {
+          method: 'POST',
+          body: formData,
+        }
+      ).then((response) => {
         if (!response.ok) {
           throw new Error(`Upload failed: ${response.status}`);
         } else {
@@ -178,7 +184,6 @@ async function handleBedrijfRegister(event) {
   const errorLabel = document.getElementById('error-label');
   errorLabel.style.display = 'none';
 
-
   // Validate required fields
   const bedrijfnaam = formData.get('bedrijfnaam');
   const plaats = formData.get('plaats');
@@ -203,7 +208,10 @@ async function handleBedrijfRegister(event) {
   if (linkedinInput && linkedinInput.trim() !== '') {
     linkedinInput = linkedinInput.trim();
     // Remove both 'https://www.linkedin.com' and 'https://linkedin.com' from the start
-    linkedinInput = linkedinInput.replace(/^(https?:\/\/)?(www\.)?linkedin\.com/i, '');
+    linkedinInput = linkedinInput.replace(
+      /^(https?:\/\/)?(www\.)?linkedin\.com/i,
+      ''
+    );
     // Accept if it starts with '/company/'
     if (linkedinInput.startsWith('/company/')) {
       linkedinValue = linkedinInput;
@@ -224,11 +232,12 @@ async function handleBedrijfRegister(event) {
   };
   try {
     const result = await registerCompany(data);
-    console.log('Bedrijf registratie succesvol:', result);
 
     // Clear stored user data
 
-    alert('Uw bedrijfsaccount is succesvol aangemaakt! Gelieve te wachten tot ons team uw account bevestigt.');
+    alert(
+      'Uw bedrijfsaccount is succesvol aangemaakt! Gelieve te wachten tot ons team uw account bevestigt.'
+    );
     Router.navigate('/login');
   } catch (error) {
     console.error('Fout bij het aanmaken van bedrijf account:', error);

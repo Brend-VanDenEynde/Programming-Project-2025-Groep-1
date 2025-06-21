@@ -21,7 +21,9 @@ async function fetchSpeeddateData(bedrijfId, token) {
     const data = await response.json();
 
     // Filter out unaccepted speeddate requests made by other users
-    const filteredData = data.filter((item) => item.akkoord !== 0 || item.asked_by === bedrijfId);
+    const filteredData = data.filter(
+      (item) => item.akkoord !== 0 || item.asked_by === bedrijfId
+    );
 
     // Structureer de data voor eenvoudige rendering
     return formatSpeeddateData(filteredData);
@@ -67,7 +69,12 @@ function formatTijdslot(beginISO, eindeISO) {
   const einde = new Date(eindeISO);
 
   // Dag en datum
-  const dagOpties = { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' };
+  const dagOpties = {
+    weekday: 'long',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  };
   const dagDatum = begin.toLocaleDateString('nl-BE', dagOpties);
 
   // Uur
@@ -113,7 +120,11 @@ function renderSpeeddatesList(speeddates) {
                      style="cursor:pointer;"
                      onerror="this.src='/images/default.png'" />
                 <div class="student-details">
-                  <h4 class="student-popup-trigger" data-student='${JSON.stringify(afspraak.student)}' style="cursor:pointer;text-decoration:none;">${afspraak.student.naam}</h4>
+                  <h4 class="student-popup-trigger" data-student='${JSON.stringify(
+                    afspraak.student
+                  )}' style="cursor:pointer;text-decoration:none;">${
+              afspraak.student.naam
+            }</h4>
                 </div>
               </div>
               <div class="afspraak-details" style="display:flex;flex-direction:row;align-items:center;gap:24px;">
@@ -183,7 +194,6 @@ async function loadSpeeddateData() {
       try {
         const companyData = JSON.parse(companyDataString);
         bedrijfId = companyData.id;
-        console.log('Company data gevonden:', companyData);
       } catch (parseError) {
         console.error('Fout bij parsen companyData:', parseError);
       }
@@ -196,11 +206,6 @@ async function loadSpeeddateData() {
       );
       bedrijfId = '24'; // Test ID uit je API voorbeeld
     }
-
-    console.log('Gebruikte credentials:', {
-      token: token ? 'Token beschikbaar' : 'Geen token',
-      bedrijfId: bedrijfId,
-    });
 
     // Haal speeddate data op
     const speeddates = await fetchSpeeddateData(bedrijfId, token);
@@ -220,19 +225,21 @@ async function loadSpeeddateData() {
 function initSpeeddatesFilter() {
   const filterBtns = document.querySelectorAll('.speeddates-filter-btn');
   if (!filterBtns.length) return;
-  filterBtns.forEach(btn => {
+  filterBtns.forEach((btn) => {
     btn.addEventListener('click', function () {
-      filterBtns.forEach(b => b.classList.remove('active'));
+      filterBtns.forEach((b) => b.classList.remove('active'));
       this.classList.add('active');
       const filter = this.dataset.filter;
-      document.querySelectorAll('.speeddate-item').forEach(item => {
+      document.querySelectorAll('.speeddate-item').forEach((item) => {
         const badge = item.querySelector('.status-badge');
         if (filter === 'all') {
           item.style.display = '';
         } else if (filter === 'goedgekeurd') {
-          item.style.display = badge && badge.classList.contains('goedgekeurd') ? '' : 'none';
+          item.style.display =
+            badge && badge.classList.contains('goedgekeurd') ? '' : 'none';
         } else if (filter === 'in-behandeling') {
-          item.style.display = badge && badge.classList.contains('in-behandeling') ? '' : 'none';
+          item.style.display =
+            badge && badge.classList.contains('in-behandeling') ? '' : 'none';
         }
       });
     });
@@ -246,7 +253,8 @@ function bindStudentPopupTriggers() {
       el.addEventListener('click', async () => {
         // Haal altijd de meest actuele bedrijf skills/functies op vóór popup
         try {
-          const companyDataString = window.sessionStorage.getItem('companyData');
+          const companyDataString =
+            window.sessionStorage.getItem('companyData');
           let bedrijfId;
           if (companyDataString) {
             const companyData = JSON.parse(companyDataString);
@@ -255,18 +263,30 @@ function bindStudentPopupTriggers() {
           if (!bedrijfId) return;
           // Fetch actuele skills en functies
           const [skillsResp, functiesResp] = await Promise.all([
-            authenticatedFetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`).then(r => r.ok ? r.json() : []),
-            authenticatedFetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`).then(r => r.ok ? r.json() : [])
+            authenticatedFetch(
+              `https://api.ehb-match.me/bedrijven/${bedrijfId}/skills`
+            ).then((r) => (r.ok ? r.json() : [])),
+            authenticatedFetch(
+              `https://api.ehb-match.me/bedrijven/${bedrijfId}/functies`
+            ).then((r) => (r.ok ? r.json() : [])),
           ]);
           // Zet in sessionStorage zodat popup altijd up-to-date vergelijkt
           const nieuweCompanyData = {
-            ...(JSON.parse(window.sessionStorage.getItem('companyData') || '{}')),
-            skills: skillsResp.map(s => s.naam),
-            functies: functiesResp.map(f => f.naam)
+            ...JSON.parse(window.sessionStorage.getItem('companyData') || '{}'),
+            skills: skillsResp.map((s) => s.naam),
+            functies: functiesResp.map((f) => f.naam),
           };
-          window.sessionStorage.setItem('companyData', JSON.stringify(nieuweCompanyData));
-          window.sessionStorage.setItem('bedrijfData', JSON.stringify(nieuweCompanyData)); // <-- fix: ook onder bedrijfData opslaan
-        } catch (e) { console.error('Kon bedrijf skills/functies niet verversen:', e); }
+          window.sessionStorage.setItem(
+            'companyData',
+            JSON.stringify(nieuweCompanyData)
+          );
+          window.sessionStorage.setItem(
+            'bedrijfData',
+            JSON.stringify(nieuweCompanyData)
+          ); // <-- fix: ook onder bedrijfData opslaan
+        } catch (e) {
+          console.error('Kon bedrijf skills/functies niet verversen:', e);
+        }
         const student = JSON.parse(el.getAttribute('data-student'));
         await showStudentInfoPopup(student);
       });

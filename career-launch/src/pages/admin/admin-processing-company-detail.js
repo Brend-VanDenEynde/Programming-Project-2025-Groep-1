@@ -175,7 +175,6 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
           );
           if (response.ok) {
             const result = await response.json();
-            console.log('Company approved successfully:', result);
 
             alert(
               `${company.naam} is geaccepteerd en toegevoegd aan ingeschreven bedrijven.`
@@ -245,7 +244,6 @@ export async function renderAdminProcessingCompanyDetail(rootElement) {
 
           if (response.status === 204) {
             // 204 No Content - successful deletion
-            console.log('Company deleted successfully');
 
             alert(
               `${company.naam} is geweigerd en permanent verwijderd uit het systeem.`

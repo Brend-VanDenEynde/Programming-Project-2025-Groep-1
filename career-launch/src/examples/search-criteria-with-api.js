@@ -29,7 +29,6 @@ export async function renderSearchCriteriaStudent(
   // Haal skills van de API op
   let availableSkills = [];
   try {
-    console.log('Fetching skills from API...');
     availableSkills = await fetchSkills();
   } catch (error) {
     console.error('Failed to fetch skills:', error);
@@ -171,17 +170,13 @@ export async function renderSearchCriteriaStudent(
     ).map((el) => el.value);
     studentData.criteria.talen = selectedTalen;
 
-    console.log('Opgeslagen Zoek-criteria:', studentData.criteria);
-
     // Probeer criteria op te slaan via API
     try {
       const studentId = window.sessionStorage.getItem('currentStudentId');
       if (studentId) {
-        console.log('Saving search criteria to API...');
         await saveSearchCriteria(studentId, studentData.criteria);
         alert('Zoek-criteria succesvol opgeslagen!');
       } else {
-        console.log('Criteria opgeslagen lokaal (geen student ID gevonden)');
         alert('Zoek-criteria zijn lokaal opgeslagen.');
       }
     } catch (error) {

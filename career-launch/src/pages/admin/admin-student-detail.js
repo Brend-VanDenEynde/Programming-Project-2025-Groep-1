@@ -1,7 +1,11 @@
 // Admin student detail pagina
 import Router from '../../router.js';
 import defaultAvatar from '../../images/default.png';
-import { performLogout, logoutUser, authenticatedFetch } from '../../utils/auth-api.js';
+import {
+  performLogout,
+  logoutUser,
+  authenticatedFetch,
+} from '../../utils/auth-api.js';
 import { deleteUser } from '../../utils/data-api.js';
 import ehbLogo from '../../images/EhB-logo-transparant.png';
 
@@ -114,7 +118,8 @@ export async function renderAdminStudentDetail(rootElement) {
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
-    }    const studentData = await response.json();
+    }
+    const studentData = await response.json();
 
     // Also fetch student data from discover endpoint to get contactemail
     let studentDiscoverData = null;
@@ -128,20 +133,28 @@ export async function renderAdminStudentDetail(rootElement) {
           },
           cache: 'no-store',
         }
-      );      if (discoverResponse.ok) {
+      );
+      if (discoverResponse.ok) {
         const allStudents = await discoverResponse.json();
 
         // Find the specific student by ID - try both string and number comparison
-        studentDiscoverData = allStudents.find(student => {
-          return student.id == studentId || student.id === parseInt(studentId) || student.id === studentId.toString();
+        studentDiscoverData = allStudents.find((student) => {
+          return (
+            student.id == studentId ||
+            student.id === parseInt(studentId) ||
+            student.id === studentId.toString()
+          );
         });
       }
     } catch (discoverError) {
       console.warn('Could not fetch discover data:', discoverError);
-    }    // Merge the data - use contact_email from original student data or discover if available
+    } // Merge the data - use contact_email from original student data or discover if available
     const mergedStudentData = {
       ...studentData,
-      contactemail: studentData.contact_email || studentDiscoverData?.contact_email || studentData.email
+      contactemail:
+        studentData.contact_email ||
+        studentDiscoverData?.contact_email ||
+        studentData.email,
     };
 
     // Render the full page with the fetched data
@@ -194,7 +207,11 @@ function renderFullDetailPage(rootElement, studentData, adminUsername) {
             </div>
               <div class="detail-field">
               <label>Contact-Email:</label>
-              <span>${studentData.contactemail || studentData.email || 'Niet beschikbaar'}</span>
+              <span>${
+                studentData.contactemail ||
+                studentData.email ||
+                'Niet beschikbaar'
+              }</span>
             </div>
             
             <div class="detail-field">
@@ -310,7 +327,7 @@ async function openSpeedDatesModal() {
           }" title="Annuleren">✕</button>
         `;
         speedDatesList.appendChild(speedDateItem);
-      });      // Add event listeners for cancel buttons
+      }); // Add event listeners for cancel buttons
       const cancelButtons = speedDatesList.querySelectorAll(
         '.speeddate-cancel-btn'
       );
@@ -322,29 +339,29 @@ async function openSpeedDatesModal() {
             // Disable button during processing
             btn.disabled = true;
             btn.textContent = '⏳';
-              try {
+            try {
               // Call API to reject/delete the speeddate
               await rejectSpeeddate(speedDateId);
-              
+
               // Remove from DOM only if API call succeeded
               btn.closest('.speeddate-item').remove();
-              console.log(`Speeddate ${speedDateId} geannuleerd`);
 
               // Check if list is now empty
               if (speedDatesList.children.length === 0) {
                 speedDatesList.innerHTML =
                   '<div class="no-speeddates">Geen speeddates gevonden</div>';
               }
-              
+
               // Close modal after successful cancellation
               setTimeout(() => {
                 closeSpeedDatesModal();
               }, 500);
-              
             } catch (error) {
               console.error('Error rejecting speeddate:', error);
-              alert('Er is een fout opgetreden bij het annuleren van de speeddate. Probeer het opnieuw.');
-              
+              alert(
+                'Er is een fout opgetreden bij het annuleren van de speeddate. Probeer het opnieuw.'
+              );
+
               // Re-enable button
               btn.disabled = false;
               btn.textContent = '✕';
@@ -386,12 +403,16 @@ function closeSpeedDatesModal() {
   modal.style.display = 'none';
 }
 
-function setupEventHandlers(studentData) {  // Admin action buttons
+function setupEventHandlers(studentData) {
+  // Admin action buttons
   const contactBtn = document.getElementById('contact-student-btn');
   if (contactBtn) {
     contactBtn.addEventListener('click', () => {
       // Create mailto link using the contact email from the merged data
-      const email = studentData.contactemail || studentData.email || 'onbekend@student.ehb.be';
+      const email =
+        studentData.contactemail ||
+        studentData.email ||
+        'onbekend@student.ehb.be';
       const mailtoLink = `mailto:${email}`;
       window.location.href = mailtoLink;
     });
@@ -460,7 +481,7 @@ function setupEventHandlers(studentData) {  // Admin action buttons
 // Function to reject/delete a speeddate via API
 async function rejectSpeeddate(speeddateId) {
   const accessToken = sessionStorage.getItem('accessToken');
-  
+
   const response = await fetch(
     `https://api.ehb-match.me/speeddates/reject/${speeddateId}`,
     {

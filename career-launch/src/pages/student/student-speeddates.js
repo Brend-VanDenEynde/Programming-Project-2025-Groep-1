@@ -12,7 +12,7 @@ import { showBedrijfInfoPopup } from './bedrijven.js';
 // Nieuw: API fetch
 async function fetchSpeeddates(rootElement) {
   const token = sessionStorage.getItem('authToken');
-  console.log('authToken:', token);
+
   if (!token) {
     renderLogin(rootElement);
     return [];
@@ -114,7 +114,12 @@ export function formatTijdslotStudent(beginISO, eindeISO) {
   const begin = new Date(beginISO);
   const einde = new Date(eindeISO);
   // Dag en datum
-  const dagOpties = { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' };
+  const dagOpties = {
+    weekday: 'long',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  };
   const dagDatum = begin.toLocaleDateString('nl-BE', dagOpties);
   // Uur
   const tijdOpties = { hour: '2-digit', minute: '2-digit' };
@@ -131,7 +136,6 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
   let speeddates = [];
   try {
     speeddates = await fetchSpeeddates(rootElement);
-    console.log('Alle opgehaalde speeddates:', speeddates);
   } catch (e) {
     if (e.message.includes('401')) {
       renderLogin(rootElement);
@@ -140,13 +144,11 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     console.error(e);
     speeddates = []; // Fallback: leeg array bij API-fout
   }
-  // DEBUG: Toon studentData en studentId
-  console.log('studentData:', studentData);
-  console.log('sessionStorage.user:', sessionStorage.getItem('user'));
+
   let studentId = studentData?.id || studentData?.gebruiker_id;
   if (!studentId) {
     const stored = JSON.parse(sessionStorage.getItem('user') || '{}');
-    console.log('Gevonden stored user:', stored);
+
     studentId = stored.id || stored.gebruiker_id;
   }
   if (!studentId && speeddates && speeddates.length) {
@@ -155,7 +157,7 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
   } // Haal speeddates op
   try {
     speeddates = await fetchSpeeddates(rootElement);
-    console.log('Alle opgehaalde speeddates:', speeddates);
+
     // Verwijder deze filter zodat ALLE speeddates (zowel inkomend als uitgaand) zichtbaar zijn
     // speeddates = speeddates.filter(s => s.asked_by !== studentId);
   } catch (e) {
@@ -193,12 +195,14 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     <div class="speeddate-item ${
       s.akkoord ? 'goedgekeurd' : 'in-behandeling'
     } bedrijf-popup-trigger" data-bedrijf='${JSON.stringify(
-      s
-    )}' style="min-width:600px;max-width:1200px;width:100%;cursor:pointer;">
+        s
+      )}' style="min-width:600px;max-width:1200px;width:100%;cursor:pointer;">
       <div class="speeddate-info" style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:24px;">
         <div class="bedrijf-info">
           <img src="${
-            s.profiel_foto_bedrijf || s.foto || 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'
+            s.profiel_foto_bedrijf ||
+            s.foto ||
+            'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'
           }" 
                alt="${s.naam_bedrijf}" 
                class="profiel-foto bedrijf-foto"
@@ -283,7 +287,8 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
       el.addEventListener('click', async () => {
         const data = JSON.parse(el.dataset.bedrijf);
         // Zorg dat we altijd een bedrijf-id of gebruiker_id meegeven
-        if (!data.gebruiker_id && data.id_bedrijf) data.gebruiker_id = data.id_bedrijf;
+        if (!data.gebruiker_id && data.id_bedrijf)
+          data.gebruiker_id = data.id_bedrijf;
         await showBedrijfInfoPopup(data);
       });
     });
@@ -457,35 +462,54 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
     if (bedrijfId) {
       const { functies, skills } = await fetchFunctiesSkills(bedrijfId);
       // Haal student skills/functies uit sessionStorage (voor matching)
-      let studentSkills = [], studentFuncties = [];
+      let studentSkills = [],
+        studentFuncties = [];
       try {
-        const studentData = JSON.parse(sessionStorage.getItem('studentData') || sessionStorage.getItem('user') || '{}');
+        const studentData = JSON.parse(
+          sessionStorage.getItem('studentData') ||
+            sessionStorage.getItem('user') ||
+            '{}'
+        );
         if (studentData.skills && Array.isArray(studentData.skills)) {
-          studentSkills = studentData.skills.map(s => (typeof s === 'string' ? s : s.naam)).filter(Boolean).map(s => s.toLowerCase());
+          studentSkills = studentData.skills
+            .map((s) => (typeof s === 'string' ? s : s.naam))
+            .filter(Boolean)
+            .map((s) => s.toLowerCase());
         }
         if (studentData.functies && Array.isArray(studentData.functies)) {
-          studentFuncties = studentData.functies.map(f => (typeof f === 'string' ? f : f.naam)).filter(Boolean).map(f => f.toLowerCase());
+          studentFuncties = studentData.functies
+            .map((f) => (typeof f === 'string' ? f : f.naam))
+            .filter(Boolean)
+            .map((f) => f.toLowerCase());
         }
       } catch {}
       const functiesHtml = functies.length
         ? functies
-            .map(
-              (f) => {
-                const isMatch = studentFuncties.includes((f.naam||'').toLowerCase());
-                return `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:${isMatch ? '#e3f2fd' : '#f1f1f1'};color:${isMatch ? '#1565c0' : '#222'};font-size:0.85rem;\">${f.naam}</span>`;
-              }
-            )
+            .map((f) => {
+              const isMatch = studentFuncties.includes(
+                (f.naam || '').toLowerCase()
+              );
+              return `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:${
+                isMatch ? '#e3f2fd' : '#f1f1f1'
+              };color:${isMatch ? '#1565c0' : '#222'};font-size:0.85rem;\">${
+                f.naam
+              }</span>`;
+            })
             .join('')
         : '<em>Geen functies beschikbaar</em>';
       document.getElementById('popup-functies').innerHTML = functiesHtml;
       const skillsHtml = skills.length
         ? skills
-            .map(
-              (skill) => {
-                const isMatch = studentSkills.includes((skill.naam||'').toLowerCase());
-                return `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:${isMatch ? '#e3f2fd' : '#f1f1f1'};color:${isMatch ? '#1565c0' : '#222'};font-size:0.85rem;\">${skill.naam}</span>`;
-              }
-            )
+            .map((skill) => {
+              const isMatch = studentSkills.includes(
+                (skill.naam || '').toLowerCase()
+              );
+              return `<span style=\"display:inline-block;padding:4px 8px;margin:3px;border-radius:6px;background:${
+                isMatch ? '#e3f2fd' : '#f1f1f1'
+              };color:${isMatch ? '#1565c0' : '#222'};font-size:0.85rem;\">${
+                skill.naam
+              }</span>`;
+            })
             .join('')
         : '<em>Geen skills beschikbaar</em>';
       document.getElementById('popup-skills').innerHTML = skillsHtml;
@@ -497,19 +521,21 @@ export async function renderSpeeddates(rootElement, studentData = {}) {
 function initSpeeddatesFilter() {
   const filterBtns = document.querySelectorAll('.speeddates-filter-btn');
   if (!filterBtns.length) return;
-  filterBtns.forEach(btn => {
+  filterBtns.forEach((btn) => {
     btn.addEventListener('click', function () {
-      filterBtns.forEach(b => b.classList.remove('active'));
+      filterBtns.forEach((b) => b.classList.remove('active'));
       this.classList.add('active');
       const filter = this.dataset.filter;
-      document.querySelectorAll('.speeddate-item').forEach(item => {
+      document.querySelectorAll('.speeddate-item').forEach((item) => {
         const badge = item.querySelector('.status-badge');
         if (filter === 'all') {
           item.style.display = '';
         } else if (filter === 'goedgekeurd') {
-          item.style.display = badge && badge.classList.contains('goedgekeurd') ? '' : 'none';
+          item.style.display =
+            badge && badge.classList.contains('goedgekeurd') ? '' : 'none';
         } else if (filter === 'in-behandeling') {
-          item.style.display = badge && badge.classList.contains('in-behandeling') ? '' : 'none';
+          item.style.display =
+            badge && badge.classList.contains('in-behandeling') ? '' : 'none';
         }
       });
     });

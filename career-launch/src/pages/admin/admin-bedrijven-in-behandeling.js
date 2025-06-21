@@ -211,7 +211,7 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
 
           if (response.ok) {
             const result = await response.json();
-            console.log('Company approved successfully:', result); // Remove the item from the list
+
             companyItem.remove();
 
             // Check if list is empty BEFORE navigating
@@ -301,7 +301,7 @@ export async function renderAdminBedrijvenInBehandeling(rootElement) {
 
           if (response.status === 204) {
             // 204 No Content - successful deletion
-            console.log('Company deleted successfully'); // Remove the item from the list
+
             companyItem.remove();
             alert(
               `${companyName} is afgewezen en permanent verwijderd uit het systeem.`

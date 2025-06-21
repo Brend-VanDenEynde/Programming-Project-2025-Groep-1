@@ -155,7 +155,6 @@ async function handleLogin(event, rootElement) {
     const user = infoRes.user;
 
     // Debug: log de volledige user-object
-    console.log('USER OBJECT:', user);
 
     if (!user || !user.type) {
       alert(
@@ -193,6 +192,8 @@ async function handleLogin(event, rootElement) {
     window.sessionStorage.removeItem('companyData');
     window.sessionStorage.removeItem('userType');
 
-    alert('Inloggen mislukt. Controleer uw e-mailadres en wachtwoord.\nIndien u een bedrijfsaccount heeft, kan het zijn dat uw account nog niet is goedgekeurd. Neem contact op met support als het probleem aanhoudt.');
+    alert(
+      'Inloggen mislukt. Controleer uw e-mailadres en wachtwoord.\nIndien u een bedrijfsaccount heeft, kan het zijn dat uw account nog niet is goedgekeurd. Neem contact op met support als het probleem aanhoudt.'
+    );
   }
 }

@@ -423,7 +423,7 @@ async function openSpeedDatesModal() {
           }" title="Annuleren">✕</button>
         `;
         speedDatesList.appendChild(speedDateItem);
-      });      // Add event listeners for cancel buttons
+      }); // Add event listeners for cancel buttons
       const cancelButtons = speedDatesList.querySelectorAll(
         '.speeddate-cancel-btn'
       );
@@ -435,30 +435,30 @@ async function openSpeedDatesModal() {
             // Disable button during processing
             btn.disabled = true;
             btn.textContent = '⏳';
-            
+
             try {
               // Call API to reject/delete the speeddate
               await rejectSpeeddate(speedDateId);
-              
+
               // Remove from DOM only if API call succeeded
               btn.closest('.speeddate-item').remove();
-              console.log(`Speeddate ${speedDateId} geannuleerd`);
 
               // Check if list is now empty
               if (speedDatesList.children.length === 0) {
                 speedDatesList.innerHTML =
                   '<div class="no-speeddates">Geen speeddates gevonden</div>';
               }
-              
+
               // Close modal after successful cancellation
               setTimeout(() => {
                 closeSpeedDatesModal();
               }, 500);
-              
             } catch (error) {
               console.error('Error rejecting speeddate:', error);
-              alert('Er is een fout opgetreden bij het annuleren van de speeddate. Probeer het opnieuw.');
-              
+              alert(
+                'Er is een fout opgetreden bij het annuleren van de speeddate. Probeer het opnieuw.'
+              );
+
               // Re-enable button
               btn.disabled = false;
               btn.textContent = '✕';
@@ -503,7 +503,7 @@ function closeSpeedDatesModal() {
 // Function to reject/delete a speeddate via API
 async function rejectSpeeddate(speeddateId) {
   const accessToken = sessionStorage.getItem('accessToken');
-  
+
   const response = await fetch(
     `https://api.ehb-match.me/speeddates/reject/${speeddateId}`,
     {
