@@ -87,10 +87,8 @@ async function showBedrijfPopup(bedrijf, studentId) {
   popup.style.zIndex = '2000';
 
   // Uren en slots genereren
-  const uren = [12, 13, 14, 15, 16, 17];
-  const slotDuur = 10; // minuten
-  const slotsPerUur = 6; // 0,10,20,30,40,50
-  const datum = '2025-10-01'; // vaste dag in jouw voorbeeld
+  let slotDuur = 10; // minuten
+  let slotsPerUur = 6; // 0,10,20,30,40,50
   // 1. Haal alle accepted en pending speeddates op voor student en bedrijf
   const [
     acceptedStudentDates,
@@ -116,26 +114,32 @@ async function showBedrijfPopup(bedrijf, studentId) {
 
   // Status functie
   function getStatusForTijd(tijd, allAccepted, allPending) {
+    // Also check the selected date
     const isConfirmed = allAccepted.some((s) => {
       if (!s.begin) return false;
       const dt = new Date(s.begin);
-      return (
-        `${dt.getHours().toString().padStart(2, '0')}:${dt
-          .getMinutes()
-          .toString()
-          .padStart(2, '0')}` === tijd
-      );
+      // Compare both date and time
+      const slotDate = `${dt.getFullYear()}-${(dt.getMonth() + 1)
+        .toString()
+        .padStart(2, '0')}-${dt.getDate().toString().padStart(2, '0')}`;
+      const slotTijd = `${dt.getHours().toString().padStart(2, '0')}:${dt
+        .getMinutes()
+        .toString()
+        .padStart(2, '0')}`;
+      return slotDate === selectedDate && slotTijd === tijd;
     });
     if (isConfirmed) return 'confirmed';
     const isPending = allPending.some((s) => {
       if (!s.begin) return false;
       const dt = new Date(s.begin);
-      return (
-        `${dt.getHours().toString().padStart(2, '0')}:${dt
-          .getMinutes()
-          .toString()
-          .padStart(2, '0')}` === tijd
-      );
+      const slotDate = `${dt.getFullYear()}-${(dt.getMonth() + 1)
+        .toString()
+        .padStart(2, '0')}-${dt.getDate().toString().padStart(2, '0')}`;
+      const slotTijd = `${dt.getHours().toString().padStart(2, '0')}:${dt
+        .getMinutes()
+        .toString()
+        .padStart(2, '0')}`;
+      return slotDate === selectedDate && slotTijd === tijd;
     });
     if (isPending) return 'pending';
     return 'free';
@@ -174,8 +178,55 @@ async function showBedrijfPopup(bedrijf, studentId) {
     return slots;
   }
 
+  // --- Datepicker and dynamic slot calculation ---
+  // Fetch events for this bedrijf (days with begin/einde)
+  const eventsResp = await authenticatedFetch(`https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/events`);
+  const events = eventsResp.ok ? await eventsResp.json() : [];
+  // Map: { 'YYYY-MM-DD': { begin, einde } }
+  const dateMap = {};
+  events.forEach(ev => {
+    if (ev.begin && ev.einde) {
+      const dateStr = new Date(new Date(ev.begin).toLocaleString('en-US', { timeZone: 'Europe/Brussels' })).toISOString().slice(0, 10);
+      dateMap[dateStr] = { begin: ev.begin, einde: ev.einde };
+    }
+  });
+  const availableDates = Object.keys(dateMap).sort();
+  let selectedDate = availableDates[0] || null;
+
+  // Helper to get hours array from event window (Europe/Brussels)
+  function getUrenForEvent(dateStr) {
+    const event = dateMap[dateStr];
+    if (!event) return [];
+    // Parse as Europe/Brussels regardless of browser timezone
+    // event.begin and event.einde are ISO strings in Brussels time, but JS Date parses as local time!
+    // So: parse as UTC, then add the Brussels offset (2 hours in summer, 1 in winter)
+    // We'll use the string split to get hours directly
+    const startParts = event.begin.split('T')[1].split(':');
+    const endParts = event.einde.split('T')[1].split(':');
+    let startHour = parseInt(startParts[0], 10);
+    let endHour = parseInt(endParts[0], 10);
+    // If end is exactly on the hour, don't include that hour
+    if (parseInt(endParts[1], 10) === 0) endHour -= 1;
+    const uren = [];
+    for (let h = startHour; h <= endHour; h++) {
+      uren.push(h);
+    }
+    return uren;
+  }
+
+  // Datepicker HTML
+  let datePickerHTML = '';
+  if (availableDates.length > 0) {
+    datePickerHTML = `<label for="popup-date-picker" style="font-weight:500;display:block;margin-bottom:0.3em;">Kies een datum:</label><select id="popup-date-picker" style="margin-bottom:1em;width:100%;padding:0.5em 0.7em;border-radius:8px;border:1.5px solid #e1e5e9;font-size:1rem;">${availableDates.map(date => `<option value="${date}">${date}</option>`).join('')}</select>`;
+  } else {
+    datePickerHTML = '<div class="info">Geen beschikbare data voor speeddates.</div>';
+  }
+
+  // Dynamisch uren genereren op basis van geselecteerde datum
+  let uren = getUrenForEvent(selectedDate);
+
   // Bouw alle slots met status
-  const allSlots = buildTimeSlotOptions({
+  let allSlots = buildTimeSlotOptions({
     uren,
     slotDuur,
     slotsPerUur,
@@ -224,51 +275,74 @@ async function showBedrijfPopup(bedrijf, studentId) {
         .join(' ')
     : '<span style="color:#aaa;">Geen functies bekend</span>';
 
+  // --- Datepicker and dynamic slot calculation ---
+  // Fetch events for this bedrijf (days with begin/einde)
+  const eventsResp2 = await authenticatedFetch(`https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/events`);
+  const events2 = eventsResp2.ok ? await eventsResp2.json() : [];
+  // Map: { 'YYYY-MM-DD': { begin, einde } }
+  const dateMap2 = {};
+  events2.forEach(ev => {
+    if (ev.begin && ev.einde) {
+      const dateStr = new Date(new Date(ev.begin).toLocaleString('en-US', { timeZone: 'Europe/Brussels' })).toISOString().slice(0, 10);
+      dateMap2[dateStr] = { begin: ev.begin, einde: ev.einde };
+    }
+  });
+  const availableDates2 = Object.keys(dateMap2).sort();
+  let selectedDate2 = availableDates2[0] || null;
+
+  // Helper to get hours array from event window (Europe/Brussels)
+  function getUrenForEvent2(dateStr) {
+    const event = dateMap2[dateStr];
+    if (!event) return [];
+    // Use the event's begin/einde directly (assume already in Europe/Brussels)
+    const start = new Date(event.begin);
+    const end = new Date(event.einde);
+    const uren = [];
+    let h = start.getHours();
+    const endHour = end.getMinutes() === 0 ? end.getHours() - 1 : end.getHours();
+    while (h <= endHour) {
+      uren.push(h);
+      h++;
+    }
+    return uren;
+  }
+
+  // Datepicker HTML
+  let datePickerHTML2 = '';
+  if (availableDates2.length > 0) {
+    datePickerHTML2 = `<label for="popup-date-picker" style="font-weight:500;display:block;margin-bottom:0.3em;">Kies een datum:</label><select id="popup-date-picker" style="margin-bottom:1em;width:100%;padding:0.5em 0.7em;border-radius:8px;border:1.5px solid #e1e5e9;font-size:1rem;">${availableDates2.map(date => `<option value="${date}">${date}</option>`).join('')}</select>`;
+  } else {
+    datePickerHTML2 = '<div class="info">Geen beschikbare data voor speeddates.</div>';
+  }
+
+  // Dynamisch uren genereren op basis van geselecteerde datum
+  let uren2 = getUrenForEvent2(selectedDate2);
+
+  // Bouw alle slots met status
+  let allSlots2 = buildTimeSlotOptions({
+    uren: uren2,
+    slotDuur,
+    slotsPerUur,
+    allAccepted,
+    allPending,
+  });
+
   popup.innerHTML = `
     <div id="bedrijf-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:600px;width:98vw;min-width:340px;position:relative;display:flex;flex-direction:column;align-items:center;">
       <button id="bedrijf-popup-close" style="position:absolute;top:10px;right:14px;font-size:1.7rem;background:none;border:none;cursor:pointer;color:#888;">&times;</button>
-      <button id="popup-favorite-btn" class="popup-favorite-btn" title="${
-        isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'
-      }">${hartIcon}</button>
-      <img src="${bedrijf.foto}" alt="Logo ${
-    bedrijf.naam
-  }" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'">
+      <button id="popup-favorite-btn" class="popup-favorite-btn" title="${isFavoriet ? 'Verwijder uit favorieten' : 'Voeg toe aan favorieten'}">${hartIcon}</button>
+      <img src="${bedrijf.foto}" alt="Logo ${bedrijf.naam}" style="width:90px;height:90px;object-fit:contain;margin-bottom:1.2rem;" onerror="this.onerror=null;this.src='https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'">
       <h2 style="margin-bottom:0.5rem;text-align:center;">${bedrijf.naam}</h2>
-      <div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${
-        bedrijf.locatie
-      }</div>
-      <div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${
-        bedrijf.werkdomein
-      }</div>
-      <a href="${
-        bedrijf.linkedin
-      }" target="_blank" style="color:#0077b5;margin-bottom:1rem;">LinkedIn</a>
-      <div style="font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;">
-        <a href="mailto:${bedrijf.contact_email}" style="color:#444;">${
-    bedrijf.contact_email
-  }</a>
-      </div>
+      <div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${bedrijf.locatie}</div>
+      <div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${bedrijf.werkdomein}</div>
+      <a href="${bedrijf.linkedin}" target="_blank" style="color:#0077b5;margin-bottom:1rem;">LinkedIn</a>
+      <div style="font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;"><a href="mailto:${bedrijf.contact_email}" style="color:#444;">${bedrijf.contact_email}</a></div>
       <div style="margin-bottom:0.7rem;width:100%;display:flex;flex-direction:row;gap:1.5rem;justify-content:center;">
-        <div style="text-align:left;">
-          <strong>Gezochte functies:</strong>
-          <div style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;">
-            ${functiesHTML}
-          </div>
-        </div>
-        <div style="text-align:left;">
-          <strong>Gezochte skills/talen:</strong>
-          <div style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;">
-            ${skillsHTML}
-          </div>
-        </div>
-      </div>      <div style="margin-bottom:0.7rem;width:100%;">
-        <div style="margin-bottom:0.4rem;font-size:0.97rem;text-align:center;">
-          <strong>Tijdslot legenda:</strong>
-          <span style="background:#fff;border:1px solid #ccc;padding:0.1rem 0.5rem;border-radius:5px;margin-left:0.5rem;">Vrij</span>
-          <span style="background:#fff9d1;border:1px solid #ffe9a0;padding:0.1rem 0.5rem;border-radius:5px;margin-left:0.5rem;">Pending</span>
-          <span style="background:#ffe0e0;border:1px solid #ffbdbd;padding:0.1rem 0.5rem;border-radius:5px;margin-left:0.5rem;">Bezet</span>
-        </div>
+        <div style="text-align:left;"><strong>Gezochte functies:</strong><div style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;">${functiesHTML}</div></div>
+        <div style="text-align:left;"><strong>Gezochte skills/talen:</strong><div style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;">${skillsHTML}</div></div>
       </div>
+      <div style="margin-bottom:0.7rem;width:100%;"><div style="margin-bottom:0.4rem;font-size:0.97rem;text-align:center;"><strong>Tijdslot legenda:</strong><span style="background:#fff;border:1px solid #ccc;padding:0.1rem 0.5rem;border-radius:5px;margin-left:0.5rem;">Vrij</span><span style="background:#fff9d1;border:1px solid #ffe9a0;padding:0.1rem 0.5rem;border-radius:5px;margin-left:0.5rem;">Pending</span><span style="background:#ffe0e0;border:1px solid #ffbdbd;padding:0.1rem 0.5rem;border-radius:5px;margin-left:0.5rem;">Bezet</span></div></div>
+      ${datePickerHTML}
       <div id="slots-list" style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;justify-content:center;"></div>
       <button id="speeddates-aanvraag-btn" style="background:#00bcd4;color:#fff;border:none;padding:0.7rem 1.5rem;border-radius:8px;font-size:1rem;cursor:pointer;" disabled>Confirmeer aanvraag</button>
       <div id="speeddates-aanvraag-status" style="margin-top:1rem;font-size:1rem;color:#2aa97b;display:none;">Speeddate aangevraagd!</div>
@@ -292,66 +366,91 @@ async function showBedrijfPopup(bedrijf, studentId) {
   console.log('slotsList', slotsList);
 
   // Compacte urenbalk boven de slots
-  const urenLijst = document.createElement('div');
+  let urenLijst = document.createElement('div');
   urenLijst.id = 'uren-list';
   urenLijst.style.cssText =
     'display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;justify-content:center;';
-  uren.forEach((uur) => {
-    // Bereken aantal vrije slots voor dit uur
-    const slotsForHour = allSlots.filter((slot) => {
-      const slotHour = parseInt(slot.value.split(':')[0], 10);
-      return slotHour === uur;
+  function buildUrenLijst() {
+    urenLijst.innerHTML = '';
+    uren.forEach((uur) => {
+      // Bereken aantal vrije slots voor dit uur
+      const slotsForHour = allSlots.filter((slot) => {
+        const slotHour = parseInt(slot.value.split(':')[0], 10);
+        return slotHour === uur;
+      });
+      const vrijeSlots = slotsForHour.filter(
+        (slot) => slot.status === 'free'
+      ).length;
+      const btn = document.createElement('button');
+      // Bepaal kleur en style gebaseerd op aantal vrije slots
+      const isUnavailable = vrijeSlots === 0;
+      const backgroundColor = isUnavailable ? '#ffebee' : '#eef1fa';
+      const borderColor = isUnavailable ? '#f44336' : '#b7b7ff';
+      const textColor = isUnavailable ? '#c62828' : '#4e7bfa';
+      const spanBackground = isUnavailable ? '#ffcdd2' : '#fff';
+      const spanBorderColor = isUnavailable ? '#f44336' : '#b7b7ff';
+      const spanTextColor = isUnavailable ? '#c62828' : '#4e7bfa';
+      btn.innerHTML = `${uur}u <span style="background:${spanBackground};border-radius:8px;padding:0.1rem 0.7rem;font-size:0.92em;margin-left:0.5em;border:1px solid ${spanBorderColor};color:${spanTextColor};" title="Aantal beschikbare tijdslots">${vrijeSlots}</span>`;
+      btn.style.cssText = `
+        background:${backgroundColor};
+        border:1.5px solid ${borderColor};
+        border-radius:8px;
+        padding:0.5rem 1.2rem;
+        font-size:1.05rem;
+        cursor:${isUnavailable ? 'not-allowed' : 'pointer'};
+        margin:0;
+        transition:box-shadow .2s;
+        display:flex;align-items:center;gap:0.4em;
+        color:${textColor};
+        opacity:${isUnavailable ? '0.7' : '1'};
+      `;
+      if (isUnavailable) {
+        btn.disabled = true;
+        btn.title = 'Geen tijdslots beschikbaar voor dit uur';
+      } else {
+        btn.title = `${vrijeSlots} beschikbare tijdslots voor ${uur}:00 uur`;
+      }
+      btn.addEventListener('click', () => {
+        if (isUnavailable) return;
+        geselecteerdUur = uur;
+        urenLijst
+          .querySelectorAll('button')
+          .forEach((b) => (b.style.boxShadow = ''));
+        btn.style.boxShadow = '0 0 0 2.5px #4e7bfa';
+        renderSlotsForHour(uur);
+      });
+      urenLijst.appendChild(btn);
     });
-    const vrijeSlots = slotsForHour.filter(
-      (slot) => slot.status === 'free'
-    ).length;
-    const btn = document.createElement('button');
-
-    // Bepaal kleur en style gebaseerd op aantal vrije slots
-    const isUnavailable = vrijeSlots === 0;
-    const backgroundColor = isUnavailable ? '#ffebee' : '#eef1fa';
-    const borderColor = isUnavailable ? '#f44336' : '#b7b7ff';
-    const textColor = isUnavailable ? '#c62828' : '#4e7bfa';
-    const spanBackground = isUnavailable ? '#ffcdd2' : '#fff';
-    const spanBorderColor = isUnavailable ? '#f44336' : '#b7b7ff';
-    const spanTextColor = isUnavailable ? '#c62828' : '#4e7bfa';
-
-    btn.innerHTML = `${uur}u <span style="background:${spanBackground};border-radius:8px;padding:0.1rem 0.7rem;font-size:0.92em;margin-left:0.5em;border:1px solid ${spanBorderColor};color:${spanTextColor};" title="Aantal beschikbare tijdslots">${vrijeSlots}</span>`;
-    btn.style.cssText = `
-      background:${backgroundColor};
-      border:1.5px solid ${borderColor};
-      border-radius:8px;
-      padding:0.5rem 1.2rem;
-      font-size:1.05rem;
-      cursor:${isUnavailable ? 'not-allowed' : 'pointer'};
-      margin:0;
-      transition:box-shadow .2s;
-      display:flex;align-items:center;gap:0.4em;
-      color:${textColor};
-      opacity:${isUnavailable ? '0.7' : '1'};
-    `;
-
-    if (isUnavailable) {
-      btn.disabled = true;
-      btn.title = 'Geen tijdslots beschikbaar voor dit uur';
-    } else {
-      btn.title = `${vrijeSlots} beschikbare tijdslots voor ${uur}:00 uur`;
-    }
-
-    btn.addEventListener('click', () => {
-      if (isUnavailable) return;
-      geselecteerdUur = uur;
-      urenLijst
-        .querySelectorAll('button')
-        .forEach((b) => (b.style.boxShadow = ''));
-      btn.style.boxShadow = '0 0 0 2.5px #4e7bfa';
-      renderSlotsForHour(uur);
-    });
-    urenLijst.appendChild(btn);
-  });
+  }
+  buildUrenLijst();
   popup
     .querySelector('#bedrijf-popup-content')
     .insertBefore(urenLijst, slotsList);
+
+  // Datepicker event: update uren and slots on change
+  const datePicker = popup.querySelector('#popup-date-picker');
+  if (datePicker) {
+    datePicker.addEventListener('change', (e) => {
+      selectedDate = e.target.value;
+      uren = getUrenForEvent(selectedDate);
+      allSlots = buildTimeSlotOptions({
+        uren,
+        slotDuur,
+        slotsPerUur,
+        allAccepted,
+        allPending,
+      });
+      buildUrenLijst();
+      geselecteerdUur = null;
+      const firstAvailableButton = urenLijst.querySelector('button:not([disabled])');
+      if (firstAvailableButton) {
+        firstAvailableButton.click();
+      } else {
+        slotsList.innerHTML = '<div style="color:#888;">Geen tijdslots beschikbaar voor deze dag.</div>';
+        aanvraagBtn.disabled = true;
+      }
+    });
+  }
 
   // Render alleen slots van geselecteerd uur
   function renderSlotsForHour(uur) {
@@ -495,7 +594,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
     }
     try {
       // Combineer datum + tijd voor de API
-      const apiDatum = `${datum} ${tijd}:00`;
+      const apiDatum = `${selectedDate} ${tijd}:00`;
       const payload = {
         id_student: Number(studentId),
         id_bedrijf: Number(bedrijf.gebruiker_id),
@@ -1580,7 +1679,7 @@ function createPopup({
     searchInput.addEventListener('input', (e) => {
       renderOptions(e.target.value);
     });
-  }
+   }
   // Handlers
   document.getElementById(`${id}-cancel`).onclick = () => overlay.remove();
   document.getElementById(`${id}-save`).onclick = () => {
