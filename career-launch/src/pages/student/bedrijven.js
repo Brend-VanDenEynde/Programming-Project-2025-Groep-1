@@ -198,19 +198,15 @@ async function showBedrijfPopup(bedrijf, studentId) {
   function getUrenForEvent(dateStr) {
     const event = dateMap[dateStr];
     if (!event) return [];
-    // Parse as Europe/Brussels regardless of browser timezone
-    // event.begin and event.einde are ISO strings in Brussels time, but JS Date parses as local time!
-    // So: parse as UTC, then add the Brussels offset (2 hours in summer, 1 in winter)
-    // We'll use the string split to get hours directly
-    const startParts = event.begin.split('T')[1].split(':');
-    const endParts = event.einde.split('T')[1].split(':');
-    let startHour = parseInt(startParts[0], 10);
-    let endHour = parseInt(endParts[0], 10);
-    // If end is exactly on the hour, don't include that hour
-    if (parseInt(endParts[1], 10) === 0) endHour -= 1;
+    // Use the event's begin/einde directly (assume already in Europe/Brussels)
+    const start = new Date(event.begin);
+    const end = new Date(event.einde);
     const uren = [];
-    for (let h = startHour; h <= endHour; h++) {
+    let h = start.getHours();
+    const endHour = end.getMinutes() === 0 ? end.getHours() - 1 : end.getHours();
+    while (h <= endHour) {
       uren.push(h);
+      h++;
     }
     return uren;
   }
@@ -277,58 +273,8 @@ async function showBedrijfPopup(bedrijf, studentId) {
         .join(' ')
     : '<span style="color:#aaa;">Geen functies bekend</span>';
 
-  // --- Datepicker and dynamic slot calculation ---
-  // Fetch events for this bedrijf (days with begin/einde)
-  const eventsResp2 = await authenticatedFetch(`https://api.ehb-match.me/bedrijven/${bedrijf.gebruiker_id}/events`);
-  const events2 = eventsResp2.ok ? await eventsResp2.json() : [];
-  // Map: { 'YYYY-MM-DD': { begin, einde } }
-  const dateMap2 = {};
-  events2.forEach(ev => {
-    if (ev.begin && ev.einde) {
-      const dateStr = new Date(new Date(ev.begin).toLocaleString('en-US', { timeZone: 'Europe/Brussels' })).toISOString().slice(0, 10);
-      dateMap2[dateStr] = { begin: ev.begin, einde: ev.einde };
-    }
-  });
-  const availableDates2 = Object.keys(dateMap2).sort();
-  let selectedDate2 = availableDates2[0] || null;
-
-  // Helper to get hours array from event window (Europe/Brussels)
-  function getUrenForEvent2(dateStr) {
-    const event = dateMap2[dateStr];
-    if (!event) return [];
-    // Use the event's begin/einde directly (assume already in Europe/Brussels)
-    const start = new Date(event.begin);
-    const end = new Date(event.einde);
-    const uren = [];
-    let h = start.getHours();
-    const endHour = end.getMinutes() === 0 ? end.getHours() - 1 : end.getHours();
-    while (h <= endHour) {
-      uren.push(h);
-      h++;
-    }
-    return uren;
-  }
-
-  // Datepicker HTML
-  let datePickerHTML2 = '';
-  if (availableDates2.length > 0) {
-    datePickerHTML2 = `<label for="popup-date-picker" style="font-weight:500;display:block;margin-bottom:0.3em;">Kies een datum:</label><select id="popup-date-picker" style="margin-bottom:1em;width:100%;padding:0.5em 0.7em;border-radius:8px;border:1.5px solid #e1e5e9;font-size:1rem;">${availableDates2.map(date => `<option value="${date}">${date}</option>`).join('')}</select>`;
-  } else {
-    datePickerHTML2 = '<div class="info">Geen beschikbare data voor speeddates.</div>';
-  }
-
-  // Dynamisch uren genereren op basis van geselecteerde datum
-  let uren2 = getUrenForEvent2(selectedDate2);
-
-  // Bouw alle slots met status
-  let allSlots2 = buildTimeSlotOptions({
-    uren: uren2,
-    slotDuur,
-    slotsPerUur,
-    allAccepted,
-    allPending,
-    selectedDate: selectedDate2,
-  });
+  // (verwijderd: dubbele fetch van events en duplicatie van date/slot logic)
+  // Alle logica gebruikt nu de eerste fetch en variabelen: dateMap, availableDates, selectedDate, getUrenForEvent, uren, allSlots, datePickerHTML
 
   popup.innerHTML = `
     <div id="bedrijf-popup-content" style="background:#fff;padding:2.2rem 2rem 1.5rem 2rem;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.18);max-width:600px;width:98vw;min-width:340px;position:relative;display:flex;flex-direction:column;align-items:center;">
