@@ -1286,6 +1286,10 @@ export async function renderBedrijven(rootElement, studentData = {}) {
               const hartIcon = isFavoriet ? '❤️' : '🤍';
               let matchPercentage = bedrijf.match_percentage;
               const colorScheme = getMatchColorScheme(matchPercentage);
+              const profielFoto =
+                bedrijf.foto && bedrijf.foto.trim() !== ''
+                  ? bedrijf.foto
+                  : defaultBedrijfLogo;
               return `
   <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001, -8px 0 16px 0 ${colorScheme.background}33;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;position:relative;" data-bedrijf-idx="${bedrijven.indexOf(
     bedrijf
