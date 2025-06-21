@@ -15,6 +15,7 @@ import { fetchAndStoreStudentProfile } from '../../utils/fetch-student-profile.j
 import { authenticatedFetch } from '../../utils/auth-api.js';
 import { performLogout } from '../../utils/auth-api.js';
 
+
 // Globale variabelen
 let bedrijven = [];
 let currentStudentId = null;
@@ -46,70 +47,6 @@ function showFeedbackNotification(message, type = 'success') {
   }, 3000);
 }
 
-// Functie om student criteria te laden (inclusief opgeslagen criteria)
-async function getStudentCriteria(studentId) {
-  // Probeer eerst opgeslagen criteria uit sessionStorage
-  const storageKey = `searchCriteria_student_${studentId}`;
-  let savedCriteria = null;
-  try {
-    const stored = sessionStorage.getItem(storageKey);
-    savedCriteria = stored ? JSON.parse(stored) : null;
-  } catch (error) {
-    console.error('Fout bij laden opgeslagen criteria:', error);
-  }
-
-  // Haal altijd ook API data op als fallback
-  const { skills: liveStudentSkills, functies: liveStudentFuncties } =
-    await fetchStudentSkillsAndFuncties(studentId);
-
-  // Combineer/prioriteer opgeslagen criteria
-  let finalFuncties = liveStudentFuncties;
-  let finalSkills = liveStudentSkills;
-
-  if (savedCriteria) {
-    // Als er opgeslagen criteria zijn, gebruik die voor functies
-    if (savedCriteria.functies && savedCriteria.functies.length > 0) {
-      // Haal alle beschikbare functies op om ID's naar namen te mappen
-      try {
-        const functiesResp = await authenticatedFetch(
-          'https://api.ehb-match.me/functies'
-        );
-        if (functiesResp.ok) {
-          const alleFuncties = await functiesResp.json();
-          finalFuncties = savedCriteria.functies
-            .map((functieId) => {
-              const functie = alleFuncties.find((f) => f.id === functieId);
-              return functie ? functie.naam : null;
-            })
-            .filter(Boolean);
-        }
-      } catch (error) {
-        console.error('Fout bij ophalen functies voor matching:', error);
-      }
-    }
-
-    // Voor skills en talen kun je ook de opgeslagen criteria gebruiken
-    if (savedCriteria.skills && savedCriteria.skills.length > 0) {
-      const savedSkillNames = savedCriteria.skills
-        .map((s) => s.naam)
-        .filter(Boolean);
-      finalSkills = [...new Set([...finalSkills, ...savedSkillNames])];
-    }
-    console.log('Student criteria voor matching:', {
-      savedCriteria: savedCriteria,
-      opgeslagenFuncties: savedCriteria?.functies,
-      apiLiveFuncties: liveStudentFuncties,
-      finalFuncties,
-      finalSkills: finalSkills.slice(0, 5), // Toon eerste 5 skills voor debug
-    });
-  }
-
-  return {
-    skills: finalSkills,
-    functies: finalFuncties,
-  };
-}
-
 // Popup voor bedrijf detail
 // Popup voor bedrijf detail - MET slots en speeddate verzoek
 async function showBedrijfPopup(bedrijf, studentId) {
@@ -132,16 +69,9 @@ async function showBedrijfPopup(bedrijf, studentId) {
     );
     if (skillsResp.ok) skills = await skillsResp.json();
   } catch {}
-  // Haal actuele student skills/functies op (inclusief opgeslagen criteria):
-  const { skills: liveStudentSkills, functies: liveStudentFuncties } =
-    await getStudentCriteria(studentId);
 
-  console.log('Bedrijf popup matching data:', {
-    bedrijfNaam: bedrijf.naam,
-    studentFuncties: liveStudentFuncties,
-    bedrijfFuncties: functies?.map((f) => f.naam) || [],
-    studentSkills: liveStudentSkills.slice(0, 5), // Eerste 5 voor debug
-  });
+  // Haal actuele student skills/functies op:
+  const { skills: liveStudentSkills, functies: liveStudentFuncties } = await fetchStudentSkillsAndFuncties(studentId);
 
   const popup = document.createElement('div');
   popup.id = 'bedrijf-popup-modal';
@@ -180,7 +110,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
     authenticatedFetch(
       `https://api.ehb-match.me/speeddates/pending?id=${bedrijf.gebruiker_id}`
     ).then((r) => (r.ok ? r.json() : [])),
-  ]);
+]);
   const allAccepted = [...acceptedStudentDates, ...acceptedCompanyDates];
   const allPending = [...pendingStudentDates, ...pendingCompanyDates];
 
@@ -266,44 +196,31 @@ async function showBedrijfPopup(bedrijf, studentId) {
   );
   const skillsHTML = bedrijfSkillsType0.length
     ? bedrijfSkillsType0
-        .map((s) => {
-          // Case-insensitive matching voor betere compatibiliteit
-          const isMatch = liveStudentSkills.some(
-            (studentSkill) =>
-              studentSkill.toLowerCase() === s.naam.toLowerCase()
-          );
-          return `<span class="skill-badge"
+        .map(
+          (s) =>
+            `<span class="skill-badge"
                style="display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;
-               background:${isMatch ? '#e3f2fd' : '#f5f5f5'};
+               background:${liveStudentSkills.includes(s.naam) ? '#e3f2fd' : '#f5f5f5'};
                color:#222;font-size:0.97em;"
-               title="${
-                 isMatch
-                   ? 'Deze skill/talent matcht met jouw zoek-criteria!'
-                   : ''
-               }"
-             >${s.naam}</span>`;
-        })
+               title="${liveStudentSkills.includes(s.naam) ? 'Deze skill/talent matcht met jouw profiel!' : ''}"
+             >${s.naam}</span>`
+        )
         .join(' ')
     : '<span style="color:#aaa;">Geen skills/talen bekend</span>';
+
   // Alle functies van het bedrijf
   const bedrijfFuncties = Array.isArray(functies) ? functies : [];
   const functiesHTML = bedrijfFuncties.length
     ? bedrijfFuncties
-        .map((f) => {
-          // Case-insensitive matching voor betere compatibiliteit
-          const isMatch = liveStudentFuncties.some(
-            (studentFunctie) =>
-              studentFunctie.toLowerCase() === f.naam.toLowerCase()
-          );
-          return `<span class="functie-badge"
+        .map(
+          (f) =>
+            `<span class="functie-badge"
                style="display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;
-               background:${isMatch ? '#e3f2fd' : '#f5f5f5'};
+               background:${liveStudentFuncties.includes(f.naam) ? '#e3f2fd' : '#f5f5f5'};
                color:#222;font-size:0.97em;"
-               title="${
-                 isMatch ? 'Deze functie matcht met jouw zoek-criteria!' : ''
-               }"
-             >${f.naam}</span>`;
-        })
+               title="${liveStudentFuncties.includes(f.naam) ? 'Deze functie matcht met jouw profiel!' : ''}"
+             >${f.naam}</span>`
+        )
         .join(' ')
     : '<span style="color:#aaa;">Geen functies bekend</span>';
 
@@ -536,9 +453,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
   aanvraagBtn.onclick = async () => {
     const status = document.getElementById('speeddates-aanvraag-status');
     // Disable all popup controls immediately when request is sent
-    const popupControls = Array.from(
-      popup.querySelectorAll('button, input, select')
-    );
+    const popupControls = Array.from(popup.querySelectorAll('button, input, select'));
     popupControls.forEach((el) => {
       el.disabled = true;
       el.style.pointerEvents = 'none';
@@ -600,9 +515,7 @@ async function showBedrijfPopup(bedrijf, studentId) {
       if (req.status === 201) {
         // Highlight het gekozen tijdslot direct lichtgeel
         if (gekozenDatum) {
-          const slotBtn = slotsList.querySelector(
-            `.slot-btn[data-slot="${gekozenDatum}"]`
-          );
+          const slotBtn = slotsList.querySelector(`.slot-btn[data-slot="${gekozenDatum}"]`);
           if (slotBtn) {
             slotBtn.style.background = '#fff9d1';
             slotBtn.style.borderColor = '#ffe9a0';
@@ -656,9 +569,7 @@ export async function showBedrijfInfoPopup(bedrijf) {
   let bedrijfData = { ...bedrijf };
   if (bedrijfId) {
     try {
-      const resp = await authenticatedFetch(
-        `https://api.ehb-match.me/bedrijven/${bedrijfId}`
-      );
+      const resp = await authenticatedFetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}`);
       if (resp.ok) {
         const apiData = await resp.json();
         bedrijfData = { ...bedrijfData, ...apiData };
@@ -683,43 +594,24 @@ export async function showBedrijfInfoPopup(bedrijf) {
   } catch {}
 
   // Haal student skills/functies uit API (altijd up-to-date)
-  let userSkills = [],
-    userFuncties = [];
+  let userSkills = [], userFuncties = [];
   try {
     // Probeer studentId te bepalen
     let studentId = null;
-    const studentData = JSON.parse(
-      sessionStorage.getItem('studentData') ||
-        sessionStorage.getItem('user') ||
-        '{}'
-    );
+    const studentData = JSON.parse(sessionStorage.getItem('studentData') || sessionStorage.getItem('user') || '{}');
     studentId = studentData.id || studentData.gebruiker_id;
     if (studentId) {
       // Haal functies van student op
-      const functiesResp = await authenticatedFetch(
-        `https://api.ehb-match.me/studenten/${studentId}/functies`
-      );
+      const functiesResp = await authenticatedFetch(`https://api.ehb-match.me/studenten/${studentId}/functies`);
       if (functiesResp.ok) {
         const functiesArr = await functiesResp.json();
-        userFuncties = Array.isArray(functiesArr)
-          ? functiesArr
-              .map((f) => (typeof f === 'string' ? f : f.naam))
-              .filter(Boolean)
-              .map((f) => f.toLowerCase())
-          : [];
+        userFuncties = Array.isArray(functiesArr) ? functiesArr.map(f => (typeof f === 'string' ? f : f.naam)).filter(Boolean).map(f => f.toLowerCase()) : [];
       }
       // Haal skills van student op
-      const skillsResp = await authenticatedFetch(
-        `https://api.ehb-match.me/studenten/${studentId}/skills`
-      );
+      const skillsResp = await authenticatedFetch(`https://api.ehb-match.me/studenten/${studentId}/skills`);
       if (skillsResp.ok) {
         const skillsArr = await skillsResp.json();
-        userSkills = Array.isArray(skillsArr)
-          ? skillsArr
-              .map((s) => (typeof s === 'string' ? s : s.naam))
-              .filter(Boolean)
-              .map((s) => s.toLowerCase())
-          : [];
+        userSkills = Array.isArray(skillsArr) ? skillsArr.map(s => (typeof s === 'string' ? s : s.naam)).filter(Boolean).map(s => s.toLowerCase()) : [];
       }
     }
   } catch {}
@@ -732,24 +624,12 @@ export async function showBedrijfInfoPopup(bedrijf) {
   const contact_email = bedrijfData.contact_email || bedrijfData.email || '';
 
   // Toon alleen locatie, werkdomein, linkedin, email als ze niet leeg zijn
-  const locatieHtml = locatie
-    ? `<div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${locatie}</div>`
-    : '';
-  const werkdomeinHtml = werkdomein
-    ? `<div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${werkdomein}</div>`
-    : '';
-  const linkedinHtml = linkedin
-    ? `<a href="${linkedin}" target="_blank" style="color:#0077b5;margin-bottom:1rem;">LinkedIn</a>`
-    : '';
-  const emailHtml = contact_email
-    ? `<div style="font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;"><a href="mailto:${contact_email}" style="color:#444;">${contact_email}</a></div>`
-    : '';
+  const locatieHtml = locatie ? `<div style="font-size:1rem;color:#666;margin-bottom:0.3rem;">${locatie}</div>` : '';
+  const werkdomeinHtml = werkdomein ? `<div style="font-size:0.97rem;color:#888;margin-bottom:0.7rem;">${werkdomein}</div>` : '';
+  const linkedinHtml = linkedin ? `<a href="${linkedin}" target="_blank" style="color:#0077b5;margin-bottom:1rem;">LinkedIn</a>` : '';
+  const emailHtml = contact_email ? `<div style="font-size:0.95rem;color:#555;text-align:center;margin-bottom:0.5rem;"><a href="mailto:${contact_email}" style="color:#444;">${contact_email}</a></div>` : '';
 
-  const profielFoto =
-    bedrijfData.foto ||
-    bedrijfData.profiel_foto_bedrijf ||
-    bedrijfData.profiel_foto_url ||
-    'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
+  const profielFoto = bedrijfData.foto || bedrijfData.profiel_foto_bedrijf || bedrijfData.profiel_foto_url || 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4';
   const popup = document.createElement('div');
   popup.id = 'bedrijf-popup-modal';
   popup.style.position = 'fixed';
@@ -775,43 +655,19 @@ export async function showBedrijfInfoPopup(bedrijf) {
         <div style="text-align:left;">
           <strong>Functies:</strong>
           <div style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;">
-            ${
-              Array.isArray(functies) && functies.length
-                ? functies
-                    .map((f) => {
-                      const isMatch = userFuncties.includes(
-                        (f.naam || '').toLowerCase()
-                      );
-                      return `<span class='functie-badge' style='display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${
-                        isMatch ? '#e3f2fd' : '#f5f5f5'
-                      };color:${
-                        isMatch ? '#1565c0' : '#222'
-                      };font-size:0.97em;'>${f.naam}</span>`;
-                    })
-                    .join(' ')
-                : '<span style="color:#aaa;">Geen functies bekend</span>'
-            }
+            ${Array.isArray(functies) && functies.length ? functies.map(f => {
+              const isMatch = userFuncties.includes((f.naam||'').toLowerCase());
+              return `<span class='functie-badge' style='display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${isMatch ? '#e3f2fd' : '#f5f5f5'};color:${isMatch ? '#1565c0' : '#222'};font-size:0.97em;'>${f.naam}</span>`;
+            }).join(' ') : '<span style="color:#aaa;">Geen functies bekend</span>'}
           </div>
         </div>
         <div style="text-align:left;">
           <strong>Skills/talen:</strong>
           <div style="margin-top:0.3rem;max-width:100%;white-space:normal;display:flex;flex-wrap:wrap;gap:0.3em;">
-            ${
-              Array.isArray(skills) && skills.length
-                ? skills
-                    .map((s) => {
-                      const isMatch = userSkills.includes(
-                        (s.naam || '').toLowerCase()
-                      );
-                      return `<span class='skill-badge' style='display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${
-                        isMatch ? '#e3f2fd' : '#f5f5f5'
-                      };color:${
-                        isMatch ? '#1565c0' : '#222'
-                      };font-size:0.97em;'>${s.naam}</span>`;
-                    })
-                    .join(' ')
-                : '<span style="color:#aaa;">Geen skills/talen bekend</span>'
-            }
+            ${Array.isArray(skills) && skills.length ? skills.map(s => {
+              const isMatch = userSkills.includes((s.naam||'').toLowerCase());
+              return `<span class='skill-badge' style='display:inline-block;margin:0 0.3em 0.3em 0;padding:0.2em 0.7em;border-radius:7px;background:${isMatch ? '#e3f2fd' : '#f5f5f5'};color:${isMatch ? '#1565c0' : '#222'};font-size:0.97em;'>${s.naam}</span>`;
+            }).join(' ') : '<span style=\"color:#aaa;\">Geen skills/talen bekend</span>'}
           </div>
         </div>
       </div>
@@ -819,9 +675,7 @@ export async function showBedrijfInfoPopup(bedrijf) {
   `;
   document.body.appendChild(popup);
   document.getElementById('bedrijf-popup-close').onclick = () => popup.remove();
-  popup.addEventListener('click', (e) => {
-    if (e.target === popup) popup.remove();
-  });
+  popup.addEventListener('click', (e) => { if (e.target === popup) popup.remove(); });
 }
 
 // Haal alle skills op uit de algemene skills API
@@ -923,33 +777,8 @@ function getUniekeLocaties() {
 function getUniekeDomeinen() {
   return [...new Set(bedrijven.map((b) => b.werkdomein).filter(Boolean))];
 }
-// Globale variabele voor alle beschikbare functies uit de API
-let alleBeschikbareFuncties = [];
-
-// Functie om alle beschikbare functies uit de API op te halen
-async function fetchAlleFuncties() {
-  try {
-    const response = await authenticatedFetch(
-      'https://api.ehb-match.me/functies'
-    );
-    if (response.ok) {
-      const functiesData = await response.json();
-      alleBeschikbareFuncties = functiesData.map((f) => f.naam || f);
-      return alleBeschikbareFuncties;
-    }
-  } catch (error) {
-    console.error('Fout bij ophalen functies:', error);
-  }
-  return [];
-}
-
 function getUniekeFuncties() {
-  // Als we de API-functies hebben, gebruik die
-  if (alleBeschikbareFuncties.length > 0) {
-    return [...alleBeschikbareFuncties].sort();
-  }
-
-  // Fallback: verzamel alle unieke functie-namen uit functie_matches of een vergelijkbaar veld
+  // Verzamel alle unieke functie-namen uit functie_matches of een vergelijkbaar veld
   const alleFuncties = bedrijven.flatMap((b) => {
     if (Array.isArray(b.functiesArray) && b.functiesArray.length) {
       return b.functiesArray.map((f) => f.naam);
@@ -1068,11 +897,11 @@ export async function renderBedrijven(rootElement, studentData = {}) {
         return;
       }
       bedrijven = [];
-    } // Voeg skills en functies toe aan bedrijven
+    }
+    // Voeg skills en functies toe aan bedrijven
     await Promise.all([
       fetchSkillsForAllCompanies(),
       fetchFunctiesForAllCompanies(),
-      fetchAlleFuncties(), // Haal alle beschikbare functies op uit de API
     ]);
     // Function to update favorites count display
     function updateFavoritesCount() {
@@ -1462,14 +1291,10 @@ export async function renderBedrijven(rootElement, studentData = {}) {
                   ? bedrijf.foto
                   : defaultBedrijfLogo;
               return `
-  <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001, -8px 0 16px 0 ${
-    colorScheme.background
-  }33;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;position:relative;" data-bedrijf-idx="${bedrijven.indexOf(
-                bedrijf
-              )}">
-    <span class="match-badge" style="position:absolute;top:10px;left:10px;background:${
-      colorScheme.background
-    };color:#fff;font-weight:bold;padding:0.3em 0.8em;border-radius:16px;font-size:0.98em;z-index:3;box-shadow:0 2px 8px #0002;">${
+  <div class="bedrijf-card" style="background:#fff;border-radius:12px;box-shadow:0 2px 8px #0001, -8px 0 16px 0 ${colorScheme.background}33;padding:1.5rem 1rem;display:flex;flex-direction:column;align-items:center;width:220px;cursor:pointer;transition:box-shadow 0.2s;position:relative;" data-bedrijf-idx="${bedrijven.indexOf(
+    bedrijf
+  )}">
+    <span class="match-badge" style="position:absolute;top:10px;left:10px;background:${colorScheme.background};color:#fff;font-weight:bold;padding:0.3em 0.8em;border-radius:16px;font-size:0.98em;z-index:3;box-shadow:0 2px 8px #0002;">${
                 typeof matchPercentage === 'number'
                   ? matchPercentage.toFixed(1)
                   : '?'
@@ -1661,18 +1486,16 @@ export async function renderBedrijven(rootElement, studentData = {}) {
       }
       showSettingsPopup(() => renderBedrijven(rootElement, actualStudentData));
     });
-    document
-      .getElementById('nav-logout')
-      .addEventListener('click', async () => {
-        const dropdown = document.getElementById('burger-dropdown');
-        if (dropdown) {
-          dropdown.classList.remove('open');
-          await performLogout();
-        }
-        localStorage.setItem('darkmode', 'false');
-        document.body.classList.remove('darkmode');
-        renderLogin(rootElement);
-      });
+    document.getElementById('nav-logout').addEventListener('click', async () => {
+      const dropdown = document.getElementById('burger-dropdown');
+      if (dropdown) {
+        dropdown.classList.remove('open');
+        await performLogout();
+      }
+      localStorage.setItem('darkmode', 'false');
+      document.body.classList.remove('darkmode');
+      renderLogin(rootElement);
+    });
 
     document.getElementById('privacy-policy').addEventListener('click', (e) => {
       e.preventDefault();
@@ -1848,15 +1671,11 @@ function getMatchColorScheme(percentage) {
 // Haal altijd de actuele skills en functies van een student op
 async function fetchStudentSkillsAndFuncties(studentId) {
   const [skillsResp, functiesResp] = await Promise.all([
-    authenticatedFetch(
-      `https://api.ehb-match.me/studenten/${studentId}/skills`
-    ).then((r) => (r.ok ? r.json() : [])),
-    authenticatedFetch(
-      `https://api.ehb-match.me/studenten/${studentId}/functies`
-    ).then((r) => (r.ok ? r.json() : [])),
+    authenticatedFetch(`https://api.ehb-match.me/studenten/${studentId}/skills`).then(r => r.ok ? r.json() : []),
+    authenticatedFetch(`https://api.ehb-match.me/studenten/${studentId}/functies`).then(r => r.ok ? r.json() : [])
   ]);
   return {
-    skills: skillsResp.map((s) => s.naam),
-    functies: functiesResp.map((f) => f.naam),
+    skills: skillsResp.map(s => s.naam),
+    functies: functiesResp.map(f => f.naam),
   };
 }
