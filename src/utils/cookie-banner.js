@@ -9,6 +9,7 @@ export function showCookieBanner() {
     cookieBanner.id = 'cookie-banner';
     cookieBanner.setAttribute('role', 'dialog');
     cookieBanner.setAttribute('aria-modal', 'false');
+    cookieBanner.setAttribute('aria-label', 'Cookie toestemming banner');
     cookieBanner.style.cssText = `
       position: fixed;
       bottom: 1.2rem;
