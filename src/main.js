@@ -110,7 +110,7 @@ window.addEventListener('popstate', setupFooterLinks);
 document.addEventListener('DOMContentLoaded', setupFooterLinks);
 
 // Show cookie banner on every page load unless accepted
-showCookieBanner();
+document.addEventListener('DOMContentLoaded', showCookieBanner);
 
 if (
   window.location.protocol === 'http:' &&
