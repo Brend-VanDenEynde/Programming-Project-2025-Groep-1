@@ -1,4 +1,5 @@
 import Router from '../router.js';
+import { showCookieBanner } from '../utils/cookie-banner.js';
 import ehbLogo from '/images/EhB-logo-transparant.png';
 
 export function renderHome(rootElement) {
@@ -66,3 +67,5 @@ export function renderHome(rootElement) {
     });
   }
 }
+
+showCookieBanner();
