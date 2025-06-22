@@ -29,6 +29,8 @@ import { renderBedrijfSpeeddatesRequests } from './pages/bedrijf/bedrijf-speedda
 import { renderSearchCriteriaBedrijf } from './pages/bedrijf/search-criteria-bedrijf.js';
 import { renderStudenten } from './pages/bedrijf/studenten.js';
 
+import { showCookieBanner } from './utils/cookie-banner.js';
+
 function renderNotFound(rootElement) {
   rootElement.innerHTML = `
     <div class="not-found-container">
@@ -106,6 +108,9 @@ function setupFooterLinks() {
 // Hook in op elke route change
 window.addEventListener('popstate', setupFooterLinks);
 document.addEventListener('DOMContentLoaded', setupFooterLinks);
+
+// Show cookie banner on every page load unless accepted
+showCookieBanner();
 
 if (
   window.location.protocol === 'http:' &&
