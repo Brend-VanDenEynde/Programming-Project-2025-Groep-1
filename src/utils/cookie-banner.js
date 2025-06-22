@@ -7,6 +7,8 @@ export function showCookieBanner() {
     if (document.getElementById('cookie-banner')) return;
     const cookieBanner = document.createElement('div');
     cookieBanner.id = 'cookie-banner';
+    cookieBanner.setAttribute('role', 'dialog');
+    cookieBanner.setAttribute('aria-modal', 'false');
     cookieBanner.style.cssText = `
       position: fixed;
       bottom: 1.2rem;
