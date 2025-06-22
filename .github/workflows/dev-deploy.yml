@@ -19,11 +19,9 @@ jobs:
           node-version: '22'  # or your version
 
       - name: Install dependencies
-        working-directory: ./career-launch
         run: npm ci  # faster & more reproducible than install
 
       - name: Build the site
-        working-directory: ./career-launch
         run: npm run build
 
       - name: Set up SSH
@@ -35,6 +33,5 @@ jobs:
         run: ssh-keyscan ehb-match.me >> ~/.ssh/known_hosts
 
       - name: Deploy via rsync
-        working-directory: ./career-launch
         run: |
           rsync -avz --delete -e "ssh -v" ./dist/ dev-deploy-ehb-match@ehb-match.me:/var/www/dev.ehb-match.me

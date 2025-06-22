@@ -1,13 +1,14 @@
 {
-  "name": "programming-project-2025-groep-1",
+  "name": "EhB-Match",
+  "private": true,
   "version": "1.0.0",
-  "description": "Project for checking import case sensitivity",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
-    "check-imports": "node check-import-casing.js career-launch/src",
-    "check-imports-all": "node check-import-casing.js src"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "engines": {
-    "node": ">=14.0.0"
+  "devDependencies": {
+    "vite": "^6.3.5"
   }
 }
